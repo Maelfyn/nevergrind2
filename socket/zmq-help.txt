@@ -1,0 +1,58 @@
+SETTING UP COMPOSER, RATCHET, ZMQ
+
+SET PHP PATH
+Get PHP environment variable path working
+
+Run php -v
+
+SETUP COMPOSER
+https://getcomposer.org/download/
+Run the Windows INSTALLER!
+
+Follow install instructions
+
+{
+    "autoload": {
+        "psr-0": {
+            "MyApp": "src"
+        }
+    },
+    "require": {
+        "cboden/ratchet": "0.3.*",
+		"react/zmq": "0.3.0"
+    }
+}
+
+composer update 
+
+
+http://socketo.me/docs/install
+FOLLOW INSTRUCTIONS FROM SITE
+
+http://zeromq.org/area:download
+http://zeromq.org/bindings:php
+
+http://pecl.php.net/package/zmq/1.1.2/windows
+DOWNLOAD x86 threadsafe version use PHP 5.6 - PHP 7 didn't work!
+xampp/php: libzmq.dll 
+xampp/php/ext: php_zmq.dll
+
+https://stackoverflow.com/questions/16979793/php-ratchet-websocket-ssl-connect
+
+
+SERVER/CONFIG STUFF:
+
+apache/conf/httpd.conf:
+
+LoadModule proxy_module modules/mod_proxy.so
+LoadModule proxy_wstunnel_module modules/mod_proxy_wstunnel.so
+ProxyPass /wss2/ ws://localhost:8080/
+
+php.ini:
+
+extension=php_zmq.dll
+
+Make a pusherd.bat in /xampp folder that runs:
+
+php d:/xampp/htdocs/socket/bin/push-server.php
+
