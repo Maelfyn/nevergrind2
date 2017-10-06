@@ -11,9 +11,9 @@ var audio = {
 			if (bg){
 				// music
 				if (g.config.audio.musicVolume){
-					DOM.bgmusic.pause();
-					DOM.bgmusic.src = "music/" + foo + ".mp3";
-					DOM.bgmusic.volume = g.config.audio.musicVolume / 100;
+					dom.bgmusic.pause();
+					dom.bgmusic.src = "music/" + foo + ".mp3";
+					dom.bgmusic.volume = g.config.audio.musicVolume / 100;
 				}
 			} else {
 				// sfx
@@ -39,7 +39,7 @@ var audio = {
 			// start playing music
 			audio.musicStart();
 		}
-		DOM.bgmusic.volume = val / 100;
+		dom.bgmusic.volume = val / 100;
 		g.config.audio.musicVolume = val;
 		audio.save();
 	},
@@ -48,35 +48,37 @@ var audio = {
 		audio.save();
 	},
 	pause: function(){
-		DOM.bgmusic.pause();
+		dom.bgmusic.pause();
 	},
 	gameMusicInit: function(){
 		if (g.config.audio.musicVolume){
 			audio.pause();
-			DOM.bgmusic.loop = false;
+			dom.bgmusic.loop = false;
 			audio.gameMusicPlayNext();
 		}
 	},
 	// rotating music tracks in game
 	trackIndex: ~~(Math.random() * 8),
 	tracks: [
-		'BehindTheShield',
-		'DeceptionPoint',
-		'HeroicReturn',
-		'HeartOfChampions',
-		'LeadingTheCharge',
-		'RiseAgainstTheMachine',
-		'TheAssault',
-		'WithGreatPower'
+		'ArcLight',
+		'Blackmoor Colossus',
+		'Blackmoor Tides',
+		'Dark Descent',
+		'Heroic Demise',
+		"Ireland's Coast",
+		'Salt Marsh Birds',
+		'Snowland Loop',
+		'soliliquoy',
+		'The Dark Amulet'
 	],
 	gameMusicPlayNext: function(){
 		// FIX IT SO IT USES BGAUDIO
 		audio.totalTracks = audio.tracks.length;
 		var nowPlaying = audio.tracks[++audio.trackIndex % audio.totalTracks];
-		DOM.bgmusic.pause();
-		DOM.bgmusic.src = "music/" + nowPlaying +".mp3";
-		DOM.bgmusic.volume = g.config.audio.musicVolume / 100;
-		DOM.bgmusic.onended = function(){
+		dom.bgmusic.pause();
+		dom.bgmusic.src = "music/" + nowPlaying +".mp3";
+		dom.bgmusic.volume = g.config.audio.musicVolume / 100;
+		dom.bgmusic.onended = function(){
 			audio.gameMusicPlayNext();
 		}
 	},
@@ -88,22 +90,15 @@ var audio = {
 			vol: 0,
 			ease: Linear.easeNone,
 			onUpdate: function(){
-				DOM.bgmusic.volume = x.vol;
+				dom.bgmusic.volume = x.vol;
 			}
 		});
-	},
-	move: function(){
-		audio.play('march' + ~~(Math.random()*3));
-	},
-	deploy: function(){
-		audio.play('deploy' + ~~(Math.random()*3));
 	},
 	cache: {},
 	load: {
 		title: function(){
 			var x = [
-				'click', 
-				'beep'
+				'bash'
 			];
 			for (var i=0, len=x.length; i<len; i++){
 				var z = x[i];
@@ -112,35 +107,7 @@ var audio = {
 		},
 		game: function(){
 			var x = [
-				'machine0',
-				'machine1',
-				'machine2',
-				'machine3',
-				'machine4',
-				'machine5',
-				'machine6',
-				'machine7',
-				'machine8',
-				'machine9',
-				'march0',
-				'march1',
-				'march2',
-				'deploy0',
-				'deploy1',
-				'deploy2',
-				'chat', 
-				'hup2', 
-				'cheer3',
-				'culture',
-				'error',
-				'build',
-				'grenade5',
-				'grenade6',
-				'grenade8',
-				'missile7',
-				'bomb9',
-				'warning',
-				'research'
+				'bash'
 			];
 			for (var i=0, len=x.length; i<len; i++){
 				var z = x[i];
@@ -150,7 +117,7 @@ var audio = {
 	},
 	musicStart: function(){
 		if (g.view !== 'game'){
-			audio.play("ReturnOfTheFallen", 1);
+			audio.play("ArcLight", 1);
 			//audio.play("WaitingBetweenWorlds", 1);
 		} else {
 			audio.gameMusicPlayNext();
@@ -193,21 +160,24 @@ audio.init = (function(){
 			}
 		}).slider('setValue', g.config.audio.musicVolume);
 	}
-	$("#soundSlider").slider({
-		min  : 0, 
-		max  : 100, 
-		value: g.config.audio.soundVolume, 
-		tooltip_position: 'bottom',
-		formatter: function(value) {
-			if (initComplete){
-				audio.setSoundVolume(value);
-				return value;
-			} else {
-				return g.config.audio.soundVolume
+	var e = $("#musicSlider");
+	if (e.length){
+		$("#soundSlider").slider({
+			min  : 0, 
+			max  : 100, 
+			value: g.config.audio.soundVolume, 
+			tooltip_position: 'bottom',
+			formatter: function(value) {
+				if (initComplete){
+					audio.setSoundVolume(value);
+					return value;
+				} else {
+					return g.config.audio.soundVolume
+				}
 			}
-		}
-	}).on('slideStop', function(val){
-		audio.play('machine0');
-	}).slider('setValue', g.config.audio.soundVolume);
+		}).on('slideStop', function(val){
+			audio.play('machine0');
+		}).slider('setValue', g.config.audio.soundVolume);
+	}
 	initComplete = true;
 })();

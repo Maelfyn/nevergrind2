@@ -8,11 +8,11 @@ var events = {
 			}
 		});
 		$(window).on('resize orientationchange focus', function() {
-			resizeWindow();
+			env.resizeWindow();
 		}).on('load', function(){
-			resizeWindow();
+			env.resizeWindow();
 			// background map
-			if (isMobile){
+			if (init.isMobile){
 				document.getElementById('worldTitle').style.display = 'none';
 				TweenMax.set('#worldTitle', {
 					xPercent: -50,
@@ -37,7 +37,7 @@ var events = {
 		});
 	})(),
 	title: (function(){
-		$("#mainWrap").on(ui.click, '.titlePlayerAccount, .lobbyAccountName', function(){
+		$("#mainWrap").on(env.click, '.titlePlayerAccount, .lobbyAccountName', function(){
 			title.who('/who '+ $(this).text());
 		});
 		$("#gameView").on('dragstart', 'img', function(e) {
@@ -47,11 +47,11 @@ var events = {
 			event.preventDefault();
 		});
 
-		$("#logout").on(ui.click, function() {
+		$("#logout").on(env.click, function() {
 			playerLogout();
 			return false;
 		});
-		$("#login").on(ui.click, function(){
+		$("#login").on(env.click, function(){
 			socket.removePlayer(my.account);
 			$.ajax({
 				type: 'GET',
@@ -59,7 +59,7 @@ var events = {
 			});
 		});
 
-		$("#titleMenu").on(ui.click, '.wars', function(){
+		$("#titleMenu").on(env.click, '.wars', function(){
 			var gameName = $(this).data("name");
 			$("#joinGame").val(gameName);
 			$("#joinGamePassword").val('');
@@ -110,30 +110,30 @@ var events = {
 			g.speed = speed;
 			$("#createGameSpeed").text(speed);
 		}
-		$('#mainWrap').on(ui.click, '.chat-join', function(){
+		$('#mainWrap').on(env.click, '.chat-join', function(){
 			socket.setChannel($(this).text());
 		});
-		$('#create').on(ui.click, function(){
+		$('#create').on(env.click, function(){
 			openCreateGameModal('ffa');
 		});
-		$('#createRankedBtn').on(ui.click, function(){
+		$('#createRankedBtn').on(env.click, function(){
 			openCreateGameModal('ranked');
 		});
-		$("#createTeamBtn").on(ui.click, function(){
+		$("#createTeamBtn").on(env.click, function(){
 			openCreateGameModal('team');
 		});
 
-		$("#createGame").on(ui.click, function(){
+		$("#createGame").on(env.click, function(){
 			title.createGame();
 		});
-		$("#play-now-btn").on(ui.click, function(){
+		$("#play-now-btn").on(env.click, function(){
 			title.createGameService(my.account +'_'+ ~~(Math.random()*999999), '', 'Earth Omega', 8, 0, 0, 20);
 			setTimeout(function(){
 				lobby.addCpuPlayer();
 			}, 500);
 			
 		});
-		$("body").on(ui.click, '#options', function(){
+		$("body").on(env.click, '#options', function(){
 			TweenMax.to(document.getElementById("optionsModal"), g.modalSpeed, {
 				startAt: {
 					visibility: 'visible',
@@ -144,7 +144,7 @@ var events = {
 				alpha: 1
 			});
 			title.showBackdrop();
-		}).on(ui.click, '#hotkeys', function(){
+		}).on(env.click, '#hotkeys', function(){
 			TweenMax.to(document.getElementById("hotkeysModal"), g.modalSpeed, {
 				startAt: {
 					visibility: 'visible',
@@ -155,71 +155,71 @@ var events = {
 				alpha: 1
 			});
 			title.showBackdrop();
-		}).on(ui.click, '#resync', function(){
+		}).on(env.click, '#resync', function(){
 			window.onbeforeunload = null;
 			localStorage.setItem('resync', 1);
 			location.reload();
 		});
-		$("#hotkeysDone, #optionsDone, #cancelCreateGame").on(ui.click, function(){
+		$("#hotkeysDone, #optionsDone, #cancelCreateGame").on(env.click, function(){
 			title.closeModal();
 		});
 
 
 		// cached values on client to reduce DB load
 
-		$("#joinPrivateGameModal").on(ui.click, "#joinPrivateGameBtn", function(){
+		$("#joinPrivateGameModal").on(env.click, "#joinPrivateGameBtn", function(){
 			title.joinGame();
 		});
 
 		// events for title-chat buttons
-		$("#refresh-game-button").on(ui.click, function(){
+		$("#refresh-game-button").on(env.click, function(){
 			title.refreshGames();
 			$("#title-chat-input").focus();
 		});
-		$("#titleChatPlayers").on(ui.click, '#friend-status', function(){
+		$("#titleChatPlayers").on(env.click, '#friend-status', function(){
 			title.listFriends();
 			$("#title-chat-input").focus();
 		});
-		$("#get-help").on(ui.click, function(){
+		$("#get-help").on(env.click, function(){
 			title.help();
 			$("#title-chat-input").focus();
 		});
-		$("#ignore-user").on(ui.click, function(){
+		$("#ignore-user").on(env.click, function(){
 			$("#title-chat-input").val('/ignore ').focus();
 		});
-		$("#share-url").on(ui.click, function(){
+		$("#share-url").on(env.click, function(){
 			$("#title-chat-input").val('/url ').focus();
 		});
-		$("#share-image").on(ui.click, function(){
+		$("#share-image").on(env.click, function(){
 			$("#title-chat-input").val('/img ').focus();
 		});
-		$("#share-video").on(ui.click, function(){
+		$("#share-video").on(env.click, function(){
 			$("#title-chat-input").val('/video ').focus();
 		});
-		$("#who-account").on(ui.click, function(){
+		$("#who-account").on(env.click, function(){
 			$("#title-chat-input").val('/who ').focus();
 		});
-		$("#add-friend").on(ui.click, function(){
+		$("#add-friend").on(env.click, function(){
 			$("#title-chat-input").val('/friend ').focus();
 		});
-		$("#whisper-account").on(ui.click, function(){
+		$("#whisper-account").on(env.click, function(){
 			$("#title-chat-input").val('@').focus();
 		});
-		$("#change-channel").on(ui.click, function(){
+		$("#change-channel").on(env.click, function(){
 			$("#title-chat-input").val('#').focus();
 		});
 		
-		$("#body").on(ui.click, "#cancelGame", function(){
+		$("#body").on(env.click, "#cancelGame", function(){
 			exitGame();
-		}).on(ui.click, "#startGame", function(){
+		}).on(env.click, "#startGame", function(){
 			lobby.startGame();
-		}).on(ui.click, '.addFriend', function(){
+		}).on(env.click, '.addFriend', function(){
 			title.toggleFriend($(this).data('account'));
-		}).on(ui.click, '.ribbon', function(){
+		}).on(env.click, '.ribbon', function(){
 			var x = $(this).data('ribbon') * 1;
 			g.chat(game.ribbonTitle[x] +": "+ game.ribbonDescription[x], 'chat-warning'); 
 		});
-		$("#toggleNation").on(ui.click, function(){
+		$("#toggleNation").on(env.click, function(){
 			$.ajax({
 				url: 'php/loadAvatar.php',
 			}).done(function(data){
@@ -236,7 +236,7 @@ var events = {
 			});
 			title.showBackdrop();
 		});
-		$("#joinPrivateGameBtn").on(ui.click, function(){
+		$("#joinPrivateGameBtn").on(env.click, function(){
 			var e = $("#joinGame");
 			e.val('');
 			TweenMax.to('#joinPrivateGameModal', g.modalSpeed, {
@@ -253,7 +253,7 @@ var events = {
 			});
 			title.showBackdrop();
 		});
-		$("#mainWrap").on(ui.click, ".unlockGameBtn", function(){ 
+		$("#mainWrap").on(env.click, ".unlockGameBtn", function(){ 
 			title.closeModal();
 			TweenMax.to('#unlockGame', g.modalSpeed, {
 				startAt: {
@@ -269,7 +269,7 @@ var events = {
 			}, 100);
 			title.showBackdrop();
 		});
-		$("#leaderboardBtn").on(ui.click, function(){
+		$("#leaderboardBtn").on(env.click, function(){
 			TweenMax.to(document.getElementById('leaderboard'), g.modalSpeed, {
 				startAt: {
 					visibility: 'visible',
@@ -283,29 +283,29 @@ var events = {
 			title.getLeaderboard('FFA');
 		});
 		// leaderboard buttons
-		$("#leaderboardFFABtn").on(ui.click, function(){
+		$("#leaderboardFFABtn").on(env.click, function(){
 			title.getLeaderboard('FFA');
 		});
-		$("#leaderboardRankedBtn").on(ui.click, function(){
+		$("#leaderboardRankedBtn").on(env.click, function(){
 			title.getLeaderboard('Ranked');
 		});
-		$("#leaderboard-trips-btn").on(ui.click, function(){
+		$("#leaderboard-trips-btn").on(env.click, function(){
 			title.getLeaderboard('Trips');
 		});
-		$("#leaderboard-quads-btn").on(ui.click, function(){
+		$("#leaderboard-quads-btn").on(env.click, function(){
 			title.getLeaderboard('Quads');
 		});
-		$("#leaderboard-pents-btn").on(ui.click, function(){
+		$("#leaderboard-pents-btn").on(env.click, function(){
 			title.getLeaderboard('Pents');
 		});
-		$("#leaderboardTeamBtn").on(ui.click, function(){
+		$("#leaderboardTeamBtn").on(env.click, function(){
 			title.getLeaderboard('Team');
 		});
-		$("#endTurn").on(ui.click, function(){
+		$("#endTurn").on(env.click, function(){
 			action.endTurn();
 		});
 
-		$("#flagDropdown").on(ui.click, '.flagSelect', function(e){
+		$("#flagDropdown").on(env.click, '.flagSelect', function(e){
 			my.selectedFlag = $(this).text();
 			my.selectedFlagFull = my.selectedFlag === "Nepal" ? my.selectedFlag+".png" : my.selectedFlag+".jpg";
 			$(".flagPurchaseStatus").css("display", "none");
@@ -326,7 +326,7 @@ var events = {
 				});
 				Msg("Your nation's flag is now: " + my.selectedFlag);
 				document.getElementById('selectedFlag').textContent = my.selectedFlag;
-				if (!isMobile){
+				if (!init.isMobile){
 					$("[title]")
 						.tooltip('fixTitle')
 						.tooltip({
@@ -359,30 +359,30 @@ var events = {
 		$("#refreshGameWrap").on("blur", "#gameName", function(){
 			g.focusGameName = false;
 		});
-		$("#titleViewBackdrop").on(ui.click, function(){
+		$("#titleViewBackdrop").on(env.click, function(){
 			title.closeModal();
 		});
-		$("#mainWrap").on(ui.click, '#unlockGameDone, #configureNationDone, #leaderboardDone', function(){
+		$("#mainWrap").on(env.click, '#unlockGameDone, #configureNationDone, #leaderboardDone', function(){
 			audio.play('click');
 			title.closeModal();
 		});
 		/*
-		$("#autoJoinGame").on(ui.click, function(){
+		$("#autoJoinGame").on(env.click, function(){
 			$("#joinGame").val('');
 			audio.play('click');
 			$("#joinGamePassword").val();
-			$(".wars-FFA").filter(":first").trigger(ui.click); 
+			$(".wars-FFA").filter(":first").trigger(env.click); 
 			if (!$("#joinGame").val()){
 				Msg("No FFA games found!", 1.5);
 			} else {
 				title.joinGame();
 			}
 		});
-		$("#joinTeamGame").on(ui.click, function(){
+		$("#joinTeamGame").on(env.click, function(){
 			$("#joinGame").val('');
 			audio.play('click');
 			$("#joinGamePassword").val();
-			$(".wars-Team").filter(":first").trigger(ui.click); 
+			$(".wars-Team").filter(":first").trigger(env.click); 
 			if (!$("#joinGame").val()){
 				Msg("No team games found!", 1.5);
 			} else {
@@ -390,14 +390,14 @@ var events = {
 			}
 		});
 		*/
-		$("#overlay").on(ui.click, function(){
+		$("#overlay").on(env.click, function(){
 			g.searchingGame = false;
-			TweenMax.set(DOM.Msg, {
+			TweenMax.set(dom.Msg, {
 				opacity: 0
 			});
 			g.unlock();
 		});
-		$("#joinRankedGame").on(ui.click, function(){
+		$("#joinRankedGame").on(env.click, function(){
 			audio.play('click');
 			g.lock();
 			g.searchingGame = true;
@@ -414,7 +414,7 @@ var events = {
 						url: 'php/joinRankedGame.php'
 					}).done(function(data){
 						if (g.searchingGame){
-							TweenMax.set(DOM.Msg, {
+							TweenMax.set(dom.Msg, {
 								opacity: 0
 							});
 							g.joinedGame = 1;
@@ -434,10 +434,10 @@ var events = {
 		});
 	})(),
 	lobby: (function(){
-		$("#chat-input-open").on(ui.click, function(){
+		$("#chat-input-open").on(env.click, function(){
 			toggleChatMode();
 		});
-		$("#chat-input-send").on(ui.click, function(){
+		$("#chat-input-send").on(env.click, function(){
 			toggleChatMode(true);
 		});
 		$("#lobby-chat-input").on('focus', function(){
@@ -445,7 +445,7 @@ var events = {
 		}).on('blur', function(){
 			lobby.chatOn = false;
 		});
-		$("#lobbyChatSend").on(ui.click, function(){
+		$("#lobbyChatSend").on(env.click, function(){
 			lobby.sendMsg(true);
 		});
 		// prevents auto scroll while scrolling
@@ -454,7 +454,7 @@ var events = {
 		}).on('mouseup', function(){
 			lobby.chatDrag = false;
 		});
-		$("#joinGameLobby").on(ui.click, '.governmentChoice', function(e){
+		$("#joinGameLobby").on(env.click, '.governmentChoice', function(e){
 			// changes player's own government only
 			var government = $(this).text();
 			lobby.updateGovernmentWindow(government);
@@ -464,7 +464,7 @@ var events = {
 					government: government
 				}
 			});
-		}).on(ui.click, '.cpu-choice', function(e){
+		}).on(env.click, '.cpu-choice', function(e){
 			var difficulty = $(this).text();
 			$.ajax({
 				url: "php/change-cpu-difficulty.php",
@@ -473,7 +473,7 @@ var events = {
 					player: $(this).data('player')
 				}
 			});
-		}).on(ui.click, '.playerColorChoice', function(e){
+		}).on(env.click, '.playerColorChoice', function(e){
 			var playerColor = $(this).data('playercolor');
 			$.ajax({
 				url: 'php/changePlayerColor.php',
@@ -485,7 +485,7 @@ var events = {
 			}).fail(function(data){
 				Msg(data.statusText, 1.5);
 			});
-		}).on(ui.click, '.teamChoice', function(e){
+		}).on(env.click, '.teamChoice', function(e){
 			var team = $(this).text().slice(5),
 				player = $(this).data('player');
 			console.info("TEAM: ", team, player);
@@ -499,11 +499,11 @@ var events = {
 				my.team = data.team;
 			});
 			
-		}).on(ui.click, '#cpu-add-player', function(e){
+		}).on(env.click, '#cpu-add-player', function(e){
 			//console.info("Adding player");
 			audio.play('click');
 			lobby.addCpuPlayer();
-		}).on(ui.click, '#cpu-remove-player', function(e){
+		}).on(env.click, '#cpu-remove-player', function(e){
 			//console.info("Removing player");
 			audio.play('click');
 			$.ajax({
@@ -512,7 +512,7 @@ var events = {
 		});
 	})(),
 	map: (function(){
-		if (!isFirefox){
+		if (!env.isFirefox){
 			$("body").on("mousewheel", function(e){
 				if (g.view === 'game'){
 					setMousePosition(e.offsetX, e.offsetY);
@@ -537,17 +537,17 @@ var events = {
 		}
 
 		$("#worldWrap").on("mousemove", function(e){
-			if (isFirefox){
+			if (env.isFirefox){
 				setMousePosition(e.originalEvent.layerX, e.originalEvent.layerY);
 			} else {
 				setMousePosition(e.offsetX, e.offsetY);
 				//console.info(e.offsetX, e.offsetY);
 			}
 		});
-		$("#resources-ui").on(ui.click, '#surrender', function(e){
+		$("#resources-ui").on(env.click, '#surrender', function(e){
 			surrenderMenu(); 
 		});
-		$("#createGameWrap").on(ui.click, '.mapSelect', function(e){
+		$("#createGameWrap").on(env.click, '.mapSelect', function(e){
 			var x = $(this).text();
 			var key = x.replace(/ /g,'');
 			g.map.name = x;
@@ -562,10 +562,10 @@ var events = {
 			}
 			e.preventDefault();
 		});
-		$("#mainWrap").on(ui.click, '.gameSelect', function(e){
+		$("#mainWrap").on(env.click, '.gameSelect', function(e){
 			e.preventDefault();
 		});
-		$("#mainWrap").on(ui.click, '.speedSelect', function(e){
+		$("#mainWrap").on(env.click, '.speedSelect', function(e){
 			var x = $(this).text()*1;
 			g.speed = x;
 			$("#createGameSpeed").text(x);
@@ -591,11 +591,11 @@ var events = {
 		});
 	})(),
 	game: (function(){
-		$("#cancelSurrenderButton").on(ui.click, function(){
+		$("#cancelSurrenderButton").on(env.click, function(){
 			audio.play('click');
 			document.getElementById('surrenderScreen').style.display = 'none';
 		});
-		$("#surrenderButton").on(ui.click, function(){
+		$("#surrenderButton").on(env.click, function(){
 			surrender();
 		});
 	})()
@@ -681,7 +681,7 @@ $(document).on('keydown', function(e){
 				my.attackOn = false;
 				my.attackName = '';
 				my.clearHud();
-				ui.showTarget(DOM['land' + my.tgt]); 
+				env.showTarget(DOM['land' + my.tgt]); 
 				//console.clear();
 			} else if (x === 65){
 				// a

@@ -1,0 +1,41 @@
+HP
+ATK: str, 
+DEF:
+
+HERO PROPS:
+my = {
+	name: '',
+	lastName: '',
+	gender: '',
+	job: '',
+	race: '',
+	level: 0,
+	exp: 0,
+	hp: 0,
+	maxHp: 0,
+	mp: 0,
+	maxMp: 0,
+	str: 0, // (phy dam, 10 str == +1% phy dam)
+	sta: 0, // (hp)
+	agi: 0, // (armor)
+	dex: 0, // (all hit %, proc, crit %?)
+	wis: 0, // (mag heal)
+	intel: 0, // (mag dam, mp)
+	threat: 0,
+	armor: 0, 
+	resistPoison: 0,
+	resistMagic: 0,
+	resistLightning: 0,
+	resistFire: 0,
+	resistCold: 0,
+	gold: 0,
+	zone: 0,
+	playtime: 0,
+	questNormal: 0
+};
+my.keys = Object.keys(my);
+
+item = {
+	
+};
+item.keys = Object.keys(item);
