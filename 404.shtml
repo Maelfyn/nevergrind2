@@ -1,1 +1,63 @@
-404 oh no that's bad
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Nevergrind | 404 Error</title>
+	<link rel='stylesheet' type='text/css' href="/css/global.css">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<?php
+		include($_SERVER['DOCUMENT_ROOT'] . "/includes/head.html");
+	?>
+	<style>
+		body {
+			position: relative;
+			width: 100%;
+			height: auto;
+			top: 0;
+			left: 0;
+			right: 0;
+			margin: 0 auto;
+			max-width: 1920px;
+		}
+		#ng-bg{
+			min-height: 1080px;
+		}
+		#main-wrap{
+			position: absolute;
+			top: 20px;
+			left: 0;
+			width: 100%;
+			color: #fff;
+			font-size: 24px;
+			padding: 12px 0;
+			text-align: center;
+			background: rgba(0,0,0,.9);
+		}
+	</style>
+</head>
+
+<body>
+	<img id="ng-bg" src="/images/bg/ng2-bg.jpg" title="Nevergrind Background">
+	<div id="main-wrap">
+		<h1>Server Error 404</h1>
+		<p>File not found. The requested resource could not be found but may be available in the future.</p>
+		<div>
+			<a href="/">Play Nevergrind</a>
+		</div>
+		<div>
+			<a href="/games/firmament-wars">Play Firmament Wars</a>
+		</div>
+		<div>
+			<a href="/blog">Nevergrind Blog</a>
+		</div>
+		<div>
+			<a href="/wiki">Nevergrind Wiki</a>
+		</div>
+		<div>
+			<a href="/nevergrounds">Nevergrounds</a>
+		</div>
+		<div>
+			<a href="https://discord.gg/n2gp8rC">Neverworks Discord</a>
+		</div>
+	</div>
+</body>
+</html>

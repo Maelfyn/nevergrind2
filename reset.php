@@ -1,6 +1,6 @@
 <?php
 	session_start();
-	if(php_uname('n')=="JOE-PC"){
+	if($_SERVER["SERVER_NAME"] === "localhost"){
 		error_reporting(E_ALL);
 		ini_set('display_errors', true);
 	}
@@ -17,23 +17,43 @@
 <head>
 	<title>Nevergrind | Password Reset</title>
 	<link rel='stylesheet' type='text/css' href="/css/global.css">
-	<meta name="viewport" content="width=1280,user-scalable=no">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<?php
 		include($_SERVER['DOCUMENT_ROOT'] . "/includes/head.html");
 	?>
 	<style>
+		body{
+			position: relative;
+			width: 100%;
+			height: auto;
+			top: 0;
+			left: 0;
+			right: 0;
+			margin: 0 auto;
+			max-width: 1920px;
+		}
+		#message{
+			position: absolute;
+			top: 50px;
+			text-align: center;
+			font-size: 24px;
+			color: #fff;
+			width: 100%;
+			padding: 0;
+			background: rgba(0,0,0,.9);
+		}
 		#currencyIndicator{
 			width: 100%;
 		}
 		#mainBG{
-			width: 1024px;
-			height: 768px;
-			background: url('/backgrounds/sanctum.jpg') -110px 0px;
+			width: 100%;
+			height: 1080px;
+			background: url('/images/bg/ng2-bg.jpg');
 		}
 	</style>
 </head>
 
-<body id="curtain">
+<body>
 	<div id="mainBG">
 		<header id="currencyIndicator" class="strongShadow">
 		<?php
@@ -63,7 +83,7 @@
 				$showReset = true;
 				$checkHash = true;
 				
-				echo '<div class="message blackOutline3">';
+				echo '<div id="message" class=" blackOutline3">';
 				
 				$_SESSION['reset'] = $_GET['reset'];
 				$hash = crypt($_SESSION['reset'], '$2a$07$'.$_SESSION['salt'].'$');

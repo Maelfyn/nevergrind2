@@ -7,7 +7,7 @@
 	}
 	require('php/values.php');
 	
-	if (isset($_SESSION['email'])){
+	if (isset($_SESSION['email']) && isset($_SESSION['account'])){
 		if(strlen($_SESSION['email']) > 0){
 			header("Location: /");
 			exit();
@@ -20,23 +20,46 @@
 <html lang="en">
 <head>
 	<title>Nevergrind | Login & Account Creation</title>
-	<meta name="viewport" content="width=1280,user-scalable=no">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="google-signin-client_id" content="1015425037202-g5ri6qnj14b8vrk33lnu130ver9f43ef.apps.googleusercontent.com">
 	<link rel='stylesheet' type='text/css' href="/css/global.css">
 	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
 	<?php
 		include($_SERVER['DOCUMENT_ROOT'] . "/includes/head.html");
 	?>
 	<style>
-		#curtain{
-			visibility: hidden;
+		body{
+			position: relative;
+			width: 100%;
+			height: auto;
+			top: 0;
+			left: 0;
+			right: 0;
+			margin: 0 auto;
+			max-width: 1920px;
+		}
+	.fancy-hr {
+		border: 0;
+		height: 1px;
+		margin: 8px 0;
+		background-image: -webkit-linear-gradient(left, rgba(16, 64, 176, .4), rgba(32, 128, 232, 1), rgba(16, 64, 176, .4));
+		background-image: -moz-linear-gradient(left, rgba(16, 64, 176, .4), rgba(32, 128, 232, 1), rgba(16, 64, 176, .4));
+		background-image: -ms-linear-gradient(left, rgba(16, 64, 176, .4), rgba(32, 128, 232, 1), rgba(16, 64, 176, .4));
+		background-image: -o-linear-gradient(left, rgba(16, 64, 176, .4), rgba(32, 128, 232, 1), rgba(16, 64, 176, .4))
+	}
+		.abcRioButton{
+			margin: 5px auto;
+		}
+		#divider{
+			margin: 8px 0;
 		}
 		#currencyIndicator{
 			width: 100%;
 		}
 		#mainBG{
-			width: 1024px;
-			height: 768px;
-			background: url('/backgrounds/sanctum.jpg') -110px 0px;
+			width: 100%;
+			height: 1080px;
+			background: url('/images/bg/ng2-bg.jpg');
 		}
 		label{
 			font-weight: normal;
@@ -70,7 +93,8 @@
 			top: 2px;
 		}
 		#loginWrap{
-			bottom: 30%;
+			top: 100px;
+			bottom: auto;
 			padding: 10px 0;
 			border-radius: 6px;
 			border: 2px ridge #337ab7;
@@ -80,7 +104,7 @@
 	</style>
 </head>
 
-<body id="curtain">
+<body id="body">
 	<div id="mainBG">
 		<header id="currencyIndicator" class="strongShadow">
 		<?php
@@ -121,8 +145,17 @@
 							<input type="checkbox" id="rememberMe" name="rememberMe" checked> Remember Me
 						</label>
 						
-						<input id="login" type="submit" value="Login" class="btn btn-primary strongShadow" />
-						 
+						<input id="login" type="submit" value="Login" class="btn btn-primary strongShadow" />';
+						
+						echo '
+						<hr class="fancy-hr">
+						<div id="divider">Or Authenticate Using Google</div>
+						<div id="google-wrap">
+							<span id="my-signin2"></span>
+						</div>';
+						
+						echo'
+						<hr class="fancy-hr">
 						<div id="forgotPasswordWrap">
 							<span title="Neverworks Games will send you an email. Click the link to reset your password." id="forgotPassword">Forgot Password?</span>
 						</div>
@@ -134,7 +167,52 @@
 	</div>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"></script>
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+	<script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>
 	<script>
+	
+	function onSuccess(googleUser) {
+		var token = googleUser.getAuthResponse().id_token;
+		var user = googleUser.getBasicProfile();
+		
+		if (token){
+			authenticationLock = true;
+			
+			$.ajax({
+				type: 'POST',
+				data: {
+					run: "authenticate",
+					googleToken: token
+				}
+			}).done(function(data){
+				if (data === 'Account created!' ||
+					data === 'Create an account name!'){
+					// redirect to 
+					location.replace('/setAccount.php' + $("#refer").attr("href"));
+				} else {
+					gotoRefer(data);
+				}
+			}).fail(function() {
+				QMsg("Google credentials could not be verified!");
+			}).always(function(){
+				authenticationLock = false;
+			});
+		}
+	}
+	function onFailure(error) {
+	  console.log('error: ', error);
+	}
+	function renderButton() {
+		gapi.signin2.render('my-signin2', {
+			scope: 'profile email openid',
+			width: 176,
+			height: 40,
+			longtitle: false,
+			theme: 'dark',
+			onsuccess: onSuccess,
+			onfailure: onFailure
+		});
+	}
+	
 	$.ajaxSetup({
 		type: 'POST',
 		url: '/php/master1.php'
@@ -236,11 +314,11 @@
 		}).done(function(data){
 			gotoRefer(data, true);
 		}).always(function(){
-			document.getElementById('curtain').style.visibility = 'visible';
+			document.getElementById('body').style.visibility = 'visible';
 		});
 	}
 	function gotoRefer(data, suppress){
-		var target = "https://" + location.host + $("#refer").attr("href");
+		var target = "//" + location.host + $("#refer").attr("href");
 		if (data === "Login successful!"){
 			location.replace(target);
 		} else {
@@ -251,9 +329,9 @@
 	}
 	
 	(function(){
-		var e = document.getElementById('curtain');
 		email = localStorage.getItem('email');
 		token = localStorage.getItem('token');
+		
 		if (email){
 			// attempt persistent login
 			$("#loginEmail").val(email);
@@ -270,12 +348,13 @@
 				}).done(function(data){
 					token = data;
 				}).always(function(){
-					document.getElementById('curtain').style.visibility = 'visible';
+					document.getElementById('body').style.visibility = 'visible';
 				});
 			}
 		} else {
+			
 			$("#loginEmail").focus();
-			document.getElementById('curtain').style.visibility = 'visible';
+			document.getElementById('body').style.visibility = 'visible';
 		}
 	})();
 	</script>

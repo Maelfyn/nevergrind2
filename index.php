@@ -46,13 +46,14 @@
 	<meta name="mobile-web-app-capable" content="yes">
 	<meta name="apple-mobile-web-app-capable" content="yes" />
 	<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no">
+	<meta name="google-signin-client_id" content="1015425037202-g5ri6qnj14b8vrk33lnu130ver9f43ef.apps.googleusercontent.com">
 	<meta name="google-site-verification" content="iC9l4midOGIXERCwagfpkef9ifunV-aZd_zlUUOPjIU" />
 	
 	<link rel="stylesheet" href="css/bootstrap.min.css">
 	<link rel="stylesheet" href="css/bootstrap-slider.min.css">
 	<link rel="stylesheet" href="css/font-awesome.min.css">
 	<link rel="stylesheet" href="css/ng2.css?v=0-0-1">
-	<link rel="shortcut icon" href="/images1/favicon.png">
+	<link rel="shortcut icon" href="/images/favicon.png">
 	
 	<script>
 		var g = {
@@ -420,6 +421,14 @@
 	<div id="msg" class="shadow4"></div>
 </body>
 
+<script>
+	function googleSsoSignIn(){
+		gapi.load('auth2', function() {
+			console.info("Loaded SSO data");
+			gapi.auth2.init();
+		});
+	}
+</script>
 <script src="js/libs/TweenMax.min.js"></script>
 <script src="js/libs/jquery.min.js"></script>
 <script src="js/libs/Draggable.min.js"></script>
@@ -430,13 +439,13 @@
 <script src="js/libs/easelJS.min.js"></script>
 <script src="js/libs/EaselPlugin.min.js"></script>
 <script src="js/libs/autobahn.min.js"></script>
+<script src="//apis.google.com/js/platform.js?onload=googleSsoSignIn" async defer></script>
 <?php
 require $_SERVER['DOCUMENT_ROOT'] . '/includes/ga.php';
 ?>
 <script>
 <?php
-echo '
-	var chat = {};
+echo 'var chat = {};
 	g.guest = '. $_SESSION['guest'] .';
 	// set channel
 	if (location.hash.length > 1){

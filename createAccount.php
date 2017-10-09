@@ -19,20 +19,30 @@
 <html lang="en">
 <head>
 	<title>Nevergrind | Login & Account Creation</title>
-	<meta name="viewport" content="width=1280,user-scalable=no">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel='stylesheet' type='text/css' href="/css/global.css">
 	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
 	<?php
 		include($_SERVER['DOCUMENT_ROOT'] . "/includes/head.html");
 	?>
 	<style>
+		body{
+			position: relative;
+			width: 100%;
+			height: auto;
+			top: 0;
+			left: 0;
+			right: 0;
+			margin: 0 auto;
+			max-width: 1920px;
+		}
 		#currencyIndicator{
 			width: 100%;
 		}
 		#mainBG{
-			width: 1024px;
-			height: 768px;
-			background: url('/backgrounds/sanctum.jpg') -110px 0px;
+			width: 100%;
+			height: 1080px;
+			background: url('/images/bg/ng2-bg.jpg');
 		}
 		#createAccount{
 			color: #fff;
@@ -59,7 +69,7 @@
 			display: block;
 		}
 		#loginWrap{
-			top: 10%;
+			top: 100px;
 			bottom: auto;
 			padding: 10px 0;
 			border-radius: 6px;
@@ -70,7 +80,7 @@
 	</style>
 </head>
 
-<body id="curtain">
+<body id="body">
 	<div id="mainBG">
 		<header id="currencyIndicator" class="strongShadow">
 		<?php
@@ -122,6 +132,7 @@
 	</div><!-- window 2 -->
 	<script src="//cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"></script>
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+	<script src="https://apis.google.com/js/platform.js" async defer></script>
 	<script>
 	$.ajaxSetup({
 		type: 'POST',
