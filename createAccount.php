@@ -74,8 +74,10 @@
 			padding: 10px 0;
 			border-radius: 6px;
 			border: 2px ridge #337ab7;
-			background: rgba(0,0,0,.9);
-			box-shadow: 0 0 4px #000;
+			background: #0a0a1a;
+			box-shadow: 0 0 20px #000,
+				0 0 40px #000,
+				0 0 60px #000;
 		}
 	</style>
 </head>
@@ -112,13 +114,15 @@
 				
 				<label class="signupHeader create-account" for="promoCode">Promo Code
 					<input name="promo" type="text" id="promoCode" class="loginInputs create-account" maxlength="20" placeholder="Promo Code" />
-				</label>
+				</label>';
 				
+				
+				/*
 				<label class="signupHeader create-account" for="referFriend">Referral Account Name
 					<input name="refer" type="text" id="referFriend" class="loginInputs create-account" maxlength="20" placeholder="Referral Account Name" />
 				</label>
-				
-				<div id="tosWrap" class="create-account">
+				*/
+				echo '<div id="tosWrap" class="create-account">
 					<span id="tos" class="aqua">
 						<a target="_blank" href="//nevergrind.com/blog/terms-of-service/">Terms of Service</a> | <a target="_blank" href="//nevergrind.com/blog/privacy-policy/">Privacy Policy</a>
 					</span>
@@ -168,14 +172,16 @@
 		}
 		QMsg("Connecting to server...");
 		createAccountLock = true;
+		/*,
+			referral: $("#referFriend").val().toLowerCase()
+		*/
 		$.ajax({
 			data: {
 				run: "createAccount",
 				email: $("#loginEmail").val().toLowerCase(),
 				account: newAcc.toLowerCase(),
 				password: pw,
-				promo: $("#promoCode").val().toLowerCase(),
-				referral: $("#referFriend").val().toLowerCase()
+				promo: $("#promoCode").val().toLowerCase()
 			}
 		}).done(function(data) {
 			if (data.indexOf("Account Created") === -1){

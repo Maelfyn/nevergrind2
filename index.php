@@ -1,5 +1,4 @@
 <?php
-	error_log("Testing error log! ". microtime(true));
 	$currentPlayers = 0;
 	session_start();
 	if($_SERVER["SERVER_NAME"] === "localhost"){
@@ -35,7 +34,7 @@
 <!DOCTYPE html> 
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head id='head'>
-	<title>Nevergrind 2 | Free Multiplayer Browser RPG</title>
+	<title>Nevergrind Online | Free Multiplayer Browser RPG</title>
 	<meta charset="utf-8">
 	<meta name="keywords" content="realtime, rpg, browser, multiplayer, online, fantasy, html5">
 	<meta name="description" content="A free multiplayer RPG playable in your web browser! Gather your allies, create your hero, and venture forth in this fast-paced action RPG !">
@@ -108,7 +107,7 @@
 				</div>
 				
 				<h1>
-					<div>Nevergrind 2 | Multiplayer Browser RPG</div>
+					<div>Nevergrind Online | Multiplayer Browser RPG</div>
 					<div>
 						a free online game by <a href="https://www.linkedin.com/company/neverworks-games-llc">Neverworks Games</a>
 					</div>

@@ -8,7 +8,7 @@
 	require('php/values.php');
 	$refer = isset($_GET['back']) ? $_GET['back'] : "/";
 	
-	if(!isset($_SESSION['email']) || !strlen($_SESSION['email'])){
+	if(!isset($_SESSION['tempEmail']) || !strlen($_SESSION['tempEmail'])){
 		header("Location: login.php");
 		exit();
 	}

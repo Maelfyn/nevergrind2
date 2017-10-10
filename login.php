@@ -6,15 +6,15 @@
 		ini_set('display_errors', true);
 	}
 	require('php/values.php');
+	$refer = isset($_GET['back']) ? $_GET['back'] : "/";
 	
 	if (isset($_SESSION['email']) && isset($_SESSION['account'])){
 		if(strlen($_SESSION['email']) > 0){
-			header("Location: /");
+			header("Location: ". $refer);
 			exit();
 		}
 	}
 	
-	$refer = isset($_GET['back']) ? $_GET['back'] : "/";
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -98,8 +98,10 @@
 			padding: 10px 0;
 			border-radius: 6px;
 			border: 2px ridge #337ab7;
-			background: rgba(0,0,0,.9);
-			box-shadow: 0 0 4px #000;
+			background: #0a0a1a;
+			box-shadow: 0 0 20px #000,
+				0 0 40px #000,
+				0 0 60px #000;
 		}
 	</style>
 </head>
@@ -145,7 +147,11 @@
 							<input type="checkbox" id="rememberMe" name="rememberMe" checked> Remember Me
 						</label>
 						
-						<input id="login" type="submit" value="Login" class="btn btn-primary strongShadow" />';
+						<input id="login" type="submit" value="Login" class="btn btn-primary strongShadow" />
+						
+						<div id="forgotPasswordWrap">
+							<span title="Neverworks Games will send you an email. Click the link to reset your password." id="forgotPassword">Forgot Password?</span>
+						</div>';
 						
 						echo '
 						<hr class="fancy-hr">
@@ -154,11 +160,7 @@
 							<span id="my-signin2"></span>
 						</div>';
 						
-						echo'
-						<hr class="fancy-hr">
-						<div id="forgotPasswordWrap">
-							<span title="Neverworks Games will send you an email. Click the link to reset your password." id="forgotPassword">Forgot Password?</span>
-						</div>
+						echo '
 					</fieldset>
 				</form>';
 		}
@@ -170,46 +172,45 @@
 	<script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>
 	<script>
 	
-	function onSuccess(googleUser) {
-		var token = googleUser.getAuthResponse().id_token;
-		var user = googleUser.getBasicProfile();
-		
-		if (token){
-			authenticationLock = true;
-			
-			$.ajax({
-				type: 'POST',
-				data: {
-					run: "authenticate",
-					googleToken: token
-				}
-			}).done(function(data){
-				if (data === 'Account created!' ||
-					data === 'Create an account name!'){
-					// redirect to 
-					location.replace('/setAccount.php' + $("#refer").attr("href"));
-				} else {
-					gotoRefer(data);
-				}
-			}).fail(function() {
-				QMsg("Google credentials could not be verified!");
-			}).always(function(){
-				authenticationLock = false;
-			});
-		}
-	}
-	function onFailure(error) {
-	  console.log('error: ', error);
-	}
 	function renderButton() {
+		console.info("Rendering google button");
 		gapi.signin2.render('my-signin2', {
 			scope: 'profile email openid',
 			width: 176,
 			height: 40,
 			longtitle: false,
 			theme: 'dark',
-			onsuccess: onSuccess,
-			onfailure: onFailure
+			onsuccess: function(googleUser){
+				var token = googleUser.getAuthResponse().id_token;
+				if (token){
+					authenticationLock = true;
+					
+					$.ajax({
+						type: 'POST',
+						data: {
+							run: "authenticate",
+							googleToken: token
+						}
+					}).done(function(data){
+						if (data === 'Create an account name!'){
+							// redirect to 
+							location.replace('/setAccount.php' + $("#refer").attr("href"));
+						} else {
+							// it's coming out here for some reason
+							gotoRefer(data);
+						}
+					}).fail(function() {
+						QMsg("Google credentials could not be verified!");
+					}).always(function(){
+						authenticationLock = false;
+					});
+				} else {
+					console.info("No gapi tokens found");
+				}
+			},
+			onfailure: function(){
+				console.log('error: ', error);
+			}
 		});
 	}
 	
@@ -304,6 +305,7 @@
 		return false; // prevent form submission
 	}
 	function tokenAuthenticate(){
+		console.info("Token authenticate!");
 		$.ajax({
 			type: 'POST',
 			data: {
@@ -323,7 +325,8 @@
 			location.replace(target);
 		} else {
 			if (!suppress){
-				QMsg(data);
+				//QMsg(data);
+				console.error(data);
 			}
 		}
 	}
@@ -334,6 +337,7 @@
 		
 		if (email){
 			// attempt persistent login
+			/*
 			$("#loginEmail").val(email);
 			if (token){
 				tokenAuthenticate();
@@ -351,6 +355,7 @@
 					document.getElementById('body').style.visibility = 'visible';
 				});
 			}
+			*/
 		} else {
 			
 			$("#loginEmail").focus();

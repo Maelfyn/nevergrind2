@@ -7,7 +7,7 @@ g = {
 	ignore: [],
 	joinedGame: false,
 	searchingGame: false,
-	defaultTitle: 'Nevergrind 2',
+	defaultTitle: 'Nevergrind Online',
 	titleFlashing: false,
 	name: "",
 	password: "",
