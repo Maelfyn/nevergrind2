@@ -66,7 +66,8 @@ a:visited{
 	font-size: 24px;
 	color: #fff;
 	width: 100%;
-	background: rgba(0,0,0,.8);
+	background: rgba(0,0,0,.9);
+	z-index: 9999;
 }
 .message > p{
 	padding: 10px;

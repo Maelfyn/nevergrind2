@@ -107,6 +107,24 @@
 </head>
 
 <body id="body">
+	<script>
+	window.fbAsyncInit = function() {
+	FB.init({
+		appId: '737706186279455',
+		autoLogAppEvents: true,
+		xfbml: true,
+		version: 'v2.10'
+	});
+	FB.AppEvents.logPageView();
+	};
+	(function(d, s, id){
+		var js, fjs = d.getElementsByTagName(s)[0];
+		if (d.getElementById(id)) {return;}
+		js = d.createElement(s); js.id = id;
+		js.src = "//connect.facebook.net/en_US/sdk.js";
+		fjs.parentNode.insertBefore(js, fjs);
+	}(document, 'script', 'facebook-jssdk'));
+	</script>
 	<div id="mainBG">
 		<header id="currencyIndicator" class="strongShadow">
 		<?php
@@ -158,9 +176,11 @@
 						<div id="divider">Or Authenticate Using Google</div>
 						<div id="google-wrap">
 							<span id="my-signin2"></span>
-						</div>';
+						</div>
 						
-						echo '
+						<hr class="fancy-hr">
+						<div>Problems?</div>
+						<div>Contact: support@nevergrind.com</div>
 					</fieldset>
 				</form>';
 		}
@@ -218,9 +238,29 @@
 		type: 'POST',
 		url: '/php/master1.php'
 	});
+	var fadeTimer = new TweenMax.delayedCall(0, '');;
+	function fadeOut(){
+		fadeTimer.kill();
+		fadeTimer = TweenMax.to('.message', 0, {
+			opacity: 1,
+			display: 'block',
+			onComplete: function(){
+				TweenMax.to('.message', 1, {
+					delay: 8,
+					opacity: 0,
+					onComplete: function(){
+						TweenMax.set('.message', {
+							display: 'none'
+						});
+					}
+				});
+			}
+		});
+	}
 	function QMsg(msg){
 		var str = "<p>" + msg + "</p>";
 		$(".message").html(str);
+		fadeOut();
 	}
 	$('#login').on('click', function() {
 		authenticate();

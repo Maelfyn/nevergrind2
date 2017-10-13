@@ -36,6 +36,15 @@
 			margin: 0 auto;
 			max-width: 1920px;
 		}
+		.fancy-hr {
+			border: 0;
+			height: 1px;
+			margin: 8px 0;
+			background-image: -webkit-linear-gradient(left, rgba(16, 64, 176, .4), rgba(32, 128, 232, 1), rgba(16, 64, 176, .4));
+			background-image: -moz-linear-gradient(left, rgba(16, 64, 176, .4), rgba(32, 128, 232, 1), rgba(16, 64, 176, .4));
+			background-image: -ms-linear-gradient(left, rgba(16, 64, 176, .4), rgba(32, 128, 232, 1), rgba(16, 64, 176, .4));
+			background-image: -o-linear-gradient(left, rgba(16, 64, 176, .4), rgba(32, 128, 232, 1), rgba(16, 64, 176, .4))
+		}
 		#currencyIndicator{
 			width: 100%;
 		}
@@ -130,6 +139,10 @@
 				
 				<input id="login" type="submit" value="Create Account" class="btn btn-primary strongShadow" />
 			</fieldset>
+						
+			<hr class="fancy-hr">
+			<div>Problems?</div>
+			<div>Contact: support@nevergrind.com</div>
 		</form>';
 		echo "<a id='refer' style='display:none' href='{$refer}'></a>";
 	?>
@@ -142,9 +155,29 @@
 		type: 'POST',
 		url: '/php/master1.php'
 	});
+	var fadeTimer = new TweenMax.delayedCall(0, '');;
+	function fadeOut(){
+		fadeTimer.kill();
+		fadeTimer = TweenMax.to('.message', 0, {
+			opacity: 1,
+			display: 'block',
+			onComplete: function(){
+				TweenMax.to('.message', 1, {
+					delay: 8,
+					opacity: 0,
+					onComplete: function(){
+						TweenMax.set('.message', {
+							display: 'none'
+						});
+					}
+				});
+			}
+		});
+	}
 	function QMsg(msg){
 		var str = "<p>" + msg + "</p>";
 		$(".message").html(str);
+		fadeOut();
 	}
 	function createAccount(f) {
 		if (createAccountLock === true) {
