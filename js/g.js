@@ -200,16 +200,6 @@ g = {
 		}
 	},
 	logout: function(){
-		function nwLogout(){
-			$.ajax({
-				type: 'GET',
-				url: '/php/logout.php'
-			}).done(function(data){
-				location.reload();
-			}).fail(function(){
-				Msg("Logout failed. Is the server on fire?");
-			});
-		}
 		
 		g.lock();
 		socket.removePlayer(my.account);
@@ -217,18 +207,42 @@ g = {
 			type: 'GET',
 			url: 'php/deleteFromFwtitle.php'
 		});
+	
+		var ssoFailLogins = 0;
 		
-		var auth2 = gapi.auth2.getAuthInstance();
-		if (auth2 === null){
-			nwLogout();
-		} else {
-			auth2.signOut().then(function () {
+		FB.getLoginStatus(function(ret) {
+			if (ret.authResponse) {
+				FB.logout(function(response) {
+					nwLogout(1);
+				});
+			} else {
+				ssoFailLogins++;
 				nwLogout();
-			});
-		}
+			}
+		});
+	
+		var auth2 = gapi.auth2.getAuthInstance();
+		auth2.signOut().then(function(){
+			ssoFailLogins++;
+			nwLogout();
+		});
 		
 		localStorage.removeItem('email');
 		localStorage.removeItem('token');
+		
+		function nwLogout(bypass){
+			// successful SSO logout or 2 fails triggers logout
+			if (bypass || ssoFailLogins >= 2){
+				$.ajax({
+					type: 'GET',
+					url: '/php/logout.php'
+				}).done(function(data){
+					location.reload();
+				}).fail(function(){
+					Msg("Logout failed. Is the server on fire?");
+				});
+			}
+		}
 	}
 };
 g.init = (function(){

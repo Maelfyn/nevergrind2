@@ -90,6 +90,7 @@
 </head>
 
 <body id="body">
+	<div class="message blackOutline3"></div>
 	<div id="mainBG">
 		<header id="currencyIndicator" class="strongShadow">
 		<?php
@@ -128,6 +129,7 @@ echo
 			
 		if (!inputLock && account){
 			inputLock = true;
+			QMsg("Setting account name...");
 			$.ajax({
 				type: 'POST',
 				url: '/php/setAccountName.php',
@@ -141,12 +143,18 @@ echo
 				location.replace(target);
 			}).fail(function(data){
 				console.info("FAIL ", data);
+				QMsg("");
 				setError(data.statusText);
 			}).always(function(){
 				inputLock = false;
 			});
 		}
 	});
+	
+	
+	function QMsg(msg){
+		$(".message").html(msg);
+	}
 	</script>
 	<?php
 		require($_SERVER['DOCUMENT_ROOT'] . "/includes/ga.html");

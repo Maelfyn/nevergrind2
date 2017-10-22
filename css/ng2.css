@@ -225,6 +225,7 @@ body {
     position: absolute;
     background: #000;
     width: 100%;
+	max-width: 1920px;
     height: 100%;
     overflow: hidden
 }

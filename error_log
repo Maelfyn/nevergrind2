@@ -1,0 +1,1 @@
+[21-Oct-2017 02:21:59 America/Denver] PHP Warning:  mysqli_connect(): (28000/1045): Access denied for user 'nevergri_ng'@'localhost' (using password: YES) in /home/nevergrind2/public_html/php/connect1.php on line 12

@@ -36,61 +36,69 @@
 			left: 0;
 			right: 0;
 			margin: 0 auto;
-			max-width: 1920px;
+			max-width: 1920px
 		}
-	.fancy-hr {
-		border: 0;
-		height: 1px;
-		margin: 8px 0;
-		background-image: -webkit-linear-gradient(left, rgba(16, 64, 176, .4), rgba(32, 128, 232, 1), rgba(16, 64, 176, .4));
-		background-image: -moz-linear-gradient(left, rgba(16, 64, 176, .4), rgba(32, 128, 232, 1), rgba(16, 64, 176, .4));
-		background-image: -ms-linear-gradient(left, rgba(16, 64, 176, .4), rgba(32, 128, 232, 1), rgba(16, 64, 176, .4));
-		background-image: -o-linear-gradient(left, rgba(16, 64, 176, .4), rgba(32, 128, 232, 1), rgba(16, 64, 176, .4))
-	}
+		.fancy-hr {
+			border: 0;
+			height: 1px;
+			margin: 8px 0;
+			background-image: -webkit-linear-gradient(left, rgba(16, 64, 176, .4), rgba(32, 128, 232, 1), rgba(16, 64, 176, .4));
+			background-image: -moz-linear-gradient(left, rgba(16, 64, 176, .4), rgba(32, 128, 232, 1), rgba(16, 64, 176, .4));
+			background-image: -ms-linear-gradient(left, rgba(16, 64, 176, .4), rgba(32, 128, 232, 1), rgba(16, 64, 176, .4));
+			background-image: -o-linear-gradient(left, rgba(16, 64, 176, .4), rgba(32, 128, 232, 1), rgba(16, 64, 176, .4))
+		}
 		.abcRioButton{
-			margin: 5px auto;
+			margin: 5px auto
+		}
+		.abcRioButtonBlue .abcRioButtonIcon {
+			border-radius: 5px !important
+		}
+		.abcRioButtonBlue {
+			border-radius: 5px !important
 		}
 		#divider{
-			margin: 8px 0;
+			margin: 8px 0
 		}
 		#currencyIndicator{
-			width: 100%;
+			width: 100%
 		}
 		#mainBG{
 			width: 100%;
 			height: 1080px;
-			background: url('/images/bg/ng2-bg.jpg');
+			background: url('/images/bg/ng2-bg.jpg')
 		}
 		label{
 			font-weight: normal;
 			display: block;
-			margin: .1em 0;
+			margin: .1em 0
 		}
 		#login{
-			border: 2px groove #357;
+			border: 1px solid #000;
+			width: 240px;
+			border-radius: 5px;
 		}
 		#createAccount{
-			color: #fff;
+			color: #fff
 		}
 		#createAccount:hover{
-			color: #fff;
+			color: #fff
 		}
 		#forgotPassword{
-			color: #fff;
+			color: #fff
 		}
 		.textLeft, .signupHeader{
-			margin-top: .375em;
+			margin-top: .375em
 		}
 		.loginInputs{
 			background: #132239;
-			border: 1px solid #357;
+			border: 1px solid #357
 		}
 		.hide{
-			display: none;
+			display: none
 		}
 		#rememberMe{
 			position: relative;
-			top: 2px;
+			top: 2px
 		}
 		#loginWrap{
 			top: 100px;
@@ -101,30 +109,23 @@
 			background: #0a0a1a;
 			box-shadow: 0 0 20px #000,
 				0 0 40px #000,
-				0 0 60px #000;
+				0 0 60px #000
 		}
 	</style>
 </head>
 
 <body id="body">
-	<script>
-	window.fbAsyncInit = function() {
-	FB.init({
-		appId: '737706186279455',
-		autoLogAppEvents: true,
-		xfbml: true,
-		version: 'v2.10'
-	});
-	FB.AppEvents.logPageView();
-	};
-	(function(d, s, id){
+	<div id="fb-root"></div>
+<script>
+	(function(d, s, id) {
 		var js, fjs = d.getElementsByTagName(s)[0];
-		if (d.getElementById(id)) {return;}
+		if (d.getElementById(id)) return;
 		js = d.createElement(s); js.id = id;
-		js.src = "//connect.facebook.net/en_US/sdk.js";
+		js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.10&appId=737706186279455";
 		fjs.parentNode.insertBefore(js, fjs);
+		console.info("ATTEMPTING FB LOGIN...");
 	}(document, 'script', 'facebook-jssdk'));
-	</script>
+</script>
 	<div id="mainBG">
 		<header id="currencyIndicator" class="strongShadow">
 		<?php
@@ -178,6 +179,17 @@
 							<span id="my-signin2"></span>
 						</div>
 						
+						<fb:login-button 
+							data-width="176" 
+							data-max-rows="1" 
+							data-size="large" 
+							data-button-type="login_with" 
+							data-show-faces="false" 
+							data-auto-logout-link="false" 
+							data-use-continue-as="false"
+							scope="public_profile,email" >
+						</fb:login-button>
+
 						<hr class="fancy-hr">
 						<div>Problems?</div>
 						<div>Contact: support@nevergrind.com</div>
@@ -191,220 +203,280 @@
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
 	<script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>
 	<script>
-	
-	function renderButton() {
-		console.info("Rendering google button");
-		gapi.signin2.render('my-signin2', {
-			scope: 'profile email openid',
-			width: 176,
-			height: 40,
-			longtitle: false,
-			theme: 'dark',
-			onsuccess: function(googleUser){
-				var token = googleUser.getAuthResponse().id_token;
-				if (token){
-					authenticationLock = true;
-					
-					$.ajax({
-						type: 'POST',
-						data: {
-							run: "authenticate",
-							googleToken: token
-						}
-					}).done(function(data){
-						if (data === 'Create an account name!'){
-							// redirect to 
-							location.replace('/setAccount.php' + $("#refer").attr("href"));
-						} else {
-							// it's coming out here for some reason
-							gotoRefer(data);
-						}
-					}).fail(function() {
-						QMsg("Google credentials could not be verified!");
-					}).always(function(){
-						authenticationLock = false;
-					});
-				} else {
-					console.info("No gapi tokens found");
-				}
-			},
-			onfailure: function(){
-				console.log('error: ', error);
-			}
-		});
-	}
-	
-	$.ajaxSetup({
-		type: 'POST',
-		url: '/php/master1.php'
+// FB SSO
+window.fbAsyncInit = function() {
+	FB.init({
+		appId: '737706186279455',
+		cookie: true,
+		xfbml: true,
+		version: 'v2.8'
 	});
-	var fadeTimer = new TweenMax.delayedCall(0, '');;
-	function fadeOut(){
-		fadeTimer.kill();
-		fadeTimer = TweenMax.to('.message', 0, {
-			opacity: 1,
-			display: 'block',
-			onComplete: function(){
-				TweenMax.to('.message', 1, {
-					delay: 8,
-					opacity: 0,
-					onComplete: function(){
-						TweenMax.set('.message', {
-							display: 'none'
-						});
-					}
-				});
-			}
-		});
-	}
-	function QMsg(msg){
-		var str = "<p>" + msg + "</p>";
-		$(".message").html(str);
-		fadeOut();
-	}
-	$('#login').on('click', function() {
-		authenticate();
-	});
-	$("#forgotPassword").on('click', function() {
-		if (this.textContent === "Checking...") {
-			return;
-		}
-		var email = $("#loginEmail").val().toLowerCase();
-		var msg = "Forgot Password?";
-		$("#forgotPassword").text("Checking...");
-		if (!email || email.length < 3) {
-			QMsg("Enter a valid email address");
-			$("#forgotPassword").text(msg);
-			return;
-		}
-		QMsg("Checking account status...");
-		$.ajax({
-			data: {
-				run: "forgotPassword",
-				email: email
-			}
-		}).done(function(data){
-			QMsg(data, 0, 0, 8000);
-			$("#forgotPassword").text(msg);
-		});
+	FB.getLoginStatus(function(response) {
+		//console.log("FB.getLoginStatus ", response);
+		fbLoginCallback(response);
 	});
 	
-	var focusInput = false,
-		authenticationLock = false;
-		
-	$(".loginInputs").on('focus', function() {
-		focusInput = true;
-	}).on('blur', function() {
-		focusInput = false;
+	FB.Event.subscribe('auth.authResponseChange', function(response){ 
+		//console.info("auth.authResponseChange", response);
+		response.status === 'connected' && fbLoginCallback(response);
 	});
-	
-	$(document).on('keydown',function(e){
-		// hit enter
-		if(e.keyCode === 13){
-			authenticate();
-		}
-	});
-	function authenticate(f) {
-		if (authenticationLock === true) {
-			return false;
-		}
-		if ($("#loginEmail").val().length < 3) {
-			QMsg("This is not a valid email address.");
-			return false;
-		}
-		if ($("#password").val().length < 6 && !token) {
-			QMsg("Passwords must be at least six characters long.");
-			return false;
-		}
-		var login = $("#loginEmail").val().toLowerCase();
-		var setToken = false;
-		if ($("#rememberMe").prop('checked')){
-			localStorage.setItem('email', login);
-			localStorage.setItem('token', token);
-			setToken = true;
-		} else {
-			localStorage.removeItem('email');
-		}
-		QMsg("Connecting to server...");
-		authenticationLock = true;
-		
-		$.ajax({
-			type: 'POST',
-			data: {
-				run: "authenticate",
-				email: login,
-				password: $("#password").val()
-			}
-		}).done(function(data){
-			gotoRefer(data);
-		}).fail(function() {
-			QMsg("Could not contact the server!");
-		}).always(function(){
-			authenticationLock = false;
-		});
-		return false; // prevent form submission
-	}
-	function tokenAuthenticate(){
-		console.info("Token authenticate!");
-		$.ajax({
-			type: 'POST',
-			data: {
-				run: "authenticate",
-				email: email,
-				token: token
-			}
-		}).done(function(data){
-			gotoRefer(data, true);
-		}).always(function(){
-			document.getElementById('body').style.visibility = 'visible';
-		});
-	}
-	function gotoRefer(data, suppress){
-		var target = "//" + location.host + $("#refer").attr("href");
-		if (data === "Login successful!"){
-			location.replace(target);
-		} else {
-			if (!suppress){
-				//QMsg(data);
-				console.error(data);
-			}
-		}
-	}
-	
-	(function(){
-		email = localStorage.getItem('email');
-		token = localStorage.getItem('token');
-		
-		if (email){
-			// attempt persistent login
-			/*
-			$("#loginEmail").val(email);
-			if (token){
-				tokenAuthenticate();
-			} else {
-				$("#password").focus();
+}
+
+function fbLoginCallback(response){
+	//console.info("fbLoginCallback: ", response);
+	if (response && response.status === 'connected') {
+		// Logged into your app and Facebook.
+		var token = response.authResponse.accessToken;
+		if (token){
+			authenticationLock = true;
+			FB.api('/me', {
+				fields: 'email'
+			}, function(response) {
+				//console.log('Successful FB graph response: ', response);
 				$.ajax({
 					type: 'POST',
 					data: {
-						run: "getToken",
-						email: email
+						run: "authenticate",
+						facebookToken: token
 					}
 				}).done(function(data){
-					token = data;
+					//console.info('FB authenticate response: ', data);
+					if (data === 'Create an account name!'){
+						// redirect to 
+						var to = '//nevergrind.com/setAccount.php' + $("#refer").attr("href");
+						//console.info("Redirecting to: ", to);
+						window.location = to;
+					} else {
+						// it's coming out here for some reason
+						gotoRefer(data);
+					}
+				}).fail(function() {
+					QMsg("Facebook credentials could not be verified!");
 				}).always(function(){
-					document.getElementById('body').style.visibility = 'visible';
+					authenticationLock = false;
+				});
+			});
+		} else {
+			console.info("No tokens found");
+			QMsg("Facebook credentials could not be verified.");
+		}
+	}
+}
+
+// google SSO
+function renderButton() {
+	console.info("Rendering google button");
+	gapi.signin2.render('my-signin2', {
+		scope: 'profile email openid',
+		width: 240,
+		height: 40,
+		longtitle: true,
+		theme: 'dark',
+		onsuccess: function(googleUser){
+			var token = googleUser.getAuthResponse().id_token;
+			if (token){
+				authenticationLock = true;
+				
+				$.ajax({
+					type: 'POST',
+					data: {
+						run: "authenticate",
+						googleToken: token
+					}
+				}).done(function(data){
+					if (data === 'Create an account name!'){
+						// redirect to 
+						var to = '//nevergrind.com/setAccount.php' + $("#refer").attr("href");
+						//console.info("Redirecting to: ", to);
+						window.location = to;
+					} else {
+						// it's coming out here for some reason
+						gotoRefer(data);
+					}
+				}).fail(function() {
+					QMsg("Google credentials could not be verified!");
+				}).always(function(){
+					authenticationLock = false;
 				});
 			}
-			*/
-		} else {
-			
-			$("#loginEmail").focus();
-			document.getElementById('body').style.visibility = 'visible';
+		},
+		onfailure: function(){
+			console.log('error: ', error);
 		}
-	})();
-	</script>
-	<?php
-		require($_SERVER['DOCUMENT_ROOT'] . "/includes/ga.html");
-	?>
+	});
+}
+
+$.ajaxSetup({
+	type: 'POST',
+	url: '/php/master1.php'
+});
+var fadeTimer = new TweenMax.delayedCall(0, '');;
+function fadeOut(){
+	fadeTimer.kill();
+	fadeTimer = TweenMax.to('.message', 0, {
+		opacity: 1,
+		display: 'block',
+		onComplete: function(){
+			TweenMax.to('.message', 1, {
+				delay: 8,
+				opacity: 0,
+				onComplete: function(){
+					TweenMax.set('.message', {
+						display: 'none'
+					});
+				}
+			});
+		}
+	});
+}
+function QMsg(msg){
+	var str = "<p>" + msg + "</p>";
+	$(".message").html(str);
+	fadeOut();
+}
+$('#login').on('click', function() {
+	authenticate();
+});
+$("#forgotPassword").on('click', function() {
+	if (this.textContent === "Checking...") {
+		return;
+	}
+	var email = $("#loginEmail").val().toLowerCase();
+	var msg = "Forgot Password?";
+	$("#forgotPassword").text("Checking...");
+	if (!email || email.length < 3) {
+		QMsg("Enter a valid email address");
+		$("#forgotPassword").text(msg);
+		return;
+	}
+	QMsg("Checking account status...");
+	$.ajax({
+		data: {
+			run: "forgotPassword",
+			email: email
+		}
+	}).done(function(data){
+		QMsg(data, 0, 0, 8000);
+		$("#forgotPassword").text(msg);
+	});
+});
+
+var focusInput = false,
+	authenticationLock = false;
+	
+$(".loginInputs").on('focus', function() {
+	focusInput = true;
+}).on('blur', function() {
+	focusInput = false;
+});
+
+$(document).on('keydown',function(e){
+	// hit enter
+	if(e.keyCode === 13){
+		authenticate();
+	}
+});
+function authenticate(f) {
+	if (authenticationLock === true) {
+		return false;
+	}
+	if ($("#loginEmail").val().length < 3) {
+		QMsg("This is not a valid email address.");
+		return false;
+	}
+	if ($("#password").val().length < 6 && !token) {
+		QMsg("Passwords must be at least six characters long.");
+		return false;
+	}
+	var login = $("#loginEmail").val().toLowerCase();
+	var setToken = false;
+	if ($("#rememberMe").prop('checked')){
+		localStorage.setItem('email', login);
+		localStorage.setItem('token', token);
+		setToken = true;
+	} else {
+		localStorage.removeItem('email');
+	}
+	QMsg("Connecting to server...");
+	authenticationLock = true;
+	
+	$.ajax({
+		type: 'POST',
+		data: {
+			run: "authenticate",
+			email: login,
+			password: $("#password").val()
+		}
+	}).done(function(data){
+		gotoRefer(data);
+	}).fail(function() {
+		QMsg("Could not contact the server!");
+	}).always(function(){
+		authenticationLock = false;
+	});
+	return false; // prevent form submission
+}
+function tokenAuthenticate(){
+	console.info("Token authenticate!");
+	$.ajax({
+		type: 'POST',
+		data: {
+			run: "authenticate",
+			email: email,
+			token: token
+		}
+	}).done(function(data){
+		gotoRefer(data, true);
+	}).always(function(){
+		document.getElementById('body').style.visibility = 'visible';
+	});
+}
+function gotoRefer(data, suppress){
+	var target = "//" + location.host + $("#refer").attr("href");
+	if (data === "Login successful!"){
+		location.replace(target);
+	} else {
+		if (!suppress){
+			//QMsg(data);
+			console.error(data);
+		}
+	}
+}
+
+(function(){
+	email = localStorage.getItem('email');
+	token = localStorage.getItem('token');
+	
+	if (email){
+		// attempt persistent login
+		/*
+		$("#loginEmail").val(email);
+		if (token){
+			tokenAuthenticate();
+		} else {
+			$("#password").focus();
+			$.ajax({
+				type: 'POST',
+				data: {
+					run: "getToken",
+					email: email
+				}
+			}).done(function(data){
+				token = data;
+			}).always(function(){
+				document.getElementById('body').style.visibility = 'visible';
+			});
+		}
+		*/
+	} else {
+		
+		$("#loginEmail").focus();
+		document.getElementById('body').style.visibility = 'visible';
+	}
+})();
+</script>
+<?php
+require($_SERVER['DOCUMENT_ROOT'] . "/includes/ga.html");
+?>
 </body>
 </html>
