@@ -38,8 +38,30 @@
 	display: block;
 	margin: 4px auto;
 }
+/* title */
 #title-wrap {
 }
+#title-container-wrap {
+	position: absolute;
+	top: 60px;
+	left: 0;
+	right: 0;
+	margin: 0 auto;
+	width: 95%;
+}
+#title-container {
+}
+#title-header{
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	font-size: 1.125rem;
+}
+#logout {
+	color: #fff;
+}
+
 #hud {
     position: absolute;
     top: 120px;
@@ -135,7 +157,7 @@
     max-width: 800px;
     padding: 0 8%;
     text-align: center;
-    font-size: 1.5em;
+    font-size: 1.125rem;
     color: #fff;
     background: rgba(0, 0, 0, .9);
     background: linear-gradient(right, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, .9) 20%, rgba(0, 0, 0, .9) 80%, rgba(0, 0, 0, 0) 100%);
@@ -155,7 +177,7 @@
     z-index: 999999;
     pointer-events: none
 }
-#titleViewBackdrop {
+#title-backdrop {
     position: absolute;
     visibility: hidden;
     top: 0;
@@ -239,7 +261,7 @@ a {
 }
 h1,
 h2 {
-    font-size: 1.25em;
+    font-size: .875em;
     color: #fff;
     margin: 0;
     padding: 0
@@ -311,7 +333,26 @@ tbody {
     border: 2px ridge #357;
     background: rgba(16, 56, 96, 1)
 }
-/* utility classes */
+/* helper classes */
+.abs {
+	position: absolute;
+}
+.neverworks {
+	display: block;
+	margin: 3px 0
+}
+.text-shadow {
+    text-shadow: 
+		1px 1px #000, 
+		-1px 0 #000, 
+		1px 0 #000, 
+		-1px 1px #000, 
+		1px -1px #000, 
+		-1px -1px #000
+}
+.text-small {
+	font-size: 75%;
+}
 .no-select {
     -khtml-user-select: none;
     -o-user-select: none;

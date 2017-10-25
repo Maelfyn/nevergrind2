@@ -94,6 +94,8 @@
 <body id="body">
 	<div id="mainBG">
 		<header id="currencyIndicator" class="strongShadow">
+		<img style="margin: 4px 0 0 2px; display: inline-block" 
+		src="/images/neverworks-txt.png">
 		<?php
 			echo "<div class='modePanel'>";
 				echo "Account Creation";
@@ -106,9 +108,11 @@
 		'<form id="loginWrap" accept-charset="UTF-8" class="strongShadow" onSubmit="return createAccount(this);">
 			<fieldset>
 				<div id="createAccountWrap">
-					<a id="createAccount" href="/login.php?back=' . $refer . '" class="btn btn-primary strongShadow">Return to Login</a>
+					<a id="createAccount" href="/login.php?back=' . $refer . '" class="strongShadow">Return to Login Page</a>
 				</div>
 				
+				<hr class="fancy-hr">
+			
 				<label class="textLeft" for="loginEmail">Email Address
 					<input name="username" type="text" id="loginEmail" class="loginInputs" maxlength="255" placeholder="Account or Email Address" required="required" />
 				</label>
@@ -123,15 +127,9 @@
 				
 				<label class="signupHeader create-account" for="promoCode">Promo Code
 					<input name="promo" type="text" id="promoCode" class="loginInputs create-account" maxlength="20" placeholder="Promo Code" />
-				</label>';
-				
-				
-				/*
-				<label class="signupHeader create-account" for="referFriend">Referral Account Name
-					<input name="refer" type="text" id="referFriend" class="loginInputs create-account" maxlength="20" placeholder="Referral Account Name" />
 				</label>
-				*/
-				echo '<div id="tosWrap" class="create-account">
+				
+				<div id="tosWrap" class="create-account">
 					<span id="tos" class="aqua">
 						<a target="_blank" href="//nevergrind.com/blog/terms-of-service/">Terms of Service</a> | <a target="_blank" href="//nevergrind.com/blog/privacy-policy/">Privacy Policy</a>
 					</span>

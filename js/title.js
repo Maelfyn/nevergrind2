@@ -293,57 +293,8 @@ var title = {
 			e.parentNode.removeChild(e);
 		}
 	},
-	mapData: {
-		EarthOmega: {
-			name: 'Earth Omega',
-			tiles: 78,
-			players: 8
-		},
-		/*
-		EarthAlpha: {
-			name: 'Earth Alpha',
-			tiles: 83,
-			players: 8
-		},
-		*/
-		FlatEarth: {
-			name: 'Flat Earth',
-			tiles: 78,
-			players: 8
-		},
-		France: {
-			name: 'France',
-			tiles: 81,
-			players: 8
-		},
-		Italy: {
-			name: 'Italy',
-			tiles: 81,
-			players: 8
-		},
-		Japan: {
-			name: "Japan",
-			tiles: 47,
-			players: 4
-		},
-		Turkey: {
-			name: "Turkey",
-			tiles: 75,
-			players: 7
-		},
-		UnitedKingdom: {
-			name: "United Kingdom",
-			tiles: 69,
-			players: 8
-		},
-		UnitedStates: {
-			name: 'United States',
-			tiles: 48,
-			players: 3
-		}
-	},
 	showBackdrop: function(e){
-		TweenMax.to('#titleViewBackdrop', env.delay(.3), {
+		TweenMax.to('#title-backdrop', env.delay(.3), {
 			startAt: {
 				visibility: 'visible',
 				alpha: 0
@@ -358,7 +309,7 @@ var title = {
 		g.isModalOpen = true;
 	},
 	closeModal: function(){
-		TweenMax.set('.title-modals, #titleViewBackdrop', {
+		TweenMax.set('.title-modals, #title-backdrop', {
 			alpha: 0,
 			visibility: 'hidden'
 		});

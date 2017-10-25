@@ -171,7 +171,8 @@ g = {
 			if (!d || d < .5){
 				d = 2;
 			}
-			TweenMax.to(dom.msg, g.delay(d), {
+			console.info('delay ', g.delay);
+			TweenMax.to(dom.msg, d, {
 				overwrite: 1,
 				startAt: {
 					opacity: 1
@@ -185,6 +186,7 @@ g = {
 		}
 		// split text animation
 		if (!init.isMobile){
+			return;
 			var tl = new TimelineMax();
 			var split = new SplitText(dom.msg, {
 				type: "words,chars"
@@ -200,6 +202,13 @@ g = {
 		}
 	},
 	logout: function(){
+		$.ajax({
+		}).done(function(data){
+			localStorage.removeItem('token');
+			location.reload();
+		}).fail(function(){
+			Msg("Logout failed. Is the server on fire?");
+		});
 		
 		g.lock();
 		socket.removePlayer(my.account);
@@ -207,42 +216,29 @@ g = {
 			type: 'GET',
 			url: 'php/deleteFromFwtitle.php'
 		});
-	
-		var ssoFailLogins = 0;
 		
 		FB.getLoginStatus(function(ret) {
-			if (ret.authResponse) {
-				FB.logout(function(response) {
-					nwLogout(1);
-				});
-			} else {
-				ssoFailLogins++;
-				nwLogout();
-			}
+			ret.authResponse && FB.logout(function(response) {});
 		});
-	
+		
 		var auth2 = gapi.auth2.getAuthInstance();
-		auth2.signOut().then(function(){
-			ssoFailLogins++;
-			nwLogout();
-		});
+		auth2.signOut().then(function(){});
 		
 		localStorage.removeItem('email');
 		localStorage.removeItem('token');
 		
-		function nwLogout(bypass){
-			// successful SSO logout or 2 fails triggers logout
-			if (bypass || ssoFailLogins >= 2){
-				$.ajax({
-					type: 'GET',
-					url: '/php/logout.php'
-				}).done(function(data){
-					location.reload();
-				}).fail(function(){
-					Msg("Logout failed. Is the server on fire?");
-				});
-			}
-		}
+		setTimeout(function(){
+			$.ajax({
+				type: 'GET',
+				url: 'php/logout.php'
+			}).done(function(data) {
+				g.msg("Logout successful");
+				localStorage.removeItem('token');
+				location.reload();
+			}).fail(function() {
+				g.msg("Logout failed.");
+			});
+		}, 1000);
 	}
 };
 g.init = (function(){
@@ -252,24 +248,45 @@ g.init = (function(){
 		timeout: 5000
 	});
 	TweenMax.defaultEase = Quad.easeOut;
-	if (!init.isMobile){
-		$('[title]').tooltip({
-			animation: false
-		});
-	}
-	
-	// build map drop-down 
-	// <li><a class='flagSelect'>Default</a></li>
-	/*
-	
-	var s = "";
-	for (var key in g.flagData){
-		s += "<li class='dropdown-header'>" + g.flagData[key].group + "</li>";
-		g.flagData[key].name.forEach(function(e){
-			s += "<li><a class='flagSelect' href='#'>" + e + "</a></li>";
-		});
-	}
-	document.getElementById("flagDropdown").innerHTML = s;
-	
-	*/
 })();
+function test(){
+	$("#title-container-wrap").css('display', 'none');
+	
+	var e2 = document.getElementById('ng2-logo-wrap');
+	for (var i=0; i<1000; i++){
+		var e = document.createElement('img');
+		e.id = 'mob' + i;
+		e.className = 'abs';
+		e.style.top = ~~(Math.random() * 600) +'px';
+		e.style.left = ~~(Math.random() * 900) +'px';
+		e.src = 'images/an orc.png';
+		e2.appendChild(e);
+	}
+	
+	
+	(function(){
+		for (var i=0; i<1000; i++){
+			(function(){
+				function setFilter(z) {
+					z.style.filter = 'grayscale(100%) sepia(100%) saturate(1000%) ' + filters.hue;
+				}
+				var z = document.getElementById("mob" + i);
+			
+				var filters = {
+				  hue: "hue-rotate(0deg)"
+				};
+				
+				var tl = new TimelineMax({
+					onUpdate: function(){
+						setFilter(z);
+					},
+					repeat: -1
+				});
+				tl.to(filters, Math.random() * 6 + 1, {
+					hue: "hue-rotate(360deg)"
+				});
+			})();
+		}
+	})();
+	
+}

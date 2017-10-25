@@ -95,7 +95,7 @@ chat = Object.assign(chat, {
 			message: msg,
 			type: type
 		};
-		if (o.message){
+		if (o.message && dom.chatLog !== null){
 			while (dom.chatLog.childNodes.length > 500) {
 				dom.chatLog.removeChild(dom.chatLog.firstChild);
 			}

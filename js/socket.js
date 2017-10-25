@@ -68,8 +68,8 @@ var socket = {
 					socket.addPlayer(my.account, my.flag);
 					// update display of channel
 					if (g.view === 'title'){
-						document.getElementById('titleChatHeaderChannel').textContent = data.channel;
-						document.getElementById('titleChatBody').innerHTML = '';
+						//document.getElementById('titleChatHeaderChannel').textContent = data.channel;
+						//document.getElementById('titleChatBody').innerHTML = '';
 					}
 					//chat.updatePlayers(0);
 					location.hash = my.channel;
@@ -185,7 +185,7 @@ var socket = {
 				})();
 			}
 			socket.initialConnection = false;
-			document.getElementById('titleChatHeaderChannel').innerHTML = my.channel;
+			//document.getElementById('titleChatHeaderChannel').innerHTML = my.channel;
 			socket.setChannel(chat.initChannel);
 		}
 		if (g.view === 'game'){

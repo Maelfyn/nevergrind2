@@ -25,26 +25,7 @@ var my = {
 		my.hudTimer.kill();
 		DOM.hud.style.visibility = 'hidden';
 	},
-	nextTarget: function(backwards){
-		
-	},
-	playerLogout: function(){
-		g.lock();
-		socket.removePlayer(my.account);
-		$.ajax({
-			type: 'GET',
-			url: 'php/deleteFromFwtitle.php'
-		});
-		$.ajax({
-			type: 'GET',
-			url: 'php/logout.php'
-		}).done(function(data){
-			localStorage.removeItem('token');
-			location.reload();
-		}).fail(function(){
-			Msg("Logout failed. Is the server on fire?");
-		});
-	},
+	nextTarget: function(backwards){},
 	exitGame: function(bypass){
 		if (g.view === 'game'){
 			var r = confirm("Are you sure you want to surrender?");

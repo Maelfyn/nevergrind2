@@ -78,7 +78,8 @@
 			border-radius: 5px;
 		}
 		#createAccount{
-			color: #fff
+			color: #aef;
+			font: 14px;
 		}
 		#createAccount:hover{
 			color: #fff
@@ -123,11 +124,13 @@
 		js = d.createElement(s); js.id = id;
 		js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.10&appId=737706186279455";
 		fjs.parentNode.insertBefore(js, fjs);
-		console.info("ATTEMPTING FB LOGIN...");
+		//console.info("ATTEMPTING FB LOGIN...");
 	}(document, 'script', 'facebook-jssdk'));
 </script>
 	<div id="mainBG">
 		<header id="currencyIndicator" class="strongShadow">
+		<img style="margin: 4px 0 0 2px; display: inline-block" 
+		src="/images/neverworks-txt.png">
 		<?php
 			echo "<div class='modePanel'>";
 				echo "Login to Nevergrind.com";
@@ -150,10 +153,7 @@
 			echo 
 				'<form id="loginWrap" accept-charset="UTF-8" class="strongShadow" onSubmit="return authenticate(this);">
 					<fieldset>
-						<div id="createAccountWrap">
-							<a id="createAccount" href="/createAccount.php?back=' . $refer . '" class="btn btn-primary strongShadow">Create Account</a>
-						</div>
-						
+						<p>Login with your Neverworks Account or <a id="createAccount" href="/createAccount.php?back=' . $refer . '" class="strongShadow">Create an Account</a></p>
 						<label class="textLeft" for="loginEmail">Account or Email Address
 							<input name="username" type="text" id="loginEmail" class="loginInputs" maxlength="255" placeholder="Account or Email Address" required="required" />
 						</label>
@@ -169,12 +169,14 @@
 						<input id="login" type="submit" value="Login" class="btn btn-primary strongShadow" />
 						
 						<div id="forgotPasswordWrap">
-							<span title="Neverworks Games will send you an email. Click the link to reset your password." id="forgotPassword">Forgot Password?</span>
-						</div>';
+							<a title="Neverworks Games will send you an email. Click the link to reset your password." id="forgotPassword">Forgot Password?</a>
+						</div>
 						
-						echo '
+						
 						<hr class="fancy-hr">
-						<div id="divider">Or Authenticate Using Google</div>
+						
+						<p>Or login with existing accounts:</p>
+						
 						<div id="google-wrap">
 							<span id="my-signin2"></span>
 						</div>
@@ -265,7 +267,7 @@ function fbLoginCallback(response){
 
 // google SSO
 function renderButton() {
-	console.info("Rendering google button");
+	// console.info("Rendering google button");
 	gapi.signin2.render('my-signin2', {
 		scope: 'profile email openid',
 		width: 240,
@@ -437,7 +439,7 @@ function gotoRefer(data, suppress){
 		location.replace(target);
 	} else {
 		if (!suppress){
-			//QMsg(data);
+			QMsg(data);
 			console.error(data);
 		}
 	}

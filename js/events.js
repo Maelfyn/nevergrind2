@@ -48,8 +48,7 @@ var events = {
 		});
 
 		$("#logout").on(env.click, function() {
-			playerLogout();
-			return false;
+			g.logout();
 		});
 		$("#login").on(env.click, function(){
 			socket.removePlayer(my.account);
@@ -326,13 +325,6 @@ var events = {
 				});
 				Msg("Your nation's flag is now: " + my.selectedFlag);
 				document.getElementById('selectedFlag').textContent = my.selectedFlag;
-				if (!init.isMobile){
-					$("[title]")
-						.tooltip('fixTitle')
-						.tooltip({
-							animation: false
-						});
-				}
 			}).always(function(){
 				g.unlock(1);
 				TweenMax.to("#updateNationFlag", 1, {
@@ -359,7 +351,7 @@ var events = {
 		$("#refreshGameWrap").on("blur", "#gameName", function(){
 			g.focusGameName = false;
 		});
-		$("#titleViewBackdrop").on(env.click, function(){
+		$("#title-backdrop").on(env.click, function(){
 			title.closeModal();
 		});
 		$("#mainWrap").on(env.click, '#unlockGameDone, #configureNationDone, #leaderboardDone', function(){
