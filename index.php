@@ -80,9 +80,9 @@
 		<header id="title-header" class="text-primary text-shadow">
 			<?php
 			if (isset($_SESSION['email'])){
-				echo '<a id="logout" class="btn btn-primary btn-responsive">Logout '. $_SESSION['account'] .'</a>';
+				echo '<a id="logout" class="btn btn-primary btn-responsive pointer">Logout '. $_SESSION['account'] .'</a>';
 			} else {
-				echo '<a id="login" class="btn btn-primary btn-responsive" href="/login.php?back=/">Login</a>';
+				echo '<a id="login" class="btn btn-primary btn-responsive pointer" href="/login.php?back=/">Login</a>';
 			}
 			?>
 			<i id="options" class="pointer options fa fa-volume-up"></i>
@@ -111,9 +111,7 @@
 							<div>Nevergrind 2</div>
 							<div>Multiplayer Browser RPG</div>
 							<div class="text-small">a free online web game by<div>
-							<a class="neverworks" href="https://www.linkedin.com/company/neverworks-games-llc">
-								<img src="images/neverworks-txt.png">
-							</a>
+							<img class="neverworks" src="images/neverworks-txt.png" alt="Neverworks Games">
 						</h1>
 						<img id="ng2-logo" src="images/ng_logo_532x428.png">
 					</div>

@@ -252,9 +252,15 @@ body {
     overflow: hidden
 }
 header {
-    font-size: 1.275em;
+    font-size: 2rem;
     padding: .25em .5em;
-    word-spacing: .05em
+	background: rgba(0,0,0,.8);
+	border-bottom: 1px solid #05b;
+}
+header .fa {
+    margin: 0 .2rem;
+    font-size: 1.4rem;
+    line-height: 1.5;
 }
 a {
     color: #8bf
@@ -339,7 +345,7 @@ tbody {
 }
 .neverworks {
 	display: block;
-	margin: 3px 0
+	margin: 3px auto
 }
 .text-shadow {
     text-shadow: 

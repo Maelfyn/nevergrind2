@@ -1,17 +1,66 @@
+max:	1hs		2hs		1hb		2hb		pierce	h2h
+WAR		250		250		250		250		230		200	
+MNK		0		0		250		250		0		250	
+ROG		250		0		250		0		250		100	
+PAL		200		200		225		225		0		100	
+RNG		200		200		240		240		200		100	
+SHD		200		200		200		200		0		100	
+BRD		200		0		225		0		200		100	
+CLR		0		0		175		175		0		75	
+DRU		175		0		175		175		0		75	
+SHM		0		0		220		220		0		75	
+NEC		0		0		110		110		110		75	
+ENC		0		0		110		110		110		75	
+MAG		0		0		110		110		110		75	
+WIZ		0		0		110		110		110		75	
+
+max:	offense		defense		dodge		parry		riposte		DW			DA			
+WAR		250			250			175(6)		230(10)		225(25)		240(13)		245(15)		
+MNK		250			250			230(1)		225(12)		225(35)		250(1)		250(15)		
+ROG		250			250			210(4)		230(12)		225(30)		245(13)		240(16)		
+PAL		225			250			155(10)		200(17)		200(30)		0			235(20)		
+RNG		240			200			170(8)		220(18)		150(35)		240(17)		235(20)		
+SHD		230			250			155(10)		205(17)		200(30)		0			235(20)		
+BRD		225			250			155(10)		0			0			210(17)		0			
+CLR		200			200			75(15)		0			0			0			0			
+DRU								75(15)		0			0			0			0			
+SHM								75(15)		0			0			0			0			
+NEC								75(22)		0			0			0			0			
+ENC								75(22)		0			0			0			0			
+MAG								75(22)		0			0			0			0			
+WIZ								75(22)		0			0			0			0			
+
+max:	alteration	abjuration	evocation	conjuration	channeling
+WAR		0			0			0			0			0	
+MNK		0			0			0			0			0	
+ROG		0			0			0			0			0	
+PAL		235			235			235			235			220	(9)
+RNG		235			235			235			235			215	(9)
+SHD		235			235			235			235			220	(9)
+BRD		235			235			235			235			235	
+CLR		235			235			235			235			220	
+DRU		235			235			235			235			220	
+SHM		235			235			235			235			220	
+NEC		235			235			235			235			200	
+ENC		235			235			235			235			200	
+MAG		235			235			235			235			200	
+WIZ		235			235			235			235			200	
+
 - db model:
 	ng2_chars
 		row
-		account varchar16
-		name varchar16
-		lastName varchar16
-		gender char1
-		race varchar10
-		job varchar13
-		exp int11
-		gold int11
-		level tinyint4
-		hp medint9
-		maxHp medint9
+		account 
+		name 
+		lastName 
+		gender 
+		race 
+		job 
+		threat
+		exp 
+		gold 
+		level 
+		hp 
+		maxHp 
 		mp
 		maxMp
 		str
@@ -44,17 +93,20 @@
 		resistFire
 		playtime
 		
-	ng2_party
+	ng2_party ??? is this needed at all? DELETED
 		row
 		timestamp
 		name
 		level
 		zone
 		
-	ng2_players - heartbeat
+	ng2_players - heartbeat - joins ng2_chars for values
 		row
 		timestamp
-		party
+		name
+		leader
+		level
+		zone
 		
 	ng2_mobs
 		row
@@ -81,7 +133,7 @@
 	ng2_eq
 		row
 		name
-		character
+		charName
 		slot
 		damage
 		delay
@@ -106,21 +158,7 @@
 		rarityType
 		equipSlots (multiple)
 		equipJobs (multiple)
-		oneHandSlash
-		twoHandSlash
-		oneHandBlunt
-		piercing
-		handToHand
-		offense
-		defense
-		dodge
-		parry
-		riposte
-		alteration
-		evocation
-		conjuration
-		abjuration
-		channeling
+		req
 		
 	ng2_item
 		row
@@ -150,22 +188,7 @@
 		rarityType
 		equipSlots (multiple)
 		equipJobs (multiple)
-		oneHandSlash
-		twoHandSlash
-		oneHandBlunt
-		piercing
-		handToHand
-		offense
-		defense
-		dodge
-		parry
-		riposte
-		alteration
-		evocation
-		conjuration
-		abjuration
-		channeling
-		
+		req
 		
 	ng2_bank
 		row
@@ -195,23 +218,32 @@
 		rarityType
 		equipSlots (multiple)
 		equipJobs (multiple)
-		oneHandSlash
-		twoHandSlash
-		oneHandBlunt
-		piercing
-		handToHand
-		offense
-		defense
-		dodge
-		parry
-		riposte
-		alteration
-		evocation
-		conjuration
-		abjuration
-		channeling
+		req
 		
 	ng2_quests
 		row
 		name
-		json
+		salubrinForest
+		tendolinMeadows
+		greenthornCavern
+		rivenGrotto
+		lanfeldOutpost
+		braxxensBastille
+		kordataMarshlands
+		arcturinsCrypt
+		fahlnirCitadel
+		kordataRuins
+		templeOfPrenssor
+		vistonsRedoubt
+		galeblastFortress
+		ashenflowPeak
+		direSanctum
+		nimgaul
+		
+		
+		
+		
+		
+		
+		
+		

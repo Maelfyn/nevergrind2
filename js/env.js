@@ -50,7 +50,7 @@ var env = {
 			visibility: 'visible',
 			yPercent: -50,
 			xPercent: -50,
-			force3D: true
+			force3D: false
 		});
 		g.resizeX = w / window.innerWidth;
 		g.resizeY = h / window.innerHeight;
