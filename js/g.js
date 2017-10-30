@@ -202,14 +202,6 @@ g = {
 		}
 	},
 	logout: function(){
-		$.ajax({
-		}).done(function(data){
-			localStorage.removeItem('token');
-			location.reload();
-		}).fail(function(){
-			Msg("Logout failed. Is the server on fire?");
-		});
-		
 		g.lock();
 		socket.removePlayer(my.account);
 		$.ajax({
@@ -217,12 +209,20 @@ g = {
 			url: 'php/deleteFromFwtitle.php'
 		});
 		
-		FB.getLoginStatus(function(ret) {
-			ret.authResponse && FB.logout(function(response) {});
-		});
+		try {
+			FB.getLoginStatus(function(ret) {
+				ret.authResponse && FB.logout(function(response) {});
+			});
+		} catch (err){
+			console.info('Facebook error: ', err);
+		}
 		
-		var auth2 = gapi.auth2.getAuthInstance();
-		auth2.signOut().then(function(){});
+		try {
+			var auth2 = gapi.auth2.getAuthInstance();
+			auth2.signOut().then(function(){});
+		} catch (err){
+			console.info('Google error: ', err);
+		}
 		
 		localStorage.removeItem('email');
 		localStorage.removeItem('token');

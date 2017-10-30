@@ -51,6 +51,11 @@
 	<link rel="stylesheet" href="css/bootstrap4.min.css">
 	<!--link rel="stylesheet" href="css/bootstrap-slider.min.css"-->
 	<link rel="stylesheet" href="css/font-awesome.min.css">
+	<?php
+	if (!isset($_SESSION['email'])){
+		require $_SERVER['DOCUMENT_ROOT'] . "/includes/loginCss.html";
+	}
+	?>
 	<link rel="stylesheet" href="css/ng2.css?v=0-0-1">
 	<link rel="shortcut icon" href="/images/favicon.png">
 	
@@ -76,13 +81,18 @@
 	</div>
 	
 	<div id="title-wrap">
+		<?php
+		if (!isset($_SESSION['email'])){
+			$backdrop = 1;
+			require $_SERVER['DOCUMENT_ROOT'] . "/includes/loginModal.php";
+			require $_SERVER['DOCUMENT_ROOT'] . "/includes/loginRefer.php";
+		}
+		?>
 	
 		<header id="title-header" class="text-primary text-shadow">
 			<?php
 			if (isset($_SESSION['email'])){
-				echo '<a id="logout" class="btn btn-primary btn-responsive pointer">Logout '. $_SESSION['account'] .'</a>';
-			} else {
-				echo '<a id="login" class="btn btn-primary btn-responsive pointer" href="/login.php?back=/">Login</a>';
+				echo '<a id="logout" class="btn btn-primary btn-responsive pointer">Logout</a>';
 			}
 			?>
 			<i id="options" class="pointer options fa fa-volume-up"></i>
@@ -93,7 +103,10 @@
 				<a href="//youtube.com/c/Maelfyn" target="_blank">
 					<i class="fa fa-youtube text-primary pointer"></i>
 				</a>
-				<a href="//www.facebook.com/neverworksgames" target="_blank">
+				<a href="//discord.gg/n2gp8rC" target="_blank">
+					<i class="fa fa-discord text-primary pointer"></i>
+				</a>
+				<a href="//www.facebook.com/maelfyn" target="_blank">
 					<i class="fa fa-facebook text-primary pointer"></i>
 				</a>
 				<a href="//twitter.com/maelfyn" target="_blank">
@@ -154,9 +167,13 @@
 <script src="js/libs/easelJS.min.js"></script>
 <script src="js/libs/EaselPlugin.min.js"></script>
 <script src="js/libs/autobahn.min.js"></script>
-<script src="//apis.google.com/js/platform.js?onload=googleSsoSignIn" async defer></script>
+<script src="//apis.google.com/js/platform.js?onload=loginRenderButton" async defer></script>
 <?php
+require $_SERVER['DOCUMENT_ROOT'] . "/includes/loginJs.html";
 require $_SERVER['DOCUMENT_ROOT'] . '/includes/ga.php';
+if (!isset($_SESSION['email'])){
+	exit();
+}
 ?>
 <script>
 <?php
