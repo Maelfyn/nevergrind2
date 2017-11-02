@@ -48,7 +48,7 @@ g = {
 		});
 	},
 	updateUserInfo: function(){
-		if (location.host !== 'localhost' && !guest){
+		if (location.host !== 'localhost'){
 			$.ajax({
 				async: true,
 				type: 'GET',
@@ -73,29 +73,29 @@ g = {
 		}
 	},
 	checkPlayerData: function(){
-		if (my.account.indexOf('guest_') !== 0){
-			// not a guest
-			var geo = localStorage.getItem(my.account+ '_geo');
-			var geoTime = localStorage.getItem(my.account+ '_geoTime');
-			var geoSeason = localStorage.getItem(my.account+ '_geoSeason');
-			if (geoTime !== null || geoSeason === null){
-				// longer than 90 days?
-				if ((Date.now() - geoTime) > 7776000 || geoSeason === null){
-					g.updateUserInfo();
-				}
-			} else if (geo === null){
+		// not a guest
+		var geo = localStorage.getItem(my.account+ '_geo');
+		var geoTime = localStorage.getItem(my.account+ '_geoTime');
+		var geoSeason = localStorage.getItem(my.account+ '_geoSeason');
+		if (geoTime !== null || geoSeason === null){
+			// longer than 90 days?
+			if ((Date.now() - geoTime) > 7776000 || geoSeason === null){
 				g.updateUserInfo();
 			}
-			// ignore list
-			var ignore = localStorage.getItem('ignore');
-			if (ignore !== null){
-				g.ignore = JSON.parse(ignore);
-			} else {
-				var foo = []; 
-				localStorage.setItem('ignore', JSON.stringify(foo));
-			}
-			chat.friendGet();
+		} else if (geo === null){
+			g.updateUserInfo();
 		}
+		// ignore list
+		var ignore = localStorage.getItem('ignore');
+		if (ignore !== null){
+			g.ignore = JSON.parse(ignore);
+		} else {
+			var foo = []; 
+			localStorage.setItem('ignore', JSON.stringify(foo));
+		}
+		setTimeout(function(){
+			chat.friendGet();
+		}, 100);
 	},
 	TDC: function(){
 		return new TweenMax.delayedCall(0, '');

@@ -23,8 +23,12 @@ var env = {
 	},
 	click: init.isMobile ? 'mousedown' : 'click',
 	resizeWindow: function() {
+		function forceMod4(x){
+			while (x % 4 !== 0) x--;
+			return x;
+		}
 		var winWidth = window.innerWidth,
-			winHeight = window.innerHeight
+			winHeight = window.innerHeight,
 			b = document.getElementById('body');
 		if (init.isMobile){
 			winHeight = ~~(winHeight * 1.1);
@@ -41,29 +45,21 @@ var env = {
 			// too wide
 			h = ~~(w / widthToHeight);
 		}
+		w = forceMod4(w);
+		h = forceMod4(h);
 		b.style.width = w + 'px';
 		b.style.height = h + 'px';
 		TweenMax.set(b, {
 			x: ~~(w/2 + ((winWidth - w) / 2)),
 			y: ~~(h/2 + ((winHeight - h) / 2)),
-			opacity: 1,
-			visibility: 'visible',
 			yPercent: -50,
 			xPercent: -50,
-			force3D: false
+			opacity: 1,
+			visibility: 'visible',
+			force3D: true
 		});
 		g.resizeX = w / window.innerWidth;
 		g.resizeY = h / window.innerHeight;
-		TweenMax.set("#worldTitle", {
-			xPercent: -50,
-			yPercent: -50
-		});
-		if (g.view === 'game'){
-			g.screen.resizeMap();
-			if (typeof worldMap[0] !== 'undefined'){
-				worldMap[0].applyBounds();
-			}
-		}
 	},
 	isXbox: /Xbox/i.test(navigator.userAgent),
     isPlaystation: navigator.userAgent.toLowerCase().indexOf("playstation") >= 0,

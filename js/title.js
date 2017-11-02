@@ -138,7 +138,7 @@ var title = {
 									}
 								}
 							}
-							document.getElementById('titleChatHeaderCount').textContent = '('+ len +')';
+							document.getElementById('titleChatHeaderCount').textContent = len !== undefined ? '('+len+')' : '';
 							// game data sanity check
 							var serverGames = [];
 							if (data.gameData !== undefined){

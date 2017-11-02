@@ -67,32 +67,27 @@
 </head>
 
 <body id="body">
-<script>
-	(function(d, s, id) {
-		var js, fjs = d.getElementsByTagName(s)[0];
-		if (d.getElementById(id)) return;
-		js = d.createElement(s); js.id = id;
-		js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.10&appId=737706186279455";
-		fjs.parentNode.insertBefore(js, fjs);
-	}(document, 'script', 'facebook-jssdk'));
-</script>
 	<div id="ng2-logo-wrap">
-		<img src="images/bg/ng2-bg.jpg" id="ng2-bg" alt="Firmament Wars Background">
+		<img src="images/bg/ng2-bg.jpg" id="ng2-bg" alt="Nevergrind 2 Background">
+		<img style="position: absolute; bottom: 0; left: 0; width: 140px" 
+				src="/images/neverworks.png">
 	</div>
 	
-	<div id="title-wrap">
-		<?php
-		if (!isset($_SESSION['email'])){
-			$backdrop = 1;
-			require $_SERVER['DOCUMENT_ROOT'] . "/includes/loginModal.php";
-			require $_SERVER['DOCUMENT_ROOT'] . "/includes/loginRefer.php";
-		}
-		?>
-	
-		<header id="title-header" class="text-primary text-shadow">
+	<?php
+	if (!isset($_SESSION['email'])){
+		$backdrop = 1;
+		require $_SERVER['DOCUMENT_ROOT'] . "/includes/loginModal.php";
+		require $_SERVER['DOCUMENT_ROOT'] . "/includes/loginRefer.php";
+	}
+	?>
+	<div id="title-container-wrap">
+		
+		<header id="title-header" class="text-primary text-shadow ">
 			<?php
-			if (isset($_SESSION['email'])){
-				echo '<a id="logout" class="btn btn-primary btn-responsive pointer">Logout</a>';
+			if (isset($_SESSION['email']) && !isset($_SESSION['kong'])){
+				echo '<a id="logout" class="btn btn-primary btn-sm pointer">Logout '. $_SESSION['account'] .'</a>';
+			} else if (isset($_SESSION['kong'])){
+				echo $_SESSION['account'];
 			}
 			?>
 			<i id="options" class="pointer options fa fa-volume-up"></i>
@@ -115,26 +110,24 @@
 			</div>
 		</header>
 		
-		<div id="title-container-wrap">
-			<div id="title-container" class="container-fluid shadow4">
-				
-				<div id="title-menu" class="ng-primary row">
-					<div class="col-5">
-						<h1>
-							<div>Nevergrind 2</div>
-							<div>Multiplayer Browser RPG</div>
-							<div class="text-small">a free online web game by<div>
-							<img class="neverworks" src="images/neverworks-txt.png" alt="Neverworks Games">
-						</h1>
-						<img id="ng2-logo" src="images/ng_logo_532x428.png">
-					</div>
-					<div class="col"></div>
+		<div id="title-container" class="container-fluid shadow4">
+			<div id="title-menu" class="row">
+				<div class="col-6">
+					<h1>
+						<div>Nevergrind 2<br>
+							Cooperative Multiplayer<br>
+							Browser RPG
+						</div>
+						<div class="small">a free online web game by</div>
+						<img class="neverworks" src="images/neverworks-txt.png" alt="Neverworks Games">
+						<hr class="fancy-hr-dark">
+					</h1>
+					<img id="ng2-logo" src="images/ng_logo_532x428.png">
 				</div>
+				<div class="col"></div>
 			</div>
 		</div>
 		
-		<img style="position: absolute; bottom: 0; left: 0; width: 140px" 
-				src="/images/neverworks.png">
 	</div> <!-- end title-wrap -->
 
 	<div id="game-wrap" class="portal">
@@ -150,13 +143,6 @@
 	<div id="msg" class="shadow4"></div>
 </body>
 
-<script>
-	function googleSsoSignIn(){
-		gapi.load('auth2', function() {
-			gapi.auth2.init();
-		});
-	}
-</script>
 <script src="js/libs/TweenMax.min.js"></script>
 <script src="js/libs/jquery.min.js"></script>
 <script src="js/libs/Draggable.min.js"></script>
@@ -167,27 +153,28 @@
 <script src="js/libs/easelJS.min.js"></script>
 <script src="js/libs/EaselPlugin.min.js"></script>
 <script src="js/libs/autobahn.min.js"></script>
+<script src='//cdn1.kongregate.com/javascripts/kongregate_api.js'></script>
 <script src="//apis.google.com/js/platform.js?onload=loginRenderButton" async defer></script>
 <?php
 require $_SERVER['DOCUMENT_ROOT'] . "/includes/loginJs.html";
 require $_SERVER['DOCUMENT_ROOT'] . '/includes/ga.php';
 if (!isset($_SESSION['email'])){
-	exit();
+	require $_SERVER['DOCUMENT_ROOT'] . "/includes/loginKong.html";
 }
 ?>
 <script>
-<?php
-echo 'var chat = {};
-	g.guest = '. $_SESSION['guest'] .';
-	// set channel
-	if (location.hash.length > 1){
-		chat.channel = location.hash.slice(1);
-	} else {
-		chat.channel = "usa-" + (~~(Math.random()*'. ($currentPlayers / 1000) .') + 1);
-	}'; 
-?>
+(function(d, s, id) {
+	var js, fjs = d.getElementsByTagName(s)[0];
+	js = d.createElement(s); js.id = id;
+	js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.10&appId=737706186279455";
+	fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));
+var chat = {
+	channel: 'usa-1'
+};
+g.guest = 0;
 (function(d, scripts){
-	if (location.host === 'nevergrind.com' || 
+	if (//location.host === 'nevergrind.com' || 
 		location.hash === '#test'){
 		scripts = [
 			'nevergrind2'
@@ -201,7 +188,7 @@ echo 'var chat = {};
 			'dom',
 			'video',
 			'audio',
-			'game',
+		'game',
 			'title',
 			'events',
 			'socket',
@@ -217,4 +204,4 @@ echo 'var chat = {};
 })(document, []);
 
 </script>
-</html>
+</html>>
