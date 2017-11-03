@@ -1,0 +1,29 @@
+/* nevergrind 2 color theme */
+.colors {
+	/* basics */
+	color: #fff;
+	color: #000;
+	
+	/* blues */
+	color: #aef;
+	color: #8bf;
+	color: #05b;
+	color: #27d;
+	color: #025;
+	color: #013;
+	
+	/* red */
+	color: #e11;
+	
+	/* greens */
+	color: #060;
+	
+	/* yellows */
+	color: #fd0;
+	
+	/* grays */
+	color: #bbc;
+	color: #777;
+	color: #444;
+	color: #222;
+}
