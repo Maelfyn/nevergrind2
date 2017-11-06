@@ -24,6 +24,7 @@
 	<meta name="google-signin-client_id" content="1015425037202-g5ri6qnj14b8vrk33lnu130ver9f43ef.apps.googleusercontent.com">
 	<link rel='stylesheet' type='text/css' href="/css/global.css">
 	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+	<link rel="stylesheet" href="css/font-awesome.min.css">
 	<?php
 		include($_SERVER['DOCUMENT_ROOT'] . "/includes/head.html");
 		require $_SERVER['DOCUMENT_ROOT'] . "/includes/loginCss.html";
@@ -32,15 +33,6 @@
 </head>
 
 <body id="body">
-<div id="fb-root"></div>
-<script>
-	(function(d, s, id) {
-		var js, fjs = d.getElementsByTagName(s)[0];
-		js = d.createElement(s); js.id = id;
-		js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.10&appId=737706186279455";
-		fjs.parentNode.insertBefore(js, fjs);
-	}(document, 'script', 'facebook-jssdk'));
-</script>
 	<div id="mainBG">
 		<header id="login-header" class="strongShadow">
 		<img style="margin: 4px 0 0 2px; display: inline-block" 
@@ -73,7 +65,9 @@
 	<script src="https://apis.google.com/js/platform.js?onload=loginRenderButton" async defer></script>
 
 <?php
-require $_SERVER['DOCUMENT_ROOT'] . "/includes/loginJs.html";
+if (!isset($_SESSION['account'])){
+	require $_SERVER['DOCUMENT_ROOT'] . "/includes/loginJs.html";
+}
 require($_SERVER['DOCUMENT_ROOT'] . "/includes/ga.html");
 ?>
 </body>

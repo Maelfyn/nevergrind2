@@ -22,14 +22,13 @@ g = {
 	keyLock: false,
 	loadAttempts: 0,
 	isModalOpen: false,
-	lock: function(clear){
+	lock: function(hide){
 		g.overlay.style.display = "block";
-		clear ? g.overlay.style.opacity = 0 : g.overlay.style.opacity = 1;
+		g.overlay.style.opacity = hide ? 0 : 1;
 		g.keyLock = true;
 	},
-	unlock: function(clear){
+	unlock: function(){
 		g.overlay.style.display = "none";
-		clear ? g.overlay.style.opacity = 0 : g.overlay.style.opacity = 1;
 		g.keyLock = false;
 	},
 	unlockFade: function(d){
@@ -99,6 +98,10 @@ g = {
 	},
 	TDC: function(){
 		return new TweenMax.delayedCall(0, '');
+	},
+	TM: function(o){
+		o = o || {};
+		return new TimelineMax(o);
 	},
 	config: {
 		audio: {

@@ -126,69 +126,76 @@
 				</div>
 				
 				<div class="col-6">
-					<div id="title-ch-create-col">
-						<div id="title-well-top" class="title-ch-well ng-blue">
-							<a id="go-create-character" class="btn btn-secondary btn-lg center title-ch-btn">Create<br>Character</a>
+					<div id="title-select-character" class="title-ch-create-col">
+						<!-- well top -->
+						<div id="title-well-top" class="title-ch-well ng-blue text-center">
+							<a id="delete-character" 
+								class="btn btn-secondary btn-lg title-ch-btn">
+								Delete
+							</a>
 						</div>
 						<!-- char cards -->
 						<div id="ch-card-base">
 							<div id="ch-card-wrap" class="stag-blue">
-								<div class="btn btn-info btn-lg ch-card center">
-									<div class="ch-card-name">Maelfyn</div>
-									<div class="ch-card-details">50 Half Elf Ranger</div>
-								</div>
-								<div class="btn btn-info btn-lg ch-card center">
-									<div class="ch-card-name">Sinifay</div>
-									<div class="ch-card-details">50 Half Elf Bard</div>
-								</div>
-								<div class="btn btn-info btn-lg ch-card center">
-									<div class="ch-card-name">Spinalzz</div>
-									<div class="ch-card-details">50 Troll Shadowknight</div>
-								</div>
-								<div class="btn btn-info btn-lg ch-card center">
-									<div class="ch-card-name">Furor</div>
-									<div class="ch-card-details">50 Human Warrior</div>
-								</div>
-								<div class="btn btn-info btn-lg ch-card center">
-									<div class="ch-card-name">Maelfyn</div>
-									<div class="ch-card-details">50 Half Elf Ranger</div>
-								</div>
-								<div class="btn btn-info btn-lg ch-card center">
-									<div class="ch-card-name">Sinifay</div>
-									<div class="ch-card-details">50 Half Elf Bard</div>
-								</div>
-								<div class="btn btn-info btn-lg ch-card center">
-									<div class="ch-card-name">Spinalzz</div>
-									<div class="ch-card-details">50 Troll Shadowknight</div>
-								</div>
-								<div class="btn btn-info btn-lg ch-card center">
-									<div class="ch-card-name">Furor</div>
-									<div class="ch-card-details">50 Human Warrior</div>
-								</div>
-								<div class="btn btn-info btn-lg ch-card center">
-									<div class="ch-card-name">Maelfyn</div>
-									<div class="ch-card-details">50 Half Elf Ranger</div>
-								</div>
-								<div class="btn btn-info btn-lg ch-card center">
-									<div class="ch-card-name">Sinifay</div>
-									<div class="ch-card-details">50 Half Elf Bard</div>
-								</div>
-								<div class="btn btn-info btn-lg ch-card center">
-									<div class="ch-card-name">Spinalzz</div>
-									<div class="ch-card-details">50 Troll Shadowknight</div>
-								</div>
-								<div class="btn btn-info btn-lg ch-card center">
-									<div class="ch-card-name">Furor</div>
-									<div class="ch-card-details">50 Human Warrior</div>
+								<div id="ch-card-container">
+									<div class="btn btn-info btn-lg ch-card center">
+										<div class="ch-card-name">Maelfyn</div>
+										<div class="ch-card-details">50 Half Elf Ranger</div>
+									</div>
+									<div class="btn btn-info btn-lg ch-card center">
+										<div class="ch-card-name">Sinifay</div>
+										<div class="ch-card-details">50 Half Elf Bard</div>
+									</div>
+									<div class="btn btn-info btn-lg ch-card center">
+										<div class="ch-card-name">Spinalzz</div>
+										<div class="ch-card-details">50 Troll Shadowknight</div>
+									</div>
+									<div class="btn btn-info btn-lg ch-card center">
+										<div class="ch-card-name">Furor</div>
+										<div class="ch-card-details">50 Human Warrior</div>
+									</div>
+									<div id="go-create-character" 
+										class="btn btn-info btn-lg ch-card center">
+										Create Character
+									</div>
 								</div>
 							</div>
 						</div>
-						
-						<div id="title-well-bottom" class="title-ch-well ng-blue">
-							<a id="delete-character" class="btn btn-danger btn-sm center title-ch-btn">Delete Character</a>
+						<!-- well bottom -->
+						<div id="title-well-bottom" class="title-ch-well ng-blue text-center">
+							<a id="enter-world" 
+								class="btn btn-secondary btn-sm title-ch-btn">
+								Enter World
+							</a>
 						</div>
 					</div>
-					
+					<!-- create character -->
+					<div id="title-create-character" class="title-ch-create-col">
+						<div class="btn btn-info btn-lg ch-card center">
+							<div class="ch-card-name">Maelfyn</div>
+							<div class="ch-card-details">50 Half Elf Ranger</div>
+						</div>
+						<div class="btn btn-info btn-lg ch-card center">
+							<div class="ch-card-name">Sinifay</div>
+							<div class="ch-card-details">50 Half Elf Bard</div>
+						</div>
+						<div class="btn btn-info btn-lg ch-card center">
+							<div class="ch-card-name">Spinalzz</div>
+							<div class="ch-card-details">50 Troll Shadowknight</div>
+						</div>
+						<div class="btn btn-info btn-lg ch-card center">
+							<div class="ch-card-name">Furor</div>
+							<div class="ch-card-details">50 Human Warrior</div>
+						</div>
+						<div class="btn btn-info btn-lg ch-card center">
+							<div class="ch-card-name">Furor</div>
+							<div class="ch-card-details">50 Human Warrior</div>
+						</div>
+						<div class="btn btn-info btn-lg ch-card center">
+							<div class="ch-card-name">Furor</div>
+							<div class="ch-card-details">50 Human Warrior</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -221,7 +228,9 @@
 <script src='//cdn1.kongregate.com/javascripts/kongregate_api.js'></script>
 <script src="//apis.google.com/js/platform.js?onload=loginRenderButton" async defer></script>
 <?php
-require $_SERVER['DOCUMENT_ROOT'] . "/includes/loginJs.html";
+if (!isset($_SESSION['account'])){
+	require $_SERVER['DOCUMENT_ROOT'] . "/includes/loginJs.html";
+}
 require $_SERVER['DOCUMENT_ROOT'] . '/includes/ga.php';
 if (!isset($_SESSION['email'])){
 	require $_SERVER['DOCUMENT_ROOT'] . "/includes/loginKong.html";
