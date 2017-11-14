@@ -1,5 +1,22 @@
 // audio.js
 var audio = {
+	events: function(){
+		$("#bgmusic").on('ended', function() {
+			var x = document.getElementById('bgmusic');
+			x.currentTime = 0;
+			x.play();
+		});
+		$("#bgamb1").on('ended', function() {
+			var x = document.getElementById('bgamb1');
+			x.currentTime = 0;
+			x.play();
+		});
+		$("#bgamb2").on('ended', function() {
+			var x = document.getElementById('bgamb2');
+			x.currentTime = 0;
+			x.play();
+		});
+	},
 	ext: (function(a){
 		return !!(a.canPlayType && a.canPlayType('audio/mpeg;').replace(/no/, '')) ? 'mp3' : 'ogg'
 	})(document.createElement('audio')),
@@ -117,8 +134,8 @@ var audio = {
 	},
 	musicStart: function(){
 		if (g.view !== 'game'){
-			audio.play("ArcLight", 1);
-			//audio.play("WaitingBetweenWorlds", 1);
+			// audio.play("ArcLight", 1);
+			// audio.play("WaitingBetweenWorlds", 1);
 		} else {
 			audio.gameMusicPlayNext();
 		}

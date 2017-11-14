@@ -1,50 +1,100 @@
-max:	1hs		2hs		1hb		2hb		pierce	h2h
-WAR		250		250		250		250		230		200	
-MNK		0		0		250		250		0		250	
-ROG		250		0		250		0		250		100	
-PAL		200		200		225		225		0		100	
-RNG		200		200		240		240		200		100	
-SHD		200		200		200		200		0		100	
-BRD		200		0		225		0		200		100	
-CLR		0		0		175		175		0		75	
-DRU		175		0		175		175		0		75	
-SHM		0		0		220		220		0		75	
-NEC		0		0		110		110		110		75	
-ENC		0		0		110		110		110		75	
-MAG		0		0		110		110		110		75	
-WIZ		0		0		110		110		110		75	
+HP FORMULA:
 
-max:	offense		defense		dodge		parry		riposte		DW			DA			
-WAR		250			250			175(6)		230(10)		225(25)		240(13)		245(15)		
-MNK		250			250			230(1)		225(12)		225(35)		250(1)		250(15)		
-ROG		250			250			210(4)		230(12)		225(30)		245(13)		240(16)		
-PAL		225			250			155(10)		200(17)		200(30)		0			235(20)		
-RNG		240			200			170(8)		220(18)		150(35)		240(17)		235(20)		
-SHD		230			250			155(10)		205(17)		200(30)		0			235(20)		
-BRD		225			250			155(10)		0			0			210(17)		0			
-CLR		200			200			75(15)		0			0			0			0			
-DRU								75(15)		0			0			0			0			
-SHM								75(15)		0			0			0			0			
-NEC								75(22)		0			0			0			0			
-ENC								75(22)		0			0			0			0			
-MAG								75(22)		0			0			0			0			
-WIZ								75(22)		0			0			0			0			
+var foo = (((((staTotal()) * JOB.hpTier) * (x / 50)) + (x *  (7/11/13) + 20)) + g.hpEquip + maxHpBuff;
+
+war: 5
+pal, shd: 4.5
+mnk, brd, rng, rog: 4
+clr, shm, dru: 3.5
+casters: 3
+
+RESISTS GENDER/RACE/CLASS:
+male: +5 cold, arcane resist
+female: +5 poison, bleed resist
+barb 25 CR 5 scout
+DE 10 BR 10 AR 5 traps 8 scout
+Dwarf 10 AR 10 PR 10 treasure
+ERU 25 AR 5 pulling
+gnome 20 LR Silence resistant 5 treasure
+HE 3 all resist, 7 all dungeon
+halfling - flee duration, +10 traps, +20 treasure, +10 pulling
+high elf: +1/20 levels mp regen
+human fear resistant, 10 treasure 20 pulling
+ogre stun immune
+troll 1 hp regen/12 levels -10 FR
+WE 10 FR 10 CR 10 traps 15 scout
+
+Bard 			30 	20 	20 	20 
+Cleric 			5 	0 	5 	0
+Druid 			10 	20 	25 	15
+Enchanter 		10 	10 	10 	10
+Magician 		0 	5 	0 	5
+Monk 			20 	10 	20 	50
+Necromancer 	0 	5 	0 	5
+Paladin 		10 	5 	10 	0
+Ranger 			30 	30 	50 	30
+Rogue 			50 	30 	25 	10
+Shadowknight	5 	10 	5 	10
+Shaman 			5 	5 	10 	5
+Warrior 		10 	10 	5 	40
+Wizard 			5 	0 	5 	0
+
+DUNGEON:
+trap: avoid damage/disable when entering room
+treasure: find chests & magic find
+scout: possibly -1 mob; possibly -1 level
+pulling: avoid additional mobs
+
+===========================================================================================
+SKILLS:
+
+max:	1hs		2hs		1hb		2hb		pierce	h2h		avg w/offense	defense		defTotal
+WAR		200		200		200		200		200		200		200				250			650
+PAL		200		200		200		200		0		100		200				250			600
+SHD		200		200		200		200		0		100		225				250			600
+MNK		0		0		250		250		0		250		250				200			500
+ROG		200		0		200		0		250		100		250/225			200			500
+RNG		250		200		200		200		200		100		250/225			200			500
+BRD		200		0		200		0		200		100		200				200			150
+CLR		0		0		150		150		0		50		175				200			100
+DRU		150		0		150		150		0		50		175				200			100
+SHM		0		0		200		200		0		50		200				200			100
+NEC		0		0		100		100		100		50		125				150			100
+ENC		0		0		100		100		100		50		125				150			100
+MAG		0		0		100		100		100		50		125				150			100
+WIZ		0		0		100		100		100		50		125				150			100
+
+max:	offense		defense		dodge		parry		riposte		DW			DA			HP
+WAR		200			250			150(6)		250(10)		250(25)		250(13)		250(15)		
+PAL		200			250			150(10)		250(17)		200(30)		0			250(20)		
+SHD		250			250			150(10)		200(17)		250(30)		0			250(20)		
+MNK		250			200			150(1)		150(12)		200(35)		250(1)		250(15)		
+ROG		250			200			200(4)		150(12)		150(30)		250(13)		250(16)		
+RNG		250			200			150(8)		200(18)		150(35)		250(17)		250(20)		
+BRD		200			200			150(10)		0			0			200(17)		0			
+CLR		200			200			100(15)		0			0			0			0			
+DRU		200			200			100(15)		0			0			0			0			
+SHM		200			200			100(15)		0			0			0			0			
+NEC		150			150			100(22)		0			0			0			0			
+ENC		150			150			100(22)		0			0			0			0			
+MAG		150			150			100(22)		0			0			0			0			
+WIZ		150			150			100(22)		0			0			0			0			
 
 max:	alteration	abjuration	evocation	conjuration	channeling
 WAR		0			0			0			0			0	
+PAL		200			200			200			200			200	(9)
+SHD		200			200			200			200			200	(9)
 MNK		0			0			0			0			0	
 ROG		0			0			0			0			0	
-PAL		235			235			235			235			220	(9)
-RNG		235			235			235			235			215	(9)
-SHD		235			235			235			235			220	(9)
-BRD		235			235			235			235			235	
-CLR		235			235			235			235			220	
-DRU		235			235			235			235			220	
-SHM		235			235			235			235			220	
-NEC		235			235			235			235			200	
-ENC		235			235			235			235			200	
-MAG		235			235			235			235			200	
-WIZ		235			235			235			235			200	
+RNG		200			200			200			200			200	(9)
+BRD		250			250			250			250			250	
+CLR		250			250			250			250			250	
+DRU		250			250			250			250			250	
+SHM		250			250			250			250			250	
+NEC		250			250			250			250			250	
+ENC		250			250			250			250			250	
+MAG		250			250			250			250			250	
+WIZ		250			250			250			250			250	
 
 - db model:
 	ng2_chars

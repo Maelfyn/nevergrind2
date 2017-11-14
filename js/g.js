@@ -1,5 +1,19 @@
 // core.js
 g = {
+	events: function(){
+		$(window).focus(function(){
+			document.title = g.defaultTitle;
+			g.titleFlashing = false;
+			if (g.notification.close !== undefined){
+				g.notification.close();
+			}
+		});
+		$(window).on('resize orientationchange focus', function() {
+			env.resizeWindow();
+		}).on('load', function(){
+			env.resizeWindow();
+		});
+	},
 	gameDuration: 0,
 	delay: init.isMobile? 0 : .5,
 	modalSpeed: init.isMobile ? 0 : .5,
@@ -174,7 +188,6 @@ g = {
 			if (!d || d < .5){
 				d = 2;
 			}
-			console.info('delay ', g.delay);
 			TweenMax.to(dom.msg, d, {
 				overwrite: 1,
 				startAt: {
@@ -187,15 +200,18 @@ g = {
 				}
 			});
 		}
-		// split text animation
-		if (!init.isMobile){
-			return;
-			var tl = new TimelineMax();
-			var split = new SplitText(dom.msg, {
-				type: "words,chars"
-			});
-			var chars = split.chars;
-			tl.staggerFromTo(chars, .01, {
+	},
+	split: function(e, msg, d){
+		if (d === undefined){
+			d = .01;
+		}
+		var e = document.getElementById(e);
+		e.innerHTML = msg;
+		if (init.isMobile || e !== null){
+			var split = new SplitText(e, {
+					type: "words,chars"
+				});
+			TweenMax.staggerFromTo(split.chars, d, {
 				immediateRender: true,
 				alpha: 0
 			}, {
@@ -242,6 +258,34 @@ g = {
 				g.msg("Logout failed.");
 			});
 		}, 1000);
+	},
+	goCreateCharacter: function(){
+		g.lock(1);
+		var z = document.getElementById('title-scene-select-character');
+		TweenMax.to(z, .6, {
+			y: 20,
+			opacity: 0,
+			onComplete: function(){
+				TweenMax.set(z, {
+					display: 'none',
+					opacity: 1
+				});
+				create.setRandomRace();
+				create.setRandomGender();
+				TweenMax.to('#title-scene-create-character', .6, {
+					startAt: {
+						display: 'block',
+						y: 20,
+						opacity: 0
+					},
+					y: 0,
+					opacity: 1,
+					onComplete: function(){
+						g.unlock();
+					}
+				});
+			}
+		});
 	}
 };
 g.init = (function(){
@@ -290,6 +334,6 @@ function test(){
 				});
 			})();
 		}
-	})();
-	
+	})();	
 }
+location.search === '?create' && g.goCreateCharacter();

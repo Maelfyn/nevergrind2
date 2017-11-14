@@ -9,27 +9,6 @@
 	}
 	require('php/connect1.php');
 	require('php/values.php');
-	
-	if (!isset($_SESSION['guest'])){
-		// first visit
-		if ( !isset($_SESSION['email']) && !isset($_SESSION['account']) ){
-			// guests
-			mysqli_query($link, "insert into fwguests (`row`) VALUES (null)");
-			$guestId = mysqli_insert_id($link);
-			$_SESSION['guest'] = 1;
-			$_SESSION['account'] = 'guest_'. $guestId;
-		} else {
-			// logged in - not a guest
-			$_SESSION['guest'] = 0;
-		}
-	} else { 
-		// guest already determined
-		if (strpos($_SESSION['account'], '_') !== FALSE){
-			$_SESSION['guest'] = 1;
-		} else {
-			$_SESSION['guest'] = 0;
-		}
-	}
 ?>
 <!DOCTYPE html> 
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
@@ -37,7 +16,7 @@
 	<title>Nevergrind Online | Free Multiplayer Browser RPG</title>
 	<meta charset="utf-8">
 	<meta name="keywords" content="realtime, rpg, browser, multiplayer, online, web, html5">
-	<meta name="description" content="A free web-based multiplayer browser RPG playable in your web browser! Go forth to conquer in this fast-paced action RPG!">
+	<meta name="description" content="A free web-based cooperative multiplayer browser RPG! Gather your friends and go forth to conquer in this roguelike dungeon crawler!">
 	<meta name="author" content="Joe Leonard">
 	<meta name="referrer" content="always">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
@@ -48,25 +27,24 @@
 	<meta name="google-signin-client_id" content="1015425037202-g5ri6qnj14b8vrk33lnu130ver9f43ef.apps.googleusercontent.com">
 	<meta name="google-site-verification" content="iC9l4midOGIXERCwagfpkef9ifunV-aZd_zlUUOPjIU" />
 	
-	<link rel="stylesheet" href="css/bootstrap4.min.css">
+	<link rel="stylesheet" href="css/all.min.css">
 	<!--link rel="stylesheet" href="css/bootstrap-slider.min.css"-->
-	<link rel="stylesheet" href="css/font-awesome.min.css">
 	<?php
-	if (!isset($_SESSION['email'])){
+	if (!isset($_SESSION['account'])){
 		require $_SERVER['DOCUMENT_ROOT'] . "/includes/loginCss.html";
 	}
 	?>
-	<link rel="stylesheet" href="css/ng2.css?v=0-0-1">
+	<link rel="stylesheet" href="css/ng2.css?v=0-0-9">
 	<link rel="shortcut icon" href="/images/favicon.png">
-	
 	<script>
 		var g = {
-			version: '0-0-1'
+			version: '0-0-9'
 		};
 	</script>
 </head>
 
 <body id="body">
+<div id="landscape">
 	<div id="ng2-logo-wrap">
 		<img src="images/bg/ng2-bg.jpg" id="ng2-bg" alt="Nevergrind 2 Background">
 		<img style="position: absolute; bottom: 0; left: 0; width: 140px" 
@@ -74,17 +52,17 @@
 	</div>
 	
 	<?php
-	if (!isset($_SESSION['email'])){
+	if (!isset($_SESSION['account'])){
 		$backdrop = 1;
 		require $_SERVER['DOCUMENT_ROOT'] . "/includes/loginModal.php";
 		require $_SERVER['DOCUMENT_ROOT'] . "/includes/loginRefer.php";
 	}
 	?>
-	<div id="title-container-wrap">
-		
-		<header id="title-header" class="text-primary text-shadow ">
+	<div id="title-scene-select-character">
+	
+		<header id="title-header" class="text-primary text-shadow">
 			<?php
-			if (isset($_SESSION['email']) && !isset($_SESSION['kong'])){
+			if (isset($_SESSION['account']) && !isset($_SESSION['kong'])){
 				echo '<a id="logout" class="btn btn-primary btn-sm pointer">Logout '. $_SESSION['account'] .'</a>';
 			} else if (isset($_SESSION['kong'])){
 				echo $_SESSION['account'];
@@ -92,37 +70,39 @@
 			?>
 			<i id="options" class="pointer options fa fa-volume-up"></i>
 			<div class="pull-right text-primary">
-				<a href="//twitch.tv/maelfyn" target="_blank">
+				<a href="//twitch.tv/maelfyn">
 					<i class="fa fa-twitch text-primary pointer"></i>
 				</a>
-				<a href="//youtube.com/c/Maelfyn" target="_blank">
+				<a href="//youtube.com/c/Maelfyn">
 					<i class="fa fa-youtube text-primary pointer"></i>
 				</a>
-				<a href="//discord.gg/n2gp8rC" target="_blank">
+				<a href="//discord.gg/n2gp8rC">
 					<i class="fa fa-discord text-primary pointer"></i>
 				</a>
-				<a href="//www.facebook.com/maelfyn" target="_blank">
+				<a href="//www.facebook.com/maelfyn">
 					<i class="fa fa-facebook text-primary pointer"></i>
 				</a>
-				<a href="//twitter.com/maelfyn" target="_blank">
+				<a href="//twitter.com/maelfyn">
 					<i class="fa fa-twitter text-primary pointer"></i>
 				</a>
 			</div>
 		</header>
 		
-		<div id="title-container" class="container-fluid shadow4">
-			<div id="title-menu" class="row">
+		<div id="title-screen-wrap" class="container-fluid text-shadow">
+			<div id="title-menu-wrap" class="row title-menu-row stag-blue">
 				<div class="col-6">
-					<h1>
-						<div>Nevergrind 2<br>
-							Cooperative Multiplayer<br>
-							Browser RPG
-						</div>
-						<div class="small">a free online web game by</div>
-						<img class="neverworks" src="images/neverworks-txt.png" alt="Neverworks Games">
-						<hr class="fancy-hr-dark">
-					</h1>
-					<img id="ng2-logo" src="images/ng_logo_532x428.png">
+					<div class="title-ch-create-col">
+						<h1>
+							<div>Nevergrind 2<br>
+								Cooperative Multiplayer<br>
+								Browser RPG
+							</div>
+							<div class="small">a free online web game by</div>
+							<img class="neverworks" src="images/neverworks-txt.png" alt="Neverworks Games">
+							<hr class="fancy-hr-dark">
+						</h1>
+						<img id="ng2-logo" src="images/ng_logo_532x428.png">
+					</div>
 				</div>
 				
 				<div class="col-6">
@@ -137,27 +117,16 @@
 						<!-- char cards -->
 						<div id="ch-card-base">
 							<div id="ch-card-wrap" class="stag-blue">
-								<div id="ch-card-container">
+								<div id="ch-card-list">
 									<div class="btn btn-info btn-lg ch-card center">
 										<div class="ch-card-name">Maelfyn</div>
 										<div class="ch-card-details">50 Half Elf Ranger</div>
 									</div>
-									<div class="btn btn-info btn-lg ch-card center">
-										<div class="ch-card-name">Sinifay</div>
-										<div class="ch-card-details">50 Half Elf Bard</div>
-									</div>
-									<div class="btn btn-info btn-lg ch-card center">
-										<div class="ch-card-name">Spinalzz</div>
-										<div class="ch-card-details">50 Troll Shadowknight</div>
-									</div>
-									<div class="btn btn-info btn-lg ch-card center">
-										<div class="ch-card-name">Furor</div>
-										<div class="ch-card-details">50 Human Warrior</div>
-									</div>
-									<div id="go-create-character" 
-										class="btn btn-info btn-lg ch-card center">
-										Create Character
-									</div>
+								</div>
+								
+								<div id="go-create-character" 
+									class="btn btn-info btn-lg ch-card center">
+									Create Character
 								</div>
 							</div>
 						</div>
@@ -169,41 +138,178 @@
 							</a>
 						</div>
 					</div>
-					<!-- create character -->
-					<div id="title-create-character" class="title-ch-create-col">
-						<div class="btn btn-info btn-lg ch-card center">
-							<div class="ch-card-name">Maelfyn</div>
-							<div class="ch-card-details">50 Half Elf Ranger</div>
-						</div>
-						<div class="btn btn-info btn-lg ch-card center">
-							<div class="ch-card-name">Sinifay</div>
-							<div class="ch-card-details">50 Half Elf Bard</div>
-						</div>
-						<div class="btn btn-info btn-lg ch-card center">
-							<div class="ch-card-name">Spinalzz</div>
-							<div class="ch-card-details">50 Troll Shadowknight</div>
-						</div>
-						<div class="btn btn-info btn-lg ch-card center">
-							<div class="ch-card-name">Furor</div>
-							<div class="ch-card-details">50 Human Warrior</div>
-						</div>
-						<div class="btn btn-info btn-lg ch-card center">
-							<div class="ch-card-name">Furor</div>
-							<div class="ch-card-details">50 Human Warrior</div>
-						</div>
-						<div class="btn btn-info btn-lg ch-card center">
-							<div class="ch-card-name">Furor</div>
-							<div class="ch-card-details">50 Human Warrior</div>
-						</div>
-					</div>
 				</div>
 			</div>
 		</div>
 		
-	</div> <!-- end title-wrap -->
+	</div> <!-- end title-scene-select-character -->
+	
+	<div id="title-scene-create-character" class="none">
+		
+		<div id="create-character-wrap" class="container-fluid text-shadow">
+			<div class="row title-menu-row stag-blue">
+				<div class="col-3 tight">
+					<div class="title-ch-create-col">
+					
+						<div id="race-wrap">
+							<div class="select-create-wrap">
+								<div class="select-race">Barbarian</div>
+							</div>
+							<div class="select-create-wrap">
+								<div class="select-race">Dark Elf</div>
+							</div>
+							<div class="select-create-wrap">
+								<div class="select-race">Dwarf</div>
+							</div>
+							<div class="select-create-wrap">
+								<div class="select-race">Erudite</div>
+							</div>
+							<div class="select-create-wrap">
+								<div class="select-race">Gnome</div>
+							</div>
+							<div class="select-create-wrap">
+								<div class="select-race">Half Elf</div>
+							</div>
+							<div class="select-create-wrap">
+								<div class="select-race">Halfling</div>
+							</div>
+							<div class="select-create-wrap">
+								<div class="select-race">High Elf</div>
+							</div>
+							<div class="select-create-wrap">
+								<div class="select-race">Human</div>
+							</div>
+							<div class="select-create-wrap">
+								<div class="select-race">Ogre</div>
+							</div>
+							<div class="select-create-wrap">
+								<div class="select-race">Troll</div>
+							</div>
+							<div class="select-create-wrap">
+								<div class="select-race">Wood Elf</div>
+							</div>
+						</div>
+						
+						<div id="gender-wrap">
+							<div class="gender-row">
+								<span>Male</span>
+								<div id="Male" class="select-radial select-gender active"></div>
+							</div>
+							<div class="gender-row">
+								<span>Female</span>
+								<div id="Female" class="select-radial select-gender"></div>
+							</div>
+						</div>
+						
+					</div>
+				</div>
+				
+				<div class="col-3 tight">
+					<div class="title-ch-create-col">
+						<div id="create-info">
+							<div class="character-info-header">Overview</div>
+							<div>Gender: <span id="gender-value"></span></div>
+							<div>Race: <span id="race-value"></span></div>
+							<div>Class: <span id="job-value"></span></div>
+							<div>Type: <span id="type-value"></span></div>
+							
+							<div class="character-info-header">Ratings</div>
+							<div>Tank: <span id="tank-value"></div>
+							<div>Physical DPS: <span id="physical-value"></div>
+							<div>Magical DPS: <span id="magical-value"></div>
+							<div>Healer: <span id="healer-value"></div>
+							<div>Utility: <span id="utility-value"></div>
+							
+							<div class="character-info-header">Resistances</div>
+							<div>Bleed: <span id="bleed-value"></span></div>
+							<div>Poison: <span id="poison-value"></span></div>
+							<div>Arcane: <span id="arcane-value"></span></div>
+							<div>Lightning: <span id="lightning-value"></span></div>
+							<div>Fire: <span id="fire-value"></span></div>
+							<div>Cold: <span id="cold-value"></span></div>
+							
+							<div class="character-info-header">Dungeon</div>
+							<div>Traps: <span id="traps-value"></span></div>
+							<div>Treasure: <span id="treasure-value"></span></div>
+							<div>Scout: <span id="scout-value"></span></div>
+							<div>Pulling: <span id="pulling-value"></span></div>
+						</div>
+						
+						<div id="create-character-name-wrap">
+							<input id="create-character-name" 
+								class="form-control ng-blue-input text-shadow" 
+								type="text" 
+								maxlength="16" 
+								spellcheck="false"
+								autocomplete="off"
+								placeholder="Character Name">
+						</div>
+					</div>
+				</div>
+				
+				<div class="col-3 tight">
+					<div class="title-ch-create-col">
+						
+						<div id="class-wrap">
+							<div class="select-create-wrap">
+								<div id="create-Bard" class="select-class disabled">Bard</div>
+							</div>
+							<div class="select-create-wrap">
+								<div id="create-Cleric" class="select-class disabled">Cleric</div>
+							</div>
+							<div class="select-create-wrap">
+								<div id="create-Druid" class="select-class disabled">Druid</div>
+							</div>
+							<div class="select-create-wrap">
+								<div id="create-Enchanter" class="select-class disabled">Enchanter</div>
+							</div>
+							<div class="select-create-wrap">
+								<div id="create-Magician" class="select-class disabled">Magician</div>
+							</div>
+							<div class="select-create-wrap">
+								<div id="create-Monk" class="select-class disabled">Monk</div>
+							</div>
+							<div class="select-create-wrap">
+								<div id="create-Necromancer" class="select-class disabled">Necromancer</div>
+							</div>
+							<div class="select-create-wrap">
+								<div id="create-Paladin" class="select-class disabled">Paladin</div>
+							</div>
+							<div class="select-create-wrap">
+								<div id="create-Ranger" class="select-class disabled">Ranger</div>
+							</div>
+							<div class="select-create-wrap">
+								<div id="create-Rogue" class="select-class disabled">Rogue</div>
+							</div>
+							<div class="select-create-wrap">
+								<div id="create-Shadowknight" class="select-class disabled">Shadowknight</div>
+							</div>
+							<div class="select-create-wrap">
+								<div id="create-Shaman" class="select-class disabled">Shaman</div>
+							</div>
+							<div class="select-create-wrap">
+								<div id="create-Warrior" class="select-class disabled">Warrior</div>
+							</div>
+							<div class="select-create-wrap">
+								<div id="create-Wizard" class="select-class disabled">Wizard</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				
+				<div class="col-3 tight">
+					<div class="title-ch-create-col">
+						Points Remaining<br>
+						Attributes<br>
+						Create Button
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 
 	<div id="game-wrap" class="portal">
-		<div id="hud" class="shadow4"></div>
+		<div id="hud" class="text-shadow"></div>
 	</div> <!-- end game-wrap -->
 
 	<audio id="bgmusic" autoplay loop preload="auto"></audio>
@@ -212,27 +318,21 @@
 	<div id="title-backdrop"></div>
 	<div id="screen-flash" class="overlay"></div>
 	<div id="overlay" class="overlay"></div>
-	<div id="msg" class="shadow4"></div>
+	<div id="msg" class="text-shadow"></div>
+	
+</div>
+
+<div id="portrait">This application must be viewed in landscape mode. Turn your device 90 degrees for maximum enjoyment.</div>
 </body>
 
-<script src="js/libs/TweenMax.min.js"></script>
-<script src="js/libs/jquery.min.js"></script>
-<script src="js/libs/Draggable.min.js"></script>
-<script src="js/libs/DrawSVGPlugin.min.js"></script>
-<script src="js/libs/SplitText.min.js"></script>
-<script src="js/libs/popper.min.js"></script>
-<script src="js/libs/bootstrap4.min.js"></script>
-<script src="js/libs/easelJS.min.js"></script>
-<script src="js/libs/EaselPlugin.min.js"></script>
-<script src="js/libs/autobahn.min.js"></script>
-<script src='//cdn1.kongregate.com/javascripts/kongregate_api.js'></script>
+<script src="js/libs/libs.min.js"></script>
 <script src="//apis.google.com/js/platform.js?onload=loginRenderButton" async defer></script>
 <?php
 if (!isset($_SESSION['account'])){
 	require $_SERVER['DOCUMENT_ROOT'] . "/includes/loginJs.html";
 }
 require $_SERVER['DOCUMENT_ROOT'] . '/includes/ga.php';
-if (!isset($_SESSION['email'])){
+if (!isset($_SESSION['account'])){
 	require $_SERVER['DOCUMENT_ROOT'] . "/includes/loginKong.html";
 }
 ?>
@@ -252,17 +352,18 @@ g.guest = 0;
 		location.hash === '#test'){
 		scripts = [
 			'nevergrind2'
-		]
+		];
 	} else {
 		scripts = [
 			'init',
+			'create',
 			'g',
 			'env',
 			'my',
 			'dom',
 			'video',
 			'audio',
-		'game',
+			'game',
 			'title',
 			'events',
 			'socket',
@@ -278,4 +379,4 @@ g.guest = 0;
 })(document, []);
 
 </script>
-</html>>
+</html>

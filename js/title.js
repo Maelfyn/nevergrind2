@@ -89,6 +89,10 @@ var title = {
 			setTimeout(function(){
 				g.keepAlive();
 			}, 180000);
+			// init events
+			g.events();
+			create.events();
+			audio.events();
 		});
 	})(),
 	updatePlayers: function(once){

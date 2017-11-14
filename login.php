@@ -46,7 +46,7 @@
 	<?php
 		if (isset($_GET['reset'])){
 			echo 
-				'<form id="loginWrap" class="strongShadow">
+				'<form id="loginWrap" class="strongShadow" method="post">
 					<div>Reset Your Password</div>
 					<div class="textLeft">Password</div>
 					<input type="password" id="resetPassword" class="loginInputs" maxlength="20" placeholder="Password" />

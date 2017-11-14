@@ -38,22 +38,32 @@ html {
     touch-action: manipulation;
     display: block;
     background: #000;
-    overflow: hidden
+    overflow: hidden;
+	font-size: 16px;
 }
 input {
     cursor: text;
     background: #059
 }
+.ng-blue-input {
+    background: #025;
+    border: 1px solid #2e6da4;
+	color: #fff !important;
+}
+.form-control:focus {
+    background: #025;
+}
 body {
     font-family: Roboto, Verdana, Arial, sans-serif;
     position: absolute;
     background: #000;
-    width: 100%;
 	color: #fff;
+    width: 100%;
 	max-width: 1920px;
 	min-width: 768px;
     height: 100%;
-    overflow: hidden
+    overflow: hidden;
+	overflow-y: auto;
 }
 a {
     color: #aef;
@@ -90,6 +100,17 @@ tbody {
     background: -moz-radial-gradient(center center, farthest-side, rgba(32, 64, 124, .5) 0%, rgba(0, 0, 0, .1) 100%);
     background: -ms-radial-gradient(center center, farthest-side, rgba(32, 64, 124, .5) 0%, rgba(0, 0, 0, .1) 100%);
     background: -o-radial-gradient(center center, farthest-side, rgba(32, 64, 124, .5) 0%, rgba(0, 0, 0, .1) 100%)
+}
+#portrait {
+	position: relative;
+	display: none;
+	color: #fff;
+	width: 400px;
+	margin: 0 auto;
+	left: 0;
+	right: 0;
+	text-align: center;
+	font-size: 2rem;
 }
 /* fa overrides */
 
@@ -170,6 +191,9 @@ tbody {
 	background-color: #169 !important;
 }
 /* helper classes */
+.overflow {
+	overflow-y: auto;
+}
 .abs {
 	position: absolute;
 }
@@ -190,7 +214,14 @@ tbody {
 		-1px -1px #000
 }
 .no-select {
-    -khtml-user-select: none;
+    -o-user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    user-select: none
+}
+#go-create-character,
+.select-race,
+.select-class {
     -o-user-select: none;
     -moz-user-select: none;
     -webkit-user-select: none;
@@ -229,6 +260,9 @@ tbody {
 }
 .no-margin {
     margin: 0!important
+}
+.tight {
+    padding: 4px!important;
 }
 .snug {
     padding: 0!important;
@@ -283,34 +317,37 @@ tbody {
 	margin: 4px auto;
 }
 /* title */
-#title-menu {
+#title-screen-wrap {
+    background: #00214d;
+}
+.title-menu-row {
     background: #00214d;
     color: #fff;
     border-radius: 0 0 5px 5px;
 	border: 2px ridge #05b;
 	border-top: none;
 }
-#title-container-wrap {
+#title-scene-select-character, 
+#title-scene-create-character {
 	position: relative;
 	top: 0;
 	left: 0;
 	right: 0;
 	margin: 0 auto;
 	width: 100%;
+	height: auto;
 	max-width: 1280px;
 	min-width: 768px;
+    overflow: hidden;
 }
 #title-header{
-    padding: 2px 8px 4px ;
+	padding: 2px 8px 4px;
 	font-size: 1.5rem;
 	border-bottom: 2px ridge #000;
 	background: #111;
 }
 #title-header a:hover {
 	text-decoration: none;
-}
-#title-container {
-	position: relative;
 }
 #title-header .fa {
     margin: 0 4px;
@@ -320,15 +357,13 @@ tbody {
 	top: -2px;
 	color: #fff;
 }
+
 .title-ch-create-col {
 	background: #013;
 	margin: 4px 0;
-	padding: 3px;
-	border-radius: 6px;
+	padding: 4px 2px;
 	border: 2px ridge #444;
-}
-#title-create-character {
-	display: none;
+	height: 99%;
 }
 .title-ch-well {
 	border: 2px outset #05b;
@@ -360,11 +395,9 @@ tbody {
 	cursor: pointer;
 	letter-spacing: 2px;
 }
-#go-create-character {
-}
 #ch-card-wrap {
 	height: 510px;
-	overflow-y: scroll;
+	overflow-y: auto;
 }
 .ch-card {
 	margin: 6px auto;
@@ -378,6 +411,104 @@ tbody {
 	color: #ff2 !important;
 	text-shadow: 0 0 2px #000, 0 0 4px #000, 0 0 8px #000, 0 0 12px #000;
 }
+/* create character scene */
+#race-wrap {
+}
+.select-create-wrap {
+	border: 4px groove #579;
+}
+.select-race,
+.select-class {
+	font-family: Roboto Slab;
+	background: #bba;
+	border: 2px outset #eed;
+	text-align: center;
+	cursor: pointer;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+.select-race.active,
+.select-class.active {
+	background: #776;
+	border: 2px inset #776;
+	box-shadow: 0 0 5px #000 inset;
+}
+.select-class.disabled {
+	cursor: default;
+	pointer-events: none;
+	background: #013;
+	border: 2px inset #013;
+	box-shadow: 0 0 10px #579 inset;
+}
+#gender-wrap {
+	margin: 24px 2px 0;
+}
+.gender-row {
+	position: relative;
+	font-family: Roboto Slab;
+	font-size: 1.75rem;
+	line-height: 1;
+	text-transform: uppercase;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+#Male, #Female {
+	position: absolute;
+	top: 2px;
+	right: 0;
+}
+.select-radial {
+	display: inline-block;
+	width: 24px;
+	height: 24px;
+	background: #bba;
+	box-shadow: 
+		1px 1px #579 inset, 
+		-1px -1px #579 inset,
+		1px -1px 2px #000 inset,
+		-3px 3px 6px 2px #fff inset;
+	border: 2px groove #579;
+	cursor: pointer;
+}
+.select-radial.active {
+	background: #776;
+	box-shadow: 
+		1px 1px #000 inset, 
+		-1px -1px #000 inset, 
+		0 0 5px #000 inset;
+}
+.character-info-header {
+	font: 1rem Roboto Slab;
+	text-align: center;
+	border: 2px ridge #05b;
+	background: #025;
+	text-transform: uppercase;
+}
+#create-info {
+	font-size: 1rem;
+	padding: 0 2px;
+	height: 92%;
+}
+#create-character-name-wrap {
+	position: absolute;
+	width: calc(100% - 17px);
+	margin: 0 auto;
+	bottom: calc(0% + 12px);
+}
+#create-character-name {
+	line-height: 1;
+	border: 2px ridge #05b;
+	border-radius: 0;
+	text-transform: capitalize;
+}
+#create-character-name:focus {
+	box-shadow: none;
+}
+#class-wrap {
+}
+
 /* some other stuff */
 
 #hud {
@@ -499,9 +630,6 @@ tbody {
     background-image: -moz-linear-gradient(left, rgba(32, 32, 32, .4), rgba(128, 128, 128, 1), rgba(32, 32, 32, .4));
     background-image: -o-linear-gradient(left, rgba(32, 32, 32, .4), rgba(128, 128, 128, 1), rgba(32, 32, 32, .4));
     background-image: linear-gradient(left, rgba(32, 32, 32, .4), rgba(128, 128, 128, 1), rgba(32, 32, 32, .4));
-}
-.shadow4 {
-    text-shadow: 1px 1px #000, -1px 0 #000, 1px 0 #000, -1px 1px #000, 1px -1px #000, -1px -1px #000
 }
 .stag-blue {
     background: rgba(0, 16, 60, .8);

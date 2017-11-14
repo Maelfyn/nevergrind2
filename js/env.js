@@ -29,7 +29,8 @@ var env = {
 		}
 		var winWidth = window.innerWidth,
 			winHeight = window.innerHeight,
-			b = document.getElementById('body');
+			b = document.getElementById('body'),
+			scenes = document.getElementsByClassName('scene');
 		if (init.isMobile){
 			winHeight = ~~(winHeight * 1.1);
 		}
@@ -47,19 +48,22 @@ var env = {
 		}
 		w = forceMod4(w);
 		h = forceMod4(h);
-		b.style.width = w + 'px';
-		b.style.height = h + 'px';
-		TweenMax.set(b, {
+		TweenMax.set([b], {
 			x: ~~(w/2 + ((winWidth - w) / 2)),
 			y: ~~(h/2 + ((winHeight - h) / 2)),
+			width: w + 'px',
+			height: h + 'px',
 			yPercent: -50,
 			xPercent: -50,
-			opacity: 1,
-			visibility: 'visible',
 			force3D: true
 		});
 		g.resizeX = w / window.innerWidth;
 		g.resizeY = h / window.innerHeight;
+		// portrait/landscape
+		if (init.isMobile){
+			document.getElementById('portrait').style.display = w < h ? 'block' : 'none';
+			document.getElementById('landscape').style.display = w < h ? 'none' : 'block';
+		}
 	},
 	isXbox: /Xbox/i.test(navigator.userAgent),
     isPlaystation: navigator.userAgent.toLowerCase().indexOf("playstation") >= 0,

@@ -105,7 +105,11 @@
 		<div class="message blackOutline3"></div>
 	<?php
 		echo 
-		'<form id="loginWrap" accept-charset="UTF-8" class="strongShadow" onSubmit="return createAccount(this);">
+		'<form id="loginWrap" 
+			accept-charset="UTF-8" 
+			class="strongShadow" 
+			method="post"
+			onSubmit="return createAccount(this);">
 			<fieldset>
 				<div id="createAccountWrap">
 					<a id="createAccount" href="/login.php?back=' . $refer . '" class="strongShadow">Return to Login Page</a>
@@ -184,17 +188,17 @@
 		var pw = $("#password").val();
 		var acc = $("#loginAccount").val();
 		
-		var newAcc = acc.replace(/[^a-z0-9]/gi, '');
-		if (acc.match(/[a-z0-9]/gi, '').length < acc.length) {
-			QMsg("Your account name should only contain letters and numbers.");
-			return false;
-		}
 		if (acc.length < 2) {
 			QMsg("Your account name must be more than two characters long.");
 			return false;
 		}
 		if (acc.length > 16) {
 			QMsg("Your account name must be less than 16 characters long.");
+			return false;
+		}
+		var tempAcc = acc.replace('_', '');
+		if (tempAcc.match(/[a-z0-9]/gi, '').length < tempAcc.length) {
+			QMsg("Your account name should only contain letters, numbers, and underscores.");
 			return false;
 		}
 		if (pw.length < 6) {
@@ -210,7 +214,7 @@
 			data: {
 				run: "createAccount",
 				email: $("#loginEmail").val().toLowerCase(),
-				account: newAcc.toLowerCase(),
+				account: acc.toLowerCase(),
 				password: pw,
 				promo: $("#promoCode").val().toLowerCase()
 			}

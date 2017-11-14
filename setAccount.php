@@ -102,7 +102,11 @@
 		<div class="message blackOutline3"></div>
 	<?php
 echo 
-	'<form id="loginWrap" accept-charset="UTF-8" class="strongShadow" onSubmit="return false">
+	'<form id="loginWrap" 
+		accept-charset="UTF-8" 
+		class="strongShadow" 
+		method="post" 
+		onSubmit="return false">
 		<fieldset>
 			<label class="textLeft" for="loginEmail">Set Your Account Name:
 				<input name="account" type="text" id="account" class="loginInputs" maxlength="16" placeholder="Account Name" required="required" />
@@ -137,7 +141,7 @@ echo
 					account: account
 				}
 			}).done(function(data){
-				console.info("OK ", data);
+				//console.info("OK ", data);
 				setError('');
 				var target = "//" + location.host + $("#refer").attr("href");
 				location.replace(target);
