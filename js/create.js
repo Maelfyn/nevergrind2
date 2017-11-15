@@ -147,21 +147,71 @@ var create = {
 		};
 		return z[race];
 	},
+	msg: function(key, val){
+		var z = {
+			gender: {
+				Male: "Males have strong cold and arcane resistance.",
+				Female: "Females receive a boost to bleed and poison resistance."
+			},
+			race: {
+				Barbarian: 'Barbarians are a hardy race that benefit from high strength and stamina. Living through harsh winters in Fenwoven has given them strong cold resistance and above-average scouting skills.',
+				'Dark Elf': 'Dark Elves are an evil race from Vedria that excel in a variety of roles. They boast strong blood and arcane resistance along with good trap and scouting skills.',
+				Dwarf: 'Dwarves hail from Dunhoven, a mountainous region of Vandamor. They are a stout, loyal race with strong resistances to arcane and poison magic. They are also known for unearthing hidden treasures where others would not.',
+				Erudite: 'Erudites are a learned race hailing from the remote island city of Wexxen. Generations of intense academic pursuit has made their bodies weak, but their minds strong. They also boast higher than normal pulling skills, which helps them avoid unnecessary conflicts in dungeons.',
+				Gnome: 'Gnomes hail from Brindomir, a mountainous city on the eastern outskirts of Vandamor. Due to their extensive tinkering and scientific experimentation, they have high lightning resistance and are immune to silence. They also have a small bonus to treasure-finding.',
+				'Half Elf': 'Half Elves are a hybrid of Humans and Wood Elves that primarily dwell in Prentia, a city in western Vandamor. They share a blend of traits from both races and a love of the great outdoors. They have a minor boost to all resists and strong dungeon skills.',
+				Halfling: 'Halflings dwell in Aspen Grove, a hamlet on the southern coast of Vandamor. They are a race of nimble pranksters with high agility and dexterity. They are adept treasure-finders with strong bonuses to disarming traps and pulling. Their unique ability to escape from combat is unmatched.',
+				'High Elf': 'High Elves live in Kaedorn, a walled kingdom ruled by a monarchy for thousands of years. Despite their resemblance to Wood Elves, their strengths are in spellcasting due to their diligent study of magic. They regenerate magic faster than any other race.',
+				Human: 'Humans are a swashbuckling, fearless race hailing from Edenberg, the trade capital of the world. Despite their average attributes, their fearless leadership is legendary throughout Vandamor. Humans are immune to fear, have a bonus to treasure, and the best pulling in the game.',
+				Ogre: 'Ogres hail from Gorgek, a city on an isolated peninsula of southern Vandamor. A brutish and violent race, Ogres have the highest strength and stamina among all races. Furthermore, they are immune to stuns which makes them powerful allies in any party.',
+				Troll: 'Trolls are a savage race from the swaps of Slagnon. Their strength and stamina is second only to Ogres. They uniquely regenerate health faster than any other race, but they are weak to fire magic.',
+				'Wood Elf': 'Wood Elves are a race from the city of Artremia. Their knowledge of the great outdoors is unmatched, giving them strong cold resistance, fire resistance, and the best scouting skills among all races. They are also skilled at disarming traps.'
+			},
+			job: {
+				Bard: 'Bards are a utility class that can wear plate armor. They can fill in almost any role in a pinch, but their true strength lies in making everyone in their party better. Their charm and crowd control skills make them a boon to any party. They also have very strong all-around dungeon skills.',
+				Cleric: "Clerics are a healing class that can wear plate armor. They specialize in directly healing their allies in combat. They boast powerful support spells that buff their party's health and armor. They also have strong magic-based stuns and they can do modest magic damage in a pinch.",
+				Druid: 'Druids are a healing class that can wear leather armor. They have strong direct healing skills and HoT spells. Druids also have powerful elemental spells that make them highly adaptive. Their strong support spells and exception dungeon skills make them an asset to any party.',
+				Enchanter: 'Enchanters are a utility class that can only wear cloth armor. Among the cloth-wearing casters, their magic does the least amount of damage, but they have the strongest support spells in the game. Their ability to crowd control is unmatched, and they have the ability to charm mobs when you really need to turn the tables.',
+				Magician: 'Magicians are a magical DPS class that can only wear cloth armor. They boast the strongest pets in the game due to their ability to summon four types of pets. They also wield powerful elemental magic and some of the most useful support spells in the game.',
+				Monk: "Monks are a physical DPS class that can wear leather armor. Monks practice martial arts to deliver powerful punches and kicks. Monks deliver top-tier physical DPS with hand-to-hand or blunt weapons. They have solid dungeon skills and the best pulling ability among all classes.",
+				Necromancer: 'Necromancers are a magical DPS class that can only wear cloth armor. They have powerful skeleton pets that make quick work of their enemies. Powerful DoT spells, fear, and life tap make them a formidable addition to any party.',
+				Paladin: 'Paladins are a tank class that can wear plate armor. Paladins have the unique ability to lay hands, healing themselves when they need it most. Paladins also have strong stuns and healing spells which make them very difficult to kill.',
+				Ranger: "Rangers are a physical DPS class that can wear chain armor. They're the only class that can use bows, which help them inflict massive damage. A diverse arsenal of magic also aids them in battle. Notably, Rangers have the strongest overall dungeon skills, including the best scouting skills.",
+				Rogue: 'Rogues are a physical DPS class that can wear chain armor. Their combination of stealth and bursts of damage make them deadly on the battlefield. Rogues have unparalleled disarm trap skills, along with very strong treasure and scouting skills.',
+				Shadowknight: 'Shadowknights are a tank class that can wear plate armor. They have the unique ability to harm touch a mob, dealing a large amount of damage to a single target. They have the strongest offensive potential among all tanks along with deadly abilities like fear and life tap.',
+				Shaman: 'Shaman are a healing class that can wear chain armor. They can summon a formidable pet familiar that assists them in combat. Their ability to buff their party and debuff mobs is capable of shifting the odds with ease.',
+				Warrior: 'Warriors are a tank class that can wear plate armor. Warriors have the strongest physical defense and the highest hit points in the game. They can also dish out a solid amount of physical DPS. Their exceptional pulling skills help keep their party out of trouble.',
+				Wizard: 'Wizards are a magical DPS class that can only wear cloth armor. Instead of opting for trickery or pets, they focus on raw magical power. Wizards have a powerful and diverse arsenal of spells at their disposal that make quick work of their prey.'
+			}
+		};
+		return z[key][val];
+	},
+	getRatings: { // tank, phy, mag, heal, utility
+		Warrior: 		[10, 7, 1, 1, 1],
+		Paladin: 		[9, 7, 3, 4, 3],
+		Shadowknight: 	[9, 8, 3, 2, 2],
+		Monk: 			[6, 10, 1, 3, 2],
+		Rogue: 			[6, 10, 1, 1, 4],
+		Ranger: 		[6, 9, 3, 3, 3],
+		Bard: 			[5, 5, 5, 5, 9],
+		Cleric: 		[4, 3, 6, 10, 6],
+		Druid: 			[4, 3, 8, 9, 7],
+		Shaman: 		[4, 4, 7, 9, 8],
+		Enchanter: 		[1, 1, 7, 3, 10],
+		Magician: 		[1, 1, 8, 2, 8],
+		Necromancer: 	[1, 1, 9, 3, 6],
+		Wizard: 		[1, 1, 10, 1, 5]
+	},
 	set: function(key, val){
 		console.info('Setting ', key, 'to: ', val);
 		console.info(create.form);
 		create.form[key] = val;
 		document.getElementById(key + '-value').innerHTML = val;
+		// details
+		var msg = "Lorem ipsum test 1 2 3 4 5";
+		g.split('create-details', create.msg(key, val));
 		if (key === 'job'){
 			document.getElementById('type-value').innerHTML = create.types[val];
-			// ratings
-			['tank',
-			'physical',
-			'magical',
-			'healer',
-			'utility'].forEach(function(v, i){
-				document.getElementById(v + '-value').innerHTML = create.getRatings[val][i];
-			});
 		}
 		// resists
 		['bleed',
@@ -197,22 +247,6 @@ var create = {
 		Shaman: 'Healer',
 		Warrior: 'Tank',
 		Wizard: 'Magical DPS'
-	},
-	getRatings: { // tank, phy, mag, heal, utility
-		Warrior: 		[10, 7, 1, 1, 1],
-		Paladin: 		[9, 7, 3, 4, 3],
-		Shadowknight: 	[9, 8, 3, 2, 2],
-		Monk: 			[6, 10, 1, 3, 2],
-		Rogue: 			[6, 10, 1, 1, 4],
-		Ranger: 		[6, 9, 3, 3, 3],
-		Bard: 			[5, 5, 5, 5, 9],
-		Cleric: 		[4, 3, 6, 10, 6],
-		Druid: 			[4, 3, 8, 9, 7],
-		Shaman: 		[4, 4, 7, 9, 8],
-		Enchanter: 		[1, 1, 7, 3, 10],
-		Magician: 		[1, 1, 8, 2, 8],
-		Necromancer: 	[1, 1, 9, 3, 6],
-		Wizard: 		[1, 1, 10, 1, 5]
 	},
 	getResist: function(type){
 		var v = 15,
@@ -418,8 +452,7 @@ var create = {
 			// class
 			if (f.job === 'Magician' || 
 				f.job === 'Necromancer' || 
-				f.job === 'Shaman' || 
-				f.job === 'Wizard'){
+				f.job === 'Shaman'){
 				v += 5;
 			}
 			else if (f.job === 'Enchanter' || 
@@ -431,8 +464,7 @@ var create = {
 			else if (f.job === 'Druid'){
 				v += 15;
 			}
-			else if (f.job === 'Bard' ||
-				f.job === 'Monk'){
+			else if (f.job === 'Bard'){
 				v += 20;
 			}
 			else if (f.job === 'Ranger'){
@@ -444,6 +476,7 @@ var create = {
 			else if (f.job === 'Monk'){
 				v += 50;
 			}
+			console.info("JOB: ", f.job, v);
 		}
 		return v;
 	},

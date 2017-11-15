@@ -39,8 +39,41 @@ html {
     display: block;
     background: #000;
     overflow: hidden;
-	font-size: 16px;
+	font-size: 12px;
 }
+@media only screen and (min-width: 0px) and (max-width: 639px) {
+	html {
+		font-size: 12px;
+	}
+}
+@media only screen and (min-width: 640px) {
+	html {
+		font-size: 15px;
+	}
+}
+@media only screen and (min-width: 768px){
+	html {
+		font-size: 18px;
+	}
+}
+@media only screen and (min-width: 1024px) {
+	html {
+		font-size: 22px;
+	}
+}
+body {
+    font-family: Roboto, Verdana, Arial, sans-serif;
+    position: absolute;
+    background: #000;
+	color: #fff;
+    width: 100%;
+	max-width: 1920px;
+	min-width: 540px;
+    height: 100%;
+    overflow: hidden;
+	overflow-y: auto;
+}
+
 input {
     cursor: text;
     background: #059
@@ -52,18 +85,6 @@ input {
 }
 .form-control:focus {
     background: #025;
-}
-body {
-    font-family: Roboto, Verdana, Arial, sans-serif;
-    position: absolute;
-    background: #000;
-	color: #fff;
-    width: 100%;
-	max-width: 1920px;
-	min-width: 768px;
-    height: 100%;
-    overflow: hidden;
-	overflow-y: auto;
 }
 a {
     color: #aef;
@@ -262,7 +283,7 @@ tbody {
     margin: 0!important
 }
 .tight {
-    padding: 4px!important;
+    padding: .125rem!important;
 }
 .snug {
     padding: 0!important;
@@ -278,21 +299,6 @@ tbody {
     cursor: text!important
 }
 /* responsive rules */
-@media all and (min-width: 1024px) {
-    body {
-        font-size: 1.5rem
-    }
-}
-@media all and (min-width: 768px) and (max-width: 1023px) {
-    body {
-        font-size: 1.25rem
-    }
-}
-@media all (max-width: 767px) {
-    body {
-        font-size: 1rem
-    }
-}
 /* ng2 general */
 #ng2-logo-wrap {
     background: #000;
@@ -337,7 +343,7 @@ tbody {
 	width: 100%;
 	height: auto;
 	max-width: 1280px;
-	min-width: 768px;
+	min-width: 540px;
     overflow: hidden;
 }
 #title-header{
@@ -442,27 +448,18 @@ tbody {
 	box-shadow: 0 0 10px #579 inset;
 }
 #gender-wrap {
-	margin: 24px 2px 0;
-}
-.gender-row {
-	position: relative;
-	font-family: Roboto Slab;
-	font-size: 1.75rem;
+	margin-top: 1rem;
+	font: 1.5rem Roboto Slab;
 	line-height: 1;
 	text-transform: uppercase;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
 }
-#Male, #Female {
-	position: absolute;
-	top: 2px;
-	right: 0;
+.select-gender {
+	float: right;
 }
 .select-radial {
 	display: inline-block;
-	width: 24px;
-	height: 24px;
+	width: 1.25rem;
+	height: 1.25rem;
 	background: #bba;
 	box-shadow: 
 		1px 1px #579 inset, 
@@ -487,19 +484,17 @@ tbody {
 	text-transform: uppercase;
 }
 #create-info {
-	font-size: 1rem;
+	font-size: .75rem;
 	padding: 0 2px;
 	height: 92%;
 }
 #create-character-name-wrap {
-	position: absolute;
-	width: calc(100% - 17px);
-	margin: 0 auto;
-	bottom: calc(0% + 12px);
+	margin-bottom: .5rem;
+	border: 2px outset #27d;
 }
 #create-character-name {
 	line-height: 1;
-	border: 2px ridge #05b;
+	border: 2px inset #025;
 	border-radius: 0;
 	text-transform: capitalize;
 }
@@ -578,7 +573,7 @@ tbody {
     right: 0;
     margin: 0 auto;
     width: 80%;
-    max-width: 768px;
+    max-width: 800px;
     padding: 0 8%;
     text-align: center;
     font-size: 1.125rem;

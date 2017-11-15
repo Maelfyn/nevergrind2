@@ -270,8 +270,8 @@ g = {
 					display: 'none',
 					opacity: 1
 				});
-				create.setRandomRace();
 				create.setRandomGender();
+				create.setRandomRace();
 				TweenMax.to('#title-scene-create-character', .6, {
 					startAt: {
 						display: 'block',

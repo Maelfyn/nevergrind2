@@ -15,11 +15,11 @@ barb 25 CR 5 scout
 DE 10 BR 10 AR 5 traps 8 scout
 Dwarf 10 AR 10 PR 10 treasure
 ERU 25 AR 5 pulling
-gnome 20 LR Silence resistant 5 treasure
+gnome 20 LR Silence immune 5 treasure
 HE 3 all resist, 7 all dungeon
 halfling - flee duration, +10 traps, +20 treasure, +10 pulling
 high elf: +1/20 levels mp regen
-human fear resistant, 10 treasure 20 pulling
+human fear immune, 10 treasure 20 pulling
 ogre stun immune
 troll 1 hp regen/12 levels -10 FR
 WE 10 FR 10 CR 10 traps 15 scout
@@ -31,7 +31,7 @@ Enchanter 		10 	10 	10 	10
 Magician 		0 	5 	0 	5
 Monk 			20 	10 	20 	50
 Necromancer 	0 	5 	0 	5
-Paladin 		10 	5 	10 	0
+Paladin 		10 	5 	10 	10
 Ranger 			30 	30 	50 	30
 Rogue 			50 	30 	25 	10
 Shadowknight	5 	10 	5 	10
@@ -296,4 +296,65 @@ WIZ		250			250			250			250			250
 		
 		
 		
-		
+=========================================================================
+LORE:
+
+LORE:
+Events:
+Imperial Shattering - Global war for nationality sovereignty that saw the deaths of millions due to mass ethnic cleansing, food shortages, and disease. Vandamor enjoyed long period of peace and prosperity until increasing ethnic, religious, and nationalist tension resulted in both radical political groups and Imperial officers engaged in mass ethnic cleansing, tribal warfare, and, ultimately, sovereign realignment throughout Vandamor. 
+
+Since that time a period of staunch nationalist domestic policy has emerged with increasingly distinct national identities. Yet, a period of relative calm has emerged with nations agreeing to mutually beneficial trade agreements and other forms of diplomacy.
+
+Characters:
+Marcus Arwen - Imperial Leader
+
+Cities:
+Imperial City - Cathmodin - ? Central large city in Vandamor
+Edenburg - Humans
+Wexxen - Erudite City
+Fenwoven - Barbarian City
+Prentia - HE City - Altheim
+Artremia - WE City - Rinara
+Vedria - DE City - Wenerva
+Kaedorn - HE City
+Dunhoven - Dwarf City - Grynnhoven - 
+	Surlin Grimhelm
+Brindomir - Gnome City
+Aspen Grove - Halfling City
+Slagnon - Troll City - Megnemon
+Gorgek - Ogre City - Trogmaar
+	Gelke
+
+Landmarks:
+Holomir River - By Riven Grotto
+	
+Bosses:
+Chief Grimden
+Arcturin, the Skeleton King
+Sentoth, Lord of Rapture
+
+Revenant Viston
+Matron Maelentia
+Highlord Szarthax
+Vixen Sarmina
+Falzitherin
+Ghalentus
+Nalatos, God of Chaos
+
+Gods:
+
+Yentus - God of Light - Venova
+Kartumi - God of Souls - Qalon
+Kurnst - God of Discipline - Qiromir
+Rinara - Goddess of Nature - Plyntha
+Ormir - God of Nature - Plyntha
+Wenerva - Goddess of Destruction - Wyrna
+Accostine - God of War - Descrina
+Tolloth - God of Sacrifice - Bozrah
+Ghalentus - God of Corruption - Bernoxt
+Nalatos - God of Chaos - Nimgaul
+Desticor - God of Pestilent - Arqas
+Carthrask - God of Magic - Kivoren
+Rathmonan - God of Lightning - Prachen
+Rorvalen - God of Cold - Shendoma
+Erasthule - God of Fire - Clastocaust - minions: Thalens

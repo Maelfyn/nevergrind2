@@ -34,11 +34,11 @@
 		require $_SERVER['DOCUMENT_ROOT'] . "/includes/loginCss.html";
 	}
 	?>
-	<link rel="stylesheet" href="css/ng2.css?v=0-0-9">
+	<link rel="stylesheet" href="css/ng2.css?v=0-0-10">
 	<link rel="shortcut icon" href="/images/favicon.png">
 	<script>
 		var g = {
-			version: '0-0-9'
+			version: '0-0-10'
 		};
 	</script>
 </head>
@@ -190,14 +190,18 @@
 							</div>
 						</div>
 						
-						<div id="gender-wrap">
-							<div class="gender-row">
-								<span>Male</span>
-								<div id="Male" class="select-radial select-gender active"></div>
+						<div id="gender-wrap" class="container-fluid">
+							<div class="row justify-content-between">
+								<span class="col tight">Male</span>
+								<div class="col tight">
+									<div id="Male" class="select-radial select-gender active"></div>
+								</div>
 							</div>
-							<div class="gender-row">
-								<span>Female</span>
-								<div id="Female" class="select-radial select-gender"></div>
+							<div class="row justify-content-between">
+								<span class="col tight">Female</span>
+								<div class="col tight">
+									<div id="Female" class="select-radial select-gender"></div>
+								</div>
 							</div>
 						</div>
 						
@@ -206,35 +210,6 @@
 				
 				<div class="col-3 tight">
 					<div class="title-ch-create-col">
-						<div id="create-info">
-							<div class="character-info-header">Overview</div>
-							<div>Gender: <span id="gender-value"></span></div>
-							<div>Race: <span id="race-value"></span></div>
-							<div>Class: <span id="job-value"></span></div>
-							<div>Type: <span id="type-value"></span></div>
-							
-							<div class="character-info-header">Ratings</div>
-							<div>Tank: <span id="tank-value"></div>
-							<div>Physical DPS: <span id="physical-value"></div>
-							<div>Magical DPS: <span id="magical-value"></div>
-							<div>Healer: <span id="healer-value"></div>
-							<div>Utility: <span id="utility-value"></div>
-							
-							<div class="character-info-header">Resistances</div>
-							<div>Bleed: <span id="bleed-value"></span></div>
-							<div>Poison: <span id="poison-value"></span></div>
-							<div>Arcane: <span id="arcane-value"></span></div>
-							<div>Lightning: <span id="lightning-value"></span></div>
-							<div>Fire: <span id="fire-value"></span></div>
-							<div>Cold: <span id="cold-value"></span></div>
-							
-							<div class="character-info-header">Dungeon</div>
-							<div>Traps: <span id="traps-value"></span></div>
-							<div>Treasure: <span id="treasure-value"></span></div>
-							<div>Scout: <span id="scout-value"></span></div>
-							<div>Pulling: <span id="pulling-value"></span></div>
-						</div>
-						
 						<div id="create-character-name-wrap">
 							<input id="create-character-name" 
 								class="form-control ng-blue-input text-shadow" 
@@ -243,6 +218,47 @@
 								spellcheck="false"
 								autocomplete="off"
 								placeholder="Character Name">
+						</div>
+						
+						<div id="create-info">
+							<div class="character-info-header">Overview</div>
+							<div>Gender: <span id="gender-value"></span></div>
+							<div>Race: <span id="race-value"></span></div>
+							<div>Class: <span id="job-value"></span></div>
+							<div>Type: <span id="type-value"></span></div>
+							
+							<div class="character-info-header">Resistances</div>
+							<div class="container">
+								<div class="row">
+									<div class="col-6 tight">
+										<div>Bleed: <span id="bleed-value" class="pull-right"></span></div>
+										<div>Poison: <span id="poison-value" class="pull-right"></span></div>
+										<div>Arcane: <span id="arcane-value" class="pull-right"></span></div>
+									</div>
+									<div class="col-6 tight">
+										<div>Lightning: <span id="lightning-value" class="pull-right"></span></div>
+										<div>Fire: <span id="fire-value" class="pull-right"></span></div>
+										<div>Cold: <span id="cold-value" class="pull-right"></span></div>
+									</div>
+								</div>
+							</div>
+							
+							<div class="character-info-header">Dungeon</div>
+							<div class="container">
+								<div class="row">
+									<div class="col-6 tight">
+										<div>Traps: <span id="traps-value" class="pull-right"></span></div>
+										<div>Treasure: <span id="treasure-value" class="pull-right"></span></div>
+									</div>
+									<div class="col-6 tight">
+										<div>Scout: <span id="scout-value" class="pull-right"></span></div>
+										<div>Pulling: <span id="pulling-value" class="pull-right"></span></div>
+									</div>
+								</div>
+							</div>
+							
+							<div class="character-info-header">Details</div>
+							<div id="create-details"></div>
 						</div>
 					</div>
 				</div>
