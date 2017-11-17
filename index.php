@@ -34,16 +34,18 @@
 		require $_SERVER['DOCUMENT_ROOT'] . "/includes/loginCss.html";
 	}
 	?>
-	<link rel="stylesheet" href="css/ng2.css?v=0-0-10">
+	<link rel="stylesheet" href="css/ng2.css?v=0-0-18">
 	<link rel="shortcut icon" href="/images/favicon.png">
 	<script>
 		var g = {
-			version: '0-0-10'
+			version: '0-0-18'
 		};
 	</script>
 </head>
 
 <body id="body">
+
+<main>
 <div id="landscape">
 	<div id="ng2-logo-wrap">
 		<img src="images/bg/ng2-bg.jpg" id="ng2-bg" alt="Nevergrind 2 Background">
@@ -61,15 +63,18 @@
 	<div id="title-scene-select-character">
 	
 		<header id="title-header" class="text-primary text-shadow">
-			<?php
-			if (isset($_SESSION['account']) && !isset($_SESSION['kong'])){
-				echo '<a id="logout" class="btn btn-primary btn-sm pointer">Logout '. $_SESSION['account'] .'</a>';
-			} else if (isset($_SESSION['kong'])){
-				echo $_SESSION['account'];
-			}
-			?>
-			<i id="options" class="pointer options fa fa-volume-up"></i>
-			<div class="pull-right text-primary">
+			<div class="title-column">
+				<?php
+				if (isset($_SESSION['account']) && !isset($_SESSION['kong'])){
+					echo '<a id="logout" class="btn btn-primary btn-sm pointer">Logout '. $_SESSION['account'] .'</a>';
+				} else if (isset($_SESSION['kong'])){
+					echo $_SESSION['account'];
+				}
+				?>
+				<i id="options" class="pointer options fa fa-volume-up"></i>
+			</div>
+			
+			<div id="social-icons" class="text-primary title-column">
 				<a href="//twitch.tv/maelfyn">
 					<i class="fa fa-twitch text-primary pointer"></i>
 				</a>
@@ -210,15 +215,6 @@
 				
 				<div class="col-3 tight">
 					<div class="title-ch-create-col">
-						<div id="create-character-name-wrap">
-							<input id="create-character-name" 
-								class="form-control ng-blue-input text-shadow" 
-								type="text" 
-								maxlength="16" 
-								spellcheck="false"
-								autocomplete="off"
-								placeholder="Character Name">
-						</div>
 						
 						<div id="create-info">
 							<div class="character-info-header">Overview</div>
@@ -259,6 +255,16 @@
 							
 							<div class="character-info-header">Details</div>
 							<div id="create-details"></div>
+						</div>
+						
+						<div id="create-character-name-wrap">
+							<input id="create-character-name" 
+								class="form-control ng-blue-input text-shadow" 
+								type="text" 
+								maxlength="16" 
+								spellcheck="false"
+								autocomplete="off"
+								placeholder="Character Name">
 						</div>
 					</div>
 				</div>
@@ -314,10 +320,81 @@
 				</div>
 				
 				<div class="col-3 tight">
-					<div class="title-ch-create-col">
-						Points Remaining<br>
-						Attributes<br>
-						Create Button
+					<div class="title-ch-create-col flex-column">
+						<div id="create-attr">
+							<div id="create-attr-remaining" class="row">
+								<div id="create-points-label" class="col-7">
+									<div>Ability</div>
+									<div>Points</div>
+									<div>Left</div>
+								</div>
+								<div id="create-points-value" class="col snug">
+									<div class="create-attr-square">
+										<div id="create-points-remaining" class="create-attr-value">10</div>
+									</div>
+								</div>
+							</div>
+							
+							<div id="create-attr-distribute" class="row">
+								<div class="create-attr-type col-7 snug">STR</div>
+								<div class="col snug">
+									<div class="create-attr-square">
+										<div id="create-points-str" 
+											class="create-attr-value create-attr-dynamic">0</div>
+									</div>
+								</div>
+								<div class="create-attr-type col-7 snug">STA</div>
+								<div class="col snug">
+									<div class="create-attr-square">
+										<div id="create-points-sta" 
+											class="create-attr-value create-attr-dynamic">0</div>
+									</div>
+								</div>
+								
+								<div class="create-attr-type col-7 snug">AGI</div>
+								<div class="col snug">
+									<div class="create-attr-square">
+										<div id="create-points-agi" 
+											class="create-attr-value create-attr-dynamic">0</div>
+									</div>
+								</div>
+								
+								<div class="create-attr-type col-7 snug">DEX</div>
+								<div class="col snug">
+									<div class="create-attr-square">
+										<div id="create-points-dex" 
+											class="create-attr-value create-attr-dynamic">0</div>
+									</div>
+								</div>
+								
+								<div class="create-attr-type col-7 snug">WIS</div>
+								<div class="col snug">
+									<div class="create-attr-square">
+										<div id="create-points-wis" 
+											class="create-attr-value create-attr-dynamic">0</div>
+									</div>
+								</div>
+								
+								<div class="create-attr-type col-7 snug">INT</div>
+								<div class="col snug">
+									<div class="create-attr-square">
+										<div id="create-points-intel" 
+											class="create-attr-value create-attr-dynamic">0</div>
+									</div>
+								</div>
+								
+								<div class="create-attr-type col-7 snug">CHA</div>
+								<div class="col snug">
+									<div class="create-attr-square">
+										<div id="create-points-cha" 
+											class="create-attr-value create-attr-dynamic">0</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div id="create-attr-btn-wrap" class="grow-0">
+							<button id="create-character-btn" class="btn btn-primary btn-block pointer text-shadow">Create Character</button>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -339,6 +416,8 @@
 </div>
 
 <div id="portrait">This application must be viewed in landscape mode. Turn your device 90 degrees for maximum enjoyment.</div>
+</main>
+
 </body>
 
 <script src="js/libs/libs.min.js"></script>

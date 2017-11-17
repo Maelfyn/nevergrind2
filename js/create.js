@@ -19,15 +19,15 @@ var create = {
 			var race = $(this).text();
 			$('.select-race').removeClass('active');
 			$(this).addClass('active');
-			create.setRandomClass(race);
 			create.set('race', race);
+			create.setRandomClass(race);
 		});
 		$(".select-class").on(env.click, function(e){
 			if ($(this).get(0).className.indexOf('disabled') === -1){
 				var job = $(this).text();
 				$('.select-class').removeClass('active');
 				$(this).addClass('active');
-			create.set('job', job);
+				create.set('job', job);
 			}
 		});
 		$(".select-gender").on(env.click, function(){
@@ -186,6 +186,69 @@ var create = {
 		};
 		return z[key][val];
 	},
+	/*
+		39 - 6
+		43 - 7
+		47 - 8
+		51 - 9
+		55 - 10
+		59 - 11
+		63 - 12
+		67 - 13
+		71 - 14
+		75 - 15
+		79 - 16
+		83 - 17
+		87 - 18
+		91 - 19
+		95 - 20
+		99 - 21
+		103 - 22
+		107 - 23
+		111 - 24
+		115 - 25
+		119 - 26
+		123 - 27
+		127 - 28
+		131 - 29
+		135 - 30
+	*/
+	getRaceAttributes: function(race){
+		var x = {
+			Barbarian: 	[22, 20, 17, 14, 14, 11, 10],
+			'Dark Elf': [11, 13, 19, 15, 17, 21, 11],
+			Dwarf: 		[19, 19, 14, 19, 17, 11, 8],
+			Erudite: 	[11, 14, 14, 14, 17, 23, 14],
+			Gnome: 		[11, 14, 18, 18, 13, 21, 11],
+			'Half Elf': [14, 14, 19, 18, 11, 15, 15],
+			Halfling: 	[14, 15, 20, 19, 16, 9, 9],
+			'High Elf': [10, 13, 18, 14, 20, 19, 16],
+			Human: 		[15, 15, 15, 15, 15, 15, 15],
+			Ogre: 		[29, 28, 14, 14, 13, 11, 6],
+			Troll: 		[23, 25, 17, 15, 11, 9, 6],
+			'Wood Elf': [13, 13, 20, 16, 15, 15, 15]
+		}
+		return x[race];
+	},
+	getJobAttributes: function(job){
+		var x = {
+			Bard: 			[2, 0, 0, 4, 0, 0, 4],
+			Cleric: 		[0, 2, 2, 0, 4, 2, 0],
+			Druid: 			[0, 2, 2, 0, 4, 2, 0],
+			Enchanter: 		[0, 0, 0, 0, 2, 4, 4],
+			Magician: 		[0, 4, 0, 0, 2, 4, 0],
+			Monk: 			[4, 2, 2, 2, 0, 0, 0],
+			Necromancer: 	[0, 4, 0, 0, 2, 4, 0],
+			Paladin: 		[4, 2, 0, 2, 2, 0, 4],
+			Ranger: 		[2, 2, 2, 2, 2, 0, 0],
+			Rogue: 			[4, 2, 4, 2, 0, 0, 0],
+			Shadowknight: 	[4, 2, 0, 2, 0, 2, 2],
+			Shaman: 		[0, 2, 2, 0, 4, 2, 0],
+			Warrior: 		[4, 4, 0, 2, 0, 0, 0],
+			Wizard: 		[0, 2, 0, 0, 4, 4, 0]
+		}
+		return x[job];
+	},
 	getRatings: { // tank, phy, mag, heal, utility
 		Warrior: 		[10, 7, 1, 1, 1],
 		Paladin: 		[9, 7, 3, 4, 3],
@@ -231,6 +294,25 @@ var create = {
 		].forEach(function(v, i){
 			document.getElementById(v + '-value').innerHTML = create.getDungeon(v);
 		});
+		// reset attr
+		if (key === 'job'){
+			console.info(key, val, create.form);
+			var attr = create.getRaceAttributes(create.form.race);
+			var bonuses = create.getJobAttributes(create.form.job);
+			bonuses.forEach(function(v, i){
+				attr[i] += v;
+			});
+			['str',
+			'sta',
+			'agi',
+			'dex',
+			'wis',
+			'intel',
+			'cha'].forEach(function(v, i){
+				document.getElementById('create-points-' + v).innerHTML = attr[i];
+			});
+			
+		}
 	},
 	types: {
 		Bard: 'Utility',
@@ -323,7 +405,7 @@ var create = {
 		return v;
 	},
 	getDungeon: function(type){
-		var v = 20,
+		var v = 15,
 			f = create.form;
 		
 		if (type === 'traps'){
@@ -476,7 +558,6 @@ var create = {
 			else if (f.job === 'Monk'){
 				v += 50;
 			}
-			console.info("JOB: ", f.job, v);
 		}
 		return v;
 	},

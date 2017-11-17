@@ -1,3 +1,78 @@
+WHAT DO ATTRIBUTES AFFECT:
+str: melee damage
+sta: maxhp, hp regen
+agi: mobs miss you, dodge
+dex: your melee miss rate, fizzle rate, proc rate, parry, riposte, melee skill upgrades?
+wis: healing power, mp regen
+int: spell damage, maxmp, casting skill upgrades
+cha: Prices. crowd control, mes, charm, etc spells
+
+
+
+
+
+Barbarian: 
+'Dark Elf': 
+Dwarf: 
+Erudite: 
+Gnome: 
+'Half Elf': 
+Halfling: 
+'High Elf': 
+Human: 
+Ogre: 
+Troll: 
+'Wood Elf': 
+
+Bard: 
+Cleric: 
+Druid: 
+Enchanter: 
+Magician: 
+Monk: 
+Necromancer: 
+Paladin: 
+Ranger: 
+Rogue: 
+Shadowknight: 
+Shaman: 
+Warrior: 
+Wizard: 
+
+ATTRIBUTE BASE STATS:
+				STR		STA		AGI		DEX		INT		CHA
+Barbarian		 										
+Dark Elf		 										
+Dwarf		 											
+Erudite		 											
+Gnome		 											
+Half Elf		 										
+Halfling		 										
+High Elf		 										
+Human		 											
+Ogre		 											
+Troll		 											
+Wood Elf		 										
+
+ATTRIBUTE BONUSES
+
+Bard 													
+Cleric 													
+Druid 			 										
+Enchanter 		 										
+Magician 		 										
+Monk 													
+Necromancer 											
+Paladin 												
+Ranger 													
+Rogue 													
+Shadowknight 											
+Shaman 													
+Warrior  												
+Wizard  												
+
+
+
 HP FORMULA:
 
 var foo = (((((staTotal()) * JOB.hpTier) * (x / 50)) + (x *  (7/11/13) + 20)) + g.hpEquip + maxHpBuff;

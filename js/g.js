@@ -15,7 +15,7 @@ g = {
 		});
 	},
 	gameDuration: 0,
-	delay: init.isMobile? 0 : .5,
+	delay: init.isMobile ? 0 : .5,
 	modalSpeed: init.isMobile ? 0 : .5,
 	friends: [],
 	ignore: [],
@@ -294,7 +294,7 @@ g.init = (function(){
 		type: 'POST',
 		timeout: 5000
 	});
-	TweenMax.defaultEase = Quad.easeOut;
+	TweenLite.defaultEase = Quad.easeOut;
 })();
 function test(){
 	$("#title-container-wrap").css('display', 'none');

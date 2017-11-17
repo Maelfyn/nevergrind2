@@ -33,45 +33,58 @@
     outline: none
 }
 html {
-    font-family: Roboto, Verdana, Arial, sans-serif;
     -ms-touch-action: manipulation;
     touch-action: manipulation;
-    display: block;
-    background: #000;
-    overflow: hidden;
-	font-size: 12px;
+	font-size: 22px;
+	padding: 0;
+	margin: 0;
+	height: 100%;
 }
-@media only screen and (min-width: 0px) and (max-width: 639px) {
+@media only screen and (min-width: 0px) and (max-width: 767px) {
 	html {
-		font-size: 12px;
-	}
-}
-@media only screen and (min-width: 640px) {
-	html {
-		font-size: 15px;
+		font-size: 14px;
 	}
 }
 @media only screen and (min-width: 768px){
+	html {
+		font-size: 16px;
+	}
+}
+@media only screen and (min-width: 900px) {
 	html {
 		font-size: 18px;
 	}
 }
 @media only screen and (min-width: 1024px) {
 	html {
+		font-size: 20px;
+	}
+}
+@media only screen and (min-width: 1280px) {
+	html {
 		font-size: 22px;
 	}
 }
 body {
+	display: flex;
+	flex-direction: column;
+	margin: 0 auto;
+	position: relative;
     font-family: Roboto, Verdana, Arial, sans-serif;
-    position: absolute;
     background: #000;
 	color: #fff;
     width: 100%;
 	max-width: 1920px;
 	min-width: 540px;
-    height: 100%;
+	height: 1080px;
     overflow: hidden;
 	overflow-y: auto;
+}
+main {
+	display: flex;
+	flex-direction: row;
+	flex: 1;
+	justify-content: center;
 }
 
 input {
@@ -102,10 +115,10 @@ h1 {
 	margin-bottom: 12px;
 }
 h1 div {
-    font-size: 1.375rem;
+    font-size: 1rem;
 }
 h1 div.small {
-    font-size: 1rem;
+    font-size: .8rem;
 }
 audio {
 	display: none;
@@ -333,6 +346,9 @@ tbody {
 	border: 2px ridge #05b;
 	border-top: none;
 }
+#title-scene-select-character {
+	font-size: .8rem;
+}
 #title-scene-select-character, 
 #title-scene-create-character {
 	position: relative;
@@ -344,26 +360,89 @@ tbody {
 	height: auto;
 	max-width: 1280px;
 	min-width: 540px;
+	max-height: 1080px;
     overflow: hidden;
 }
 #title-header{
-	padding: 2px 8px 4px;
-	font-size: 1.5rem;
+	display: flex;
+	flex-direction: row;
+	font-size: 1.2rem;
+	padding: 4px 8px;
 	border-bottom: 2px ridge #000;
-	background: #111;
+	background: rgba(0,0,0,.8);
+}
+.title-column {
+	display: flex;
+	flex: 1;
+	align-items: center;
+}
+#title-options {
+	justify-content: left;
+}
+#social-icons {
+	justify-content: right;
+	flex: 0;
 }
 #title-header a:hover {
 	text-decoration: none;
 }
 #title-header .fa {
-    margin: 0 4px;
+    margin: 0 .3rem;
 }
 #logout {
-	position: relative;
-	top: -2px;
 	color: #fff;
 }
-
+.flex-row {
+	display: flex;
+	flex-direction: row;
+}
+.flex-column {
+	display: flex;
+	flex-direction: column;
+}
+#create-attr {
+	flex-grow: 1;
+}
+.grow-0 {
+	flex-grow: 0;
+}
+#create-attr-remaining {
+	justify-content: space-evenly;
+	font-family: Roboto Slab, serif;
+	line-height: 1;
+}
+#create-points-label {
+	font-size: 1.5rem;
+	text-align: center;
+}
+#create-points-value {
+	align-self: center;
+}
+.create-attr-square {
+	position: relative;
+	width: 3rem;
+	height: 3rem;
+	border: 4px groove #579;
+}
+.create-attr-value {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100%;
+	border: 2px outset #eed;
+	height: 100%;
+}
+.create-attr-type {
+	font-family: Roboto Slab, serif;
+	text-align: center;
+	font-size: 2rem;
+}
+.create-attr-dynamic {
+	background: #048;
+}
+#create-points-remaining {
+	background: #bba;
+}
 .title-ch-create-col {
 	background: #013;
 	margin: 4px 0;
@@ -411,6 +490,7 @@ tbody {
 	display: block;
 	border-radius: 6px;
 	cursor: pointer;
+	font-size: 1rem;
 }
 .ch-card-active {
 	box-shadow: 0 99px rgba(0,0,0,.5) inset, 0 4px 10px 2px rgba(0,0,0,.8) inset;
@@ -489,8 +569,7 @@ tbody {
 	height: 92%;
 }
 #create-character-name-wrap {
-	margin-bottom: .5rem;
-	border: 2px outset #27d;
+	border: 1px outset #048;
 }
 #create-character-name {
 	line-height: 1;
@@ -501,7 +580,16 @@ tbody {
 #create-character-name:focus {
 	box-shadow: none;
 }
-#class-wrap {
+#create-attr-btn-wrap {
+	border: 2px ridge #048;
+	background: #025;
+}
+#create-character-btn {
+	border-radius: 0;
+	box-shadow: 
+		0 0 2px #025 inset,
+		0 0 6px #05b inset,
+		0 0 15px #8bf inset;
 }
 
 /* some other stuff */
@@ -512,7 +600,7 @@ tbody {
     left: 0%;
     width: 100%;
     text-align: center;
-    font-size: 1.75rem;
+    font-size: 1rem;
     color: #aef;
     z-index: 999999;
     pointer-events: none;
@@ -576,7 +664,7 @@ tbody {
     max-width: 800px;
     padding: 0 8%;
     text-align: center;
-    font-size: 1.125rem;
+    font-size: 1rem;
     color: #fff;
     background: rgba(0, 0, 0, .9);
     background: -webkit-linear-gradient(right, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, .9) 20%, rgba(0, 0, 0, .9) 80%, rgba(0, 0, 0, 0) 100%);

@@ -2,63 +2,11 @@
 
 var env = {
 	setMobile: function(){
-		 $("head").append('<style>'+
-			'*{ box-shadow: none !important; border-radius: 0 !important; } '+
-			'.fw-primary{ background: #04061a; border: 1px solid #357; } '+
-			'#titleChatPlayers,#statWrap, #joinGameLobby{ background: rgba(0,12,32,1); } '+
-			'#refreshGameWrap{ background: none; } '+
-			'#hud{ top: 40px; }'+
-			'#diplomacy-ui, #ui2{ top: .25vh; }'+
-			'#resources-ui{ bottom: .5vh; }'+
-			'#lobbyLeftCol, #lobbyRightCol{ top: 1vh; }'+
-			'#chat-ui{ bottom: 4vh; }'+
-			'#refreshGameWrap{ height: 64vh; }'+
-			/*'.titlePanelLeft{ height: 80vh; } '+
-			'#chat-input{ bottom: 3vh; }'+
-			'#titleMenu, #titleChat{ bottom: 7vh; } '+*/
-			'.lobbyButtons, .fwDropdown, .govDropdown{ font-size: 1.25em; }'+
-			'#target-ui, #targetLineShadow, .chat-img{ display: none; }'+
-			'.chat-hidden{ color: #fff; }'+
-		'</style>');
 	},
 	click: init.isMobile ? 'mousedown' : 'click',
 	resizeWindow: function() {
-		function forceMod4(x){
-			while (x % 4 !== 0) x--;
-			return x;
-		}
-		var winWidth = window.innerWidth,
-			winHeight = window.innerHeight,
-			b = document.getElementById('body'),
-			scenes = document.getElementsByClassName('scene');
-		if (init.isMobile){
-			winHeight = ~~(winHeight * 1.1);
-		}
-		// game ratio
-		var widthToHeight = window.innerWidth / window.innerHeight;
-		// current window size
-		var w = winWidth > window.innerWidth ? window.innerWidth : winWidth;
-		var h = winHeight > window.innerHeight ? window.innerHeight : winHeight;
-		if(w / h > widthToHeight){
-			// too tall
-			w = ~~(h * widthToHeight);
-		} else {
-			// too wide
-			h = ~~(w / widthToHeight);
-		}
-		w = forceMod4(w);
-		h = forceMod4(h);
-		TweenMax.set([b], {
-			x: ~~(w/2 + ((winWidth - w) / 2)),
-			y: ~~(h/2 + ((winHeight - h) / 2)),
-			width: w + 'px',
-			height: h + 'px',
-			yPercent: -50,
-			xPercent: -50,
-			force3D: true
-		});
-		g.resizeX = w / window.innerWidth;
-		g.resizeY = h / window.innerHeight;
+		var w = window.innerWidth,
+			h = window.innerHeight
 		// portrait/landscape
 		if (init.isMobile){
 			document.getElementById('portrait').style.display = w < h ? 'block' : 'none';
@@ -91,11 +39,8 @@ var env = {
 			//alert("Oh no! It looks like you're using Safari! Please consider using Chrome or Firefox for a better experience!");
 		}
 	}
-	if (init.isMobile || location.hash === '#mobiletest'){
+	if (init.isMobile){
 		env.setMobile();
-	}
-	if (location.hash === '#synergist' || location.hash === '#sfw'){
-		env.setWorkSafe();
 	}
 	localStorage.setItem('isMobile', init.isMobile);
 	setTimeout(function(){
