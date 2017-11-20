@@ -35,34 +35,43 @@
 html {
     -ms-touch-action: manipulation;
     touch-action: manipulation;
-	font-size: 22px;
 	padding: 0;
 	margin: 0;
 	height: 100%;
 }
-@media only screen and (min-width: 0px) and (max-width: 767px) {
+@media only screen and (min-width: 0px) and (max-width: 599px) {
 	html {
-		font-size: 14px;
+		font-size: 11px;
+	}
+}
+@media only screen and (min-width: 600px){
+	html {
+		font-size: 12px;
+	}
+}
+@media only screen and (min-width: 680px){
+	html {
+		font-size: 13px;
 	}
 }
 @media only screen and (min-width: 768px){
 	html {
-		font-size: 16px;
+		font-size: 14px;
 	}
 }
 @media only screen and (min-width: 900px) {
 	html {
-		font-size: 18px;
+		font-size: 16px;
 	}
 }
 @media only screen and (min-width: 1024px) {
 	html {
-		font-size: 20px;
+		font-size: 18px;
 	}
 }
 @media only screen and (min-width: 1280px) {
 	html {
-		font-size: 22px;
+		font-size: 20px;
 	}
 }
 body {
@@ -74,9 +83,10 @@ body {
     background: #000;
 	color: #fff;
     width: 100%;
-	max-width: 1920px;
 	min-width: 540px;
-	height: 1080px;
+	max-width: 1920px;
+	min-height: 900px;
+	max-height: 1080px;
     overflow: hidden;
 	overflow-y: auto;
 }
@@ -343,7 +353,7 @@ tbody {
     background: #00214d;
     color: #fff;
     border-radius: 0 0 5px 5px;
-	border: 2px ridge #05b;
+	border: .1rem ridge #05b;
 	border-top: none;
 }
 #title-scene-select-character {
@@ -357,7 +367,6 @@ tbody {
 	right: 0;
 	margin: 0 auto;
 	width: 100%;
-	height: auto;
 	max-width: 1280px;
 	min-width: 540px;
 	max-height: 1080px;
@@ -374,7 +383,7 @@ tbody {
 .title-column {
 	display: flex;
 	flex: 1;
-	align-items: center;
+	align-self: center;
 }
 #title-options {
 	justify-content: left;
@@ -388,6 +397,7 @@ tbody {
 }
 #title-header .fa {
     margin: 0 .3rem;
+	align-self: center;
 }
 #logout {
 	color: #fff;
@@ -402,9 +412,45 @@ tbody {
 }
 #create-attr {
 	flex-grow: 1;
+	padding-top: 1rem;
 }
 .grow-0 {
 	flex-grow: 0;
+}
+.cr-ch-row div {
+	margin: 0;
+	padding: 0;
+	text-align: center;
+}
+.text-shadow-steel {
+	color: #048;
+	text-shadow: 
+		1px 1px #000,
+		-1px -1px #000,
+		1px -1px #000,
+		-1px 1px #000,
+		2px 2px #025,
+		-2px -2px #025,
+		2px -2px #025,
+		-2px 2px #025;
+}
+.cr-ch-btn-col {
+	/* -/+ */
+	line-height: 1;
+	color: #048;
+	text-shadow: 
+		1px 1px #000,
+		-1px -1px #000,
+		1px -1px #000,
+		-1px 1px #000;
+}
+.create-attr-wrap {
+	padding: 0 .1rem;
+	flex: 0;
+}
+.create-attr-col {
+	text-align: center;
+	align-items: flex-start;
 }
 #create-attr-remaining {
 	justify-content: space-evenly;
@@ -412,8 +458,19 @@ tbody {
 	line-height: 1;
 }
 #create-points-label {
-	font-size: 1.5rem;
+	font: 1.3rem/1 Georgia, Roboto Slab, serif;
+	font-weight: bold;
 	text-align: center;
+	color: #048;
+	text-shadow: 
+		1px 1px #000,
+		-1px -1px #000,
+		1px -1px #000,
+		-1px 1px #000,
+		2px 2px #025,
+		-2px -2px #025,
+		2px -2px #025,
+		-2px 2px #025;
 }
 #create-points-value {
 	align-self: center;
@@ -422,20 +479,34 @@ tbody {
 	position: relative;
 	width: 3rem;
 	height: 3rem;
-	border: 4px groove #579;
+	border: .2rem groove #579;
 }
 .create-attr-value {
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	height: 100%;
-	border: 2px outset #eed;
+	border: .1rem outset #eed;
 	height: 100%;
 }
+.create-attr-value.active {
+	color: #0f0;
+}
 .create-attr-type {
-	font-family: Roboto Slab, serif;
+	font-family: Georgia, Roboto Slab, serif;
 	text-align: center;
 	font-size: 2rem;
+	font-weight: bold;
+	color: #048;
+	text-shadow: 
+		1px 1px #000,
+		-1px -1px #000,
+		1px -1px #000,
+		-1px 1px #000,
+		2px 2px #025,
+		-2px -2px #025,
+		2px -2px #025,
+		-2px 2px #025;
 }
 .create-attr-dynamic {
 	background: #048;
@@ -444,14 +515,22 @@ tbody {
 	background: #bba;
 }
 .title-ch-create-col {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
 	background: #013;
-	margin: 4px 0;
-	padding: 4px 2px;
-	border: 2px ridge #444;
+	margin: .2rem 0;
+	padding: .2rem .1rem;
+	border: .1rem ridge #444;
 	height: 99%;
 }
+#ch-cr-detail-col {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+}
 .title-ch-well {
-	border: 2px outset #05b;
+	border: .1rem outset #05b;
 	background: #025;
 }
 #title-well-top {
@@ -462,7 +541,7 @@ tbody {
 }
 #ch-card-base {
 	font-family: Roboto, sans-serif;
-	border: 2px inset #05b;
+	border: .1rem inset #05b;
 	padding: 0;
 	margin: 4px 0;
 	background: url('../images/bg/ng2-bg.jpg');
@@ -473,9 +552,7 @@ tbody {
 	margin: 6px auto;
 	padding: 5px 30px;
 	font: 24px/1.2 Cinzel;
-	border-width: 4px;
-	border-style: double;
-	border: 4px double #444;
+	border: .2rem double #444;
 	border-radius: 6px;
 	cursor: pointer;
 	letter-spacing: 2px;
@@ -495,19 +572,23 @@ tbody {
 .ch-card-active {
 	box-shadow: 0 99px rgba(0,0,0,.5) inset, 0 4px 10px 2px rgba(0,0,0,.8) inset;
 	color: #ff2 !important;
-	text-shadow: 0 0 2px #000, 0 0 4px #000, 0 0 8px #000, 0 0 12px #000;
+	text-shadow: 
+		0 0 2px #000, 
+		0 0 4px #000, 
+		0 0 8px #000, 
+		0 0 12px #000;
 }
 /* create character scene */
 #race-wrap {
 }
 .select-create-wrap {
-	border: 4px groove #579;
+	border: .2rem groove #579;
 }
 .select-race,
 .select-class {
 	font-family: Roboto Slab;
 	background: #bba;
-	border: 2px outset #eed;
+	border: .1rem outset #eed;
 	text-align: center;
 	cursor: pointer;
 	white-space: nowrap;
@@ -517,36 +598,37 @@ tbody {
 .select-race.active,
 .select-class.active {
 	background: #776;
-	border: 2px inset #776;
+	border: .1rem inset #776;
 	box-shadow: 0 0 5px #000 inset;
 }
 .select-class.disabled {
 	cursor: default;
 	pointer-events: none;
 	background: #013;
-	border: 2px inset #013;
+	border: .1rem inset #013;
 	box-shadow: 0 0 10px #579 inset;
+	color: #048;
 }
 #gender-wrap {
 	margin-top: 1rem;
-	font: 1.5rem Roboto Slab;
+	font: 1.25rem Roboto Slab;
 	line-height: 1;
 	text-transform: uppercase;
 }
-.select-gender {
-	float: right;
+.select-gender-col {
+	align-self: center;
 }
 .select-radial {
 	display: inline-block;
-	width: 1.25rem;
-	height: 1.25rem;
+	width: 1rem;
+	height: 1rem;
 	background: #bba;
 	box-shadow: 
 		1px 1px #579 inset, 
 		-1px -1px #579 inset,
 		1px -1px 2px #000 inset,
 		-3px 3px 6px 2px #fff inset;
-	border: 2px groove #579;
+	border: .1rem groove #579;
 	cursor: pointer;
 }
 .select-radial.active {
@@ -559,21 +641,23 @@ tbody {
 .character-info-header {
 	font: 1rem Roboto Slab;
 	text-align: center;
-	border: 2px ridge #05b;
+	border: .1rem ridge #05b;
 	background: #025;
 	text-transform: uppercase;
 }
 #create-info {
 	font-size: .75rem;
-	padding: 0 2px;
-	height: 92%;
+	padding: 0 .1rem;
+}
+#create-details {
+	width: 100%;
 }
 #create-character-name-wrap {
-	border: 1px outset #048;
+	border: .1rem groove #048;
 }
 #create-character-name {
 	line-height: 1;
-	border: 2px inset #025;
+	border: .1rem inset #025;
 	border-radius: 0;
 	text-transform: capitalize;
 }
@@ -581,12 +665,14 @@ tbody {
 	box-shadow: none;
 }
 #create-attr-btn-wrap {
-	border: 2px ridge #048;
-	background: #025;
 }
-#create-character-btn {
+.go-create {
+	border: .1rem groove #048 !important;
+	margin: 0 .5rem;
 	border-radius: 0;
 	box-shadow: 
+		1px 1px #013 inset,
+		-1px -1px #013 inset,
 		0 0 2px #025 inset,
 		0 0 6px #05b inset,
 		0 0 15px #8bf inset;
@@ -618,7 +704,9 @@ tbody {
 }
 .ng-text {
     color: #aef;
-    text-shadow: .5px .5px #357, 1px 1px #357
+    text-shadow: 
+		.5px .5px #357, 
+		1px 1px #357
 }
 .modals {
     visibility: hidden;

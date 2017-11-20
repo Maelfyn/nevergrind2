@@ -207,7 +207,10 @@ g = {
 		}
 		var e = document.getElementById(e);
 		e.innerHTML = msg;
-		if (init.isMobile || e !== null){
+		if (init.isMobile){
+			
+		}
+		else if (e !== null){
 			var split = new SplitText(e, {
 					type: "words,chars"
 				});

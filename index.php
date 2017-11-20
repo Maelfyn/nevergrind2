@@ -23,7 +23,7 @@
 	
 	<meta name="mobile-web-app-capable" content="yes">
 	<meta name="apple-mobile-web-app-capable" content="yes" />
-	<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 	<meta name="google-signin-client_id" content="1015425037202-g5ri6qnj14b8vrk33lnu130ver9f43ef.apps.googleusercontent.com">
 	<meta name="google-site-verification" content="iC9l4midOGIXERCwagfpkef9ifunV-aZd_zlUUOPjIU" />
 	
@@ -34,11 +34,11 @@
 		require $_SERVER['DOCUMENT_ROOT'] . "/includes/loginCss.html";
 	}
 	?>
-	<link rel="stylesheet" href="css/ng2.css?v=0-0-18">
+	<link rel="stylesheet" href="css/ng2.css?v=0-0-21">
 	<link rel="shortcut icon" href="/images/favicon.png">
 	<script>
 		var g = {
-			version: '0-0-18'
+			version: '0-0-21'
 		};
 	</script>
 </head>
@@ -46,13 +46,6 @@
 <body id="body">
 
 <main>
-<div id="landscape">
-	<div id="ng2-logo-wrap">
-		<img src="images/bg/ng2-bg.jpg" id="ng2-bg" alt="Nevergrind 2 Background">
-		<img style="position: absolute; bottom: 0; left: 0; width: 140px" 
-				src="/images/neverworks.png">
-	</div>
-	
 	<?php
 	if (!isset($_SESSION['account'])){
 		$backdrop = 1;
@@ -60,6 +53,13 @@
 		require $_SERVER['DOCUMENT_ROOT'] . "/includes/loginRefer.php";
 	}
 	?>
+<div id="landscape">
+	<div id="ng2-logo-wrap">
+		<img src="images/bg/ng2-bg.jpg" id="ng2-bg" alt="Nevergrind 2 Background">
+		<img style="position: absolute; bottom: 0; left: 0; width: 140px" 
+				src="/images/neverworks.png">
+	</div>
+	
 	<div id="title-scene-select-character">
 	
 		<header id="title-header" class="text-primary text-shadow">
@@ -96,7 +96,7 @@
 		<div id="title-screen-wrap" class="container-fluid text-shadow">
 			<div id="title-menu-wrap" class="row title-menu-row stag-blue">
 				<div class="col-6">
-					<div class="title-ch-create-col">
+					<div class="title-ch-create-col justify-content-start">
 						<h1>
 							<div>Nevergrind 2<br>
 								Cooperative Multiplayer<br>
@@ -151,9 +151,9 @@
 	
 	<div id="title-scene-create-character" class="none">
 		
-		<div id="create-character-wrap" class="container-fluid text-shadow">
+		<div class="container-fluid text-shadow">
 			<div class="row title-menu-row stag-blue">
-				<div class="col-3 tight">
+				<div class="col-2 tight">
 					<div class="title-ch-create-col">
 					
 						<div id="race-wrap">
@@ -196,15 +196,15 @@
 						</div>
 						
 						<div id="gender-wrap" class="container-fluid">
-							<div class="row justify-content-between">
-								<span class="col tight">Male</span>
-								<div class="col tight">
+							<div class="row justify-content-around">
+								<div class="col-8 tight">Male</div>
+								<div class="col-2 tight select-gender-col">
 									<div id="Male" class="select-radial select-gender active"></div>
 								</div>
 							</div>
-							<div class="row justify-content-between">
-								<span class="col tight">Female</span>
-								<div class="col tight">
+							<div class="row justify-content-around">
+								<div class="col-8 tight">Female</div>
+								<div class="col-2 tight select-gender-col">
 									<div id="Female" class="select-radial select-gender"></div>
 								</div>
 							</div>
@@ -213,7 +213,7 @@
 					</div>
 				</div>
 				
-				<div class="col-3 tight">
+				<div id="ch-cr-detail-col" class="col-4 tight">
 					<div class="title-ch-create-col">
 						
 						<div id="create-info">
@@ -224,7 +224,7 @@
 							<div>Type: <span id="type-value"></span></div>
 							
 							<div class="character-info-header">Resistances</div>
-							<div class="container">
+							<div class="container-fluid">
 								<div class="row">
 									<div class="col-6 tight">
 										<div>Bleed: <span id="bleed-value" class="pull-right"></span></div>
@@ -240,7 +240,7 @@
 							</div>
 							
 							<div class="character-info-header">Dungeon</div>
-							<div class="container">
+							<div class="container-fluid">
 								<div class="row">
 									<div class="col-6 tight">
 										<div>Traps: <span id="traps-value" class="pull-right"></span></div>
@@ -254,7 +254,7 @@
 							</div>
 							
 							<div class="character-info-header">Details</div>
-							<div id="create-details"></div>
+							<div id="create-details">                                                                                                                                                      </div>
 						</div>
 						
 						<div id="create-character-name-wrap">
@@ -324,9 +324,9 @@
 						<div id="create-attr">
 							<div id="create-attr-remaining" class="row">
 								<div id="create-points-label" class="col-7">
-									<div>Ability</div>
-									<div>Points</div>
-									<div>Left</div>
+									<div>ABILITY</div>
+									<div>POINTS</div>
+									<div>LEFT</div>
 								</div>
 								<div id="create-points-value" class="col snug">
 									<div class="create-attr-square">
@@ -335,65 +335,135 @@
 								</div>
 							</div>
 							
-							<div id="create-attr-distribute" class="row">
-								<div class="create-attr-type col-7 snug">STR</div>
-								<div class="col snug">
+							<div class="row flex-row cr-ch-row">
+								<div class="create-attr-type col-6">STR</div>
+								<div class="col-1 cr-ch-btn-col">
+									<div>–</div>
+									<div data-id="str" class="select-radial attr-minus-1"></div>
+								</div>
+								<div class="col create-attr-wrap">
 									<div class="create-attr-square">
 										<div id="create-points-str" 
 											class="create-attr-value create-attr-dynamic">0</div>
 									</div>
 								</div>
-								<div class="create-attr-type col-7 snug">STA</div>
-								<div class="col snug">
+								<div class="col-1 cr-ch-btn-col">
+									<div>+</div>
+									<div data-id="str" class="select-radial attr-add-1"></div>
+								</div>
+							</div>
+							
+							<div class="row flex-row cr-ch-row">
+								<div class="create-attr-type col-6">STA</div>
+								<div class="col-1 cr-ch-btn-col">
+									<div>–</div>
+									<div data-id="sta" class="select-radial attr-minus-1"></div>
+								</div>
+								<div class="col create-attr-wrap">
 									<div class="create-attr-square">
 										<div id="create-points-sta" 
 											class="create-attr-value create-attr-dynamic">0</div>
 									</div>
 								</div>
-								
-								<div class="create-attr-type col-7 snug">AGI</div>
-								<div class="col snug">
+								<div class="col-1 cr-ch-btn-col">
+									<div>+</div>
+									<div data-id="sta" class="select-radial attr-add-1"></div>
+								</div>
+							</div>
+							
+							<div class="row flex-row cr-ch-row">
+								<div class="create-attr-type col-6">AGI</div>
+								<div class="col-1 cr-ch-btn-col">
+									<div>–</div>
+									<div data-id="agi" class="select-radial attr-minus-1"></div>
+								</div>
+								<div class="col create-attr-wrap">
 									<div class="create-attr-square">
 										<div id="create-points-agi" 
 											class="create-attr-value create-attr-dynamic">0</div>
 									</div>
 								</div>
-								
-								<div class="create-attr-type col-7 snug">DEX</div>
-								<div class="col snug">
+								<div class="col-1 cr-ch-btn-col">
+									<div>+</div>
+									<div data-id="agi" class="select-radial attr-add-1"></div>
+								</div>
+							</div>
+							
+							<div class="row flex-row cr-ch-row">
+								<div class="create-attr-type col-6">DEX</div>
+								<div class="col-1 cr-ch-btn-col">
+									<div>–</div>
+									<div data-id="dex" class="select-radial attr-minus-1"></div>
+								</div>
+								<div class="col create-attr-wrap">
 									<div class="create-attr-square">
 										<div id="create-points-dex" 
 											class="create-attr-value create-attr-dynamic">0</div>
 									</div>
 								</div>
-								
-								<div class="create-attr-type col-7 snug">WIS</div>
-								<div class="col snug">
+								<div class="col-1 cr-ch-btn-col">
+									<div>+</div>
+									<div data-id="dex" class="select-radial attr-add-1"></div>
+								</div>
+							</div>
+							
+							<div class="row flex-row cr-ch-row">
+								<div class="create-attr-type col-6">WIS</div>
+								<div class="col-1 cr-ch-btn-col">
+									<div>–</div>
+									<div data-id="wis" class="select-radial attr-minus-1"></div>
+								</div>
+								<div class="col create-attr-wrap">
 									<div class="create-attr-square">
 										<div id="create-points-wis" 
 											class="create-attr-value create-attr-dynamic">0</div>
 									</div>
 								</div>
-								
-								<div class="create-attr-type col-7 snug">INT</div>
-								<div class="col snug">
+								<div class="col-1 cr-ch-btn-col">
+									<div>+</div>
+									<div data-id="wis" class="select-radial attr-add-1"></div>
+								</div>
+							</div>
+							
+							<div class="row flex-row cr-ch-row">
+								<div class="create-attr-type col-6">INT</div>
+								<div class="col-1 cr-ch-btn-col">
+									<div>–</div>
+									<div data-id="intel" class="select-radial attr-minus-1"></div>
+								</div>
+								<div class="col create-attr-wrap">
 									<div class="create-attr-square">
 										<div id="create-points-intel" 
 											class="create-attr-value create-attr-dynamic">0</div>
 									</div>
 								</div>
-								
-								<div class="create-attr-type col-7 snug">CHA</div>
-								<div class="col snug">
+								<div class="col-1 cr-ch-btn-col">
+									<div>+</div>
+									<div data-id="intel" class="select-radial attr-add-1"></div>
+								</div>
+							</div>
+							
+							<div class="row flex-row cr-ch-row">
+								<div class="create-attr-type col-6">CHA</div>
+								<div class="col-1 cr-ch-btn-col">
+									<div>–</div>
+									<div data-id="cha" class="select-radial attr-minus-1"></div>
+								</div>
+								<div class="col create-attr-wrap">
 									<div class="create-attr-square">
 										<div id="create-points-cha" 
 											class="create-attr-value create-attr-dynamic">0</div>
 									</div>
 								</div>
+								<div class="col-1 cr-ch-btn-col">
+									<div>+</div>
+									<div data-id="cha" class="select-radial attr-add-1"></div>
+								</div>
 							</div>
 						</div>
-						<div id="create-attr-btn-wrap" class="grow-0">
-							<button id="create-character-btn" class="btn btn-primary btn-block pointer text-shadow">Create Character</button>
+						<div id="create-attr-btn-wrap" class="row snug grow-0">
+							<button id="create-character-back" class="col btn btn-primary pointer text-shadow go-create">Back</button>
+							<button id="create-character-btn" class="col btn btn-primary pointer text-shadow go-create">Create</button>
 						</div>
 					</div>
 				</div>

@@ -19,8 +19,8 @@ var create = {
 			var race = $(this).text();
 			$('.select-race').removeClass('active');
 			$(this).addClass('active');
-			create.set('race', race);
 			create.setRandomClass(race);
+			create.set('race', race);
 		});
 		$(".select-class").on(env.click, function(e){
 			if ($(this).get(0).className.indexOf('disabled') === -1){
@@ -36,6 +36,83 @@ var create = {
 			$(this).addClass('active');
 			create.set('gender', gender);
 		});
+		$("#create-character-name").on('blur', function(){
+			create.form.name = $(this).val().trim().replace(/ /g, '');
+		});
+		$(".attr-minus-1").on(env.click, function(){
+			var attr = $(this).data('id');
+			if (create.form.left < 10 && 
+				(create.form[attr] - create.form.base[attr] > 0) ){
+				document.getElementById('create-points-' + attr).innerHTML = --create.form[attr];
+				document.getElementById('create-points-remaining').innerHTML = ++create.form.left;
+			}
+		});
+		$(".attr-add-1").on(env.click, function(){
+			var attr = $(this).data('id');
+			if (create.form.left){
+				document.getElementById('create-points-' + attr).innerHTML = ++create.form[attr];
+				document.getElementById('create-points-remaining').innerHTML = --create.form.left;
+			}
+		});
+		$("#create-character-back").on(env.click, function(){
+			g.lock(1);
+			var z = document.getElementById('title-scene-create-character');
+			TweenMax.to(z, .6, {
+				y: 20,
+				opacity: 0,
+				onComplete: function(){
+					TweenMax.set(z, {
+						display: 'none',
+						opacity: 1
+					});
+					TweenMax.to('#title-scene-select-character', .6, {
+						startAt: {
+							display: 'block',
+							y: 20,
+							opacity: 0
+						},
+						y: 0,
+						opacity: 1,
+						onComplete: function(){
+							g.unlock();
+						}
+					});
+				}
+			});
+		});
+		$("#create-character-btn").on(env.click, function(){
+			//client-side validation
+			g.lock(1);
+			var f = create.form,
+				err = '';
+			if (!f.name){
+				err = 'Your character needs a name!';
+			}
+			else if(f.name.length > 16){
+				err = "Your character name must be 16 characters or less!";
+			}
+			else if(f.left){
+				err = 'You must spend all of your ability points!';
+			}
+			if (err){
+				g.msg(err);
+				g.unlock();
+			} else {
+				// send to server
+				$.ajax({
+					url: 'php2/create/create-character.php',
+					data: {
+						form: f
+					}
+				}).done(function(r){
+					console.info('done: ', r);
+				}).fail(function(r){
+					g.msg(r.responseText);
+				}).always(function(){
+					g.unlock();
+				});
+			}
+		});
 	},
 	form: {
 		race: '',
@@ -48,7 +125,18 @@ var create = {
 		dex: 0,
 		wis: 0,
 		intel: 0,
-		cha: 0
+		cha: 0,
+		left: 10,
+		maxLeft: 10,
+		base: {
+			str: 0,
+			sta: 0,
+			agi: 0,
+			dex: 0,
+			wis: 0,
+			intel: 0,
+			cha: 0
+		}
 	},
 	getPossibleClasses: function(race){
 		var z = {
@@ -150,8 +238,8 @@ var create = {
 	msg: function(key, val){
 		var z = {
 			gender: {
-				Male: "Males have strong cold and arcane resistance.",
-				Female: "Females receive a boost to bleed and poison resistance."
+				Male: "Males have strong cold and arcane  resistance.                                                                                                                                                      ",
+				Female: "Females receive a boost to bleed and poison                                                                                                                                                      "
 			},
 			race: {
 				Barbarian: 'Barbarians are a hardy race that benefit from high strength and stamina. Living through harsh winters in Fenwoven has given them strong cold resistance and above-average scouting skills.',
@@ -232,38 +320,22 @@ var create = {
 	},
 	getJobAttributes: function(job){
 		var x = {
-			Bard: 			[2, 0, 0, 4, 0, 0, 4],
+			Bard: 			[0, 0, 0, 2, 2, 2, 4],
 			Cleric: 		[0, 2, 2, 0, 4, 2, 0],
 			Druid: 			[0, 2, 2, 0, 4, 2, 0],
 			Enchanter: 		[0, 0, 0, 0, 2, 4, 4],
-			Magician: 		[0, 4, 0, 0, 2, 4, 0],
+			Magician: 		[0, 2, 0, 0, 4, 4, 0],
 			Monk: 			[4, 2, 2, 2, 0, 0, 0],
-			Necromancer: 	[0, 4, 0, 0, 2, 4, 0],
-			Paladin: 		[4, 2, 0, 2, 2, 0, 4],
+			Necromancer: 	[0, 2, 0, 0, 4, 4, 0],
+			Paladin: 		[2, 4, 0, 2, 2, 0, 0],
 			Ranger: 		[2, 2, 2, 2, 2, 0, 0],
-			Rogue: 			[4, 2, 4, 2, 0, 0, 0],
-			Shadowknight: 	[4, 2, 0, 2, 0, 2, 2],
+			Rogue: 			[4, 0, 4, 2, 0, 0, 0],
+			Shadowknight: 	[4, 2, 0, 2, 0, 2, 0],
 			Shaman: 		[0, 2, 2, 0, 4, 2, 0],
 			Warrior: 		[4, 4, 0, 2, 0, 0, 0],
 			Wizard: 		[0, 2, 0, 0, 4, 4, 0]
 		}
 		return x[job];
-	},
-	getRatings: { // tank, phy, mag, heal, utility
-		Warrior: 		[10, 7, 1, 1, 1],
-		Paladin: 		[9, 7, 3, 4, 3],
-		Shadowknight: 	[9, 8, 3, 2, 2],
-		Monk: 			[6, 10, 1, 3, 2],
-		Rogue: 			[6, 10, 1, 1, 4],
-		Ranger: 		[6, 9, 3, 3, 3],
-		Bard: 			[5, 5, 5, 5, 9],
-		Cleric: 		[4, 3, 6, 10, 6],
-		Druid: 			[4, 3, 8, 9, 7],
-		Shaman: 		[4, 4, 7, 9, 8],
-		Enchanter: 		[1, 1, 7, 3, 10],
-		Magician: 		[1, 1, 8, 2, 8],
-		Necromancer: 	[1, 1, 9, 3, 6],
-		Wizard: 		[1, 1, 10, 1, 5]
 	},
 	set: function(key, val){
 		console.info('Setting ', key, 'to: ', val);
@@ -271,7 +343,6 @@ var create = {
 		create.form[key] = val;
 		document.getElementById(key + '-value').innerHTML = val;
 		// details
-		var msg = "Lorem ipsum test 1 2 3 4 5";
 		g.split('create-details', create.msg(key, val));
 		if (key === 'job'){
 			document.getElementById('type-value').innerHTML = create.types[val];
@@ -295,13 +366,14 @@ var create = {
 			document.getElementById(v + '-value').innerHTML = create.getDungeon(v);
 		});
 		// reset attr
-		if (key === 'job'){
-			console.info(key, val, create.form);
-			var attr = create.getRaceAttributes(create.form.race);
-			var bonuses = create.getJobAttributes(create.form.job);
-			bonuses.forEach(function(v, i){
-				attr[i] += v;
+		if (create.form.race){
+			var raceAttr = create.getRaceAttributes(create.form.race),
+				jobAttr = create.getJobAttributes(create.form.job);
+			jobAttr.forEach(function(v, i){
+				raceAttr[i] += v;
 			});
+			// set initial attr values
+			$(".create-attr-value").removeClass('active');
 			['str',
 			'sta',
 			'agi',
@@ -309,8 +381,14 @@ var create = {
 			'wis',
 			'intel',
 			'cha'].forEach(function(v, i){
-				document.getElementById('create-points-' + v).innerHTML = attr[i];
+				var e = document.getElementById('create-points-' + v);
+				e.innerHTML = create.form[v] = create.form.base[v] = raceAttr[i];
+				if (jobAttr[i]){
+					e.className = e.className + ' active';
+				}
+				document.getElementById('create-points-remaining').innerHTML = create.form.left = 10;
 			});
+			// reset form bonuses
 			
 		}
 	},
