@@ -238,8 +238,8 @@ var create = {
 	msg: function(key, val){
 		var z = {
 			gender: {
-				Male: "Males have strong cold and arcane  resistance.                                                                                                                                                      ",
-				Female: "Females receive a boost to bleed and poison                                                                                                                                                      "
+				Male: "Males have strong cold and arcane resistance.                                                                                                                                                      ",
+				Female: "Females receive a boost to bleed and poison resistance.                                                                                                                                                      "
 			},
 			race: {
 				Barbarian: 'Barbarians are a hardy race that benefit from high strength and stamina. Living through harsh winters in Fenwoven has given them strong cold resistance and above-average scouting skills.',
@@ -301,41 +301,50 @@ var create = {
 		131 - 29
 		135 - 30
 	*/
-	getRaceAttributes: function(race){
-		var x = {
-			Barbarian: 	[22, 20, 17, 14, 14, 11, 10],
-			'Dark Elf': [11, 13, 19, 15, 17, 21, 11],
-			Dwarf: 		[19, 19, 14, 19, 17, 11, 8],
-			Erudite: 	[11, 14, 14, 14, 17, 23, 14],
-			Gnome: 		[11, 14, 18, 18, 13, 21, 11],
-			'Half Elf': [14, 14, 19, 18, 11, 15, 15],
-			Halfling: 	[14, 15, 20, 19, 16, 9, 9],
-			'High Elf': [10, 13, 18, 14, 20, 19, 16],
-			Human: 		[15, 15, 15, 15, 15, 15, 15],
-			Ogre: 		[29, 28, 14, 14, 13, 11, 6],
-			Troll: 		[23, 25, 17, 15, 11, 9, 6],
-			'Wood Elf': [13, 13, 20, 16, 15, 15, 15]
-		}
-		return x[race];
+	attrs: [
+		'str', 
+		'sta',
+		'agi',
+		'dex',
+		'wis',
+		'intel',
+		'cha'
+	],
+	raceAttrs: {
+		Barbarian: 	[22, 20, 17, 14, 14, 11, 10],
+		'Dark Elf': [11, 13, 19, 15, 17, 21, 11],
+		Dwarf: 		[19, 19, 14, 19, 17, 11, 8],
+		Erudite: 	[11, 14, 14, 14, 17, 23, 14],
+		Gnome: 		[11, 14, 18, 18, 13, 21, 11],
+		'Half Elf': [14, 14, 19, 18, 11, 15, 15],
+		Halfling: 	[14, 15, 20, 19, 16, 9, 9],
+		'High Elf': [10, 13, 18, 14, 20, 19, 16],
+		Human: 		[15, 15, 15, 15, 15, 15, 15],
+		Ogre: 		[29, 28, 14, 14, 13, 11, 6],
+		Troll: 		[23, 25, 17, 15, 11, 9, 6],
+		'Wood Elf': [13, 13, 20, 16, 15, 15, 15]
 	},
-	getJobAttributes: function(job){
-		var x = {
-			Bard: 			[0, 0, 0, 2, 2, 2, 4],
-			Cleric: 		[0, 2, 2, 0, 4, 2, 0],
-			Druid: 			[0, 2, 2, 0, 4, 2, 0],
-			Enchanter: 		[0, 0, 0, 0, 2, 4, 4],
-			Magician: 		[0, 2, 0, 0, 4, 4, 0],
-			Monk: 			[4, 2, 2, 2, 0, 0, 0],
-			Necromancer: 	[0, 2, 0, 0, 4, 4, 0],
-			Paladin: 		[2, 4, 0, 2, 2, 0, 0],
-			Ranger: 		[2, 2, 2, 2, 2, 0, 0],
-			Rogue: 			[4, 0, 4, 2, 0, 0, 0],
-			Shadowknight: 	[4, 2, 0, 2, 0, 2, 0],
-			Shaman: 		[0, 2, 2, 0, 4, 2, 0],
-			Warrior: 		[4, 4, 0, 2, 0, 0, 0],
-			Wizard: 		[0, 2, 0, 0, 4, 4, 0]
-		}
-		return x[job];
+	getRaceAttrs: function(race){
+		return create.raceAttrs[race];
+	},
+	jobAttrs: {
+		Bard: 			[0, 0, 0, 2, 2, 2, 4],
+		Cleric: 		[0, 2, 2, 0, 4, 2, 0],
+		Druid: 			[0, 2, 2, 0, 4, 2, 0],
+		Enchanter: 		[0, 0, 0, 0, 2, 4, 4],
+		Magician: 		[0, 2, 0, 0, 4, 4, 0],
+		Monk: 			[4, 2, 2, 2, 0, 0, 0],
+		Necromancer: 	[0, 2, 0, 0, 4, 4, 0],
+		Paladin: 		[2, 4, 0, 2, 2, 0, 0],
+		Ranger: 		[2, 2, 2, 2, 2, 0, 0],
+		Rogue: 			[4, 0, 4, 2, 0, 0, 0],
+		Shadowknight: 	[4, 2, 0, 2, 0, 2, 0],
+		Shaman: 		[0, 2, 2, 0, 4, 2, 0],
+		Warrior: 		[4, 4, 0, 2, 0, 0, 0],
+		Wizard: 		[0, 2, 0, 0, 4, 4, 0]
+	},
+	getJobAttrs: function(job){
+		return create.jobAttrs[job];
 	},
 	set: function(key, val){
 		console.info('Setting ', key, 'to: ', val);
@@ -367,8 +376,8 @@ var create = {
 		});
 		// reset attr
 		if (create.form.race){
-			var raceAttr = create.getRaceAttributes(create.form.race),
-				jobAttr = create.getJobAttributes(create.form.job);
+			var raceAttr = create.getRaceAttrs(create.form.race),
+				jobAttr = create.getJobAttrs(create.form.job);
 			jobAttr.forEach(function(v, i){
 				raceAttr[i] += v;
 			});

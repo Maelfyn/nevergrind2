@@ -264,30 +264,53 @@ g = {
 	},
 	goCreateCharacter: function(){
 		g.lock(1);
-		var z = document.getElementById('title-scene-select-character');
+		var z = document.getElementById('title-scene-select-character')
+			prom = 0
+			transCreate = function(){
+				prom++;
+				if (prom === 2){
+					g.unlock();
+					// init create screen and show
+					TweenMax.set(z, {
+						display: 'none',
+						opacity: 1
+					});
+					create.setRandomGender();
+					create.setRandomRace();
+					TweenMax.to('#title-scene-create-character', .6, {
+						startAt: {
+							display: 'block',
+							y: 20,
+							opacity: 0
+						},
+						y: 0,
+						opacity: 1,
+						onComplete: function(){
+							g.unlock();
+						}
+					});
+				}
+			};
+		// hide
 		TweenMax.to(z, .6, {
 			y: 20,
 			opacity: 0,
 			onComplete: function(){
-				TweenMax.set(z, {
-					display: 'none',
-					opacity: 1
-				});
-				create.setRandomGender();
-				create.setRandomRace();
-				TweenMax.to('#title-scene-create-character', .6, {
-					startAt: {
-						display: 'block',
-						y: 20,
-						opacity: 0
-					},
-					y: 0,
-					opacity: 1,
-					onComplete: function(){
-						g.unlock();
-					}
-				});
+				transCreate();
 			}
+		});
+		
+		$.ajax({
+			type: 'GET',
+			url: 'php2/create/getStatMap.php'
+		}).done(function(r){
+			var r = r.statMap,
+				attrs = create.attrs;
+				
+			console.info("r: ", r.Barbarian.attrs);
+			console.info("r: ", r.Barbarian.jobs);
+			console.info("r: ", r.jobs.Bard);
+			transCreate();
 		});
 	}
 };
