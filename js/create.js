@@ -1,4 +1,48 @@
 var create = {
+	selected: 0,
+	base: {
+		str: 0,
+		sta: 0,
+		agi: 0,
+		dex: 0,
+		wis: 0,
+		intel: 0,
+		cha: 0
+	},
+	form: {
+		race: '',
+		job: '',
+		gender: '',
+		name: '',
+		str: 0,
+		sta: 0,
+		agi: 0,
+		dex: 0,
+		wis: 0,
+		intel: 0,
+		cha: 0,
+		left: 10,
+		maxLeft: 10
+	},
+	possibleJobs: {},
+	raceAttrs: {},
+	jobAttrs: {},
+	types: {
+		Bard: 'Utility',
+		Cleric: 'Healer',
+		Druid: 'Healer',
+		Enchanter: 'Utility',
+		Magician: 'Magical DPS',
+		Monk: 'Physical DPS',
+		Necromancer: 'Magical DPS',
+		Paladin: 'Tank',
+		Ranger: 'Physical DPS',
+		Rogue: 'Physical DPS',
+		Shadowknight: 'Tank',
+		Shaman: 'Healer',
+		Warrior: 'Tank',
+		Wizard: 'Magical DPS'
+	},
 	events: function(){
 		$("img").on('dragstart', function(e) {
 			e.preventDefault();
@@ -10,7 +54,7 @@ var create = {
 			$('.ch-card').removeClass('ch-card-active');
 			$(this).addClass('ch-card-active');
 		});
-		$('.ch-card:first').trigger('click');
+		$('.ch-card:first').trigger(env.click);
 		// create character
 		$("#go-create-character").on(env.click, function(){
 			g.goCreateCharacter();
@@ -42,7 +86,7 @@ var create = {
 		$(".attr-minus-1").on(env.click, function(){
 			var attr = $(this).data('id');
 			if (create.form.left < 10 && 
-				(create.form[attr] - create.form.base[attr] > 0) ){
+				(create.form[attr] - create.base[attr] > 0) ){
 				document.getElementById('create-points-' + attr).innerHTML = --create.form[attr];
 				document.getElementById('create-points-remaining').innerHTML = ++create.form.left;
 			}
@@ -56,6 +100,7 @@ var create = {
 		});
 		$("#create-character-back").on(env.click, function(){
 			g.lock(1);
+			g.loadAllCharacters();
 			var z = document.getElementById('title-scene-create-character');
 			TweenMax.to(z, .6, {
 				y: 20,
@@ -105,135 +150,19 @@ var create = {
 						form: f
 					}
 				}).done(function(r){
-					console.info('done: ', r);
+					console.info('Created character: ', r.hero);
+					g.msg(r.hero.name + ' has been created!');
+					$("#create-character-back").trigger(env.click);
 				}).fail(function(r){
-					g.msg(r.responseText);
+					g.msg(r.responseText, 8);
 				}).always(function(){
 					g.unlock();
 				});
 			}
 		});
-	},
-	form: {
-		race: '',
-		job: '',
-		gender: '',
-		name: '',
-		str: 0,
-		sta: 0,
-		agi: 0,
-		dex: 0,
-		wis: 0,
-		intel: 0,
-		cha: 0,
-		left: 10,
-		maxLeft: 10,
-		base: {
-			str: 0,
-			sta: 0,
-			agi: 0,
-			dex: 0,
-			wis: 0,
-			intel: 0,
-			cha: 0
-		}
-	},
-	getPossibleClasses: function(race){
-		var z = {
-			'Barbarian': [
-				'Rogue', 
-				'Shaman',
-				'Warrior' 
-			],
-			'Dark Elf': [
-				'Cleric',
-				'Enchanter',
-				'Magician',
-				'Necromancer',
-				'Rogue', 
-				'Shadowknight',
-				'Warrior', 
-				'Wizard'
-			],
-			'Dwarf': [
-				'Cleric',
-				'Paladin',
-				'Rogue',
-				'Warrior'
-			],
-			'Erudite': [
-				'Cleric',
-				'Enchanter',
-				'Magician',
-				'Necromancer',
-				'Paladin',
-				'Shadowknight',
-				'Wizard'
-			],
-			'Gnome': [
-				'Cleric',
-				'Enchanter',
-				'Magician',
-				'Necromancer',
-				'Rogue',
-				'Warrior',
-				'Wizard'
-			],
-			'Half Elf': [
-				'Bard',
-				'Druid',
-				'Paladin',
-				'Ranger',
-				'Rogue',
-				'Warrior'
-			],
-			'Halfling': [
-				'Druid',
-				'Cleric',
-				'Rogue',
-				'Warrior'
-			],
-			'High Elf': [
-				'Cleric',
-				'Enchanter',
-				'Magician',
-				'Paladin',
-				'Wizard'
-			],
-			'Human': [
-				'Bard',
-				'Cleric',
-				'Druid',
-				'Enchanter',
-				'Magician',
-				'Monk',
-				'Necromancer',
-				'Paladin',
-				'Ranger',
-				'Rogue',
-				'Shadowknight',
-				'Warrior',
-				'Wizard'
-			],
-			'Ogre': [
-				'Shadowknight',
-				'Shaman',
-				'Warrior'
-			],
-			'Troll': [
-				'Shadowknight',
-				'Shaman',
-				'Warrior'
-			],
-			'Wood Elf': [
-				'Bard',
-				'Druid',
-				'Ranger',
-				'Rogue',
-				'Warrior'
-			]
-		};
-		return z[race];
+		$("#ch-card-list").on(env.click, '.select-player-card', function(){
+			var id = create.selected = $(this).data('row');
+		});
 	},
 	msg: function(key, val){
 		var z = {
@@ -274,149 +203,51 @@ var create = {
 		};
 		return z[key][val];
 	},
-	/*
-		39 - 6
-		43 - 7
-		47 - 8
-		51 - 9
-		55 - 10
-		59 - 11
-		63 - 12
-		67 - 13
-		71 - 14
-		75 - 15
-		79 - 16
-		83 - 17
-		87 - 18
-		91 - 19
-		95 - 20
-		99 - 21
-		103 - 22
-		107 - 23
-		111 - 24
-		115 - 25
-		119 - 26
-		123 - 27
-		127 - 28
-		131 - 29
-		135 - 30
-	*/
-	attrs: [
-		'str', 
-		'sta',
-		'agi',
-		'dex',
-		'wis',
-		'intel',
-		'cha'
-	],
-	raceAttrs: {
-		Barbarian: 	[22, 20, 17, 14, 14, 11, 10],
-		'Dark Elf': [11, 13, 19, 15, 17, 21, 11],
-		Dwarf: 		[19, 19, 14, 19, 17, 11, 8],
-		Erudite: 	[11, 14, 14, 14, 17, 23, 14],
-		Gnome: 		[11, 14, 18, 18, 13, 21, 11],
-		'Half Elf': [14, 14, 19, 18, 11, 15, 15],
-		Halfling: 	[14, 15, 20, 19, 16, 9, 9],
-		'High Elf': [10, 13, 18, 14, 20, 19, 16],
-		Human: 		[15, 15, 15, 15, 15, 15, 15],
-		Ogre: 		[29, 28, 14, 14, 13, 11, 6],
-		Troll: 		[23, 25, 17, 15, 11, 9, 6],
-		'Wood Elf': [13, 13, 20, 16, 15, 15, 15]
+	getPossibleJobs: function(race){
+		return create.possibleJobs[race];
 	},
 	getRaceAttrs: function(race){
 		return create.raceAttrs[race];
-	},
-	jobAttrs: {
-		Bard: 			[0, 0, 0, 2, 2, 2, 4],
-		Cleric: 		[0, 2, 2, 0, 4, 2, 0],
-		Druid: 			[0, 2, 2, 0, 4, 2, 0],
-		Enchanter: 		[0, 0, 0, 0, 2, 4, 4],
-		Magician: 		[0, 2, 0, 0, 4, 4, 0],
-		Monk: 			[4, 2, 2, 2, 0, 0, 0],
-		Necromancer: 	[0, 2, 0, 0, 4, 4, 0],
-		Paladin: 		[2, 4, 0, 2, 2, 0, 0],
-		Ranger: 		[2, 2, 2, 2, 2, 0, 0],
-		Rogue: 			[4, 0, 4, 2, 0, 0, 0],
-		Shadowknight: 	[4, 2, 0, 2, 0, 2, 0],
-		Shaman: 		[0, 2, 2, 0, 4, 2, 0],
-		Warrior: 		[4, 4, 0, 2, 0, 0, 0],
-		Wizard: 		[0, 2, 0, 0, 4, 4, 0]
 	},
 	getJobAttrs: function(job){
 		return create.jobAttrs[job];
 	},
 	set: function(key, val){
-		console.info('Setting ', key, 'to: ', val);
-		console.info(create.form);
-		create.form[key] = val;
-		document.getElementById(key + '-value').innerHTML = val;
+		document.getElementById(key + '-value').innerHTML = create.form[key] = val;
 		// details
 		g.split('create-details', create.msg(key, val));
 		if (key === 'job'){
 			document.getElementById('type-value').innerHTML = create.types[val];
 		}
 		// resists
-		['bleed',
-		'poison',
-		'arcane',
-		'lightning',
-		'fire',
-		'cold'
-		].forEach(function(v, i){
+		g.resists.forEach(function(v, i){
 			document.getElementById(v + '-value').innerHTML = create.getResist(v);
 		});
 		// dungeon
-		['traps',
-		'treasure',
-		'scout',
-		'pulling'
-		].forEach(function(v, i){
+		g.dungeon.forEach(function(v, i){
 			document.getElementById(v + '-value').innerHTML = create.getDungeon(v);
 		});
 		// reset attr
-		if (create.form.race){
-			var raceAttr = create.getRaceAttrs(create.form.race),
-				jobAttr = create.getJobAttrs(create.form.job);
+		if (key !== 'gender' && create.form.race){
+			var raceAttr = g.copy(create.getRaceAttrs(create.form.race)),
+				jobAttr = g.copy(create.getJobAttrs(create.form.job));
 			jobAttr.forEach(function(v, i){
 				raceAttr[i] += v;
 			});
 			// set initial attr values
 			$(".create-attr-value").removeClass('active');
-			['str',
-			'sta',
-			'agi',
-			'dex',
-			'wis',
-			'intel',
-			'cha'].forEach(function(v, i){
+			g.attrs.forEach(function(v, i){
 				var e = document.getElementById('create-points-' + v);
-				e.innerHTML = create.form[v] = create.form.base[v] = raceAttr[i];
+				e.innerHTML = create.form[v] = create.base[v] = raceAttr[i];
 				if (jobAttr[i]){
 					e.className = e.className + ' active';
 				}
 				document.getElementById('create-points-remaining').innerHTML = create.form.left = 10;
 			});
 			// reset form bonuses
-			
 		}
 	},
-	types: {
-		Bard: 'Utility',
-		Cleric: 'Healer',
-		Druid: 'Healer',
-		Enchanter: 'Utility',
-		Magician: 'Magical DPS',
-		Monk: 'Physical DPS',
-		Necromancer: 'Magical DPS',
-		Paladin: 'Tank',
-		Ranger: 'Physical DPS',
-		Rogue: 'Physical DPS',
-		Shadowknight: 'Tank',
-		Shaman: 'Healer',
-		Warrior: 'Tank',
-		Wizard: 'Magical DPS'
-	},
+	// gender and race
 	getResist: function(type){
 		var v = 15,
 			f = create.form;
@@ -491,6 +322,7 @@ var create = {
 		}
 		return v;
 	},
+	// race and job
 	getDungeon: function(type){
 		var v = 15,
 			f = create.form;
@@ -650,11 +482,11 @@ var create = {
 	},
 	setRandomGender: function(){
 		var e = $(".select-gender:eq("+ ~~(Math.random() * 2) +")");
-		e.length && e.trigger('click');
+		e.length && e.trigger(env.click);
 	},
 	setRandomRace: function(){
 		var e = $(".select-race:eq("+ ~~(Math.random() * 12) +")");
-		e.length && e.trigger('click');
+		e.length && e.trigger(env.click);
 	},
 	// triggered by clicking race
 	setRandomClass: function(race){
@@ -662,7 +494,7 @@ var create = {
 		$(".select-class").removeClass().addClass('select-class disabled');
 		// remove disabled from possibles
 		var ids = '',
-			jobs = create.getPossibleClasses(race),
+			jobs = create.getPossibleJobs(race),
 			len = jobs.length;
 		jobs.forEach(function(v, i){
 			ids += '#create-' + v;
@@ -675,7 +507,7 @@ var create = {
 		var e = $(".select-class:not(.disabled)"),
 			len = e.length;
 		e = e.eq(~~(Math.random() * len));
-		e.length && e.trigger('click');
+		e.length && e.trigger(env.click);
 	}
 };
 

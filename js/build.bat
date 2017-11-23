@@ -1,1 +1,1 @@
-copy /b beginWrap.js+ui.js+payment.js+stats.js+animate.js+core.js+title.js+lobby.js+ws.js+audio.js+map.js+actions.js+events.js+ai.js+endWrap.js firmament-wars.js
+copy /b beginWrap.js+init.js+create.js+g.js+env.js+my.js+dom.js+video.js+audio.js+game.js+title.js+events.js+socket.js+chat.js+endWrap.js nevergrind-online.js

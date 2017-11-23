@@ -7,7 +7,7 @@
 	} else {
 		error_reporting(0);
 	}
-	require('php/connect1.php');
+	require('php2/db.php');
 	require('php/values.php');
 ?>
 <!DOCTYPE html> 
@@ -30,15 +30,15 @@
 	<link rel="stylesheet" href="css/all.min.css">
 	<!--link rel="stylesheet" href="css/bootstrap-slider.min.css"-->
 	<?php
-	if (!isset($_SESSION['account'])){
+	if (empty($_SESSION['account'])){
 		require $_SERVER['DOCUMENT_ROOT'] . "/includes/loginCss.html";
 	}
 	?>
-	<link rel="stylesheet" href="css/ng2.css?v=0-0-21">
+	<link rel="stylesheet" href="css/ng2.css?v=0-0-27">
 	<link rel="shortcut icon" href="/images/favicon.png">
 	<script>
 		var g = {
-			version: '0-0-21'
+			version: '0-0-27'
 		};
 	</script>
 </head>
@@ -47,7 +47,7 @@
 
 <main>
 	<?php
-	if (!isset($_SESSION['account'])){
+	if (empty($_SESSION['account'])){
 		$backdrop = 1;
 		require $_SERVER['DOCUMENT_ROOT'] . "/includes/loginModal.php";
 		require $_SERVER['DOCUMENT_ROOT'] . "/includes/loginRefer.php";
@@ -65,7 +65,7 @@
 		<header id="title-header" class="text-primary text-shadow">
 			<div class="title-column">
 				<?php
-				if (isset($_SESSION['account']) && !isset($_SESSION['kong'])){
+				if (!empty($_SESSION['account']) && !isset($_SESSION['kong'])){
 					echo '<a id="logout" class="btn btn-primary btn-sm pointer">Logout '. $_SESSION['account'] .'</a>';
 				} else if (isset($_SESSION['kong'])){
 					echo $_SESSION['account'];
@@ -122,11 +122,8 @@
 						<!-- char cards -->
 						<div id="ch-card-base">
 							<div id="ch-card-wrap" class="stag-blue">
+							
 								<div id="ch-card-list">
-									<div class="btn btn-info btn-lg ch-card center">
-										<div class="ch-card-name">Maelfyn</div>
-										<div class="ch-card-details">50 Half Elf Ranger</div>
-									</div>
 								</div>
 								
 								<div id="go-create-character" 
@@ -488,19 +485,20 @@
 <div id="portrait">This application must be viewed in landscape mode. Turn your device 90 degrees for maximum enjoyment.</div>
 </main>
 
-</body>
-
 <script src="js/libs/libs.min.js"></script>
-<script src="//apis.google.com/js/platform.js?onload=loginRenderButton" async defer></script>
 <?php
-if (!isset($_SESSION['account'])){
 	require $_SERVER['DOCUMENT_ROOT'] . "/includes/loginJs.html";
-}
+?>
+
+<script src="//apis.google.com/js/platform.js?onload=loginRenderButton" async defer></script>
+
+<?php
 require $_SERVER['DOCUMENT_ROOT'] . '/includes/ga.php';
-if (!isset($_SESSION['account'])){
+if (empty($_SESSION['account'])){
 	require $_SERVER['DOCUMENT_ROOT'] . "/includes/loginKong.html";
 }
 ?>
+
 <script>
 (function(d, s, id) {
 	var js, fjs = d.getElementsByTagName(s)[0];
@@ -513,26 +511,26 @@ var chat = {
 };
 g.guest = 0;
 (function(d, scripts){
-	if (//location.host === 'nevergrind.com' || 
+	if (location.host === 'nevergrind.com' || 
 		location.hash === '#test'){
 		scripts = [
-			'nevergrind2'
+			'nevergrind-online'
 		];
 	} else {
 		scripts = [
-			'init',
-			'create',
-			'g',
-			'env',
-			'my',
-			'dom',
-			'video',
-			'audio',
-			'game',
-			'title',
-			'events',
-			'socket',
-			'chat'
+			'init', 
+			'create', 
+			'g', 
+			'env', 
+			'my', 
+			'dom', 
+			'video', 
+			'audio', 
+			'game', 
+			'title', 
+			'events', 
+			'socket', 
+			'chat' 
 		]
 	}
 	for(var i=0, len=scripts.length; i<len; i++){
@@ -542,6 +540,7 @@ g.guest = 0;
 		d.head.appendChild(x);
 	}
 })(document, []);
-
 </script>
+
+</body>
 </html>

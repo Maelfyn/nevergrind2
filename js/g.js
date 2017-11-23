@@ -14,6 +14,42 @@ g = {
 			env.resizeWindow();
 		});
 	},
+	races: [
+		'Barbarian',
+		'Dark Elf',
+		'Dwarf',
+		'Erudite',
+		'Gnome',
+		'Half Elf',
+		'Halfling',
+		'High Elf',
+		'Human',
+		'Ogre',
+		'Troll',
+		'Wood Elf'
+	],
+	jobs: [
+		'Bard',
+		'Cleric',
+		'Druid',
+		'Enchanter',
+		'Magician',
+		'Monk',
+		'Necromancer',
+		'Paladin',
+		'Ranger',
+		'Rogue',
+		'Shadowknight',
+		'Shaman',
+		'Warrior',
+		'Wizard'
+	],
+	copy: function(o){
+		return JSON.parse(JSON.stringify(o));
+	},
+	attrs: ['str', 'sta', 'agi', 'dex', 'wis', 'intel', 'cha'],
+	resists: ['bleed', 'poison', 'arcane', 'lightning', 'fire', 'cold'],
+	dungeon: ['traps', 'treasure', 'scout', 'pulling'],
 	gameDuration: 0,
 	delay: init.isMobile ? 0 : .5,
 	modalSpeed: init.isMobile ? 0 : .5,
@@ -241,13 +277,11 @@ g = {
 		
 		try {
 			var auth2 = gapi.auth2.getAuthInstance();
-			auth2.signOut().then(function(){});
+			auth2.signOut().then(function(){
+			});
 		} catch (err){
 			console.info('Google error: ', err);
 		}
-		
-		localStorage.removeItem('email');
-		localStorage.removeItem('token');
 		
 		setTimeout(function(){
 			$.ajax({
@@ -255,6 +289,7 @@ g = {
 				url: 'php/logout.php'
 			}).done(function(data) {
 				g.msg("Logout successful");
+				localStorage.removeItem('email');
 				localStorage.removeItem('token');
 				location.reload();
 			}).fail(function() {
@@ -266,9 +301,8 @@ g = {
 		g.lock(1);
 		var z = document.getElementById('title-scene-select-character')
 			prom = 0
-			transCreate = function(){
-				prom++;
-				if (prom === 2){
+			allDone = function(){
+				if (++prom === 2){
 					g.unlock();
 					// init create screen and show
 					TweenMax.set(z, {
@@ -296,7 +330,7 @@ g = {
 			y: 20,
 			opacity: 0,
 			onComplete: function(){
-				transCreate();
+				allDone();
 			}
 		});
 		
@@ -304,13 +338,35 @@ g = {
 			type: 'GET',
 			url: 'php2/create/getStatMap.php'
 		}).done(function(r){
-			var r = r.statMap,
-				attrs = create.attrs;
-				
-			console.info("r: ", r.Barbarian.attrs);
-			console.info("r: ", r.Barbarian.jobs);
-			console.info("r: ", r.jobs.Bard);
-			transCreate();
+			var r = r.statMap;
+			g.races.forEach(function(v){
+				create.raceAttrs[v] = r[v].attrs;
+				create.possibleJobs[v] = r[v].jobs;
+			});
+			// job stats
+			g.jobs.forEach(function(v){
+				create.jobAttrs[v] = r.jobs[v];
+			});
+			allDone();
+		});
+	},
+	loadAllCharacters: function(){
+		$.ajax({
+			type: 'GET',
+			url: 'php2/create/loadAllCharacters.php'
+		}).done(function(r){
+			var s = '';
+			r.forEach(function(d){
+				console.info('loadAllCharacters ', d.row, d);
+				// #ch-card-list
+				s += 
+				'<div data-row="'+ d.row +'" class="btn btn-info btn-lg ch-card center select-player-card">'+
+					'<div class="ch-card-name">'+ d.name +'</div>'+
+					'<div class="ch-card-details">'+ d.level +' '+ d.race +' '+ d.job +'</div>'+
+				'</div>';
+			});
+			document.getElementById('ch-card-list').innerHTML = s;
+			$(".select-player-card:first").trigger(env.click);
 		});
 	}
 };

@@ -155,21 +155,21 @@ ENC		150			150			100(22)		0			0			0			0
 MAG		150			150			100(22)		0			0			0			0			
 WIZ		150			150			100(22)		0			0			0			0			
 
-max:	alteration	abjuration	evocation	conjuration	channeling
-WAR		0			0			0			0			0	
-PAL		200			200			200			200			200	(9)
-SHD		200			200			200			200			200	(9)
-MNK		0			0			0			0			0	
-ROG		0			0			0			0			0	
-RNG		200			200			200			200			200	(9)
-BRD		250			250			250			250			250	
-CLR		250			250			250			250			250	
-DRU		250			250			250			250			250	
-SHM		250			250			250			250			250	
-NEC		250			250			250			250			250	
-ENC		250			250			250			250			250	
-MAG		250			250			250			250			250	
-WIZ		250			250			250			250			250	
+max:	alteration	evocation	conjuration	
+WAR		0			0			0			
+PAL		200			200			200			(9)
+SHD		200			200			200			(9)
+MNK		0			0			0			
+ROG		0			0			0			
+RNG		200			200			200			(9)
+BRD		250			250			250			
+CLR		250			250			250			
+DRU		250			250			250			
+SHM		250			250			250			
+NEC		250			250			250			
+ENC		250			250			250			
+MAG		250			250			250			
+WIZ		250			250			250			
 
 - db model:
 	ng2_chars
@@ -197,6 +197,8 @@ WIZ		250			250			250			250			250
 		cha
 		offense
 		defense
+		dualWield
+		doubleAttack
 		oneHandSlash
 		twoHandSlash
 		oneHandBlunt
@@ -207,15 +209,14 @@ WIZ		250			250			250			250			250
 		parry
 		riposte
 		alteration
-		abjuration
 		evocation
-		conjuration
 		channeling
-		resistPoison
-		resistMagic
-		resistLightning
-		resistCold
-		resistFire
+		bleed
+		poison
+		arcane
+		lightning
+		cold
+		fire
 		playtime
 		
 	ng2_party ??? is this needed at all? DELETED
@@ -249,11 +250,12 @@ WIZ		250			250			250			250			250
 		dodge
 		parry
 		riposte
-		resistPoison
-		resistMagic
-		resistLightning
-		resistCold
-		resistFire
+		bleed
+		poison
+		arcane
+		lightning
+		cold
+		fire
 		
 	ng2_eq
 		row
@@ -272,11 +274,12 @@ WIZ		250			250			250			250			250
 		intel
 		cha
 		armor
-		resistPoison
-		resistMagic
-		resistLightning
-		resistCold
-		resistFire
+		bleed
+		poison
+		arcane
+		lightning
+		cold
+		fire
 		xPos
 		yPos
 		effect
@@ -302,11 +305,12 @@ WIZ		250			250			250			250			250
 		intel
 		cha
 		armor
-		resistPoison
-		resistMagic
-		resistLightning
-		resistCold
-		resistFire
+		bleed
+		poison
+		arcane
+		lightning
+		cold
+		fire
 		xPos
 		yPos
 		effect
@@ -332,11 +336,12 @@ WIZ		250			250			250			250			250
 		intel
 		cha
 		armor
-		resistPoison
-		resistMagic
-		resistLightning
-		resistCold
-		resistFire
+		bleed
+		poison
+		arcane
+		lightning
+		cold
+		fire
 		xPos
 		yPos
 		effect
