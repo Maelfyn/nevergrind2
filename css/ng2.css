@@ -74,12 +74,13 @@ html {
 		font-size: 20px;
 	}
 }
+
 body {
 	display: flex;
 	flex-direction: column;
 	margin: 0 auto;
 	position: relative;
-    font-family: Roboto, Verdana, Arial, sans-serif;
+    font-family: Roboto, Arial, sans-serif;
     background: #000;
 	color: #fff;
     width: 100%;
@@ -169,6 +170,7 @@ tbody {
 	box-shadow: none !important;
 }
 .btn-primary {
+	font-family: Roboto Slab, serif !important;
 	background-color: #05b;
 	border-color: #039!important;
 }
@@ -461,16 +463,32 @@ tbody {
 	font: 1.3rem/1 Georgia, Roboto Slab, serif;
 	font-weight: bold;
 	text-align: center;
-	color: #048;
+	color: #8bf;
 	text-shadow: 
 		1px 1px #000,
 		-1px -1px #000,
 		1px -1px #000,
 		-1px 1px #000,
-		2px 2px #025,
-		-2px -2px #025,
-		2px -2px #025,
-		-2px 2px #025;
+		2px 2px #048,
+		-2px -2px #048,
+		2px -2px #048,
+		-2px 2px #048;
+}
+.create-attr-type {
+	font-family: Georgia, Roboto Slab, serif;
+	text-align: center;
+	font-size: 2rem;
+	font-weight: bold;
+	color: #8bf;
+	text-shadow: 
+		1px 1px #000,
+		-1px -1px #000,
+		1px -1px #000,
+		-1px 1px #000,
+		2px 2px #048,
+		-2px -2px #048,
+		2px -2px #048,
+		-2px 2px #048;
 }
 #create-points-value {
 	align-self: center;
@@ -491,22 +509,6 @@ tbody {
 }
 .create-attr-value.active {
 	color: #0f0;
-}
-.create-attr-type {
-	font-family: Georgia, Roboto Slab, serif;
-	text-align: center;
-	font-size: 2rem;
-	font-weight: bold;
-	color: #048;
-	text-shadow: 
-		1px 1px #000,
-		-1px -1px #000,
-		1px -1px #000,
-		-1px 1px #000,
-		2px 2px #025,
-		-2px -2px #025,
-		2px -2px #025,
-		-2px 2px #025;
 }
 .create-attr-dynamic {
 	background: #048;
@@ -540,7 +542,6 @@ tbody {
 	border-radius: 0 0 6px 6px;
 }
 #ch-card-base {
-	font-family: Roboto, sans-serif;
 	border: .1rem inset #05b;
 	padding: 0;
 	margin: 4px 0;
@@ -549,28 +550,46 @@ tbody {
 	background-size: 1280px 720px;
 }
 .title-ch-btn {
-	margin: 6px auto;
-	padding: 5px 30px;
-	font: 24px/1.2 Cinzel;
-	border: .2rem double #444;
-	border-radius: 6px;
+	margin: .3rem auto;
+	padding: .2rem 1.5rem;
+	font: 1.1rem/1 Cinzel;
+	font-weight: bold;
+	outline: 1px solid #579;
+	outline-offset: .1rem;
+	border: .1rem outset #eed;
+	border-radius: 0;
 	cursor: pointer;
 	letter-spacing: 2px;
+	background: #bba;
+}
+.title-ch-btn:active {
+	outline: .1rem solid #579 !important;
+	background: #998;
 }
 #ch-card-wrap {
 	height: 510px;
 	overflow-y: auto;
 }
+#go-create-character,
 .ch-card {
+	background: #27a;
+	border: .1rem outset #013;
+	outline: .1rem solid #048;
+}
+.ch-card {
+	font: 1rem Roboto Slab, serif;
 	margin: 6px auto;
 	width: 90%;
 	display: block;
-	border-radius: 6px;
+	border-radius: 0;
 	cursor: pointer;
-	font: 1rem Roboto Slab, serif;;
+}
+.ch-card:active {
+	background: #048;
+	outline: .1rem solid #05b;
 }
 .ch-card-active {
-	box-shadow: 0 99px rgba(0,0,0,.5) inset, 0 4px 10px 2px rgba(0,0,0,.8) inset;
+	background: #159;
 	color: #ff2 !important;
 	text-shadow: 
 		0 0 2px #000, 
@@ -579,14 +598,12 @@ tbody {
 		0 0 12px #000;
 }
 /* create character scene */
-#race-wrap {
-}
 .select-create-wrap {
 	border: .2rem groove #579;
 }
 .select-race,
 .select-class {
-	font-family: Roboto Slab;
+	font-family: Roboto Slab, serif;
 	background: #bba;
 	border: .1rem outset #eed;
 	text-align: center;
@@ -639,7 +656,7 @@ tbody {
 		0 0 5px #000 inset;
 }
 .character-info-header {
-	font: 1rem Roboto Slab;
+	font: 1rem Roboto Slab, serif;
 	text-align: center;
 	border: .1rem ridge #05b;
 	background: #025;
@@ -708,16 +725,55 @@ tbody {
 		.5px .5px #357, 
 		1px 1px #357
 }
-.modals {
+#game-wrap {
     visibility: hidden;
-    position: absolute;
-	top: 0;
-    padding: 10px;
-    left: 0;
-    right: 0;
-    margin: 0 auto;
-    width: 640px;
+    background: #000a3a
+}
+/* overlays */
+#modal-overlay {
+    visibility: hidden;
+    background: rgba(0, 0, 0, .8);
+    background: -webkit-radial-gradient(center center, farthest-corner, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, .7) 100%);
+    background: -moz-radial-gradient(center center, farthest-corner, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, .7) 100%);
+    background: -o-radial-gradient(center center, farthest-corner, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, .7) 100%);
+    background: radial-gradient(center center, farthest-corner, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, .7) 100%);
     z-index: 999999
+}
+#modal-wrap {
+	position: relative;
+	top: 50px;
+	left: 0;
+	right: 0;
+	margin: 0 auto;
+	width: 80%;
+	max-width: 480px;
+	border: .1rem ridge #048;
+	background: #013;
+	padding: 1px;
+}
+#modal-header {
+	text-align: center;
+	border: 2px outset #2e6da4;
+	background: #048;
+}
+#modal-body {
+	text-align: center;
+	padding: .2rem .4rem;
+	min-height: 60px;
+}
+.modal-buttons {
+	margin: .2rem .4rem;
+}
+#flash-overlay {
+    background: '#ffffff';
+    z-index: 999999;
+    opacity: 0;
+    pointer-events: none
+}
+#lock-overlay {
+    display: none;
+    background: rgba(0, 0, 0, .5);
+    z-index: 999999;
 }
 .overlay {
     position: absolute;
@@ -726,25 +782,10 @@ tbody {
     width: 100%;
     height: 100%
 }
-#game-wrap {
-    visibility: hidden;
-    background: #000a3a
-}
-#overlay {
-    display: none;
-    background: rgba(0, 0, 0, .5);
-    z-index: 999999;
-}
-#screen-flash {
-    background: '#ffffff';
-    z-index: 4999;
-    opacity: 0;
-    pointer-events: none
-}
 #msg {
     opacity: 0;
     position: absolute;
-    top: 120px;
+    top: 10px;
     left: 0;
     right: 0;
     margin: 0 auto;
@@ -770,20 +811,7 @@ tbody {
     z-index: 999999;
     pointer-events: none
 }
-#title-backdrop {
-    position: absolute;
-    visibility: hidden;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, .8);
-    background: -webkit-radial-gradient(center center, farthest-corner, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, .7) 100%);
-    background: -moz-radial-gradient(center center, farthest-corner, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, .7) 100%);
-    background: -o-radial-gradient(center center, farthest-corner, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, .7) 100%);
-    background: radial-gradient(center center, farthest-corner, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, .7) 100%);
-    z-index: 999999
-}
+/* hrs */
 .fancy-hr {
     border: 0;
     height: 1px;

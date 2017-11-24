@@ -43,30 +43,32 @@ var create = {
 		Warrior: 'Tank',
 		Wizard: 'Magical DPS'
 	},
-	events: function(){
-		$("img").on('dragstart', function(e) {
-			e.preventDefault();
-		});
-		$("#logout").on(env.click, function() {
+	events: function(x){
+		$("#logout").on(x, function() {
 			g.logout();
 		});
-		$("#ch-card-base").on(env.click, '.ch-card', function(){
+		$("#ch-card-base").on(x, '.ch-card', function(){
 			$('.ch-card').removeClass('ch-card-active');
 			$(this).addClass('ch-card-active');
 		});
-		$('.ch-card:first').trigger(env.click);
+		$('.ch-card:first').trigger(x);
 		// create character
-		$("#go-create-character").on(env.click, function(){
+		$("#go-create-character").on(x, function(){
 			g.goCreateCharacter();
 		});
-		$(".select-race").on(env.click, function(e){
+		$("#delete-character").on(x, function(){
+			modal.show({
+				key: 'delete-character'
+			});
+		});
+		$(".select-race").on(x, function(e){
 			var race = $(this).text();
 			$('.select-race').removeClass('active');
 			$(this).addClass('active');
 			create.setRandomClass(race);
 			create.set('race', race);
 		});
-		$(".select-class").on(env.click, function(e){
+		$(".select-class").on(x, function(e){
 			if ($(this).get(0).className.indexOf('disabled') === -1){
 				var job = $(this).text();
 				$('.select-class').removeClass('active');
@@ -74,7 +76,7 @@ var create = {
 				create.set('job', job);
 			}
 		});
-		$(".select-gender").on(env.click, function(){
+		$(".select-gender").on(x, function(){
 			var gender = $(this).attr('id');
 			$(".select-gender").removeClass('active');
 			$(this).addClass('active');
@@ -83,7 +85,7 @@ var create = {
 		$("#create-character-name").on('blur', function(){
 			create.form.name = $(this).val().trim().replace(/ /g, '');
 		});
-		$(".attr-minus-1").on(env.click, function(){
+		$(".attr-minus-1").on(x, function(){
 			var attr = $(this).data('id');
 			if (create.form.left < 10 && 
 				(create.form[attr] - create.base[attr] > 0) ){
@@ -91,14 +93,14 @@ var create = {
 				document.getElementById('create-points-remaining').innerHTML = ++create.form.left;
 			}
 		});
-		$(".attr-add-1").on(env.click, function(){
+		$(".attr-add-1").on(x, function(){
 			var attr = $(this).data('id');
 			if (create.form.left){
 				document.getElementById('create-points-' + attr).innerHTML = ++create.form[attr];
 				document.getElementById('create-points-remaining').innerHTML = --create.form.left;
 			}
 		});
-		$("#create-character-back").on(env.click, function(){
+		$("#create-character-back").on(x, function(){
 			g.lock(1);
 			g.loadAllCharacters();
 			var z = document.getElementById('title-scene-create-character');
@@ -125,8 +127,10 @@ var create = {
 				}
 			});
 		});
-		$("#create-character-btn").on(env.click, function(){
+		$("#create-character-btn").on(x, function(){
 			//client-side validation
+			if (!g.locked){
+				
 			g.lock(1);
 			var f = create.form,
 				err = '';
@@ -150,19 +154,43 @@ var create = {
 						form: f
 					}
 				}).done(function(r){
-					console.info('Created character: ', r.hero);
+					console.info('Created character: ', r);
 					g.msg(r.hero.name + ' has been created!');
-					$("#create-character-back").trigger(env.click);
+					$("#create-character-back").trigger(x);
 				}).fail(function(r){
+					console.info('Created character: ', r.responseText);
 					g.msg(r.responseText, 8);
-				}).always(function(){
 					g.unlock();
 				});
 			}
+			
+			}
 		});
-		$("#ch-card-list").on(env.click, '.select-player-card', function(){
-			var id = create.selected = $(this).data('row');
+		$("#ch-card-list").on(x, '.select-player-card', function(){
+			var z = $(this);
+			var id = create.selected = z.data('row');
+			var id = create.name = z.data('name');
 		});
+	},
+	deleteCharacter: function(){
+		// send to server
+		if (!g.locked){
+			g.lock();
+			$.ajax({
+				url: 'php2/create/delete-character.php',
+				data: {
+					row: create.selected
+				}
+			}).done(function(r){
+				console.info('Deleted character: ', r);
+				g.msg(create.name + ' has been deleted!');
+				modal.hide();
+				g.loadAllCharacters();
+			}).fail(function(r){
+				g.msg(r.responseText, 8);
+				g.unlock();
+			});
+		}
 	},
 	msg: function(key, val){
 		var z = {

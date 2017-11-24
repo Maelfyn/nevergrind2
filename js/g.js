@@ -1,12 +1,15 @@
 // core.js
 g = {
-	events: function(){
+	events: function(x){
 		$(window).focus(function(){
 			document.title = g.defaultTitle;
 			g.titleFlashing = false;
 			if (g.notification.close !== undefined){
 				g.notification.close();
 			}
+		});
+		$("img").on('dragstart', function(e) {
+			e.preventDefault();
 		});
 		$(window).on('resize orientationchange focus', function() {
 			env.resizeWindow();
@@ -67,32 +70,39 @@ g = {
 	sfxFood: false,
 	sfxCulture: false,
 	chatOn: false,
-	overlay: document.getElementById("overlay"),
+	lockOverlay: document.getElementById("lock-overlay"),
 	startTime: Date.now(),
-	keyLock: false,
+	locked: 0,
 	loadAttempts: 0,
 	isModalOpen: false,
+	camel: function(str){
+		str = str.split("-");
+		for (var i=1, len=str.length; i<len; i++){
+			str[i] = str[i].charAt(0).toUpperCase() + str[i].substr(1);
+		}
+		return str.join("");
+	},
 	lock: function(hide){
-		g.overlay.style.display = "block";
-		g.overlay.style.opacity = hide ? 0 : 1;
-		g.keyLock = true;
+		g.lockOverlay.style.display = "block";
+		g.lockOverlay.style.opacity = hide ? 0 : 1;
+		g.locked = 1;
 	},
 	unlock: function(){
-		g.overlay.style.display = "none";
-		g.keyLock = false;
+		g.lockOverlay.style.display = "none";
+		g.locked = 0;
 	},
 	unlockFade: function(d){
 		if (!d){
 			d = 1;
 		}
-		TweenMax.to(g.overlay, d, {
+		TweenMax.to(g.lockOverlay, d, {
 			startAt: {
 				opacity: 1,
 			},
 			ease: Power3.easeIn,
 			opacity: 0,
 			onComplete: function(){
-				g.overlay.style.display = 'none';
+				g.lockOverlay.style.display = 'none';
 			}
 		});
 	},
@@ -357,10 +367,11 @@ g = {
 		}).done(function(r){
 			var s = '';
 			r.forEach(function(d){
-				console.info('loadAllCharacters ', d.row, d);
 				// #ch-card-list
 				s += 
-				'<div data-row="'+ d.row +'" class="btn btn-info btn-lg ch-card center select-player-card">'+
+				'<div data-row="'+ d.row +'" '+
+					'data-name="'+ d.name +'" '+
+					'class="btn btn-lg ch-card center select-player-card">'+
 					'<div class="ch-card-name">'+ d.name +'</div>'+
 					'<div class="ch-card-details">'+ d.level +' '+ d.race +' '+ d.job +'</div>'+
 				'</div>';

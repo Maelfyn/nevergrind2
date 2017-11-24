@@ -115,7 +115,7 @@
 						<!-- well top -->
 						<div id="title-well-top" class="title-ch-well ng-blue text-center">
 							<a id="delete-character" 
-								class="btn btn-secondary btn-lg title-ch-btn">
+								class="btn btn-lg title-ch-btn">
 								Delete
 							</a>
 						</div>
@@ -135,7 +135,7 @@
 						<!-- well bottom -->
 						<div id="title-well-bottom" class="title-ch-well ng-blue text-center">
 							<a id="enter-world" 
-								class="btn btn-secondary btn-sm title-ch-btn">
+								class="btn btn-sm title-ch-btn">
 								Enter World
 							</a>
 						</div>
@@ -475,9 +475,9 @@
 	<audio id="bgmusic" autoplay loop preload="auto"></audio>
 	
 		
-	<div id="title-backdrop"></div>
-	<div id="screen-flash" class="overlay"></div>
-	<div id="overlay" class="overlay"></div>
+	<div id="modal-overlay" class="overlay text-shadow"></div>
+	<div id="flash-overlay" class="overlay"></div>
+	<div id="lock-overlay" class="overlay"></div>
 	<div id="msg" class="text-shadow"></div>
 	
 </div>
@@ -524,6 +524,7 @@ g.guest = 0;
 			'env', 
 			'my', 
 			'dom', 
+			'modal',
 			'video', 
 			'audio', 
 			'game', 

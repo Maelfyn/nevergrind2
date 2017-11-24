@@ -1,3 +1,22 @@
+TODO:
+- add ng2_item starting equipment
+- add ng2_item inventory (8 slots)
+- enter town
+- column in item tables for ID?
+	keep all items in one table?
+- design landing page
+	- Load characters
+	- create char
+	- delete character
+- GLB should be local
+- use ? for default chat channel
+- create character screen
+	races, classes, gender, stats
+- experiment with a 3d hallway thing
+
+- Maybe upgrade autobahn?
+
+
 WHAT DO ATTRIBUTES AFFECT:
 str: melee damage
 sta: maxhp, hp regen
@@ -174,6 +193,7 @@ WIZ		250			250			250
 - db model:
 	ng2_chars
 		row
+		deleted
 		account 
 		name 
 		lastName 
@@ -219,15 +239,9 @@ WIZ		250			250			250
 		fire
 		playtime
 		
-	ng2_party ??? is this needed at all? DELETED
-		row
-		timestamp
-		name
-		level
-		zone
-		
 	ng2_players - heartbeat - joins ng2_chars for values
 		row
+		charRow
 		timestamp
 		name
 		leader
@@ -257,72 +271,11 @@ WIZ		250			250			250
 		cold
 		fire
 		
-	ng2_eq
-		row
-		name
-		charName
-		slot
-		damage
-		delay
-		hp
-		mp
-		str
-		sta
-		agi
-		dex
-		wis
-		intel
-		cha
-		armor
-		bleed
-		poison
-		arcane
-		lightning
-		cold
-		fire
-		xPos
-		yPos
-		effect
-		rarityType
-		equipSlots (multiple)
-		equipJobs (multiple)
-		req
-		
 	ng2_item
 		row
+		charRow
 		name
-		character
-		slot
-		damage
-		delay
-		hp
-		mp
-		str
-		sta
-		agi
-		dex
-		wis
-		intel
-		cha
-		armor
-		bleed
-		poison
-		arcane
-		lightning
-		cold
-		fire
-		xPos
-		yPos
-		effect
-		rarityType
-		equipSlots (multiple)
-		equipJobs (multiple)
-		req
-		
-	ng2_bank
-		row
-		name
-		character
+		slotType
 		slot
 		damage
 		delay
@@ -352,7 +305,7 @@ WIZ		250			250			250
 		
 	ng2_quests
 		row
-		name
+		charRow
 		salubrinForest
 		tendolinMeadows
 		greenthornCavern

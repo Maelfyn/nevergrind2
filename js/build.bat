@@ -1,1 +1,1 @@
-copy /b beginWrap.js+init.js+create.js+g.js+env.js+my.js+dom.js+video.js+audio.js+game.js+title.js+events.js+socket.js+chat.js+endWrap.js nevergrind-online.js
+copy /b beginWrap.js+init.js+create.js+g.js+env.js+my.js+dom.js+modal.js+video.js+audio.js+game.js+title.js+events.js+socket.js+chat.js+endWrap.js nevergrind-online.js

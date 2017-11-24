@@ -91,8 +91,9 @@ var title = {
 				g.keepAlive();
 			}, 180000);
 			// init events
-			g.events();
-			create.events();
+			var x = env.click;
+			g.events(x);
+			create.events(x);
 			audio.events();
 		});
 	})(),
