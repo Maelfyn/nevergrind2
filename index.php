@@ -34,11 +34,11 @@
 		require $_SERVER['DOCUMENT_ROOT'] . "/includes/loginCss.html";
 	}
 	?>
-	<link rel="stylesheet" href="css/ng2.css?v=0-0-27">
+	<link rel="stylesheet" href="css/ng2.css?v=0-0-28">
 	<link rel="shortcut icon" href="/images/favicon.png">
 	<script>
 		var g = {
-			version: '0-0-27'
+			version: '0-0-28'
 		};
 	</script>
 </head>
@@ -94,8 +94,8 @@
 		</header>
 		
 		<div id="title-screen-wrap" class="container-fluid text-shadow">
-			<div id="title-menu-wrap" class="row title-menu-row stag-blue">
-				<div class="col-6">
+			<div id="title-menu-wrap" class="row title-menu-row">
+				<div class="col-6 title-bg-color">
 					<div class="title-ch-create-col justify-content-start">
 						<h1>
 							<div>Nevergrind 2<br>
@@ -107,10 +107,26 @@
 							<hr class="fancy-hr-dark">
 						</h1>
 						<img id="ng2-logo" src="images/ng_logo_532x428.png">
+						<section class="text-center">
+							<div>Our Other Games</div>
+							<div>
+								<a href="/classic" title="Single-player Browser RPG">Classic Nevergrind</a> | 
+								<a href="/games/firmament-wars" title="Multiplayer Strategy Game">Firmament Wars</a>
+							</div>
+						</section>
+						<section class="text-center">
+							<div>Links</div>
+							<div>
+								<a href="/blog" title="Nevergrind News">Blog</a> | 
+								<a href="https://discord.gg/n2gp8rC" title="Nevergrind Discord Server">Discord</a> | 
+								<a href="/wiki" title="Nevergrind Wiki">Wiki</a> | 
+								<a href="/nevergrounds" title="Nevergrounds">Nevergrounds</a>
+							</div>
+						</section>
 					</div>
 				</div>
 				
-				<div class="col-6">
+				<div class="col-6 title-bg-trans">
 					<div id="title-select-character" class="title-ch-create-col">
 						<!-- well top -->
 						<div id="title-well-top" class="title-ch-well ng-blue text-center">
@@ -487,7 +503,7 @@
 
 <script src="js/libs/libs.min.js"></script>
 <?php
-	require $_SERVER['DOCUMENT_ROOT'] . "/includes/loginJs.html";
+	require $_SERVER['DOCUMENT_ROOT'] . "/includes/loginJs.php";
 ?>
 
 <script src="//apis.google.com/js/platform.js?onload=loginRenderButton" async defer></script>

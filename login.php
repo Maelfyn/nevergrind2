@@ -66,7 +66,7 @@
 
 <?php
 if (!isset($_SESSION['account'])){
-	require $_SERVER['DOCUMENT_ROOT'] . "/includes/loginJs.html";
+	require $_SERVER['DOCUMENT_ROOT'] . "/includes/loginJs.php";
 }
 require($_SERVER['DOCUMENT_ROOT'] . "/includes/ga.html");
 ?>

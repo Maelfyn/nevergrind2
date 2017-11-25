@@ -136,6 +136,7 @@ var create = {
 				err = '';
 			if (!f.name){
 				err = 'Your character needs a name!';
+				$("#create-character-name").focus();
 			}
 			else if(f.name.length > 16){
 				err = "Your character name must be 16 characters or less!";

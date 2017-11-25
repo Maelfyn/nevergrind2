@@ -348,14 +348,21 @@ tbody {
 	margin: 4px auto;
 }
 /* title */
-#title-screen-wrap {
+.title-bg-color {
     background: #00214d;
 }
+.title-bg-trans {
+	margin: 0;
+	padding: 0;
+    box-shadow: 
+		0 1rem #00214d inset,
+		-.2rem 0 #00214d inset,
+		.2rem 0 #00214d inset,
+		0 -1rem #00214d inset;
+}
 .title-menu-row {
-    background: #00214d;
     color: #fff;
     border-radius: 0 0 5px 5px;
-	border: .1rem ridge #05b;
 	border-top: none;
 }
 #title-scene-select-character {
@@ -528,6 +535,11 @@ tbody {
 }
 #title-select-character {
 	background: rgba(0,0,0,0);
+    box-shadow: 
+		0 3rem #00214d inset,
+		.1rem 0 #00214d inset,
+		-.1rem 0 #00214d inset,
+		0 -3rem #00214d inset;
 }
 #ch-cr-detail-col {
 	display: flex;
@@ -545,12 +557,8 @@ tbody {
 	border-radius: 0 0 6px 6px;
 }
 #ch-card-base {
-	border: .1rem inset #05b;
 	padding: 0;
 	margin: 4px 0;
-	background: url('../images/bg/ng2-bg.jpg');
-	background-position: -120px -50px;
-	background-size: 1280px 720px;
 }
 .title-ch-btn {
 	margin: .3rem auto;
@@ -590,7 +598,7 @@ tbody {
 }
 .ch-card:active {
 	background: #048;
-	outline: .1rem solid #05b;
+	outline: 1px solid #05b;
 }
 .ch-card-active {
 	background: #159;
@@ -674,7 +682,7 @@ tbody {
 	width: 100%;
 }
 #create-character-name-wrap {
-	border: .1rem groove #048;
+	border: 1px solid #579;
 }
 #create-character-name {
 	line-height: 1;

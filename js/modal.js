@@ -5,7 +5,7 @@ var modal = {
 	show: function(e){
 		modal.isOpen = 1;
 		e.camelKey = g.camel(e.key);
-		console.info('show: ', e);
+		//console.info('show: ', e);
 		var s = 
 			'<div id="modal-wrap">' +
 				modal.header(e) +

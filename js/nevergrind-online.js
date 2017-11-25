@@ -52,30 +52,32 @@ init.isMobile = init.checkMobile();var create = {
 		Warrior: 'Tank',
 		Wizard: 'Magical DPS'
 	},
-	events: function(){
-		$("img").on('dragstart', function(e) {
-			e.preventDefault();
-		});
-		$("#logout").on(env.click, function() {
+	events: function(x){
+		$("#logout").on(x, function() {
 			g.logout();
 		});
-		$("#ch-card-base").on(env.click, '.ch-card', function(){
+		$("#ch-card-base").on(x, '.ch-card', function(){
 			$('.ch-card').removeClass('ch-card-active');
 			$(this).addClass('ch-card-active');
 		});
-		$('.ch-card:first').trigger(env.click);
+		$('.ch-card:first').trigger(x);
 		// create character
-		$("#go-create-character").on(env.click, function(){
+		$("#go-create-character").on(x, function(){
 			g.goCreateCharacter();
 		});
-		$(".select-race").on(env.click, function(e){
+		$("#delete-character").on(x, function(){
+			modal.show({
+				key: 'delete-character'
+			});
+		});
+		$(".select-race").on(x, function(e){
 			var race = $(this).text();
 			$('.select-race').removeClass('active');
 			$(this).addClass('active');
 			create.setRandomClass(race);
 			create.set('race', race);
 		});
-		$(".select-class").on(env.click, function(e){
+		$(".select-class").on(x, function(e){
 			if ($(this).get(0).className.indexOf('disabled') === -1){
 				var job = $(this).text();
 				$('.select-class').removeClass('active');
@@ -83,7 +85,7 @@ init.isMobile = init.checkMobile();var create = {
 				create.set('job', job);
 			}
 		});
-		$(".select-gender").on(env.click, function(){
+		$(".select-gender").on(x, function(){
 			var gender = $(this).attr('id');
 			$(".select-gender").removeClass('active');
 			$(this).addClass('active');
@@ -92,7 +94,7 @@ init.isMobile = init.checkMobile();var create = {
 		$("#create-character-name").on('blur', function(){
 			create.form.name = $(this).val().trim().replace(/ /g, '');
 		});
-		$(".attr-minus-1").on(env.click, function(){
+		$(".attr-minus-1").on(x, function(){
 			var attr = $(this).data('id');
 			if (create.form.left < 10 && 
 				(create.form[attr] - create.base[attr] > 0) ){
@@ -100,14 +102,14 @@ init.isMobile = init.checkMobile();var create = {
 				document.getElementById('create-points-remaining').innerHTML = ++create.form.left;
 			}
 		});
-		$(".attr-add-1").on(env.click, function(){
+		$(".attr-add-1").on(x, function(){
 			var attr = $(this).data('id');
 			if (create.form.left){
 				document.getElementById('create-points-' + attr).innerHTML = ++create.form[attr];
 				document.getElementById('create-points-remaining').innerHTML = --create.form.left;
 			}
 		});
-		$("#create-character-back").on(env.click, function(){
+		$("#create-character-back").on(x, function(){
 			g.lock(1);
 			g.loadAllCharacters();
 			var z = document.getElementById('title-scene-create-character');
@@ -134,8 +136,10 @@ init.isMobile = init.checkMobile();var create = {
 				}
 			});
 		});
-		$("#create-character-btn").on(env.click, function(){
+		$("#create-character-btn").on(x, function(){
 			//client-side validation
+			if (!g.locked){
+				
 			g.lock(1);
 			var f = create.form,
 				err = '';
@@ -159,19 +163,43 @@ init.isMobile = init.checkMobile();var create = {
 						form: f
 					}
 				}).done(function(r){
-					console.info('Created character: ', r.hero);
+					console.info('Created character: ', r);
 					g.msg(r.hero.name + ' has been created!');
-					$("#create-character-back").trigger(env.click);
+					$("#create-character-back").trigger(x);
 				}).fail(function(r){
+					console.info('Created character: ', r.responseText);
 					g.msg(r.responseText, 8);
-				}).always(function(){
 					g.unlock();
 				});
 			}
+			
+			}
 		});
-		$("#ch-card-list").on(env.click, '.select-player-card', function(){
-			var id = create.selected = $(this).data('row');
+		$("#ch-card-list").on(x, '.select-player-card', function(){
+			var z = $(this);
+			var id = create.selected = z.data('row');
+			var id = create.name = z.data('name');
 		});
+	},
+	deleteCharacter: function(){
+		// send to server
+		if (!g.locked){
+			g.lock();
+			$.ajax({
+				url: 'php2/create/delete-character.php',
+				data: {
+					row: create.selected
+				}
+			}).done(function(r){
+				console.info('Deleted character: ', r);
+				g.msg(create.name + ' has been deleted!');
+				modal.hide();
+				g.loadAllCharacters();
+			}).fail(function(r){
+				g.msg(r.responseText, 8);
+				g.unlock();
+			});
+		}
 	},
 	msg: function(key, val){
 		var z = {
@@ -522,13 +550,16 @@ init.isMobile = init.checkMobile();var create = {
 
 // core.js
 g = {
-	events: function(){
+	events: function(x){
 		$(window).focus(function(){
 			document.title = g.defaultTitle;
 			g.titleFlashing = false;
 			if (g.notification.close !== undefined){
 				g.notification.close();
 			}
+		});
+		$("img").on('dragstart', function(e) {
+			e.preventDefault();
 		});
 		$(window).on('resize orientationchange focus', function() {
 			env.resizeWindow();
@@ -589,32 +620,39 @@ g = {
 	sfxFood: false,
 	sfxCulture: false,
 	chatOn: false,
-	overlay: document.getElementById("overlay"),
+	lockOverlay: document.getElementById("lock-overlay"),
 	startTime: Date.now(),
-	keyLock: false,
+	locked: 0,
 	loadAttempts: 0,
 	isModalOpen: false,
+	camel: function(str){
+		str = str.split("-");
+		for (var i=1, len=str.length; i<len; i++){
+			str[i] = str[i].charAt(0).toUpperCase() + str[i].substr(1);
+		}
+		return str.join("");
+	},
 	lock: function(hide){
-		g.overlay.style.display = "block";
-		g.overlay.style.opacity = hide ? 0 : 1;
-		g.keyLock = true;
+		g.lockOverlay.style.display = "block";
+		g.lockOverlay.style.opacity = hide ? 0 : 1;
+		g.locked = 1;
 	},
 	unlock: function(){
-		g.overlay.style.display = "none";
-		g.keyLock = false;
+		g.lockOverlay.style.display = "none";
+		g.locked = 0;
 	},
 	unlockFade: function(d){
 		if (!d){
 			d = 1;
 		}
-		TweenMax.to(g.overlay, d, {
+		TweenMax.to(g.lockOverlay, d, {
 			startAt: {
 				opacity: 1,
 			},
 			ease: Power3.easeIn,
 			opacity: 0,
 			onComplete: function(){
-				g.overlay.style.display = 'none';
+				g.lockOverlay.style.display = 'none';
 			}
 		});
 	},
@@ -879,10 +917,11 @@ g = {
 		}).done(function(r){
 			var s = '';
 			r.forEach(function(d){
-				console.info('loadAllCharacters ', d.row, d);
 				// #ch-card-list
 				s += 
-				'<div data-row="'+ d.row +'" class="btn btn-info btn-lg ch-card center select-player-card">'+
+				'<div data-row="'+ d.row +'" '+
+					'data-name="'+ d.name +'" '+
+					'class="btn btn-lg ch-card center select-player-card">'+
 					'<div class="ch-card-name">'+ d.name +'</div>'+
 					'<div class="ch-card-details">'+ d.level +' '+ d.race +' '+ d.job +'</div>'+
 				'</div>';
@@ -1043,7 +1082,78 @@ var dom;
 		chatLog: d.getElementById('chat-log'),
 		hud: d.getElementsByClassName('hud')
 	}
-})(document);
+})(document);// modal.js
+var modal = {
+	isOpen: 0,
+	overlay: document.getElementById('modal-overlay'),
+	show: function(e){
+		modal.isOpen = 1;
+		e.camelKey = g.camel(e.key);
+		console.info('show: ', e);
+		var s = 
+			'<div id="modal-wrap">' +
+				modal.header(e) +
+				modal.body(e) +
+			'</div>';
+		modal.overlay.innerHTML = s;
+		
+		modal.isOpen = true;
+		TweenMax.to('#modal-overlay', .3, {
+			startAt: {
+				visibility: 'visible',
+				alpha: 0
+			},
+			alpha: 1
+		});
+		TweenMax.to('#modal-wrap', .5, {
+			startAt: {
+				top: 30
+			},
+			top: 50
+		});
+		// assign events
+		$("#modal-dismiss, #modal-overlay").on(env.click, function(){
+			modal.hide();
+		});
+		// confirm event actions
+		$('#modal-wrap').on(env.click, '#delete-character-confirm', function(){
+			create.deleteCharacter();
+		});
+	},
+	hide: function(){
+		TweenMax.to('#modal-overlay', .3, {
+			overwrite: 0,
+			alpha: 0,
+			onComplete: function(){
+				modal.isOpen = 0;
+				g.unlock();
+				TweenMax.set(this.target, {
+					visibility: 'hidden'
+				});
+			}
+		});
+		
+	},
+	header: function(e){
+		var z = {
+			deleteCharacter: '<div id="modal-header">Delete '+ create.name +'?</div>'
+		}
+		return z[e.camelKey];
+	},
+	body: function(e){
+		var z = {
+			deleteCharacter: 
+			'<div id="modal-body" class="stag-blue">'+
+				'<p>Are you sure you want to delete this character?</p>'+
+				'<div>'+
+					'<a id="modal-dismiss" class="btn btn-info btn-sm modal-buttons">Cancel</a>'+
+					'<a id="'+ e.key +'-confirm" class="btn btn-info btn-sm modal-buttons">Confirm</a>'+
+				'</div>'+
+			'</div>'
+		}
+		return z[e.camelKey];
+	},
+};
 
 var video = {
 	cache: {},
@@ -1395,8 +1505,9 @@ var title = {
 				g.keepAlive();
 			}, 180000);
 			// init events
-			g.events();
-			create.events();
+			var x = env.click;
+			g.events(x);
+			create.events(x);
 			audio.events();
 		});
 	})(),
