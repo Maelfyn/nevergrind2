@@ -170,7 +170,7 @@ tbody {
 	box-shadow: none !important;
 }
 .btn-primary {
-	font-family: Roboto Slab, serif !important;
+	font-family: Roboto, Roboto Slab, serif !important;
 	background-color: #05b;
 	border-color: #039!important;
 }
@@ -526,6 +526,9 @@ tbody {
 	border: .1rem ridge #444;
 	height: 99%;
 }
+#title-select-character {
+	background: rgba(0,0,0,0);
+}
 #ch-cr-detail-col {
 	display: flex;
 	flex-direction: row;
@@ -573,8 +576,9 @@ tbody {
 #go-create-character,
 .ch-card {
 	background: #27a;
+	background: rgba(255,255,255,.3);
 	border: .1rem outset #013;
-	outline: .1rem solid #048;
+	outline: 1px solid #048;
 }
 .ch-card {
 	font: 1rem Roboto Slab, serif;

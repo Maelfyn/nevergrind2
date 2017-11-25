@@ -127,7 +127,7 @@
 								</div>
 								
 								<div id="go-create-character" 
-									class="btn btn-info btn-lg ch-card center">
+									class="btn btn-lg ch-card center">
 									Create Character
 								</div>
 							</div>
