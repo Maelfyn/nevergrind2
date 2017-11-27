@@ -61,6 +61,14 @@ var create = {
 				key: 'delete-character'
 			});
 		});
+		$("#msg").on(x, '.unlock-game', function(){
+			modal.show({
+				key: 'unlock-game'
+			});
+			TweenMax.set('#msg', {
+				visibility: 'hidden'
+			});
+		});
 		$(".select-race").on(x, function(e){
 			var race = $(this).text();
 			$('.select-race').removeClass('active');
@@ -148,6 +156,8 @@ var create = {
 				g.msg(err);
 				g.unlock();
 			} else {
+				// final adds
+				f.shortJob = g.toJobShort(f.job);
 				// send to server
 				$.ajax({
 					url: 'php2/create/create-character.php',
@@ -225,7 +235,7 @@ var create = {
 				Ranger: "Rangers are a physical DPS class that can wear chain armor. They're the only class that can use bows, which help them inflict massive damage. A diverse arsenal of magic also aids them in battle. Notably, Rangers have the strongest overall dungeon skills, including the best scouting skills.",
 				Rogue: 'Rogues are a physical DPS class that can wear chain armor. Their combination of stealth and bursts of damage make them deadly on the battlefield. Rogues have unparalleled disarm trap skills, along with very strong treasure and scouting skills.',
 				Shadowknight: 'Shadowknights are a tank class that can wear plate armor. They have the unique ability to harm touch a mob, dealing a large amount of damage to a single target. They have the strongest offensive potential among all tanks along with deadly abilities like fear and life tap.',
-				Shaman: 'Shaman are a healing class that can wear chain armor. They can summon a formidable pet familiar that assists them in combat. Their ability to buff their party and debuff mobs is capable of shifting the odds with ease.',
+				Shaman: 'Shaman are a healing class that can wear chain armor. Their ability to buff their party and debuff mobs is capable of shifting the odds with ease. Their poison and frost spells make them both versatile and deadly in combat.',
 				Warrior: 'Warriors are a tank class that can wear plate armor. Warriors have the strongest physical defense and the highest hit points in the game. They can also dish out a solid amount of physical DPS. Their exceptional pulling skills help keep their party out of trouble.',
 				Wizard: 'Wizards are a magical DPS class that can only wear cloth armor. Instead of opting for trickery or pets, they focus on raw magical power. Wizards have a powerful and diverse arsenal of spells at their disposal that make quick work of their prey.'
 			}

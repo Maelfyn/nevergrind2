@@ -1,7 +1,27 @@
 TODO:
-- add ng2_item starting equipment
-- add ng2_item inventory (8 slots)
+- finish purchase modal
+- Finish insert items template files
+	establish low/high values from 1-50 items
+	create all items
+- add ng2_item inventory (8 slots to 32 upon purchase for active characters)
+- options audio etc
+	<!--i id="options" class="pointer options fa fa-volume-up"></i-->
 - enter town
+	ability to open inventory
+	ability to open view equipment
+	open view character stats
+	see resists
+	tooltip for all items
+	ability to destroy items
+	ability to buy items
+Town
+	Quest Counter
+	Merchant
+	Train Skills
+	Purchase Spells
+	Bank
+	Mailbox
+	Auction house
 - column in item tables for ID?
 	keep all items in one table?
 - design landing page
@@ -13,9 +33,18 @@ TODO:
 - create character screen
 	races, classes, gender, stats
 - experiment with a 3d hallway thing
-
 - Maybe upgrade autobahn?
 
+WEAPON RATIOS:
+h2h
+	all: 2/36 -> 6/36
+	monk: 4/36 -> 10/30
+1H 
+	start: 3/36
+	end: 8/24
+2H
+	start: 3/24
+	end: 18/36
 
 WHAT DO ATTRIBUTES AFFECT:
 str: melee damage
@@ -26,6 +55,44 @@ wis: healing power, mp regen
 int: spell damage, maxmp, casting skill upgrades
 cha: Prices. crowd control, mes, charm, etc spells
 
+EQ LAYOUT:
+amulet helm shoulders
+ring1 bracers1 gloves bracers2 ring2
+chest cloak belt legs boots
+
+16 SLOTS
+0: head
+1: neck
+2, 3: finger
+4: shoulders
+5: back
+6: chest
+7, 8: wrist
+9: hands
+10: waist
+11: legs
+12: feet
+13: primary
+14: secondary
+15: range
+
+STARTING GEAR:
+- add 1hs, 1hb, piercer, bow
+
+Bard: 1hs sword, 1ac tunic
+Cleric: 1hb blunt, 1ac tunic
+Druid: 1hb blunt, 1ac tunic
+Enchanter: dagger, 1ac robe
+Magician: dagger, 1ac robe
+Monk: tunic
+Necromancer: dagger, 1ac robe
+Paladin: 1hb blunt, 1ac tunic
+Ranger: 1hs sword, 1ac tunic, bow
+Rogue: dagger, 1ac tunic
+Shadowknight: 1hs sword, 1ac tunic
+Shaman: 1hb blunt, 1ac tunic
+Warrior: 1hs sword, 1ac tunic
+Wizard: dagger, 1ac robe
 
 
 

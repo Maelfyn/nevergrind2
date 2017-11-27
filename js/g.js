@@ -47,6 +47,44 @@ g = {
 		'Warrior',
 		'Wizard'
 	],
+	jobShort: {
+		Bard: 'BRD',
+		Cleric: 'CLR',
+		Druid: 'DRU',
+		Enchanter: 'ENC',
+		Magician: 'MAG',
+		Monk: 'MNK',
+		Necromancer: 'NEC',
+		Paladin: 'PLD',
+		Ranger: 'RNG',
+		Rogue: 'ROG',
+		Shadowknight: 'SHD',
+		Shaman: 'SHM',
+		Warrior: 'WAR',
+		Wizard: 'WIZ'
+	},
+	toJobShort: function(key){
+		return g.jobShort[key];
+	},
+	jobLong: {
+		BRD: 'Bard',
+		CLR: 'Cleric',
+		DRU: 'Druid',
+		ENC: 'Enchanter',
+		MAG: 'Magician',
+		MNK: 'Monk',
+		NEC: 'Necromancer',
+		PLD: 'Paladin',
+		RNG: 'Ranger',
+		ROG: 'Rogue',
+		SHD: 'Shadowknight',
+		SHM: 'Shaman',
+		WAR: 'Warrior',
+		WIZ: 'Wizard'
+	},
+	toJobLong: function(key){
+		return g.jobLong[key];
+	},
 	copy: function(o){
 		return JSON.parse(JSON.stringify(o));
 	},
@@ -223,29 +261,26 @@ g = {
 	},
 	msg: function(msg, d){
 		dom.msg.innerHTML = msg;
-		if (d === 0){
-			TweenMax.set(dom.msg, {
-				overwrite: 1,
-				startAt: {
-					opacity: 1
-				}
-			});
-		} else {
-			if (!d || d < .5){
-				d = 2;
-			}
-			TweenMax.to(dom.msg, d, {
-				overwrite: 1,
-				startAt: {
-					opacity: 1
-				},
-				onComplete: function(){
-					TweenMax.to(this.target, .2, {
-						opacity: 0
-					});
-				}
-			});
+		if (d === undefined || d < 2){
+			d = 2;
 		}
+		TweenMax.to(dom.msg, d, {
+			overwrite: 1,
+			startAt: {
+				visibility: 'visible',
+				alpha: 1
+			},
+			onComplete: function(){
+				TweenMax.to(this.target, .2, {
+					alpha: 0,
+					onComplete: function(){
+						TweenMax.set(this.target, {
+							visibility: 'hidden',
+						});
+					}
+				});
+			}
+		});
 	},
 	split: function(e, msg, d){
 		if (d === undefined){
@@ -373,7 +408,7 @@ g = {
 					'data-name="'+ d.name +'" '+
 					'class="btn btn-lg ch-card center select-player-card">'+
 					'<div class="ch-card-name">'+ d.name +'</div>'+
-					'<div class="ch-card-details">'+ d.level +' '+ d.race +' '+ d.job +'</div>'+
+					'<div class="ch-card-details">'+ d.level +' '+ d.race +' '+ g.toJobLong(d.job) +'</div>'+
 				'</div>';
 			});
 			document.getElementById('ch-card-list').innerHTML = s;

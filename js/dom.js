@@ -6,7 +6,6 @@ var dom;
 		bgmusic: d.getElementById('bgmusic'),
 		msg: d.getElementById('msg'),
 		chatInput: d.getElementById('chat-input'),
-		chatLog: d.getElementById('chat-log'),
-		hud: d.getElementsByClassName('hud')
+		chatLog: d.getElementById('chat-log')
 	}
 })(document);

@@ -34,11 +34,11 @@
 		require $_SERVER['DOCUMENT_ROOT'] . "/includes/loginCss.html";
 	}
 	?>
-	<link rel="stylesheet" href="css/ng2.css?v=0-0-28">
+	<link rel="stylesheet" href="css/ng2.css?v=0-0-35">
 	<link rel="shortcut icon" href="/images/favicon.png">
 	<script>
 		var g = {
-			version: '0-0-28'
+			version: '0-0-35'
 		};
 	</script>
 </head>
@@ -54,8 +54,10 @@
 	}
 	?>
 <div id="landscape">
-	<div id="ng2-logo-wrap">
-		<img src="images/bg/ng2-bg.jpg" id="ng2-bg" alt="Nevergrind 2 Background">
+
+<div id="title-scene" class="scene">
+	<div id="ng2-logo-wrap" class="scene">
+		<img src="images/bg/ng2-bg.jpg" id="ng2-bg" alt="Nevergrind Online Background">
 		<img style="position: absolute; bottom: 0; left: 0; width: 140px" 
 				src="/images/neverworks.png">
 	</div>
@@ -71,7 +73,6 @@
 					echo $_SESSION['account'];
 				}
 				?>
-				<i id="options" class="pointer options fa fa-volume-up"></i>
 			</div>
 			
 			<div id="social-icons" class="text-primary title-column">
@@ -96,9 +97,9 @@
 		<div id="title-screen-wrap" class="container-fluid text-shadow">
 			<div id="title-menu-wrap" class="row title-menu-row">
 				<div class="col-6 title-bg-color">
-					<div class="title-ch-create-col justify-content-start">
+					<div class="title-ch-create-col justify-content-start text-center">
 						<h1>
-							<div>Nevergrind 2<br>
+							<div>Nevergrind Online<br>
 								Cooperative Multiplayer<br>
 								Browser RPG
 							</div>
@@ -107,20 +108,39 @@
 							<hr class="fancy-hr-dark">
 						</h1>
 						<img id="ng2-logo" src="images/ng_logo_532x428.png">
-						<section class="text-center">
-							<div>Our Other Games</div>
+						
+						<section>
+							<div>Our Other HTML5 Games</div>
 							<div>
 								<a href="/classic" title="Single-player Browser RPG">Classic Nevergrind</a> | 
 								<a href="/games/firmament-wars" title="Multiplayer Strategy Game">Firmament Wars</a>
 							</div>
 						</section>
-						<section class="text-center">
-							<div>Links</div>
+						
+						<section>
+							<div>Nevergrind Links</div>
 							<div>
-								<a href="/blog" title="Nevergrind News">Blog</a> | 
+								<div>
+									<a href="/blog" title="Nevergrind News">Blog</a> | 
+									<a href="https://discord.gg/n2gp8rC" title="Nevergrind Discord Server">Discord</a> | 
+									<a href="/wiki" title="Nevergrind Wiki">Wiki</a> | 
+									<a href="/nevergrounds" title="Nevergrounds">Nevergrounds</a>
+								</div>
+								<div>
+									<a href="/store" title="Neverworks Store">Neverworks Store</a> | 
+									<a href="/account" title="Manage Neverworks Account">Manage Account</a>
+								</div>
+							</div>
+						</section>
+						
+						<section>
+							<div>Social Media</div>
+							<div>
+								<a href="//twitch.tv/maelfyn" title="Neverworks Games on Twitch">Twitch</a> | 
+								<a href="//youtube.com/c/Maelfyn" title="Neverworks Games on YouTube">YouTube</a> | 
 								<a href="https://discord.gg/n2gp8rC" title="Nevergrind Discord Server">Discord</a> | 
-								<a href="/wiki" title="Nevergrind Wiki">Wiki</a> | 
-								<a href="/nevergrounds" title="Nevergrounds">Nevergrounds</a>
+								<a href="//facebook.com/maelfyn" title="Neverworks Games on Facebook">Facebook</a> | 
+								<a href="//twitter.com/maelfyn" title="Joe Leonard on Twitter">Twitter</a>
 							</div>
 						</section>
 					</div>
@@ -136,16 +156,13 @@
 							</a>
 						</div>
 						<!-- char cards -->
-						<div id="ch-card-base">
-							<div id="ch-card-wrap" class="stag-blue">
+						<div id="ch-card-base" class="stag-blue">
+							<div id="ch-card-list">
+							</div>
 							
-								<div id="ch-card-list">
-								</div>
-								
-								<div id="go-create-character" 
-									class="btn btn-lg ch-card center">
-									Create Character
-								</div>
+							<div id="go-create-character" 
+								class="btn btn-lg ch-card center">
+								Create Character
 							</div>
 						</div>
 						<!-- well bottom -->
@@ -483,15 +500,17 @@
 			</div>
 		</div>
 	</div>
+	
+</div> <!-- end title-scene -->
 
-	<div id="game-wrap" class="portal">
-		<div id="hud" class="text-shadow"></div>
+	<div id="game-wrap" class="scene">
 	</div> <!-- end game-wrap -->
 
 	<audio id="bgmusic" autoplay loop preload="auto"></audio>
 	
 		
-	<div id="modal-overlay" class="overlay text-shadow"></div>
+	<div id="modal-overlay" class="overlay"></div>
+	<div id="modal-wrap" class="text-shadow"></div>
 	<div id="flash-overlay" class="overlay"></div>
 	<div id="lock-overlay" class="overlay"></div>
 	<div id="msg" class="text-shadow"></div>

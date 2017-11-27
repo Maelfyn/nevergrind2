@@ -70,6 +70,14 @@ init.isMobile = init.checkMobile();var create = {
 				key: 'delete-character'
 			});
 		});
+		$("#msg").on(x, '.unlock-game', function(){
+			modal.show({
+				key: 'unlock-game'
+			});
+			TweenMax.set('#msg', {
+				visibility: 'hidden'
+			});
+		});
 		$(".select-race").on(x, function(e){
 			var race = $(this).text();
 			$('.select-race').removeClass('active');
@@ -145,6 +153,7 @@ init.isMobile = init.checkMobile();var create = {
 				err = '';
 			if (!f.name){
 				err = 'Your character needs a name!';
+				$("#create-character-name").focus();
 			}
 			else if(f.name.length > 16){
 				err = "Your character name must be 16 characters or less!";
@@ -156,6 +165,8 @@ init.isMobile = init.checkMobile();var create = {
 				g.msg(err);
 				g.unlock();
 			} else {
+				// final adds
+				f.shortJob = g.toJobShort(f.job);
 				// send to server
 				$.ajax({
 					url: 'php2/create/create-character.php',
@@ -233,7 +244,7 @@ init.isMobile = init.checkMobile();var create = {
 				Ranger: "Rangers are a physical DPS class that can wear chain armor. They're the only class that can use bows, which help them inflict massive damage. A diverse arsenal of magic also aids them in battle. Notably, Rangers have the strongest overall dungeon skills, including the best scouting skills.",
 				Rogue: 'Rogues are a physical DPS class that can wear chain armor. Their combination of stealth and bursts of damage make them deadly on the battlefield. Rogues have unparalleled disarm trap skills, along with very strong treasure and scouting skills.',
 				Shadowknight: 'Shadowknights are a tank class that can wear plate armor. They have the unique ability to harm touch a mob, dealing a large amount of damage to a single target. They have the strongest offensive potential among all tanks along with deadly abilities like fear and life tap.',
-				Shaman: 'Shaman are a healing class that can wear chain armor. They can summon a formidable pet familiar that assists them in combat. Their ability to buff their party and debuff mobs is capable of shifting the odds with ease.',
+				Shaman: 'Shaman are a healing class that can wear chain armor. Their ability to buff their party and debuff mobs is capable of shifting the odds with ease. Their poison and frost spells make them both versatile and deadly in combat.',
 				Warrior: 'Warriors are a tank class that can wear plate armor. Warriors have the strongest physical defense and the highest hit points in the game. They can also dish out a solid amount of physical DPS. Their exceptional pulling skills help keep their party out of trouble.',
 				Wizard: 'Wizards are a magical DPS class that can only wear cloth armor. Instead of opting for trickery or pets, they focus on raw magical power. Wizards have a powerful and diverse arsenal of spells at their disposal that make quick work of their prey.'
 			}
@@ -597,6 +608,44 @@ g = {
 		'Warrior',
 		'Wizard'
 	],
+	jobShort: {
+		Bard: 'BRD',
+		Cleric: 'CLR',
+		Druid: 'DRU',
+		Enchanter: 'ENC',
+		Magician: 'MAG',
+		Monk: 'MNK',
+		Necromancer: 'NEC',
+		Paladin: 'PLD',
+		Ranger: 'RNG',
+		Rogue: 'ROG',
+		Shadowknight: 'SHD',
+		Shaman: 'SHM',
+		Warrior: 'WAR',
+		Wizard: 'WIZ'
+	},
+	toJobShort: function(key){
+		return g.jobShort[key];
+	},
+	jobLong: {
+		BRD: 'Bard',
+		CLR: 'Cleric',
+		DRU: 'Druid',
+		ENC: 'Enchanter',
+		MAG: 'Magician',
+		MNK: 'Monk',
+		NEC: 'Necromancer',
+		PLD: 'Paladin',
+		RNG: 'Ranger',
+		ROG: 'Rogue',
+		SHD: 'Shadowknight',
+		SHM: 'Shaman',
+		WAR: 'Warrior',
+		WIZ: 'Wizard'
+	},
+	toJobLong: function(key){
+		return g.jobLong[key];
+	},
 	copy: function(o){
 		return JSON.parse(JSON.stringify(o));
 	},
@@ -773,29 +822,26 @@ g = {
 	},
 	msg: function(msg, d){
 		dom.msg.innerHTML = msg;
-		if (d === 0){
-			TweenMax.set(dom.msg, {
-				overwrite: 1,
-				startAt: {
-					opacity: 1
-				}
-			});
-		} else {
-			if (!d || d < .5){
-				d = 2;
-			}
-			TweenMax.to(dom.msg, d, {
-				overwrite: 1,
-				startAt: {
-					opacity: 1
-				},
-				onComplete: function(){
-					TweenMax.to(this.target, .2, {
-						opacity: 0
-					});
-				}
-			});
+		if (d === undefined || d < 2){
+			d = 2;
 		}
+		TweenMax.to(dom.msg, d, {
+			overwrite: 1,
+			startAt: {
+				visibility: 'visible',
+				alpha: 1
+			},
+			onComplete: function(){
+				TweenMax.to(this.target, .2, {
+					alpha: 0,
+					onComplete: function(){
+						TweenMax.set(this.target, {
+							visibility: 'hidden',
+						});
+					}
+				});
+			}
+		});
 	},
 	split: function(e, msg, d){
 		if (d === undefined){
@@ -923,7 +969,7 @@ g = {
 					'data-name="'+ d.name +'" '+
 					'class="btn btn-lg ch-card center select-player-card">'+
 					'<div class="ch-card-name">'+ d.name +'</div>'+
-					'<div class="ch-card-details">'+ d.level +' '+ d.race +' '+ d.job +'</div>'+
+					'<div class="ch-card-details">'+ d.level +' '+ d.race +' '+ g.toJobLong(d.job) +'</div>'+
 				'</div>';
 			});
 			document.getElementById('ch-card-list').innerHTML = s;
@@ -1079,36 +1125,35 @@ var dom;
 		bgmusic: d.getElementById('bgmusic'),
 		msg: d.getElementById('msg'),
 		chatInput: d.getElementById('chat-input'),
-		chatLog: d.getElementById('chat-log'),
-		hud: d.getElementsByClassName('hud')
+		chatLog: d.getElementById('chat-log')
 	}
 })(document);// modal.js
 var modal = {
 	isOpen: 0,
 	overlay: document.getElementById('modal-overlay'),
+	wrap: document.getElementById('modal-wrap'),
 	show: function(e){
 		modal.isOpen = 1;
 		e.camelKey = g.camel(e.key);
-		console.info('show: ', e);
-		var s = 
-			'<div id="modal-wrap">' +
-				modal.header(e) +
-				modal.body(e) +
-			'</div>';
-		modal.overlay.innerHTML = s;
+		var s = modal.header(e) +
+				modal.body(e);
+		modal.wrap.innerHTML = s;
 		
 		modal.isOpen = true;
-		TweenMax.to('#modal-overlay', .3, {
+		TweenMax.to(modal.overlay, .3, {
 			startAt: {
 				visibility: 'visible',
 				alpha: 0
 			},
 			alpha: 1
 		});
-		TweenMax.to('#modal-wrap', .5, {
+		TweenMax.to(modal.wrap, .3, {
 			startAt: {
+				visibility: 'visible',
+				alpha: 0,
 				top: 30
 			},
+			alpha: 1,
 			top: 50
 		});
 		// assign events
@@ -1121,7 +1166,7 @@ var modal = {
 		});
 	},
 	hide: function(){
-		TweenMax.to('#modal-overlay', .3, {
+		TweenMax.to([modal.overlay, modal.wrap], .3, {
 			overwrite: 0,
 			alpha: 0,
 			onComplete: function(){
@@ -1136,7 +1181,8 @@ var modal = {
 	},
 	header: function(e){
 		var z = {
-			deleteCharacter: '<div id="modal-header">Delete '+ create.name +'?</div>'
+			deleteCharacter: '<div id="modal-header">Delete '+ create.name +'?</div>',
+			unlockGame: '<div id="modal-header">$5 to purchase Nevergrind Online?</div>',
 		}
 		return z[e.camelKey];
 	},
@@ -1145,6 +1191,21 @@ var modal = {
 			deleteCharacter: 
 			'<div id="modal-body" class="stag-blue">'+
 				'<p>Are you sure you want to delete this character?</p>'+
+				'<div>'+
+					'<a id="modal-dismiss" class="btn btn-info btn-sm modal-buttons">Cancel</a>'+
+					'<a id="'+ e.key +'-confirm" class="btn btn-info btn-sm modal-buttons">Confirm</a>'+
+				'</div>'+
+			'</div>',
+			unlockGame:
+			'<div id="modal-body" class="stag-blue">'+
+				'<p>Purchasing Nevergrind Online unlocks:</p>'+
+				'<div id="unlock-game-perks">'+
+					'<div>8 character slots!</div>'+
+					'<div>32-slot bank! Account-shareable items!</div>'+
+					'<div>Auction house!</div>'+
+					'<div>Sending items by mail to friends!</div>'+
+				'</div>'+
+				'<div>(this does not work yet)</div>'+
 				'<div>'+
 					'<a id="modal-dismiss" class="btn btn-info btn-sm modal-buttons">Cancel</a>'+
 					'<a id="'+ e.key +'-confirm" class="btn btn-info btn-sm modal-buttons">Confirm</a>'+
