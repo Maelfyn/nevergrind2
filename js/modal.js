@@ -6,8 +6,11 @@ var modal = {
 	show: function(e){
 		modal.isOpen = 1;
 		e.camelKey = g.camel(e.key);
-		var s = modal.header(e) +
-				modal.body(e);
+		var s = '<div class="stag-blue">'+
+					modal.header(e) +
+					modal.body(e) +
+					modal.footer(e) +
+				'</div>';
 		modal.wrap.innerHTML = s;
 		
 		modal.isOpen = true;
@@ -35,6 +38,12 @@ var modal = {
 		$('#modal-wrap').on(env.click, '#delete-character-confirm', function(){
 			create.deleteCharacter();
 		});
+		if (e.key === 'unlock-game'){
+			setTimeout(function(){
+				$("#card-number").focus();
+                payment.init();
+            }, 100);
+		}
 	},
 	hide: function(){
 		TweenMax.to([modal.overlay, modal.wrap], .3, {
@@ -59,30 +68,57 @@ var modal = {
 	},
 	body: function(e){
 		var z = {
-			deleteCharacter: 
-			'<div id="modal-body" class="stag-blue">'+
+			deleteCharacter:
+			'<div id="modal-body">'+
 				'<p>Are you sure you want to delete this character?</p>'+
-				'<div>'+
-					'<a id="modal-dismiss" class="btn btn-info btn-sm modal-buttons">Cancel</a>'+
-					'<a id="'+ e.key +'-confirm" class="btn btn-info btn-sm modal-buttons">Confirm</a>'+
-				'</div>'+
 			'</div>',
 			unlockGame:
-			'<div id="modal-body" class="stag-blue">'+
+			'<div id="modal-body">'+
 				'<p>Purchasing Nevergrind Online unlocks:</p>'+
 				'<div id="unlock-game-perks">'+
 					'<div>8 character slots!</div>'+
-					'<div>32-slot bank! Account-shareable items!</div>'+
+					'<div>32-slot inventory per character!</div>'+
+					'<div>64-slot bank! Account-shareable items!</div>'+
 					'<div>Auction house!</div>'+
 					'<div>Sending items by mail to friends!</div>'+
+					'<div>Expand your friends list from 5 to 100!</div>'+
+            	'</div>'+
+				'<div id="unlock-game-card">'+
+					'<hr class="fancy-hr">'+
+					'<p>'+
+						'<label>Card Number (no spaces or hyphens)</label>'+
+						'<input id="card-number" type="text" maxlength="16" autocomplete="off" class="form-control ng-blue-input text-shadow"/>'+
+					'</p>'+
+
+					'<p>'+
+						'<label>CVC (back of your credit card)</label>'+
+						'<input id="card-cvc" type="text" maxlength="4" autocomplete="off" class="form-control ng-blue-input text-shadow"/>'+
+					'</p>'+
+
+					'<p class="container-fluid snug">'+
+						'<div class="row justify-content-between">'+
+							'<div class="col">'+
+								'<label>Expiration Month (MM) </label>'+
+								'<input id="card-month" type="text" maxlength="2" autocomplete="off"  class="form-control ng-blue-input text-shadow"/>'+
+							'</div>'+
+            				'<div class="col">'+
+								'<label>Expiration Year (YYYY) </label>'+
+								'<input id="card-year" type="text" maxlength="4" autocomplete="off" class="form-control ng-blue-input text-shadow"/>'+
+							'</div>'+
+            			'</div>'+
+					'</p>'+
 				'</div>'+
-				'<div>(this does not work yet)</div>'+
-				'<div>'+
-					'<a id="modal-dismiss" class="btn btn-info btn-sm modal-buttons">Cancel</a>'+
-					'<a id="'+ e.key +'-confirm" class="btn btn-info btn-sm modal-buttons">Confirm</a>'+
-				'</div>'+
+				'<div id="modal-error"></div>'+
 			'</div>'
 		}
 		return z[e.camelKey];
 	},
+	footer: function(e){
+		var str =
+			'<div id="modal-footer" class="text-center">'+
+				'<a id="modal-dismiss" class="btn btn-info btn-sm modal-buttons">Cancel</a>'+
+				'<a id="'+ e.key +'-confirm" class="btn btn-info btn-sm modal-buttons">Confirm</a>'+
+			'</div>';
+		return str;
+	}
 };

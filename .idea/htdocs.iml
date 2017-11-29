@@ -2,33 +2,48 @@
 <module type="WEB_MODULE" version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/build" />
       <excludeFolder url="file://$MODULE_DIR$/classic/Archive-backgrounds" />
       <excludeFolder url="file://$MODULE_DIR$/classic/backgrounds" />
       <excludeFolder url="file://$MODULE_DIR$/classic/images1" />
       <excludeFolder url="file://$MODULE_DIR$/classic/music1" />
+      <excludeFolder url="file://$MODULE_DIR$/classic/php/PHPMailer" />
+      <excludeFolder url="file://$MODULE_DIR$/classic/php/lib" />
+      <excludeFolder url="file://$MODULE_DIR$/classic/scripts" />
       <excludeFolder url="file://$MODULE_DIR$/classic/sound1" />
+      <excludeFolder url="file://$MODULE_DIR$/css/libs" />
       <excludeFolder url="file://$MODULE_DIR$/docs" />
       <excludeFolder url="file://$MODULE_DIR$/fonts" />
       <excludeFolder url="file://$MODULE_DIR$/games/firmament-wars/fonts" />
       <excludeFolder url="file://$MODULE_DIR$/games/firmament-wars/images" />
+      <excludeFolder url="file://$MODULE_DIR$/games/firmament-wars/js/libs" />
+      <excludeFolder url="file://$MODULE_DIR$/games/firmament-wars/maps" />
       <excludeFolder url="file://$MODULE_DIR$/games/firmament-wars/music" />
+      <excludeFolder url="file://$MODULE_DIR$/games/firmament-wars/php/PHPMailer" />
+      <excludeFolder url="file://$MODULE_DIR$/games/firmament-wars/php/avatars" />
+      <excludeFolder url="file://$MODULE_DIR$/games/firmament-wars/php/lib" />
+      <excludeFolder url="file://$MODULE_DIR$/games/firmament-wars/socket" />
       <excludeFolder url="file://$MODULE_DIR$/games/firmament-wars/sound" />
       <excludeFolder url="file://$MODULE_DIR$/images" />
+      <excludeFolder url="file://$MODULE_DIR$/js/libs" />
       <excludeFolder url="file://$MODULE_DIR$/music" />
+      <excludeFolder url="file://$MODULE_DIR$/php/PHPMailer" />
+      <excludeFolder url="file://$MODULE_DIR$/php/lib" />
+      <excludeFolder url="file://$MODULE_DIR$/php/values" />
+      <excludeFolder url="file://$MODULE_DIR$/socket" />
       <excludeFolder url="file://$MODULE_DIR$/sound" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor" />
       <excludeFolder url="file://$MODULE_DIR$/xampp" />
+      <excludePattern pattern="values.php" />
+      <excludePattern pattern="firmament-wars.js" />
+      <excludePattern pattern="nevergrind-online.js" />
+      <excludePattern pattern="nevergrind.js" />
+      <excludePattern pattern="fw_0-0-*" />
+      <excludePattern pattern="ng2.css" />
+      <excludePattern pattern="*.min.css" />
+      <excludePattern pattern="*.min.js" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module-library">
-      <library name="PHARS">
-        <CLASSES>
-          <root url="phar://$MODULE_DIR$/socket/composer.phar/" />
-        </CLASSES>
-        <SOURCES>
-          <root url="phar://$MODULE_DIR$/socket/composer.phar/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
   </component>
 </module>

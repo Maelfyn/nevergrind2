@@ -264,6 +264,15 @@ g = {
 		if (d === undefined || d < 2){
 			d = 2;
 		}
+		// unlock game modal?
+        if (msg.indexOf('unlock-game') > -1){
+            modal.show({
+                key: 'unlock-game'
+            });
+            TweenMax.set('#msg', {
+                visibility: 'hidden'
+            });
+        }
 		TweenMax.to(dom.msg, d, {
 			overwrite: 1,
 			startAt: {
@@ -344,8 +353,8 @@ g = {
 	},
 	goCreateCharacter: function(){
 		g.lock(1);
-		var z = document.getElementById('title-scene-select-character')
-			prom = 0
+		var z = '#title-scene-select-character',
+			prom = 0,
 			allDone = function(){
 				if (++prom === 2){
 					g.unlock();
@@ -365,6 +374,7 @@ g = {
 						y: 0,
 						opacity: 1,
 						onComplete: function(){
+                            $("#create-character-name").focus();
 							g.unlock();
 						}
 					});

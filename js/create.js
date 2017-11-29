@@ -61,14 +61,6 @@ var create = {
 				key: 'delete-character'
 			});
 		});
-		$("#msg").on(x, '.unlock-game', function(){
-			modal.show({
-				key: 'unlock-game'
-			});
-			TweenMax.set('#msg', {
-				visibility: 'hidden'
-			});
-		});
 		$(".select-race").on(x, function(e){
 			var race = $(this).text();
 			$('.select-race').removeClass('active');
@@ -90,7 +82,7 @@ var create = {
 			$(this).addClass('active');
 			create.set('gender', gender);
 		});
-		$("#create-character-name").on('blur', function(){
+		$("#create-character-name").on('change textInput input', function(){
 			create.form.name = $(this).val().trim().replace(/ /g, '');
 		});
 		$(".attr-minus-1").on(x, function(){
@@ -169,7 +161,6 @@ var create = {
 					g.msg(r.hero.name + ' has been created!');
 					$("#create-character-back").trigger(x);
 				}).fail(function(r){
-					console.info('Created character: ', r.responseText);
 					g.msg(r.responseText, 8);
 					g.unlock();
 				});

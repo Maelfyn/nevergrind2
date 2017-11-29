@@ -738,6 +738,9 @@ tbody {
 	margin-bottom: 1rem;
 	color: #ff0;
 }
+#unlock-game-card {
+	text-align: left;
+}
 /* overlays */
 #modal-overlay {
     visibility: hidden;
@@ -749,7 +752,7 @@ tbody {
     z-index: 999999
 }
 #modal-wrap {
-	position: relative;
+	position: fixed;
     visibility: hidden;
 	top: 50px;
 	left: 0;
@@ -769,6 +772,12 @@ tbody {
 	text-align: center;
 	padding: .5rem 2rem;
 	min-height: 60px;
+}
+#modal-footer {
+	padding-bottom: .2rem;
+}
+#modal-error {
+	color: #f22;
 }
 .modal-buttons {
 	margin: .2rem .4rem;

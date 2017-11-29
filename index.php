@@ -226,13 +226,11 @@
 						</div>
 						
 						<div id="gender-wrap" class="container-fluid">
-							<div class="row justify-content-around">
+							<div class="row justify-content-between">
 								<div class="col-8 tight">Male</div>
 								<div class="col-2 tight select-gender-col">
 									<div id="Male" class="select-radial select-gender active"></div>
 								</div>
-							</div>
-							<div class="row justify-content-around">
 								<div class="col-8 tight">Female</div>
 								<div class="col-2 tight select-gender-col">
 									<div id="Female" class="select-radial select-gender"></div>
@@ -566,7 +564,8 @@ g.guest = 0;
 			'title', 
 			'events', 
 			'socket', 
-			'chat' 
+			'chat',
+            'payment'
 		]
 	}
 	for(var i=0, len=scripts.length; i<len; i++){

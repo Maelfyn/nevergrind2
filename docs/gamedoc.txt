@@ -1,5 +1,4 @@
 TODO:
-- finish purchase modal
 - Finish insert items template files
 	establish low/high values from 1-50 items
 	create all items
@@ -14,6 +13,11 @@ TODO:
 	tooltip for all items
 	ability to destroy items
 	ability to buy items
+
+TODO: Nevergrind
+- Bug: Shaman Reclaim Blood particle effects stick to the screen (don't go away)
+
+
 Town
 	Quest Counter
 	Merchant
@@ -391,7 +395,158 @@ WIZ		250			250			250
 		nimgaul
 		
 		
-		
+========================================================================
+
+SPELLS/SKILLS:
+
+Status effects:
+Stun: Cannot dodge
+Fear: Cannot dodge, parry, riposte
+
+Warrior
+
+1 Bash
+4 Taunt
+8 Kick
+16 Demoralize AE taunt (debuff str AE)
+
+Paladin
+
+1 Lay Hands
+4 Bash
+8 Taunt
+9 Healing I            alt
+15 Blessed Hammer I    conj
+22 Smite I             evo
+30 Resolution I        alt
+39 Holy Might        alt
+
+Shadowknight
+
+1 Harm Touch
+4 Bash
+8 Taunt
+9 Life Tap                evo
+15 Engulfing Darkness I    conj
+22 Blood Boil            conj
+30 Invoke Fear             alt
+39 Wave of Horror        alt (debuff AC AE)
+
+Ranger
+
+1 Trueshot Strike (cannot parry, riposte)
+4 Kick
+8 Ensnare
+9 Ignite I                evo
+15 Faerie Flame            conj
+22 Careless Lightning    evo
+30 Healing                 alt
+39 Feet Like Cat        alt
+
+Monk
+
+1 Roundhouse Kick (cannot parry, riposte)
+4 Mend
+8 Feign Death
+16 Intimidation
+
+Rogue
+
+1 Backstab (cannot parry, riposte)
+4 Evade (adds threat to a tank)
+8 Widow Strike
+16 Flash Powder
+
+Druid
+
+1 Healing             alt
+4 Starfire            evo
+8 Skin Like Wood    alt (hp regen, AC, HP)
+12 Drifting Death    conj
+16 Tornado            evo
+20 Endure Lightning    alt
+25 Lightning Blast    evo
+30 Chloroplast        alt (hp regen)
+
+Cleric
+
+1 Holy Might I        evo
+4 Smite I            evo
+8 Blessed Hammer I    conj
+12 Healing I         alt
+16 Resolution I        alt (same line with SLW)
+20 Symbol of Yentus    alt (own HP buff line)
+25 Endure Bleed        alt
+30 Armor of Faith I    alt
+
+Shaman
+
+1 Healing                alt
+4 Frost Rift            evo
+8 Plague                conj
+12 Drowsy                alt (slow attack speed)
+16 Spirit of the Bear    alt (str and sta)
+20 Cannibalize            alt
+25 Endure Cold            alt
+30 Talisman of Trogmaar    alt (own HP buff line)
+
+Bard (30-second buffs, 2 second cast time)
+
+1 Chant of Battle        alt (+atk +dex)
+4 Hymn of Restoration    alt    (+hp regen)
+8 Boastful Bellow        evo    (DD)
+12 Consonant Chain        alt    (slow target)
+16 Lucid Lullaby        conj (mes target)
+20 Elemental Rhythms     alt (+all resists)
+25 Chorus of Clarity    alt    (+mp regen)
+30 Siren's Song            conj (charm)
+
+Enchanter
+
+1 Discordant Mind        evo (magic DD)
+4 Color Shift            alt    (stun)
+8 Alacrity                alt (atk speed)
+12 Dazzle                alt    single target mes
+16 Gasping Embrace        conj magic DOT
+20 Clarity                 alt (+mp regen)
+25 Cajoling Whispers    conj (charm)
+30 Mystic Rune            alt (non-combat hp shield)
+
+Necromancer
+
+1 Engulfing Darkness I    conj
+4 Invoke Death            conj
+8 Venom Bolt            evo (dd)
+12 Blood Boil            conj
+16 Invoke Fear            alt
+20 Life Tap                evo
+25 Endure Poison        alt
+30 Devouring Plague        conj (heals self and DoT)
+
+Magician
+
+1 Lava Bolt                evo dd
+4 Summon Elemental        conj 4 types     fire:     +melee damage
+                                        cold:     cold DD, slow target
+                                        earth:     boost hp regen
+                                        air:     stun/interrupt)
+8 Frozen Orb            evo
+12 Elemental Fury        conj (pet ability)
+16 Psionic Storm        evo
+20 Malaise                alt (-lower all resists)
+25 Endure Fire            alt
+30 Stasis Field            conj cannot attack or be attacked
+
+Wizard
+
+1 Ice Bolt                evo
+4 Arcane Missiles        conj (channeled)
+8 Mana Shield            alt (damage reduced and subtracts from mp)
+12 Fireball                evo
+16 Vizier's Shielding     alt (+mp regen, +all resists self)
+20 Lightning Strike        evo
+25 Glacial Spike        evo DD + freezes target
+30 Mirror Images        conj (5*3% damage and absorbs hits)
 		
 		
 		
