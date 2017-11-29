@@ -29,6 +29,6 @@ master1.php
 bg-497/
 node_modules/
 *.min.js
-htdocs.iml
-workspace.xml
+.idea/
+build/
 *.min.css
