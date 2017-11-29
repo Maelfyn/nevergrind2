@@ -34,11 +34,11 @@
 		require $_SERVER['DOCUMENT_ROOT'] . "/includes/loginCss.html";
 	}
 	?>
-	<link rel="stylesheet" href="css/ng2.css?v=0-0-35">
+	<link rel="stylesheet" href="css/ng2.css?v=0-0-39">
 	<link rel="shortcut icon" href="/images/favicon.png">
 	<script>
 		var g = {
-			version: '0-0-35'
+			version: '0-0-39'
 		};
 	</script>
 </head>
