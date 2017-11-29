@@ -34,11 +34,11 @@
 		require $_SERVER['DOCUMENT_ROOT'] . "/includes/loginCss.html";
 	}
 	?>
-	<link rel="stylesheet" href="css/ng2.css?v=0-0-39">
+	<link rel="stylesheet" href="css/ng2.css?v=0-0-41">
 	<link rel="shortcut icon" href="/images/favicon.png">
 	<script>
 		var g = {
-			version: '0-0-39'
+			version: '0-0-41'
 		};
 	</script>
 </head>
@@ -344,7 +344,7 @@
 				<div class="col-3 tight">
 					<div class="title-ch-create-col flex-column">
 						<div id="create-attr">
-							<div id="create-attr-remaining" class="row">
+							<div id="create-attr-remaining" class="flex-row">
 								<div id="create-points-label" class="col-7">
 									<div>ABILITY</div>
 									<div>POINTS</div>
@@ -357,7 +357,7 @@
 								</div>
 							</div>
 							
-							<div class="row flex-row cr-ch-row">
+							<div class="flex-row cr-ch-row">
 								<div class="create-attr-type col-6">STR</div>
 								<div class="col-1 cr-ch-btn-col">
 									<div>–</div>
@@ -375,7 +375,7 @@
 								</div>
 							</div>
 							
-							<div class="row flex-row cr-ch-row">
+							<div class="flex-row cr-ch-row">
 								<div class="create-attr-type col-6">STA</div>
 								<div class="col-1 cr-ch-btn-col">
 									<div>–</div>
@@ -393,7 +393,7 @@
 								</div>
 							</div>
 							
-							<div class="row flex-row cr-ch-row">
+							<div class="flex-row cr-ch-row">
 								<div class="create-attr-type col-6">AGI</div>
 								<div class="col-1 cr-ch-btn-col">
 									<div>–</div>
@@ -411,7 +411,7 @@
 								</div>
 							</div>
 							
-							<div class="row flex-row cr-ch-row">
+							<div class="flex-row cr-ch-row">
 								<div class="create-attr-type col-6">DEX</div>
 								<div class="col-1 cr-ch-btn-col">
 									<div>–</div>
@@ -429,7 +429,7 @@
 								</div>
 							</div>
 							
-							<div class="row flex-row cr-ch-row">
+							<div class="flex-row cr-ch-row">
 								<div class="create-attr-type col-6">WIS</div>
 								<div class="col-1 cr-ch-btn-col">
 									<div>–</div>
@@ -447,7 +447,7 @@
 								</div>
 							</div>
 							
-							<div class="row flex-row cr-ch-row">
+							<div class="flex-row cr-ch-row">
 								<div class="create-attr-type col-6">INT</div>
 								<div class="col-1 cr-ch-btn-col">
 									<div>–</div>
@@ -465,7 +465,7 @@
 								</div>
 							</div>
 							
-							<div class="row flex-row cr-ch-row">
+							<div class="flex-row cr-ch-row">
 								<div class="create-attr-type col-6">CHA</div>
 								<div class="col-1 cr-ch-btn-col">
 									<div>–</div>
@@ -483,9 +483,13 @@
 								</div>
 							</div>
 						</div>
-						<div id="create-attr-btn-wrap" class="row snug grow-0">
-							<button id="create-character-back" class="col btn btn-primary pointer text-shadow go-create">Back</button>
-							<button id="create-character-btn" class="col btn btn-primary pointer text-shadow go-create">Create</button>
+						<div id="create-attr-btn-wrap" class="snug text-center">
+                            <div class="flex-row">
+                                <button id="create-character-back"
+                                        class="col btn pointer text-shadow title-ch-btn">Back</button>
+                                <button id="create-character-btn"
+                                        class="col btn pointer text-shadow title-ch-btn">Create</button>
+                            </div>
 						</div>
 					</div>
 				</div>
@@ -537,12 +541,13 @@ var chat = {
 	channel: 'usa-1'
 };
 g.guest = 0;
-(function(d, scripts){
+(function(d, scripts, ext){
 	if (location.host === 'nevergrind.com' || 
 		location.hash === '#test'){
 		scripts = [
 			'nevergrind-online'
 		];
+        ext = '.min.js';
 	} else {
 		scripts = [
 			'init', 
@@ -564,11 +569,11 @@ g.guest = 0;
 	}
 	for(var i=0, len=scripts.length; i<len; i++){
 		var x = d.createElement('script');
-		x.src = 'js/' + scripts[i]+'.js?v=' + g.version;
+		x.src = 'js/' + scripts[i] + ext + '?v=' + g.version;
 		x.async = false;
 		d.head.appendChild(x);
 	}
-})(document, []);
+})(document, [], '.js');
 </script>
 
 </body>

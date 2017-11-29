@@ -1,5 +1,6 @@
 TODO:
 - Finish insert items template files
+
 	establish low/high values from 1-50 items
 	create all items
 - add ng2_item inventory (8 slots to 32 upon purchase for active characters)
@@ -38,6 +39,9 @@ Town
 	races, classes, gender, stats
 - experiment with a 3d hallway thing
 - Maybe upgrade autobahn?
+
+ITEMIZATION:
+
 
 WEAPON RATIOS:
 h2h

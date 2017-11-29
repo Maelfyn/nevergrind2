@@ -566,6 +566,7 @@ tbody {
 	flex: 1;
 }
 .title-ch-btn {
+	color: #fff;
 	margin: .3rem .2rem;
 	padding: .2rem 1rem;
 	font: 1.1rem/1 Cinzel;
@@ -694,18 +695,8 @@ tbody {
 #create-character-name:focus {
 	box-shadow: none;
 }
-#create-attr-btn-wrap {
-}
-.go-create {
-	border: .1rem groove #048 !important;
-	margin: 0 .5rem;
-	border-radius: 0;
-	box-shadow: 
-		1px 1px #013 inset,
-		-1px -1px #013 inset,
-		0 0 2px #025 inset,
-		0 0 6px #05b inset,
-		0 0 15px #8bf inset;
+#create-attr-btn-wrap button {
+	margin: .3rem .2rem 0;
 }
 
 /* some other stuff */

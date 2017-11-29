@@ -27,3 +27,6 @@ confirmemail/
 includes/
 master1.php
 bg-497/
+node_modules/
+.idea/
+*.min.js
