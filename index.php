@@ -151,19 +151,13 @@
 						<!-- well top -->
 						<div id="title-well-top" class="title-ch-well ng-blue text-center">
 							<a id="delete-character" 
-								class="btn btn-lg title-ch-btn">
-								Delete
-							</a>
+								class="btn btn-lg title-ch-btn">Delete</a>
+                            <a id="go-create-character"
+                                 class="btn btn-lg title-ch-btn">Create</a>
 						</div>
 						<!-- char cards -->
 						<div id="ch-card-base" class="stag-blue">
-							<div id="ch-card-list">
-							</div>
-							
-							<div id="go-create-character" 
-								class="btn btn-lg ch-card center">
-								Create Character
-							</div>
+							<div id="ch-card-list"></div>
 						</div>
 						<!-- well bottom -->
 						<div id="title-well-bottom" class="title-ch-well ng-blue text-center">

@@ -566,8 +566,8 @@ tbody {
 	flex: 1;
 }
 .title-ch-btn {
-	margin: .3rem auto;
-	padding: .2rem 1.5rem;
+	margin: .3rem .2rem;
+	padding: .2rem 1rem;
 	font: 1.1rem/1 Cinzel;
 	font-weight: bold;
 	outline: 1px solid #579;
@@ -583,7 +583,6 @@ tbody {
 	border: .1rem inset #eed;
 	background: #998;
 }
-#go-create-character,
 .ch-card {
 	background: #27a;
 	background: rgba(255,255,255,.3);

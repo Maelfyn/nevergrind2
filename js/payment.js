@@ -15,23 +15,22 @@ var payment = {
         g.unlock();
     },
     send: function(){
-        g.lock();
-        payment.data = {
+        var f = {
             ccNum: $('#card-number').val(),
             cvcNum: $('#card-cvc').val(),
             expMonth: $('#card-month').val(),
             expYear: $('#card-year').val()
         }
         var error = '';
-        if (!Stripe.validateCardNumber(payment.data.ccNum)) {
+        if (!Stripe.validateCardNumber(f.ccNum)) {
             // Validate the number:
             error = 'The credit card number appears to be invalid.';
         }
-        else if (!Stripe.validateCVC(payment.data.cvcNum)) {
+        else if (!Stripe.validateCVC(f.cvcNum)) {
             // Validate the CVC:
             error = 'The CVC number appears to be invalid.';
         }
-        else if (!Stripe.validateExpiry(payment.data.expMonth, payment.data.expYear)) {
+        else if (!Stripe.validateExpiry(f.expMonth, f.expYear)) {
             // Validate the expiration:
             error = 'The expiration date appears to be invalid.';
         }
@@ -39,7 +38,7 @@ var payment = {
             payment.error(error);
         }
         else {
-            payment.createToken(payment.data);
+            payment.createToken(f);
         }
     },
     createToken: function(d){
@@ -56,6 +55,7 @@ var payment = {
             payment.error(response.error.message);
         } else {
             // submit the form
+            g.lock();
             g.msg("Communicating with the server...");
             $.ajax({
                 url: 'php2/payment/unlockGame.php',
@@ -64,6 +64,7 @@ var payment = {
                 }
             }).done(function(data) {
                 g.msg("You have unlocked the full game: Nevergrind Online<br>Thanks for your support!");
+                console.info(data);
                 modal.hide();
             }).fail(function(r) {
                 g.msg(r.responseText, 8);

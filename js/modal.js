@@ -39,12 +39,14 @@ var modal = {
 			create.deleteCharacter();
 		});
 		if (e.key === 'unlock-game'){
-			setTimeout(function(){
-				$("#card-number").focus();
-                payment.init();
-            }, 100);
+            payment.init();
 		}
-	},
+		if (e.focus) {
+            setTimeout(function () {
+                $("#modal-wrap input:first").focus();
+            }, 100);
+        }
+    },
 	hide: function(){
 		TweenMax.to([modal.overlay, modal.wrap], .3, {
 			overwrite: 0,

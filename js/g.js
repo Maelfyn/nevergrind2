@@ -267,7 +267,8 @@ g = {
 		// unlock game modal?
         if (msg.indexOf('unlock-game') > -1){
             modal.show({
-                key: 'unlock-game'
+                key: 'unlock-game',
+                focus: 1
             });
             TweenMax.set('#msg', {
                 visibility: 'hidden'
@@ -402,6 +403,7 @@ g = {
 			g.jobs.forEach(function(v){
 				create.jobAttrs[v] = r.jobs[v];
 			});
+            $("#create-character-name").val('');
 			allDone();
 		});
 	},
