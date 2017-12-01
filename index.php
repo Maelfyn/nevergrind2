@@ -540,10 +540,9 @@ var chat = {
 }, g = {
 	guest: 0
 };
-(function(d, s, ext, i){
-	var v = '<?php echo $version ?>';
+(function(d, s, x){
 	if (location.host === 'localhost'){
-		ext = '.js';
+		x = '.js';
 		s = [
 			'init', 
 			'create', 
@@ -562,13 +561,13 @@ var chat = {
             'payment'
 		]
 	}
-	for(i=0, len=s.length; i<len; i++){
-		var x = d.createElement('script');
-		x.src = 'js/' + s[i] + ext + '?v='+v;
-		x.async = false;
-		d.head.appendChild(x);
+	for(var i=0, len=s.length; i<len; i++){
+		var e = d.createElement('script');
+		e.src = 'js/' + s[i] + x + '?v=<?php echo $version ?>';
+		e.async = false;
+		d.head.appendChild(e);
 	}
-})(document, ['nevergrind-online'], '.min.js', 0);
+})(document, ['nevergrind-online'], '.min.js');
 </script>
 
 </body>

@@ -9,27 +9,53 @@ var uglify = require('gulp-uglify'); // Minify JavaScript
 var rename = require('gulp-rename');
 
 gulp.task('minify-ng-classic-js', function(){
+// classic NG
+	gulp.src([
+		'./classic/scripts/beginWrap.js',
+		'./classic/scripts/functions4.js',
+		'./classic/scripts/core.js',
+		'./classic/scripts/battle.js',
+		'./classic/scripts/skills.js',
+		'./classic/scripts/monsters.js',
+		'./classic/scripts/quests.js',
+		'./classic/scripts/town.js',
+		'./classic/scripts/items.js',
+		'./classic/scripts/ui.js',
+		'./classic/scripts/endWrap.js'
+	])
+		.pipe(concat('nevergrind.js'))
+		.pipe(gulp.dest('./classic/scripts'))
+		.pipe(stripDebug())
+		.pipe(uglify())
+		.pipe(rename('nevergrind.min.js'))
+		.pipe(gulp.dest('./classic/scripts'));
+});
 
-// classic
-gulp.src([
-    './classic/scripts/beginWrap.js',
-    './classic/scripts/functions4.js',
-    './classic/scripts/core.js',
-    './classic/scripts/battle.js',
-    './classic/scripts/skills.js',
-    './classic/scripts/monsters.js',
-    './classic/scripts/quests.js',
-    './classic/scripts/town.js',
-    './classic/scripts/items.js',
-    './classic/scripts/ui.js',
-    './classic/scripts/endWrap.js'
-])
-    .pipe(concat('nevergrind.js'))
-    .pipe(gulp.dest('./classic/scripts'))
-    .pipe(stripDebug())
-    .pipe(uglify())
-    .pipe(rename('nevergrind.min.js'))
-    .pipe(gulp.dest('./classic/scripts'));
+gulp.task('minify-fw-js', function(){
+// FW
+	gulp.src([
+		'./games/firmament-wars/js/beginWrap.js',
+		'./games/firmament-wars/js/ui.js',
+		'./games/firmament-wars/js/payment.js',
+		'./games/firmament-wars/js/stats.js',
+		'./games/firmament-wars/js/animate.js',
+		'./games/firmament-wars/js/core.js',
+		'./games/firmament-wars/js/title.js',
+		'./games/firmament-wars/js/lobby.js',
+		'./games/firmament-wars/js/ws.js',
+		'./games/firmament-wars/js/audio.js',
+		'./games/firmament-wars/js/map.js',
+		'./games/firmament-wars/js/actions.js',
+		'./games/firmament-wars/js/events.js',
+		'./games/firmament-wars/js/ai.js',
+		'./games/firmament-wars/js/endWrap.js'
+	])
+		.pipe(concat('firmament-wars.js'))
+		.pipe(gulp.dest('./games/firmament-wars/js'))
+		.pipe(stripDebug())
+		.pipe(uglify())
+		.pipe(rename('firmament-wars.min.js'))
+		.pipe(gulp.dest('./games/firmament-wars/js'));
 });
 
 gulp.task('minify-js', function() {
