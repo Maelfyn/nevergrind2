@@ -68,21 +68,21 @@ amulet helm shoulders
 ring1 bracers1 gloves bracers2 ring2
 chest cloak belt legs boots
 
-16 SLOTS
-0: head
-1: neck
-2, 3: finger
-4: shoulders
-5: back
-6: chest
-7, 8: wrist
-9: hands
-10: waist
-11: legs
-12: feet
-13: primary
-14: secondary
-15: range
+16 SLOTS        Armor       hp      mp      str-cha, resist
+0: head         6-15        35      35      12
+1: neck         0           25      25      10
+2, 3: finger    0           20      20      8
+4: shoulders    5-12        25      25      10
+5: back         12          30      30      12
+6: chest        10-20          50      50      20
+7, 8: wrist     4-10        20      20      6
+9: hands        4-10        25      25      8
+10: waist       4-10        25      25      8
+11: legs        6-16        40      40      15
+12: feet        4-10        25      25      10
+13: primary                 20      20      8
+14: secondary               50      50      15
+15: range                   30      30      10
 
 STARTING GEAR:
 - add 1hs, 1hb, piercer, bow

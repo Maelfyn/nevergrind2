@@ -27,7 +27,7 @@
 	<meta name="google-signin-client_id" content="1015425037202-g5ri6qnj14b8vrk33lnu130ver9f43ef.apps.googleusercontent.com">
 	<meta name="google-site-verification" content="iC9l4midOGIXERCwagfpkef9ifunV-aZd_zlUUOPjIU" />
 	
-	<link rel="stylesheet" href="css/all.min.css">
+	<link rel="stylesheet" href="css/libs/all.min.css">
 	<!--link rel="stylesheet" href="css/bootstrap-slider.min.css"-->
 	<?php
 	if (empty($_SESSION['account'])){
