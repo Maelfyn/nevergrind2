@@ -33,14 +33,12 @@
 	if (empty($_SESSION['account'])){
 		require $_SERVER['DOCUMENT_ROOT'] . "/includes/loginCss.html";
 	}
+	$version = '0.0.42';
 	?>
-	<link rel="stylesheet" href="css/ng2.css?v=0-0-41">
+	<link rel="stylesheet" href="css/ng2.<?php
+		echo $_SERVER["SERVER_NAME"] === "localhost" ? '' : 'min.'; ?>css?v=<?php echo $version;
+	?>">
 	<link rel="shortcut icon" href="/images/favicon.png">
-	<script>
-		var g = {
-			version: '0-0-41'
-		};
-	</script>
 </head>
 
 <body id="body">
@@ -58,8 +56,8 @@
 <div id="title-scene" class="scene">
 	<div id="ng2-logo-wrap" class="scene">
 		<img src="images/bg/ng2-bg.jpg" id="ng2-bg" alt="Nevergrind Online Background">
-		<img style="position: absolute; bottom: 0; left: 0; width: 140px" 
-				src="/images/neverworks.png">
+		<img id="neverworks-logo" src="/images/neverworks.png">
+		<div id="version" class="text-shadow">Version <?php echo $version ?></div>
 	</div>
 	
 	<div id="title-scene-select-character">
@@ -539,17 +537,14 @@ if (empty($_SESSION['account'])){
 }(document, 'script', 'facebook-jssdk'));
 var chat = {
 	channel: 'usa-1'
+}, g = {
+	guest: 0
 };
-g.guest = 0;
-(function(d, scripts, ext){
-	if (location.host === 'nevergrind.com' || 
-		location.hash === '#test'){
-		scripts = [
-			'nevergrind-online'
-		];
-        ext = '.min.js';
-	} else {
-		scripts = [
+(function(d, s, ext, i){
+	var v = '<?php echo $version ?>';
+	if (location.host === 'localhost'){
+		ext = '.js';
+		s = [
 			'init', 
 			'create', 
 			'g', 
@@ -567,13 +562,13 @@ g.guest = 0;
             'payment'
 		]
 	}
-	for(var i=0, len=scripts.length; i<len; i++){
+	for(i=0, len=s.length; i<len; i++){
 		var x = d.createElement('script');
-		x.src = 'js/' + scripts[i] + ext + '?v=' + g.version;
+		x.src = 'js/' + s[i] + ext + '?v='+v;
 		x.async = false;
 		d.head.appendChild(x);
 	}
-})(document, [], '.js');
+})(document, ['nevergrind-online'], '.min.js', 0);
 </script>
 
 </body>

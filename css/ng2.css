@@ -346,6 +346,18 @@ tbody {
 	padding: 0;
 	box-shadow: 0 1rem #00214d inset, -.2rem 0 #00214d inset, .2rem 0 #00214d inset, 0 -1rem #00214d inset
 }
+#neverworks-logo {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 140px
+}
+#version {
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	padding: 0 .4rem;
+}
 .title-menu-row {
 	color: #fff;
 	border-radius: 0 0 5px 5px;
