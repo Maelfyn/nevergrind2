@@ -690,7 +690,7 @@ tbody {
 	z-index: 999999
 }
 #modal-wrap {
-	position: fixed;
+	position: absolute;
 	visibility: hidden;
 	top: 50px;
 	left: 0;

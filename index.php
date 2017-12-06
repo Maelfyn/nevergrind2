@@ -33,7 +33,7 @@
 	if (empty($_SESSION['account'])){
 		require $_SERVER['DOCUMENT_ROOT'] . "/includes/loginCss.html";
 	}
-	$version = '0.0.42';
+	$version = '0.0.43';
 	?>
 	<link rel="stylesheet" href="css/ng2.<?php
 		echo $_SERVER["SERVER_NAME"] === "localhost" ? '' : 'min.'; ?>css?v=<?php echo $version;
@@ -515,6 +515,7 @@
 </main>
 
 <script src="js/libs/libs.min.js"></script>
+<script src="https://js.stripe.com/v2/"></script>
 <?php
 	require $_SERVER['DOCUMENT_ROOT'] . "/includes/loginJs.php";
 ?>
@@ -535,40 +536,41 @@ if (empty($_SESSION['account'])){
 	js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.10&appId=737706186279455";
 	fjs.parentNode.insertBefore(js, fjs);
 }(document, 'script', 'facebook-jssdk'));
-var chat = {
-	channel: 'usa-1'
-}, g = {
-	guest: 0
-};
-(function(d, s, x){
-	if (location.host === 'localhost'){
-		x = '.js';
+<?php
+	echo 'var chat = {
+		testing: 1234,
+		channel: "usa-1"
+	};
+	(function(d, s, x){
+	if (location.host === "localhost"){
+		x = ".js";
 		s = [
-			'init', 
-			'create', 
-			'g', 
-			'env', 
-			'my', 
-			'dom', 
-			'modal',
-			'video', 
-			'audio', 
-			'game', 
-			'title', 
-			'events', 
-			'socket', 
-			'chat',
-            'payment'
+			"init", 
+			"create", 
+			"g", 
+			"env", 
+			"my", 
+			"dom", 
+			"modal",
+			"video", 
+			"audio", 
+			"game", 
+			"title", 
+			"events", 
+			"socket", 
+			"chat",
+            "payment",
+			"test"
 		]
 	}
-	for(var i=0, len=s.length; i<len; i++){
-		var e = d.createElement('script');
-		e.src = 'js/' + s[i] + x + '?v=<?php echo $version ?>';
+	for (var i=0, len=s.length; i<len; i++){
+		var e = d.createElement("script");
+		e.src = "js/" + s[i] + x + "?v='. $version .'";
 		e.async = false;
 		d.head.appendChild(e);
 	}
-})(document, ['nevergrind-online'], '.min.js');
-</script>
-
+})(document, ["nevergrind-online"], ".min.js");
+</script>';
+?>
 </body>
 </html>

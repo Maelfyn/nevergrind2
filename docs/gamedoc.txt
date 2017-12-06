@@ -74,15 +74,20 @@ chest cloak belt legs boots
 2, 3: finger    0           20      20      8
 4: shoulders    5-12        25      25      10
 5: back         12          30      30      12
-6: chest        10-20          50      50      20
+6: chest        10-20       50      50      20
 7, 8: wrist     4-10        20      20      6
 9: hands        4-10        25      25      8
 10: waist       4-10        25      25      8
 11: legs        6-16        40      40      15
 12: feet        4-10        25      25      10
-13: primary                 20      20      8
-14: secondary               50      50      15
-15: range                   30      30      10
+13: primary                 20      20      8       3/36-8/24
+13: primary 2hb/2hs         60      60      20      5/40-18/36
+14: secondary   2-30        40      40      15
+14: secondary   0           60      60      20 (offhand)
+15: range                   30      30      10      6/48 20/40
+
+1:11 1:10 1:9 1:8 1:7 1:6 1:5.5 1:5
+
 
 STARTING GEAR:
 - add 1hs, 1hb, piercer, bow

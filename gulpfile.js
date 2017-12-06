@@ -76,6 +76,7 @@ return gulp.src([
 './js/socket.js',
 './js/chat.js',
 './js/payment.js',
+'./js/test.js',
 './js/endWrap.js'
 ])
 .pipe(concat('nevergrind-online.js'))
