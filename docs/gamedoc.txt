@@ -1,6 +1,5 @@
 TODO:
 - Finish insert items template files
-
 	establish low/high values from 1-50 items
 	create all items
 - add ng2_item inventory (8 slots to 32 upon purchase for active characters)
@@ -14,9 +13,6 @@ TODO:
 	tooltip for all items
 	ability to destroy items
 	ability to buy items
-
-TODO: Nevergrind
-- Bug: Shaman Reclaim Blood particle effects stick to the screen (don't go away)
 
 
 Town

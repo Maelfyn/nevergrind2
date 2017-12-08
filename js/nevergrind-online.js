@@ -2891,16 +2891,16 @@ var test = {
 	},
 	juggernaut: {
 		init: function(){
-			console.info("Juggernaut Initialized! ", Date.now());
+			console.info("Juggernaut Initialized! ");
 			var e = document.createElement('div');
 			e.id = 'sprite';
 			e.style.position = 'absolute';
-			e.style.bottom = '250px';
-			e.style.left = '750px';
+			e.style.bottom = '10%';
+			e.style.left = '10%';
 			e.style.pointerEvents = 'none';
-			e.style.width = '616px';
-			e.style.height = '357px';
-			e.style.background = "url('mobs/juggernaut2.png')";
+			e.style.width = '1265px';
+			e.style.height = '729px';
+			e.style.background = "url('mobs/huge/juggernaut.png')";
 			e.style.backgroundPosition = '0 0';
 
 			document.getElementById('title-scene').appendChild(e);
@@ -2910,7 +2910,12 @@ var test = {
 			}
 			(function repeat(){
 				setTimeout(function(){
-					test.juggernaut.attack();
+					if (Math.random() > .5){
+						test.juggernaut.attack();
+					}
+					else {
+						test.juggernaut.hit();
+					}
 					repeat();
 				}, randomTime());
 			})();
@@ -2950,6 +2955,29 @@ var test = {
 					test.juggernaut.idle();
 				}
 			}, '+=.1');
+		},
+		hitState: 0,
+		hit: function(){
+			if (test.juggernaut.hitState) return;
+			test.juggernaut.hitState = 1;
+			var tl = new g.TM();
+			var e = document.getElementById('sprite');
+			tl.set(e, {
+				backgroundPosition: "0%",
+			}, '+=.1').set(e, {
+				backgroundPosition: "-800%",
+			}, '+=.1').set(e, {
+				backgroundPosition: '-900%'
+			}, '+=.1').set(e, {
+				backgroundPosition: '-800%'
+			}, '+=.1').set(e, {
+				backgroundPosition: '0%'
+			}, '+=.1').set(e, {
+				onComplete: function(){
+					test.juggernaut.hitState = 0;
+					test.juggernaut.idle();
+				}
+			}, '+=.2');
 		}
 	}
 }
