@@ -39,16 +39,6 @@
 
 	*/
 
-	// animate spritemap
-	TweenMax.to('#characterslot1', 1, {
-		startAt: {
-			backgroundPosition: '0 0'
-		},
-		repeat:-1,
-		backgroundPosition: "0 -1300%",
-		ease: SteppedEase.config(13)
-	});
-
 
 	var x = {
 		getRatings: { // tank, phy, mag, heal, utility
@@ -68,6 +58,7 @@
 			Wizard: 		[1, 1, 10, 1, 5]
 		},
 	}
+
 	/*
 	if (!isset($_SESSION['guest'])){
 		// first visit

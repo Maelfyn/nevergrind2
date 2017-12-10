@@ -2,11 +2,12 @@
 const gulp = require('gulp');
 // var minifyHTML = require('gulp-minify-html'); // Minify HTML
 var cleanCSS = require('gulp-clean-css'); // Minify the CSS
-// var minify = require('gulp-minify');
 var stripDebug = require('gulp-strip-debug'); // Remove debugging stuffs
 var concat = require('gulp-concat'); // Join all JS files together to save space
 var uglify = require('gulp-uglify'); // Minify JavaScript
 var rename = require('gulp-rename');
+var imagemin = require('imagemin');
+var imageminPngcrush = require('imagemin-pngcrush');
 
 gulp.task('minify-ng-classic-js', function(){
 // classic NG
