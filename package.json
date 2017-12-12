@@ -2,6 +2,7 @@
   "requires": true,
   "lockfileVersion": 1,
   "dependencies": {
+    "@aquafadas/gulp-php-minify": "^0.3.1",
     "ansi-regex": {
       "integrity": "sha1-w7M6te42DYbg5ijwRorn7yfWVN8=",
       "resolved": "https://registry.npmjs.org/ansi-regex/-/ansi-regex-2.1.1.tgz",

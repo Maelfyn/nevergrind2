@@ -281,6 +281,87 @@ WIZ		250			250			250
 12 Galeblast Fortress
 13 Ashenflow Peak
 
+== MOBS ==
+
+balrog
+beholder
+golem
+treant
+spider
+wolf
+rat
+snake
+dragonkin
+hydra
+lizardman
+dragon
+wyvern
+ghoul
+mummy
+skeleton
+zombie
+vampire
+cyclops
+goblin
+hobgoblin
+kobold
+ogre
+orc
+troll
+chimera
+griffon
+harpy
+manticore
+werewolf
+
+automaton
+barghest
+basilisk
+leviathin
+centaur
+cerberus
+stingray
+dark elf
+dark orc
+skull
+dwarf
+halfling
+fungoid
+gargoyle
+giant bat
+crab
+scorpion
+gnome
+gorgon
+imp
+hippogriff
+kraken
+lacodon
+minotaur
+phoenix
+revenant
+unicorn
+witch
+
+crocodile
+elephant
+hippo
+lion
+lioness
+rhino
+zebra
+[birds]
+chicken
+cow
+goat
+pig
+
+bear
+boar
+wolf ?
+
+
+
 ====================== just database thangs =====================================
 ng2_zones
 row 	name				level

@@ -7,7 +7,7 @@ var concat = require('gulp-concat'); // Join all JS files together to save space
 var uglify = require('gulp-uglify'); // Minify JavaScript
 var rename = require('gulp-rename');
 var imagemin = require('imagemin');
-var imageminPngcrush = require('imagemin-pngcrush');
+var imageminPngquant = require('imagemin-pngquant');
 
 gulp.task('minify-ng-classic-js', function(){
 // classic NG
@@ -77,6 +77,7 @@ return gulp.src([
 './js/socket.js',
 './js/chat.js',
 './js/payment.js',
+'./js/mob.js',
 './js/test.js',
 './js/endWrap.js'
 ])
@@ -87,6 +88,16 @@ return gulp.src([
 .pipe(rename('nevergrind-online.min.js'))
 .pipe(gulp.dest('./js'));
 
+});
+
+gulp.task('minify-img', function(){
+	return imagemin(['./mobs/huge/wolf.png'], './mobs/quant', {
+		plugins: [
+			imageminPngquant()
+		]
+	}).then(function(){
+		console.info("Images quant'd... is that a thing?!")
+	});
 });
 
 gulp.task('minify-css', function(){
