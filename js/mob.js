@@ -7,14 +7,20 @@ var mob = {
 		'golem',
 		'treant',
 		'spider',
-		'wolf'
+		'wolf',
+		'rat',
+		'snake',
+		'ghoul',
+		'mummy',
+		'skeleton',
+		'zombie'
 	],
 	count: 0,
 	init: function(){
 		var e = document.createElement('div');
 		e.id = 'sprite';
 		e.style.position = 'absolute';
-		e.style.bottom = '10%';
+		e.style.bottom = '0%';
 		e.style.left = '0%';
 		e.style.pointerEvents = 'none';
 		e.style.width = '1186px';
@@ -61,19 +67,19 @@ var mob = {
 				mob.idle(1);
 				if (mob.test){
 					TweenMax.delayedCall(1, function() {
-						mob.attack();
+						mob.attack(1);
 					});
 				}
 			}
 		});
 	},
-	attack: function(force2){
+	attack: function(force){
 		if (mob.animationActive) return;
 		mob.animationActive = 1;
 		var tl = g.TM(),
 			foo = !Math.round(Math.random()) ? 1 : 2;
-		if (force2) foo = 2;
-		tl.to(mob.element, .7, {
+		if (force) foo = force;
+		tl.to(mob.element, .5, {
 			startAt: {
 				backgroundPosition: '0% -'+ foo +'00%'
 			},
@@ -81,11 +87,11 @@ var mob = {
 			ease: SteppedEase.config(9),
 			onComplete: function(){
 				mob.animationActive = 0;
-				mob.idle();
+				mob.idle(1);
 				if (mob.test){
-					if (!force2){
+					if (force === 1){
 						TweenMax.delayedCall(1, function() {
-							mob.attack(1);
+							mob.attack(2);
 						});
 					}
 					else {
@@ -111,7 +117,7 @@ var mob = {
 			repeat: 1,
 			onComplete: function(){
 				mob.animationActive = 0;
-				mob.idle();
+				mob.idle(1);
 				if (mob.test){
 					TweenMax.delayedCall(1, function() {
 						mob.death();
@@ -290,5 +296,4 @@ var mob = {
 	}
 }
 mob.count = mob.images.length - 1;
-mob.count = 1;
 mob.init();

@@ -33,7 +33,7 @@
 	if (empty($_SESSION['account'])){
 		require $_SERVER['DOCUMENT_ROOT'] . "/includes/loginCss.html";
 	}
-	$version = '0.0.46';
+	$version = '0.0.47';
 	?>
 	<link rel="stylesheet" href="css/ng2.<?php
 		echo $_SERVER["SERVER_NAME"] === "localhost" ? '' : 'min.'; ?>css?v=<?php echo $version;

@@ -300,6 +300,7 @@ ghoul
 mummy
 skeleton
 zombie
+
 vampire
 cyclops
 goblin
