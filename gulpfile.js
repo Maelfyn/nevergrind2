@@ -91,12 +91,14 @@ return gulp.src([
 });
 
 gulp.task('minify-img', function(){
-	return imagemin(['./mobs/huge/wolf.png'], './mobs/quant', {
-		plugins: [
-			imageminPngquant()
+	return imagemin(['./mobs/huge/manticore.png'], './mobs/', {
+		use: [imageminPngquant({
+			quality: '93',
+			speed: 1
+		})
 		]
 	}).then(function(){
-		console.info("Images quant'd... is that a thing?!")
+		console.info("Image(s) minified with quant!")
 	});
 });
 

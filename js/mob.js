@@ -13,7 +13,19 @@ var mob = {
 		'ghoul',
 		'mummy',
 		'skeleton',
-		'zombie'
+		'zombie',
+		'vampire',
+		'goblin',
+		'cyclops',
+		'hobgoblin',
+		'kobold',
+		'ogre',
+		'orc',
+		'troll',
+		'chimera',
+		'griffon',
+		'harpy',
+		'manticore'
 	],
 	count: 0,
 	init: function(){
