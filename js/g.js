@@ -409,7 +409,6 @@ g = Object.assign(g, {
 			type: 'GET',
 			url: 'php2/initGame.php'
 		}).done(function(r){
-			console.log("Account: ", r.account);
 			if (r.account) {
 				console.info("Data: ", r);
 				my.account = r.account;
@@ -421,6 +420,7 @@ g = Object.assign(g, {
 			else {
 				notLoggedIn();
 			}
+			g.initialized = 1;
 			document.getElementById('version').textContent = 'Version ' + g.version;
 		});
 	},

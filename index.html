@@ -19,13 +19,14 @@
 	<!--link rel="stylesheet" href="css/bootstrap-slider.min.css"-->
 	<script>
 		var g = {
-			version: '0.0.49'
+			version: '0.0.50',
+			initialized: 0
 		}, my = {
 			account: ''
 		};
 	</script>
 	<link rel="stylesheet" href="css/libs/all.min.css">
-	<link rel="stylesheet" href="css/ng2.min.css?v=0.0.49">
+	<link rel="stylesheet" href="css/ng2.min.css?v=0.0.50">
 	<link rel="shortcut icon" href="/images/favicon.png">
 </head>
 
@@ -54,6 +55,7 @@
 							   id="password"
 							   class="loginInputs"
 							   maxlength="20"
+							   autocomplete="current-password"
 							   placeholder="Password"
 							   required="required" />
 					</label>
@@ -803,16 +805,17 @@
 		} else if (data === "Login successful!"){
 			if (origin === 'loginRenderButton'){
 				$("#login-modal").remove();
-				(function repeat(count){
-					if (count++ < 5){
+				(function repeat(){
+					if (g.initialized){
 						if (!my.account) {
-							setTimeout(repeat, 100, count);
+							// not logged in - Google SSO requires this
+							location.replace(target);
 						}
 					}
 					else {
-						location.replace(target);
+						setTimeout(repeat, 100);
 					}
-				})(0);
+				})();
 			}
 			else {
 				location.replace(target);
@@ -936,7 +939,7 @@
 		}
 		for (var i=0, len=s.length; i<len; i++){
 			var e = d.createElement("script");
-			e.src = "js/" + s[i] + x + "?v="+ version;
+			e.src = "js/" + s[i] + x + "?v="+ g.version;
 			e.async = false;
 			d.head.appendChild(e);
 		}
