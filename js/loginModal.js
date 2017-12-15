@@ -20,6 +20,7 @@ var modalTemplate = '<div id="login-backdrop"></div>' +
 		'class="loginInputs"'+
 		'maxlength="20"'+
 		'placeholder="Password"'+
+		'autocomplete="current-password"'+
 		'required="required" />'+
 	'</label>'+
 
@@ -73,7 +74,13 @@ var modalTemplate = '<div id="login-backdrop"></div>' +
 '</form>'+
 '</div>';
 document.getElementById('login-modal').innerHTML = modalTemplate;
+/*
 
+<link rel="stylesheet" href="css/ng2.<?php
+	echo $_SERVER["SERVER_NAME"] === "localhost" ? '' : 'min.'; ?>css?v=<?php echo $version;
+?>">
+ */
+sessionStorage.setItem('refer', location.pathname);
 // FB SSO
 window.fbAsyncInit = function() {
 	console.warn("fbAsyncInit called!");
@@ -121,7 +128,7 @@ function fbLoginCallback(response){
 					console.info('FB authenticate response: ', data);
 					if (data === 'Create an account name!'){
 						// redirect to
-						var to = '//nevergrind.com/setAccount.php' + $("#refer").attr("href");
+						var to = '//nevergrind.com/setAccount.php';
 						window.location = to;
 					} else {
 						// it's coming out here for some reason
@@ -166,7 +173,7 @@ function loginRenderButton() {
 					}).done(function(data){
 						if (data === 'Create an account name!'){
 							// redirect to
-							var to = '//nevergrind.com/setAccount.php' + $("#refer").attr("href");
+							var to = '//nevergrind.com/setAccount.php';
 							window.location = to;
 						} else {
 							// it's coming out here for some reason
@@ -307,10 +314,9 @@ function loginTokenAuthenticate(){
 	});
 }
 function loginGotoRefer(data, suppress){
-	var refer = $("#refer").attr("href") || '',
-		target = "//" + location.host + refer;
+	var target = "//" + location.host + sessionStorage.getItem('refer') || '';
 	if (data === 'Create an account name!'){
-		location.replace("//" + location.host + '/setAccount.php' + refer);
+		location.replace("//" + location.host + '/setAccount.php');
 	} else if (data === "Login successful!"){
 		location.replace(target);
 	} else {
@@ -388,7 +394,7 @@ kongregateAPI.loadAPI(function(){
 			//console.info('KONG: ', data);
 			if (data === 'Create an account name!'){
 				// redirect to
-				var to = '//nevergrind.com/setAccount.php' + $("#refer").attr("href");
+				var to = '//nevergrind.com/setAccount.php' + (sessionStorage.getItem('refer') || '');
 				window.location = to;
 			} else {
 				// it's coming out here for some reason

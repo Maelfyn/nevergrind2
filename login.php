@@ -6,11 +6,10 @@
 		ini_set('display_errors', true);
 	}
 	require('php/values.php');
-	$refer = isset($_GET['back']) ? $_GET['back'] : "/";
 	
 	if (isset($_SESSION['email']) && isset($_SESSION['account'])){
 		if(strlen($_SESSION['email']) > 0){
-			header("Location: ". $refer);
+			header("Location: /");
 			exit();
 		}
 	}

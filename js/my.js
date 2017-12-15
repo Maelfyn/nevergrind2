@@ -1,8 +1,7 @@
 
 // player data values
-var my = {
+my = Object.assign(my, {
 	lastReceivedWhisper: '',
-	account: '',
 	team: 0,
 	gameName: 'Earth Alpha',
 	slot: 1,
@@ -42,4 +41,4 @@ var my = {
 			});
 		}
 	}
-};
+});

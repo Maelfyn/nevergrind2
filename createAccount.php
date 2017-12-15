@@ -13,7 +13,6 @@
 			exit();
 		}
 	}
-	$refer = isset($_GET['back']) ? $_GET['back'] : "/";
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -112,7 +111,7 @@
 			onSubmit="return createAccount(this);">
 			<fieldset>
 				<div id="createAccountWrap">
-					<a id="createAccount" href="/login.php?back=' . $refer . '" class="strongShadow">Return to Login Page</a>
+					<a id="createAccount" href="/login.php" class="strongShadow">Return to Login Page</a>
 				</div>
 				
 				<hr class="fancy-hr">
@@ -146,7 +145,6 @@
 			<div>Problems?</div>
 			<div>Contact: support@nevergrind.com</div>
 		</form>';
-		echo "<a id='refer' style='display:none' href='{$refer}'></a>";
 	?>
 	</div><!-- window 2 -->
 	<script src="//cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"></script>
@@ -224,7 +222,8 @@
 			} else {
 				QMsg(data + " Redirecting!");
 				setTimeout(function(){
-					$("#refer")[0].click();
+					return;
+					location.replace("//" + location.host + (sessionStorage.getItem('refer') || ''));
 				}, 100);
 			}
 			createAccountLock = false;

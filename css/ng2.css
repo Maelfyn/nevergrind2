@@ -1,4 +1,5 @@
-/* login styles */fieldset {
+/* login styles */
+fieldset {
 	min-width: 0;
 	padding: 0;
 	margin: 0;
@@ -229,7 +230,9 @@ label{
 .strongShadow {
 	text-shadow: 1px 1px #222, -0.4px 0.6px #222, 0.6px -0.6px #222, -0.4px 0 #222, 0.6px 0 #222, 0 0.6px #222, 0 -0.6px #222, 0.6px 0.6px #222;
 }
-
+#login-modal {
+	visibility: hidden;
+}
 #login-modal, #login-container {
 	position: absolute;
 	width: 100%;

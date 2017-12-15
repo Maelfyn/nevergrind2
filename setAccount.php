@@ -6,7 +6,6 @@
 		ini_set('display_errors', true);
 	}
 	require('php/values.php');
-	$refer = isset($_GET['back']) ? $_GET['back'] : "/";
 	
 	if(!isset($_SESSION['tempEmail']) || !strlen($_SESSION['tempEmail'])){
 		header("Location: login.php");
@@ -116,7 +115,6 @@ echo
 			<div id="error" class="text-danger"></div>
 		</fieldset>
 	</form>';
-	echo "<a id='refer' style='display:none' href='{$refer}'></a>";
 	?>
 	</div>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"></script>
@@ -143,7 +141,7 @@ echo
 			}).done(function(data){
 				//console.info("OK ", data);
 				setError('');
-				var target = "//" + location.host + $("#refer").attr("href");
+				var target = "//" + location.host + (sessionStorage.getItem('refer') || '');
 				location.replace(target);
 			}).fail(function(data){
 				console.info("FAIL ", data);

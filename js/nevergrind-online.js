@@ -113,7 +113,7 @@ var create = {
 		});
 		$("#create-character-back").on(x, function(){
 			g.lock(1);
-			g.loadAllCharacters();
+			g.initGame();
 			var z = document.getElementById('title-scene-create-character');
 			TweenMax.to(z, .6, {
 				y: 20,
@@ -198,7 +198,7 @@ var create = {
 				console.info('Deleted character: ', r);
 				g.msg(create.name + ' has been deleted!');
 				modal.hide();
-				g.loadAllCharacters();
+				g.initGame();
 			}).fail(function(r){
 				g.msg(r.responseText, 8);
 				g.unlock();
@@ -554,7 +554,7 @@ var create = {
 
 
 // core.js
-var g = {
+g = Object.assign(g, {
 	events: function(x){
 		$(window).focus(function(){
 			document.title = g.defaultTitle;
@@ -745,9 +745,6 @@ var g = {
 			var foo = []; 
 			localStorage.setItem('ignore', JSON.stringify(foo));
 		}
-		setTimeout(function(){
-			chat.friendGet();
-		}, 100);
 	},
 	TDC: function(){
 		return new TweenMax.delayedCall(0, '');
@@ -962,27 +959,42 @@ var g = {
 			allDone();
 		});
 	},
-	loadAllCharacters: function(){
+	initGame: function(){
 		$.ajax({
 			type: 'GET',
-			url: 'php2/create/loadAllCharacters.php'
+			url: 'php2/initGame.php'
 		}).done(function(r){
-			var s = '';
-			r.forEach(function(d){
-				// #ch-card-list
-				s += 
-				'<div data-row="'+ d.row +'" '+
-					'data-name="'+ d.name +'" '+
-					'class="btn btn-lg ch-card center select-player-card">'+
-					'<div class="ch-card-name">'+ d.name +'</div>'+
-					'<div class="ch-card-details">'+ d.level +' '+ d.race +' '+ g.toJobLong(d.job) +'</div>'+
-				'</div>';
-			});
-			document.getElementById('ch-card-list').innerHTML = s;
-			$(".select-player-card:first").trigger(env.click);
+			console.log("Account: ", r.account);
+			if (r.account) {
+				console.info("Data: ", r);
+				my.account = r.account;
+				document.getElementById('logout').textContent = 'Logout ' + r.account;
+				g.displayAllCharacters(r.characterData);
+				g.checkPlayerData();
+				$("#login-modal").remove();
+			}
+			else {
+				notLoggedIn();
+			}
+			document.getElementById('version').textContent = 'Version ' + g.version;
 		});
+	},
+	displayAllCharacters: function(r){
+		var s = '';
+		r.forEach(function(d){
+			// #ch-card-list
+			s +=
+				'<div data-row="'+ d.row +'" '+
+				'data-name="'+ d.name +'" '+
+				'class="btn btn-lg ch-card center select-player-card">'+
+				'<div class="ch-card-name">'+ d.name +'</div>'+
+				'<div class="ch-card-details">'+ d.level +' '+ d.race +' '+ g.toJobLong(d.job) +'</div>'+
+				'</div>';
+		});
+		document.getElementById('ch-card-list').innerHTML = s;
+		$(".select-player-card:first").trigger(env.click);
 	}
-};
+});
 g.init = (function(){
 	// console.info("Initializing game...");
 	$.ajaxSetup({
@@ -999,13 +1011,7 @@ var env = {
 	},
 	click: init.isMobile ? 'mousedown' : 'click',
 	resizeWindow: function() {
-		var w = window.innerWidth,
-			h = window.innerHeight
-		// portrait/landscape
-		if (init.isMobile){
-			document.getElementById('portrait').style.display = w < h ? 'block' : 'none';
-			document.getElementById('landscape').style.display = w < h ? 'none' : 'block';
-		}
+		// currently doing nothing
 	},
 	isXbox: /Xbox/i.test(navigator.userAgent),
     isPlaystation: navigator.userAgent.toLowerCase().indexOf("playstation") >= 0,
@@ -1037,15 +1043,11 @@ var env = {
 		env.setMobile();
 	}
 	localStorage.setItem('isMobile', init.isMobile);
-	setTimeout(function(){
-		$("script").remove();
-	}, 1000);
 })();
 
 // player data values
-var my = {
+my = Object.assign(my, {
 	lastReceivedWhisper: '',
-	account: '',
 	team: 0,
 	gameName: 'Earth Alpha',
 	slot: 1,
@@ -1085,7 +1087,7 @@ var my = {
 			});
 		}
 	}
-};
+});
 // dom.js
 var dom;
 (function(d){
@@ -1560,16 +1562,7 @@ var title = {
 			$("#titleChatSend").on(env.click, function(){
 				title.sendMsg(true);
 			});
-			g.loadAllCharacters();
-			$.ajax({
-				type: 'GET',
-				url: 'php/initChatId.php'
-			}).done(function(data){
-				my.account = data.account;
-				my.flag = data.flag;
-				my.rating = data.rating;
-				g.checkPlayerData();
-			});
+			g.initGame();
 			// initial refresh of games
 			setTimeout(function(){
 				//title.refreshGames();

@@ -1,5 +1,5 @@
 // core.js
-var g = {
+g = Object.assign(g, {
 	events: function(x){
 		$(window).focus(function(){
 			document.title = g.defaultTitle;
@@ -409,26 +409,19 @@ var g = {
 			type: 'GET',
 			url: 'php2/initGame.php'
 		}).done(function(r){
+			console.log("Account: ", r.account);
 			if (r.account) {
 				console.info("Data: ", r);
 				my.account = r.account;
 				document.getElementById('logout').textContent = 'Logout ' + r.account;
-				document.getElementById('version').textContent = 'Version ' + version;
 				g.displayAllCharacters(r.characterData);
 				g.checkPlayerData();
+				$("#login-modal").remove();
 			}
 			else {
-				console.warn("No account data found! ", r.scripts);
-
-				(function(d){
-					r.scripts.forEach(function(z, i){
-						var e = d.createElement("script");
-						e.src = z;
-						e.async = false;
-						d.head.appendChild(e);
-					});
-				})(document);
+				notLoggedIn();
 			}
+			document.getElementById('version').textContent = 'Version ' + g.version;
 		});
 	},
 	displayAllCharacters: function(r){
@@ -446,7 +439,7 @@ var g = {
 		document.getElementById('ch-card-list').innerHTML = s;
 		$(".select-player-card:first").trigger(env.click);
 	}
-};
+});
 g.init = (function(){
 	// console.info("Initializing game...");
 	$.ajaxSetup({

@@ -1,4 +1,38 @@
+<script>
+	/*(function repeat(count){
+		if (count++ < 20){
+			console.warn('account: ', my.account);
+			if (!my.account) {
+				setTimeout(repeat, 100, count);
+			}
+		}
+		else {
+			location.replace(target);
+		}
+	})(0);*/
 
+	// attempt persistent login
+	/*
+	$("#loginEmail").val(email);
+	if (token){
+		loginTokenAuthenticate();
+	} else {
+		$("#password").focus();
+		$.ajax({
+			url: '/php/master1.php',
+			type: 'POST',
+			data: {
+				run: "getToken",
+				email: email
+			}
+		}).done(function(data){
+			token = data;
+		}).always(function(){
+			document.getElementsByTagName('body')[0].style.visibility = 'visible';
+		});
+	}
+	*/
+</script>
 
 <?php
 	session_start();
