@@ -37,7 +37,4 @@ var env = {
 		env.setMobile();
 	}
 	localStorage.setItem('isMobile', init.isMobile);
-	setTimeout(function(){
-		$("script").remove();
-	}, 1000);
 })();

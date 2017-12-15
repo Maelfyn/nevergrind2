@@ -412,6 +412,8 @@ var g = {
 			if (r.account) {
 				console.info("Data: ", r);
 				my.account = r.account;
+				document.getElementById('logout').textContent = 'Logout ' + r.account;
+				document.getElementById('version').textContent = 'Version ' + version;
 				g.displayAllCharacters(r.characterData);
 				g.checkPlayerData();
 			}
@@ -421,7 +423,7 @@ var g = {
 				(function(d){
 					r.scripts.forEach(function(z, i){
 						var e = d.createElement("script");
-						e.src = "js/" + z + ".js?v=" + version;
+						e.src = z;
 						e.async = false;
 						d.head.appendChild(e);
 					});

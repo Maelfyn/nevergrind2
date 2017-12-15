@@ -1,7 +1,82 @@
+// modal
+var modalTemplate = '<div id="login-backdrop"></div>' +
+'<div id="login-container">'+
+'<form id="loginWrap"'+
+	'accept-charset="UTF-8"'+
+	'class="strongShadow"'+
+	'method="post"'+
+	'onSubmit="return loginAuthenticate(this);">'+
+	'<fieldset>'+
+	'<p>Login with your Neverworks Account or '+
+	'<a id="createAccount" href="/createAccount.php?" class="strongShadow">Create an Account</a></p>'+
+	'<label class="textLeft" for="loginEmail">Account or Email Address'+
+		'<input name="username" type="text" id="loginEmail" class="loginInputs" maxlength="255" placeholder="Account or Email Address" required="required" />'+
+	'</label>'+
+
+	'<label class="textLeft" for="password">Password'+
+	'<input name="password"'+
+		'type="password"'+
+		'id="password"'+
+		'class="loginInputs"'+
+		'maxlength="20"'+
+		'placeholder="Password"'+
+		'required="required" />'+
+	'</label>'+
+
+	'<label for="rememberMe">'+
+		'<input type="checkbox" id="rememberMe" name="rememberMe" checked> Remember Me'+
+	'</label>'+
+
+	'<input id="login-btn" type="submit" value="Login" class="btn btn-primary strongShadow" />'+
+
+	'<div class="error-msg blackOutline3"></div>'+
+
+	'<div id="forgotPasswordWrap">'+
+		'<a title="Neverworks Games will send you an email. Click the link to reset your password." id="forgotPassword">Forgot Password?</a>'+
+	'</div>'+
+
+
+	'<hr class="fancy-hr">'+
+
+	'<p>Or login with existing accounts:</p>'+
+
+	'<div id="google-wrap">'+
+		'<span id="my-signin2"></span>'+
+		'</div>'+
+
+		'<a id="twitter-wrap" href="/twitterLogin.php">'+
+		'<div id="twitter-icon-wrap">'+
+		'<i id="twitter-icon" class="fa fa-twitter"></i>'+
+		'</div>'+
+		'<div id="twitter-text">Sign in with Twitter</div>'+
+	'</a>'+
+
+	'<div id="fb-root"></div>'+
+
+	'<fb:login-button'+
+		'class="fb_button"'+
+		'data-width="176"'+
+		'data-max-rows="1"'+
+		'data-size="large"'+
+		'data-button-type="login_with"'+
+		'data-show-faces="false"'+
+		'data-auto-logout-link="false"'+
+		'data-use-continue-as="false"'+
+		'scope="public_profile,email"'+
+		'onlogin="checkLoginState();">'+
+	'</fb:login-button>'+
+
+	'<hr class="fancy-hr">'+
+	'<div>Problems?</div>'+
+	'<div>Contact: support@nevergrind.com</div>'+
+'</fieldset>'+
+'</form>'+
+'</div>';
+document.getElementById('login-modal').innerHTML = modalTemplate;
 
 // FB SSO
-console.warn("SCRIPT LOADED");
 window.fbAsyncInit = function() {
+	console.warn("fbAsyncInit called!");
 	FB.init({
 		appId: '737706186279455',
 		cookie: true,
@@ -285,3 +360,52 @@ function loginGotoRefer(data, suppress){
 	js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.10&appId=737706186279455";
 	fjs.parentNode.insertBefore(js, fjs);
 }(document, 'script', 'facebook-jssdk'));
+
+
+// only try if not logged in
+kongregateAPI.loadAPI(function(){
+
+	function loginKong(){
+		loginAuthenticationLock = true;
+		var kongGames = {
+			'/': 'ng', // TODO: this changes later
+			'/ng2-test-server/': 'ng2',
+			'/classic': 'ng',
+			'/games/firmament-wars/': 'fw'
+		};
+		var o = {
+			kongUserName: kongregate.services.getUsername(),
+			kongToken: kongregate.services.getGameAuthToken(),
+			kongGame: kongGames[location.pathname],
+			run: 'authenticate'
+		}
+		//console.info('kong creds: ', o);
+		$.ajax({
+			type: 'POST',
+			url: '/php/master1.php',
+			data: o
+		}).done(function(data){
+			//console.info('KONG: ', data);
+			if (data === 'Create an account name!'){
+				// redirect to
+				var to = '//nevergrind.com/setAccount.php' + $("#refer").attr("href");
+				window.location = to;
+			} else {
+				// it's coming out here for some reason
+				loginGotoRefer(data);
+			}
+		}).fail(function(data) {
+			loginMsg(data.statusText);
+		}).always(function(){
+			loginAuthenticationLock = false;
+		});
+	}
+	kongregate = kongregateAPI.getAPI();
+	if (!kongregate.services.isGuest()) {
+		loginKong();
+	} else {
+		kongregate.services.addEventListener('login', function () {
+			loginKong();
+		});
+	}
+});
