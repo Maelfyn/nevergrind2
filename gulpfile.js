@@ -90,10 +90,12 @@ return gulp.src([
 
 });
 
-gulp.task('minify-img', function(){
-	return imagemin(['./mobs/huge/manticore.png'], './mobs/', {
+gulp.task('minify-png', function(){
+	return imagemin(['./mobs/huge/*.png'], './mobs/', {
 		use: [imageminPngquant({
-			quality: '93',
+			floyd: 1,
+			nofs: true, // disable FS
+			quality: '90',
 			speed: 1
 		})
 		]

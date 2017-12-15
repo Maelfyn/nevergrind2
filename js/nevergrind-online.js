@@ -2863,8 +2863,22 @@ var mob = {
 		'ghoul',
 		'mummy',
 		'skeleton',
-		'zombie'
+		'zombie',
+		'vampire',
+		'goblin',
+		'cyclops',
+		'hobgoblin',
+		'kobold',
+		'ogre',
+		'orc',
+		'troll',
+		'chimera',
+		'griffon',
+		'harpy',
+		'manticore', // dont like this
+		'werewolf'
 	],
+	cache: {},
 	count: 0,
 	init: function(){
 		var e = document.createElement('div');
@@ -2877,6 +2891,8 @@ var mob = {
 		e.style.height = '949px';
 		e.style.background = "url('mobs/"+ (mob.images[mob.count++ % mob.images.length]) +".png')";
 		e.style.backgroundPosition = '0% 0%';
+		var cache = 'mobs/'+ (mob.images[mob.count % mob.images.length]) +'.png';
+		mob.cache = new Image(cache);
 
 		document.getElementById('title-scene').appendChild(e);
 		mob.element = e;

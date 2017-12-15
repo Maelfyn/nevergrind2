@@ -32,6 +32,9 @@
 			text-align: center;
 			background: rgba(0,0,0,.9);
 		}
+		#main-wrap > * {
+			padding: 0 20px;
+		}
 	</style>
 </head>
 

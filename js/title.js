@@ -73,16 +73,7 @@ var title = {
 			$("#titleChatSend").on(env.click, function(){
 				title.sendMsg(true);
 			});
-			g.loadAllCharacters();
-			$.ajax({
-				type: 'GET',
-				url: 'php/initChatId.php'
-			}).done(function(data){
-				my.account = data.account;
-				my.flag = data.flag;
-				my.rating = data.rating;
-				g.checkPlayerData();
-			});
+			g.initGame();
 			// initial refresh of games
 			setTimeout(function(){
 				//title.refreshGames();

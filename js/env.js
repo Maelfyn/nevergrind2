@@ -5,13 +5,7 @@ var env = {
 	},
 	click: init.isMobile ? 'mousedown' : 'click',
 	resizeWindow: function() {
-		var w = window.innerWidth,
-			h = window.innerHeight
-		// portrait/landscape
-		if (init.isMobile){
-			document.getElementById('portrait').style.display = w < h ? 'block' : 'none';
-			document.getElementById('landscape').style.display = w < h ? 'none' : 'block';
-		}
+		// currently doing nothing
 	},
 	isXbox: /Xbox/i.test(navigator.userAgent),
     isPlaystation: navigator.userAgent.toLowerCase().indexOf("playstation") >= 0,

@@ -190,9 +190,6 @@ var g = {
 			var foo = []; 
 			localStorage.setItem('ignore', JSON.stringify(foo));
 		}
-		setTimeout(function(){
-			chat.friendGet();
-		}, 100);
 	},
 	TDC: function(){
 		return new TweenMax.delayedCall(0, '');
@@ -407,25 +404,45 @@ var g = {
 			allDone();
 		});
 	},
-	loadAllCharacters: function(){
+	initGame: function(){
 		$.ajax({
 			type: 'GET',
-			url: 'php2/create/loadAllCharacters.php'
+			url: 'php2/initGame.php'
 		}).done(function(r){
-			var s = '';
-			r.forEach(function(d){
-				// #ch-card-list
-				s += 
-				'<div data-row="'+ d.row +'" '+
-					'data-name="'+ d.name +'" '+
-					'class="btn btn-lg ch-card center select-player-card">'+
-					'<div class="ch-card-name">'+ d.name +'</div>'+
-					'<div class="ch-card-details">'+ d.level +' '+ d.race +' '+ g.toJobLong(d.job) +'</div>'+
-				'</div>';
-			});
-			document.getElementById('ch-card-list').innerHTML = s;
-			$(".select-player-card:first").trigger(env.click);
+			if (r.account) {
+				console.info("Data: ", r);
+				my.account = r.account;
+				g.displayAllCharacters(r.characterData);
+				g.checkPlayerData();
+			}
+			else {
+				console.warn("No account data found! ", r.scripts);
+
+				(function(d){
+					r.scripts.forEach(function(z, i){
+						var e = d.createElement("script");
+						e.src = "js/" + z + ".js?v=" + version;
+						e.async = false;
+						d.head.appendChild(e);
+					});
+				})(document);
+			}
 		});
+	},
+	displayAllCharacters: function(r){
+		var s = '';
+		r.forEach(function(d){
+			// #ch-card-list
+			s +=
+				'<div data-row="'+ d.row +'" '+
+				'data-name="'+ d.name +'" '+
+				'class="btn btn-lg ch-card center select-player-card">'+
+				'<div class="ch-card-name">'+ d.name +'</div>'+
+				'<div class="ch-card-details">'+ d.level +' '+ d.race +' '+ g.toJobLong(d.job) +'</div>'+
+				'</div>';
+		});
+		document.getElementById('ch-card-list').innerHTML = s;
+		$(".select-player-card:first").trigger(env.click);
 	}
 };
 g.init = (function(){

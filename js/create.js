@@ -102,7 +102,7 @@ var create = {
 		});
 		$("#create-character-back").on(x, function(){
 			g.lock(1);
-			g.loadAllCharacters();
+			g.initGame();
 			var z = document.getElementById('title-scene-create-character');
 			TweenMax.to(z, .6, {
 				y: 20,
@@ -187,7 +187,7 @@ var create = {
 				console.info('Deleted character: ', r);
 				g.msg(create.name + ' has been deleted!');
 				modal.hide();
-				g.loadAllCharacters();
+				g.initGame();
 			}).fail(function(r){
 				g.msg(r.responseText, 8);
 				g.unlock();

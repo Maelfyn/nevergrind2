@@ -1,5 +1,4 @@
 <?php
-	$currentPlayers = 0;
 	session_start();
 	if($_SERVER["SERVER_NAME"] === "localhost"){
 		error_reporting(E_ALL);
@@ -29,11 +28,14 @@
 	
 	<link rel="stylesheet" href="css/libs/all.min.css">
 	<!--link rel="stylesheet" href="css/bootstrap-slider.min.css"-->
+	<script>
+		version = 0.0.49;
+	</script>
 	<?php
 	if (empty($_SESSION['account'])){
 		require $_SERVER['DOCUMENT_ROOT'] . "/includes/loginCss.html";
 	}
-	$version = '0.0.47';
+	$version = '0.0.49';
 	?>
 	<link rel="stylesheet" href="css/ng2.<?php
 		echo $_SERVER["SERVER_NAME"] === "localhost" ? '' : 'min.'; ?>css?v=<?php echo $version;
@@ -51,7 +53,6 @@
 		require $_SERVER['DOCUMENT_ROOT'] . "/includes/loginRefer.php";
 	}
 	?>
-<div id="landscape">
 
 <div id="title-scene" class="scene">
 	<div id="ng2-logo-wrap" class="scene">
@@ -497,21 +498,18 @@
 	
 </div> <!-- end title-scene -->
 
-	<div id="game-wrap" class="scene">
-	</div> <!-- end game-wrap -->
+<div id="game-wrap" class="scene">
+</div> <!-- end game-wrap -->
 
-	<audio id="bgmusic" autoplay loop preload="auto"></audio>
-	
-		
-	<div id="modal-overlay" class="overlay"></div>
-	<div id="modal-wrap" class="text-shadow"></div>
-	<div id="flash-overlay" class="overlay"></div>
-	<div id="lock-overlay" class="overlay"></div>
-	<div id="msg" class="text-shadow"></div>
-	
-</div>
+<audio id="bgmusic" autoplay loop preload="auto"></audio>
 
-<div id="portrait">This application must be viewed in landscape mode. Turn your device 90 degrees for maximum enjoyment.</div>
+
+<div id="modal-overlay" class="overlay"></div>
+<div id="modal-wrap" class="text-shadow"></div>
+<div id="flash-overlay" class="overlay"></div>
+<div id="lock-overlay" class="overlay"></div>
+<div id="msg" class="text-shadow"></div>
+
 </main>
 
 <script src="js/libs/libs.min.js"></script>
@@ -521,9 +519,17 @@
 ?>
 
 <script src="//apis.google.com/js/platform.js?onload=loginRenderButton" async defer></script>
-
+<script>
+	if(location.hostname!=="localhost"){
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+			(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+		ga('create', 'UA-35167620-1', 'auto');
+		ga('send', 'pageview');
+	}
+</script>
 <?php
-require $_SERVER['DOCUMENT_ROOT'] . '/includes/ga.php';
 if (empty($_SESSION['account'])){
 	require $_SERVER['DOCUMENT_ROOT'] . "/includes/loginKong.html";
 }
@@ -570,7 +576,7 @@ if (empty($_SESSION['account'])){
 		e.async = false;
 		d.head.appendChild(e);
 	}
-})(document, ["nevergrind-online"], ".min.js");
+	})(document, ["nevergrind-online"], ".min.js");
 </script>';
 ?>
 </body>
