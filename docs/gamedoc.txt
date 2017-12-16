@@ -283,10 +283,10 @@ WIZ		250			250			250
 
 == MOBS ==
 
-balrog
-beholder
+balrog redo
+beholder redo
 golem
-treant
+treant redo
 spider
 wolf
 rat
@@ -310,9 +310,9 @@ ogre
 orc
 troll
 chimera
-griffon
-harpy
-manticore
+griffon redo
+harpy redo
+manticore redo
 werewolf
 
 automaton

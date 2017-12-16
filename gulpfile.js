@@ -91,7 +91,8 @@ return gulp.src([
 });
 
 gulp.task('minify-png', function(){
-	return imagemin(['./mobs/huge/*.png'], './mobs/', {
+	var img = 'barghest';
+	return imagemin(['./mobs-huge/'+ img +'.png'], './mobs/', {
 		use: [imageminPngquant({
 			floyd: 1,
 			nofs: true, // disable FS

@@ -33,3 +33,5 @@ node_modules/
 build/
 *.min.css
 nevergrind-online.js
+nwjs/
+images/
