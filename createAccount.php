@@ -222,7 +222,6 @@
 			} else {
 				QMsg(data + " Redirecting!");
 				setTimeout(function(){
-					return;
 					location.replace("//" + location.host + (sessionStorage.getItem('refer') || ''));
 				}, 100);
 			}

@@ -7,7 +7,7 @@ var title = {
 		e.innerHTML = '';
 		g.lock();
 		$.ajax({
-			url: 'php/leaderboard.php',
+			url: g.url + 'php/leaderboard.php',
 			data: {
 				type: type
 			}
@@ -22,7 +22,7 @@ var title = {
 			title.refreshTimer = Date.now();
 			$.ajax({
 				type: 'GET',
-				url: 'php/refreshGames.php'
+				url: g.url + 'php/refreshGames.php'
 			}).done(function(data) {
 				//console.info(data);
 				var e = document.getElementById('gameTableBody');
@@ -74,10 +74,6 @@ var title = {
 				title.sendMsg(true);
 			});
 			g.initGame();
-			// initial refresh of games
-			setTimeout(function(){
-				//title.refreshGames();
-			});
 			setTimeout(function(){
 				g.keepAlive();
 			}, 180000);
@@ -96,7 +92,7 @@ var title = {
 				if (g.view === 'title'){
 					$.ajax({
 						type: "POST",
-						url: "php/titleUpdate.php",
+						url: g.url + 'php/titleUpdate.php',
 						data: {
 							channel: my.channel
 						}
@@ -337,7 +333,7 @@ var title = {
 		g.teamMode = teamMode;
 		g.speed = speed;
 		$.ajax({
-			url: 'php/createGame.php',
+			url: g.url + 'php/createGame.php',
 			data: {
 				name: name,
 				pw: pw,
@@ -375,7 +371,7 @@ var title = {
 		g.lock();
 		audio.play('click');
 		$.ajax({
-			url: 'php/joinGame.php',
+			url: g.url + 'php/joinGame.php',
 			data: {
 				name: g.name,
 				password: g.password

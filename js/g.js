@@ -98,7 +98,7 @@ g = Object.assign(g, {
 	ignore: [],
 	joinedGame: false,
 	searchingGame: false,
-	defaultTitle: 'Nevergrind Online',
+	defaultTitle: 'Nevergrind 2',
 	titleFlashing: false,
 	name: "",
 	password: "",
@@ -156,7 +156,7 @@ g = Object.assign(g, {
 				data.longitude += '';
 				g.geo = data;
 				$.ajax({
-					url: 'php/updateUserInfo.php',
+					url: g.url + 'php/updateUserInfo.php',
 					data: {
 						location: g.geo
 					}
@@ -208,7 +208,7 @@ g = Object.assign(g, {
 	keepAlive: function(){
 		$.ajax({
 			type: 'GET',
-			url: "php/keepAlive.php"
+			url: g.url + "php/keepAlive.php"
 		}).always(function() {
 			setTimeout(g.keepAlive, 120000);
 		});
@@ -316,7 +316,7 @@ g = Object.assign(g, {
 		socket.removePlayer(my.account);
 		$.ajax({
 			type: 'GET',
-			url: 'php/deleteFromFwtitle.php'
+			url: g.url + 'php/deleteFromFwtitle.php'
 		});
 		
 		try {
@@ -338,7 +338,7 @@ g = Object.assign(g, {
 		setTimeout(function(){
 			$.ajax({
 				type: 'GET',
-				url: 'php/logout.php'
+				url: g.url + 'php/logout.php'
 			}).done(function(data) {
 				g.msg("Logout successful");
 				localStorage.removeItem('email');
@@ -389,7 +389,7 @@ g = Object.assign(g, {
 		
 		$.ajax({
 			type: 'GET',
-			url: 'php2/create/getStatMap.php'
+			url: g.url + 'php2/create/getStatMap.php'
 		}).done(function(r){
 			var r = r.statMap;
 			g.races.forEach(function(v){
@@ -406,21 +406,21 @@ g = Object.assign(g, {
 	},
 	initGame: function(){
 		$.ajax({
-			type: 'GET',
-			url: 'php2/initGame.php'
+			type: 'POST',
+			url: g.url + 'php2/initGame.php'
 		}).done(function(r){
+			console.info("response: ", r);
+			g.initialized = 1;
 			if (r.account) {
-				console.info("Data: ", r);
 				my.account = r.account;
 				document.getElementById('logout').textContent = 'Logout ' + r.account;
 				g.displayAllCharacters(r.characterData);
 				g.checkPlayerData();
-				$("#login-modal").remove();
+				document.getElementById('login-modal').style.display = 'none';
 			}
 			else {
 				notLoggedIn();
 			}
-			g.initialized = 1;
 			document.getElementById('version').textContent = 'Version ' + g.version;
 		});
 	},

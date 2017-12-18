@@ -32,7 +32,7 @@ my = Object.assign(my, {
 		if (r || bypass || g.view !== 'game'){
 			g.lock(1);
 			$.ajax({
-				url: 'php/exitGame.php',
+				url: g.url + 'php/exitGame.php',
 				data: {
 					view: g.view
 				}

@@ -33,7 +33,7 @@ var game = {
 		// or check that players are still online?
 		$.ajax({
 			type: 'GET',
-			url: "php/getGameState.php"
+			url: g.url + 'php/getGameState.php'
 		}).done(function(data){
 			console.info('getGameState ', data);
 			// get tile data

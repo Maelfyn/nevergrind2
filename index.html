@@ -1,37 +1,77 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en"
+	  xmlns="http://www.w3.org/1999/xhtml">
 <head id='head'>
-	<title>Nevergrind Online | Free Multiplayer Browser RPG</title>
+	<title>Nevergrind 2 | Free Online Multiplayer Browser RPG</title>
 	<meta charset="utf-8">
-	<meta http-equiv="Cache-control" content="no-cache">
-	<meta name="keywords" content="realtime, rpg, browser, multiplayer, online, web, html5">
-	<meta name="description" content="A free web-based cooperative multiplayer browser RPG! Gather your friends and go forth to conquer in this roguelike dungeon crawler!">
-	<meta name="author" content="Joe Leonard">
-	<meta name="referrer" content="always">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+	<meta http-equiv="Cache-control"
+		  content="no-cache">
+	<meta name="keywords"
+		  content="realtime, rpg, browser, multiplayer, online, web, html5">
+	<meta name="description"
+		  content="A free web-based cooperative multiplayer browser RPG! Gather your friends and go forth to conquer in this roguelike dungeon crawler!">
+	<meta name="author"
+		  content="Joe Leonard">
+	<meta name="referrer"
+		  content="always">
+	<meta http-equiv="X-UA-Compatible"
+		  content="IE=edge,chrome=1"/>
 
-	<meta name="mobile-web-app-capable" content="yes">
-	<meta name="apple-mobile-web-app-capable" content="yes" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-	<meta name="google-signin-client_id" content="1015425037202-g5ri6qnj14b8vrk33lnu130ver9f43ef.apps.googleusercontent.com">
-	<meta name="google-site-verification" content="iC9l4midOGIXERCwagfpkef9ifunV-aZd_zlUUOPjIU" />
+	<meta name="mobile-web-app-capable"
+		  content="yes">
+	<meta name="apple-mobile-web-app-capable"
+		  content="yes" />
+	<meta name="viewport"
+		  content="width=device-width, initial-scale=1.0, user-scalable=no">
+	<meta name="google-signin-client_id"
+		  content="1015425037202-g5ri6qnj14b8vrk33lnu130ver9f43ef.apps.googleusercontent.com">
+	<meta name="google-site-verification"
+		  content="iC9l4midOGIXERCwagfpkef9ifunV-aZd_zlUUOPjIU" />
 
 	<!--link rel="stylesheet" href="css/bootstrap-slider.min.css"-->
 	<script>
 		var g = {
-			version: '0.0.50',
-			initialized: 0
+			version: '0.0.54',
+			initialized: 0,
+			session_id: '',
+			isApp: location.protocol === 'chrome-extension:' ? 1 : 0
 		}, my = {
 			account: ''
 		};
+		g.url = g.isApp ?
+			'https://nevergrind.com/ng2-test-server/' : '';
+		g.loginUrl = 'https://nevergrind.com';
+		g.socketUrl = g.isApp ?
+			'nevergrind.com' : location.hostname;
+		g.isServer = 0;
+		if (!g.isApp){
+			if (location.hostname === 'nevergrind.com'){
+				g.isServer = 1;
+			}
+		}
+		g.isLocal = location.hostname === 'localhost';
+		if (g.isLocal) {
+			g.loginUrl = '';
+		}
 	</script>
+	<style>
+		body {
+			visibility: hidden;
+		}
+	</style>
 	<link rel="stylesheet" href="css/libs/all.min.css">
-	<link rel="stylesheet" href="css/ng2.min.css?v=0.0.50">
 	<link rel="shortcut icon" href="img2/favicon.png">
 </head>
 
 <body id="body">
-
+<script>
+	(function(b){
+		e = document.createElement('link');
+		e.href = 'css/ng2' + (g.isLocal ? '.css' : '.min.css') + '?v='+ g.version;
+		e.rel = 'stylesheet';
+		b.appendChild(e);
+	})(document.body);
+</script>
 <main>
 	<div id="login-modal">
 		<div id="login-backdrop"></div>
@@ -72,34 +112,35 @@
 						<a title="Neverworks Games will send you an email. Click the link to reset your password." id="forgotPassword">Forgot Password?</a>
 					</div>
 
+					<div id="social-login-wrap">
+						<hr class="fancy-hr">
 
-					<hr class="fancy-hr">
+						<p>Or login with existing accounts:</p>
 
-					<p>Or login with existing accounts:</p>
-
-					<div id="google-wrap">
-						<span id="my-signin2"></span>
-					</div>
-
-					<a id="twitter-wrap" href="/twitterLogin.php">
-						<div id="twitter-icon-wrap">
-							<i id="twitter-icon" class="fa fa-twitter"></i>
+						<div id="google-wrap">
+							<span id="my-signin2"></span>
 						</div>
-						<div id="twitter-text">Sign in with Twitter</div>
-					</a>
 
-					<fb:login-button
-						class="fb_button"
-						data-width="176"
-						data-max-rows="1"
-						data-size="large"
-						data-button-type="login_with"
-						data-show-faces="false"
-						data-auto-logout-link="false"
-						data-use-continue-as="false"
-						scope="public_profile,email"
-						onlogin="checkLoginState();">
-					</fb:login-button>
+						<a id="twitter-wrap" href="/twitterLogin.php">
+							<div id="twitter-icon-wrap">
+								<i id="twitter-icon" class="fa fa-twitter"></i>
+							</div>
+							<div id="twitter-text">Sign in with Twitter</div>
+						</a>
+
+						<fb:login-button
+							class="fb_button"
+							data-width="176"
+							data-max-rows="1"
+							data-size="large"
+							data-button-type="login_with"
+							data-show-faces="false"
+							data-auto-logout-link="false"
+							data-use-continue-as="false"
+							scope="public_profile,email"
+							onlogin="checkLoginState();">
+						</fb:login-button>
+					</div>
 
 					<hr class="fancy-hr">
 					<div>Problems?</div>
@@ -124,19 +165,19 @@
 				</div>
 
 				<div id="social-icons" class="text-primary title-column">
-					<a href="//twitch.tv/maelfyn">
+					<a href="https://twitch.tv/maelfyn">
 						<i class="fa fa-twitch text-primary pointer"></i>
 					</a>
-					<a href="//youtube.com/c/Maelfyn">
+					<a href="https://youtube.com/c/Maelfyn">
 						<i class="fa fa-youtube text-primary pointer"></i>
 					</a>
-					<a href="//discord.gg/n2gp8rC">
+					<a href="https://discord.gg/n2gp8rC">
 						<i class="fa fa-discord text-primary pointer"></i>
 					</a>
-					<a href="//www.facebook.com/maelfyn">
+					<a href="https://www.facebook.com/maelfyn">
 						<i class="fa fa-facebook text-primary pointer"></i>
 					</a>
-					<a href="//twitter.com/maelfyn">
+					<a href="https://twitter.com/maelfyn">
 						<i class="fa fa-twitter text-primary pointer"></i>
 					</a>
 				</div>
@@ -155,7 +196,7 @@
 								<img class="neverworks" src="img2/neverworks-txt.png" alt="Neverworks Games">
 								<hr class="fancy-hr-dark">
 							</h1>
-							<img id="ng2-logo" src="img2/ng_logo_532x428.png">
+							<img id="ng2-logo" src="img2/nevergrind.png">
 
 							<section>
 								<div>Our Other HTML5 Games</div>
@@ -169,14 +210,14 @@
 								<div>Nevergrind Links</div>
 								<div>
 									<div>
-										<a href="/blog" title="Nevergrind News">Blog</a> |
+										<a href="https://nevergrind.com/blog" title="Nevergrind News">Blog</a> |
 										<a href="https://discord.gg/n2gp8rC" title="Nevergrind Discord Server">Discord</a> |
-										<a href="/wiki" title="Nevergrind Wiki">Wiki</a> |
-										<a href="/nevergrounds" title="Nevergrounds">Nevergrounds</a>
+										<a href="https://nevergrind.com/wiki" title="Nevergrind Wiki">Wiki</a> |
+										<a href="https://nevergrind.com/nevergrounds" title="Nevergrounds">Nevergrounds</a>
 									</div>
 									<div>
-										<a href="/store" title="Neverworks Store">Neverworks Store</a> |
-										<a href="/account" title="Manage Neverworks Account">Manage Account</a>
+										<a href="https://nevergrind.com/store" title="Neverworks Store">Neverworks Store</a> |
+										<a href="https://nevergrind.com/account" title="Manage Neverworks Account">Manage Account</a>
 									</div>
 								</div>
 							</section>
@@ -184,11 +225,11 @@
 							<section>
 								<div>Social Media</div>
 								<div>
-									<a href="//twitch.tv/maelfyn" title="Neverworks Games on Twitch">Twitch</a> |
-									<a href="//youtube.com/c/Maelfyn" title="Neverworks Games on YouTube">YouTube</a> |
+									<a href="https://twitch.tv/maelfyn" title="Neverworks Games on Twitch">Twitch</a> |
+									<a href="https://youtube.com/c/Maelfyn" title="Neverworks Games on YouTube">YouTube</a> |
 									<a href="https://discord.gg/n2gp8rC" title="Nevergrind Discord Server">Discord</a> |
-									<a href="//facebook.com/maelfyn" title="Neverworks Games on Facebook">Facebook</a> |
-									<a href="//twitter.com/maelfyn" title="Joe Leonard on Twitter">Twitter</a>
+									<a href="https://facebook.com/maelfyn" title="Neverworks Games on Facebook">Facebook</a> |
+									<a href="https://twitter.com/maelfyn" title="Joe Leonard on Twitter">Twitter</a>
 								</div>
 							</section>
 						</div>
@@ -562,6 +603,19 @@
 </main>
 
 <script src="js/libs/libs.min.js"></script>
+<script>
+	// kongregate
+	if (g.isServer) {
+		(function(d, s, id) {
+			var js, fjs = d.getElementsByTagName(s)[0];
+			js = d.createElement(s);
+			js.id = id;
+			js.src = "https://cdn1.kongregate.com/javascripts/kongregate_api.js";
+			fjs.parentNode.insertBefore(js, fjs);
+		}(document, 'script', 'Kongregate-OAuth'));
+	}
+</script>
+
 <script src="https://js.stripe.com/v2/"></script>
 
 <script>
@@ -569,113 +623,112 @@
 	// loginModal.php
 	sessionStorage.setItem('refer', location.pathname);
 	// FB SSO
-	window.fbAsyncInit = function() {
-		console.warn("fbAsyncInit called!");
-		FB.init({
-			appId: '737706186279455',
-			cookie: true,
-			xfbml: true,
-			version: 'v2.8'
-		});
-		FB.getLoginStatus(function(response) {
-			console.info('getLoginStatus response: ', response);
-			fbLoginCallback(response);
-		});
-		// only triggers upon login event
-		FB.Event.subscribe('auth.authResponseChange', function(response){
-			console.info('auth.authResponseChange ', response);
-			//response.status === 'connected' && fbLoginCallback(response);
-		});
+	if (g.isServer) {
+		window.fbAsyncInit = function () {
+			FB.init({
+				appId: '737706186279455',
+				cookie: true,
+				xfbml: true,
+				version: 'v2.8'
+			});
+			FB.getLoginStatus(function (response) {
+				fbLoginCallback(response);
+			});
+			// only triggers upon login event
+			FB.Event.subscribe('auth.authResponseChange', function (response) {
+				response.status === 'connected' && fbLoginCallback(response);
+			});
+		}
 	}
 	function checkLoginState() {
 		FB.getLoginStatus(function(response) {
-			console.info('checkLoginState ', response);
 			fbLoginCallback(response);
 		});
 	}
 	function fbLoginCallback(response){
-		if (response && response.status === 'connected') {
-			// Logged into your app and Facebook.
-			var token = response.authResponse.accessToken;
-			if (token){
-				console.info('Token: ', token);
-				loginAuthenticationLock = true;
-				FB.api('/me', {
-					fields: 'email'
-				}, function(response) {
-					console.info('FB authenticate request: ');
-					$.ajax({
-						type: 'POST',
-						url: '/php/master1.php',
-						data: {
-							run: 'authenticate',
-							facebookToken: token
-						}
-					}).done(function(data){
-						console.info('FB authenticate response: ', data);
-						if (data === 'Create an account name!'){
-							// redirect to
-							var to = '//nevergrind.com/setAccount.php';
-							window.location = to;
-						} else {
-							// it's coming out here for some reason
-							loginGotoRefer(data, undefined, 'fbLoginCallback');
-						}
-					}).fail(function(data) {
-						loginMsg(data.statusText);
-					}).always(function(){
-						loginAuthenticationLock = false;
+		if (g.isServer) {
+			if (response && response.status === 'connected') {
+				// Logged into your app and Facebook.
+				var token = response.authResponse.accessToken;
+				if (token) {
+					loginAuthenticationLock = true;
+					FB.api('/me', {
+						fields: 'email'
+					}, function (response) {
+						$.ajax({
+							type: 'POST',
+							url: g.loginUrl + '/php/master1.php',
+							data: {
+								run: 'authenticate',
+								facebookToken: token
+							}
+						}).done(function (data) {
+							if (data === 'Create an account name!') {
+								// redirect to
+								var to = 'https://nevergrind.com/setAccount.php';
+								window.location = to;
+							} else {
+								// it's coming out here for some reason
+								loginGotoRefer(data, undefined, 'fbLoginCallback');
+							}
+						}).fail(function (data) {
+							loginMsg(data.statusText);
+						}).always(function () {
+							loginAuthenticationLock = false;
+						});
 					});
-				});
-			} else {
-				console.info("No tokens found");
-				loginMsg("Facebook credentials could not be verified.");
+				} else {
+					loginMsg("Facebook credentials could not be verified.");
+				}
 			}
 		}
 	}
 
 	// google SSO
 	function loginRenderButton() {
-		gapi.load('auth2', function() {
-			gapi.auth2.init();
-			gapi.signin2.render('my-signin2', {
-				scope: 'profile email openid',
-				width: 240,
-				height: 40,
-				longtitle: true,
-				theme: 'dark',
-				onsuccess: function(googleUser){
-					var token = googleUser.getAuthResponse().id_token;
-					if (token){
-						loginAuthenticationLock = true;
-						$.ajax({
-							type: 'POST',
-							url: '/php/master1.php',
-							data: {
-								run: 'authenticate',
-								googleToken: token
-							}
-						}).done(function(data){
-							if (data === 'Create an account name!'){
-								// redirect to
-								var to = '//nevergrind.com/setAccount.php';
-								window.location = to;
-							} else {
-								// it's coming out here for some reason data === Login successful!
-								loginGotoRefer(data, undefined, 'loginRenderButton');
-							}
-						}).fail(function(data) {
-							loginMsg(data.statusText);
-						}).always(function(){
-							loginAuthenticationLock = false;
-						});
+		if (g.isServer || g.isApp) {
+			gapi.load('auth2', function () {
+				gapi.auth2.init();
+				gapi.signin2.render('my-signin2', {
+					scope: 'profile email openid',
+					width: 240,
+					height: 40,
+					longtitle: true,
+					theme: 'dark',
+					onsuccess: function (googleUser) {
+						var token = googleUser.getAuthResponse().id_token;
+						if (token) {
+							loginAuthenticationLock = true;
+							$.ajax({
+								type: 'POST',
+								url: g.loginUrl + '/php/master1.php',
+								data: {
+									run: 'authenticate',
+									googleToken: token
+								}
+							}).done(function (data) {
+								console.info('google login? ', data);
+								if (data === 'Create an account name!') {
+									// redirect to
+									var to = 'https://nevergrind.com/setAccount.php';
+									window.location = to;
+								} else {
+									// it's coming out here for some reason data === Login successful!
+									loginGotoRefer(data, undefined, 'loginRenderButton');
+								}
+							}).fail(function (data) {
+								loginMsg(data.statusText);
+							}).always(function () {
+								loginAuthenticationLock = false;
+							});
+						}
+					},
+					onfailure: function () {
+						console.log('error: ', error);
 					}
-				},
-				onfailure: function(){
-					console.log('error: ', error);
-				}
+				});
 			});
-		});
+		}
 	}
 
 	var loginFadeTimer = new TweenMax.delayedCall(0, '');;
@@ -687,7 +740,10 @@
 			onComplete: function(){
 				TweenMax.to('.error-msg', 1, {
 					delay: 8,
-					opacity: 0
+					opacity: 0,
+					onComplete: function(){
+						$(".error-msg").html('');
+					}
 				});
 			}
 		});
@@ -714,7 +770,7 @@
 		}
 		loginMsg("Checking account status...");
 		$.ajax({
-			url: '/php/master1.php',
+			url: g.loginUrl + '/php/master1.php',
 			data: {
 				run: "forgotPassword",
 				email: email
@@ -764,10 +820,9 @@
 		loginMsg("Connecting to server...");
 		loginAuthenticationLock = true;
 
-		console.info('loginAuthenticate request: ');
 		$.ajax({
 			type: 'POST',
-			url: '/php/master1.php',
+			url: g.loginUrl + '/php/master1.php',
 			data: {
 				run: 'authenticate',
 				email: login,
@@ -783,10 +838,9 @@
 		return false; // prevent form submission
 	}
 	function loginTokenAuthenticate(){
-		console.info("Token authenticate!");
 		$.ajax({
 			type: 'POST',
-			url: '/php/master1.php',
+			url: g.loginUrl + '/php/master1.php',
 			data: {
 				run: 'authenticate',
 				email: email,
@@ -799,9 +853,22 @@
 		});
 	}
 	function loginGotoRefer(data, suppress, origin){
-		var target = "//" + location.host + sessionStorage.getItem('refer') || '';
+		function redirect(){
+			if (g.isApp){
+				location.reload();
+			}
+			else {
+				if (sessionStorage.getItem('refer') === location.pathname) {
+					location.reload();
+				}
+				else {
+					location.replace(target);
+				}
+			}
+		}
+		var target = g.url + (sessionStorage.getItem('refer') || '');
 		if (data === 'Create an account name!'){
-			location.replace("//" + location.host + '/setAccount.php');
+			location.replace("https://nevergrind.com/setAccount.php");
 		} else if (data === "Login successful!"){
 			if (origin === 'loginRenderButton'){
 				$("#login-modal").remove();
@@ -809,7 +876,7 @@
 					if (g.initialized){
 						if (!my.account) {
 							// not logged in - Google SSO requires this
-							location.replace(target);
+							redirect();
 						}
 					}
 					else {
@@ -818,7 +885,7 @@
 				})();
 			}
 			else {
-				location.replace(target);
+				redirect();
 			}
 		} else {
 			if (!suppress){
@@ -835,87 +902,92 @@
 
 	// facebook
 	(function(d, s, id) {
-		var js, fjs = d.getElementsByTagName(s)[0];
-		js = d.createElement(s); js.id = id;
-		js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.10&appId=737706186279455";
-		fjs.parentNode.insertBefore(js, fjs);
+		if (g.isServer) {
+			var js, fjs = d.getElementsByTagName(s)[0];
+			js = d.createElement(s);
+			js.id = id;
+			js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.10&appId=737706186279455";
+			fjs.parentNode.insertBefore(js, fjs);
+		}
 	}(document, 'script', 'facebook-jssdk'));
 </script>
-
-
-<script src="//apis.google.com/js/platform.js?onload=loginRenderButton" async defer></script>
+<script src="https://apis.google.com/js/platform.js?onload=loginRenderButton" async defer></script>
 <script>
-	if(location.hostname!=="localhost"){
+	if (g.isServer || g.isApp) {
 		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 			(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
 			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+		})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 		ga('create', 'UA-35167620-1', 'auto');
 		ga('send', 'pageview');
+		if (g.isServer) {
+			document.getElementById('social-login-wrap').style.display = 'block';
+		}
 	}
-</script>
 
-<script>
 	// only try if not logged in
 	function notLoggedIn() {
 		$("#login-modal").css({
 			visibility: 'visible'
 		});
 
-		kongregateAPI.loadAPI(function () {
-			function loginKong() {
-				loginAuthenticationLock = true;
-				var kongGames = {
-					'/': 'ng', // TODO: this changes later
-					'/ng2-test-server/': 'ng2',
-					'/classic': 'ng',
-					'/games/firmament-wars/': 'fw'
-				};
-				var o = {
-					kongUserName: kongregate.services.getUsername(),
-					kongToken: kongregate.services.getGameAuthToken(),
-					kongGame: kongGames[location.pathname],
-					run: 'authenticate'
-				}
-				//console.info('kong creds: ', o);
-				$.ajax({
-					type: 'POST',
-					url: '/php/master1.php',
-					data: o
-				}).done(function (data) {
-					if (data === 'Create an account name!') {
-						// redirect to
-						var to = '//nevergrind.com/setAccount.php' + (sessionStorage.getItem('refer') || '');
-						window.location = to;
-					} else {
-						// it's coming out here for some reason
-						loginGotoRefer(data, undefined, 'loginKong');
+		if (g.isServer) {
+			kongregateAPI.loadAPI(function () {
+				function loginKong() {
+					loginAuthenticationLock = true;
+					var kongGames = {
+						'/': 'ng', // TODO: this changes later
+						'/ng2-test-server/': 'ng2',
+						'/classic': 'ng',
+						'/games/firmament-wars/': 'fw'
+					};
+					var o = {
+						kongUserName: kongregate.services.getUsername(),
+						kongToken: kongregate.services.getGameAuthToken(),
+						kongGame: kongGames[location.pathname],
+						run: 'authenticate'
 					}
-				}).fail(function (data) {
-					loginMsg(data.statusText);
-				}).always(function () {
-					loginAuthenticationLock = false;
-				});
-			}
 
-			kongregate = kongregateAPI.getAPI();
-			if (!kongregate.services.isGuest()) {
-				loginKong();
-			} else {
-				kongregate.services.addEventListener('login', function () {
+					$.ajax({
+						type: 'POST',
+						url: g.loginUrl + '/php/master1.php',
+						data: o
+					}).done(function (data) {
+						if (data === 'Create an account name!') {
+							// redirect to
+							var to = 'https://nevergrind.com/setAccount.php' + (sessionStorage.getItem('refer') || '');
+							window.location = to;
+						} else {
+							// it's coming out here for some reason
+							loginGotoRefer(data, undefined, 'loginKong');
+						}
+					}).fail(function (data) {
+						loginMsg(data.statusText);
+					}).always(function () {
+						loginAuthenticationLock = false;
+					});
+				}
+
+				kongregate = kongregateAPI.getAPI();
+				if (!kongregate.services.isGuest()) {
 					loginKong();
-				});
-			}
-		});
+				} else {
+					kongregate.services.addEventListener('login', function () {
+						loginKong();
+					});
+				}
+			});
+		}
 	}
 
 	var chat = {
 		testing: 1234,
 		channel: "usa-1"
 	};
+
 	(function(d, s, x){
 
-		if (location.host === "localhost"){
+		if (location.hostname === 'localhost'){
 			x = ".js";
 			s = [
 				"init",
@@ -937,9 +1009,11 @@
 				"test"
 			]
 		}
+
 		for (var i=0, len=s.length; i<len; i++){
 			var e = d.createElement("script");
-			e.src = "js/" + s[i] + x + "?v="+ g.version;
+			var js = "js/" + s[i] + x + "?v="+ g.version;
+			e.src = js;
 			e.async = false;
 			d.head.appendChild(e);
 		}

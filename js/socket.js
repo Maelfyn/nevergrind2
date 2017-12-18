@@ -39,7 +39,7 @@ var socket = {
 			if (channel !== my.channel){
 				$.ajax({
 					type: "POST",
-					url: "php/titleChangeChannel.php",
+					url: g.url + 'php/titleChangeChannel.php',
 					data: {
 						channel: channel
 					}
@@ -88,7 +88,7 @@ var socket = {
 					flag = flag[0].replace(/ /g, "-");
 					my.lastReceivedWhisper = data.account;
 					$.ajax({
-						url: 'php/insertWhisper.php',
+						url: g.url + 'php/insertWhisper.php',
 						data: {
 							action: "receive",
 							flag: data.flag,
@@ -151,7 +151,7 @@ var socket = {
 	enabled: false,
 	init: function(){
 		// is player logged in?
-		socket.zmq = new ab.Session('wss://' + location.hostname + '/wss2/', function(){
+		socket.zmq = new ab.Session('wss://' + g.socketUrl + '/wss2/', function(){
 			// on open
 			socket.connectionSuccess();
 		}, function(){

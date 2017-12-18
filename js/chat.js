@@ -19,7 +19,7 @@ chat = Object.assign(chat, {
 		var flag = my.flag.split(".");
 		flag = flag[0].replace(/ /g, "-");
 		$.ajax({
-			url: 'php/insertWhisper.php',
+			url: g.url + 'php/insertWhisper.php',
 			data: {
 				account: account,
 				flag: flag,
@@ -78,7 +78,7 @@ chat = Object.assign(chat, {
 						// skip
 					} else {
 						$.ajax({
-							url: 'php/insertTitleChat.php',
+							url: g.url + 'php/insertTitleChat.php',
 							data: {
 								message: msg
 							}
@@ -263,7 +263,7 @@ chat = Object.assign(chat, {
 		g.chat('<div>Checking friends list...</div>');
 		if (g.friends.length){
 			$.ajax({
-				url: 'php/friendStatus.php',
+				url: g.url + 'php/friendStatus.php',
 				data: {
 					friends: g.friends
 				}
@@ -304,7 +304,7 @@ chat = Object.assign(chat, {
 		g.friends = [];
 		$.ajax({
 			type: 'GET',
-			url: 'php/friendGet.php',
+			url: g.url + 'php/friendGet.php',
 		}).done(function(data){
 			data.friends.forEach(function(friend){
 				g.friends.push(friend);
@@ -316,7 +316,7 @@ chat = Object.assign(chat, {
 		if (account !== my.account){
 			console.info('toggle: ', account, account.length);
 			$.ajax({
-				url: 'php/friendToggle.php',
+				url: g.url + 'php/friendToggle.php',
 				data: {
 					account: account
 				}
@@ -379,7 +379,7 @@ chat = Object.assign(chat, {
 	who: function(msg){
 		var a = msg.split("/who ");
 		$.ajax({
-			url: 'php/whoUser.php',
+			url: g.url + 'php/whoUser.php',
 			data: {
 				account: a[1]
 			}
@@ -448,7 +448,7 @@ chat = Object.assign(chat, {
 	},
 	broadcast: function(msg){
 		$.ajax({
-			url: 'php/insertBroadcast.php',
+			url: g.url + 'php/insertBroadcast.php',
 			data: {
 				message: msg
 			}
@@ -456,7 +456,7 @@ chat = Object.assign(chat, {
 	},
 	url: function(url){
 		$.ajax({
-			url: 'php/insertUrl.php',
+			url: g.url + 'php/insertUrl.php',
 			data: {
 				url: url
 			}
@@ -464,7 +464,7 @@ chat = Object.assign(chat, {
 	},
 	img: function(url){
 		$.ajax({
-			url: 'php/insertImg.php',
+			url: g.url + 'php/insertImg.php',
 			data: {
 				url: url
 			}
@@ -472,7 +472,7 @@ chat = Object.assign(chat, {
 	},
 	video: function(url){
 		$.ajax({
-			url: 'php/insertVideo.php',
+			url: g.url + 'php/insertVideo.php',
 			data: {
 				url: url
 			}
@@ -480,7 +480,7 @@ chat = Object.assign(chat, {
 	},
 	fwpaid: function(msg){
 		$.ajax({
-			url: 'php/fwpaid.php',
+			url: g.url + 'php/fwpaid.php',
 			data: {
 				message: msg
 			}

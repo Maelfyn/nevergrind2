@@ -16,9 +16,15 @@
 <html lang="en">
 <head>
 	<title>Nevergrind | Set Account Name</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel='stylesheet' type='text/css' href="/css/global.css">
-	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+	<meta name="viewport"
+		  content="width=device-width, initial-scale=1.0">
+	<link rel='stylesheet'
+		  type='text/css'
+		  href="/css/global.css">
+	<link rel="stylesheet"
+		  href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+		  integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7"
+		  crossorigin="anonymous">
 	<?php
 		include($_SERVER['DOCUMENT_ROOT'] . "/includes/head.html");
 	?>
@@ -139,12 +145,15 @@ echo
 					account: account
 				}
 			}).done(function(data){
-				//console.info("OK ", data);
 				setError('');
 				var target = "//" + location.host + (sessionStorage.getItem('refer') || '');
-				location.replace(target);
+				if (sessionStorage.getItem('refer') === location.pathname){
+					location.reload();
+				}
+				else {
+					location.replace(target);
+				}
 			}).fail(function(data){
-				console.info("FAIL ", data);
 				QMsg("");
 				setError(data.statusText);
 			}).always(function(){

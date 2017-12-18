@@ -58,12 +58,12 @@ var payment = {
             g.lock();
             g.msg("Communicating with the server...");
             $.ajax({
-                url: 'php2/payment/unlockGame.php',
+                url: g.url + 'php2/payment/unlockGame.php',
                 data: {
                     stripeToken: response.id
                 }
             }).done(function(data) {
-                g.msg("You have unlocked the full game: Nevergrind Online<br>Thanks for your support!");
+                g.msg("You have unlocked the full game: Nevergrind 2<br>Thanks for your support!");
                 console.info(data);
                 modal.hide();
             }).fail(function(r) {

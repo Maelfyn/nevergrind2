@@ -34,7 +34,38 @@
 	*/
 </script>
 
+I am trying to convert my web game into a desktop app. Everything works except for the session data. I got websockets, images, audio, and all of that working. Great! But when I try to authenticate, it POSTs to the web server just fine, returns a successful authentication, and attempts to reload the page. However, upon page reload, the subsequent AJAX requests cannot get any of the $_SESSION values again.
+
+I was able to find my PHPSESSID using win.cookies.getAll inside of the nw.js app, but I don't see how this helps me at all. Normally this is automatic when loading the webpage from the server. How do I fix this?
+
 <?php
+header('Content-Type: application/json');
+if (session_status() === PHP_SESSION_NONE) {
+	if (isset($_POST['session_id']) && strlen($_POST['session_id'])) {
+		session_id($_POST['session_id']);
+	}
+	session_start();
+	session_set_cookie_params(86400);
+	ini_set('session.gc_maxlifetime', 86400);
+}
+require 'db.php';
+$r = [];
+$empty = empty($_SESSION['account']);
+$r['account'] = $empty ? '' : $_SESSION['account'];
+
+$r['empty'] = $empty;
+if ($empty) {
+	// no account data
+} else {
+	require 'create/loadAllCharacters.php';
+}
+$r['random'] = mt_rand(0,100);
+
+echo json_encode($r);
+
+
+
+
 	session_start();
 	// database examples
 

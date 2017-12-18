@@ -289,7 +289,7 @@ golem
 treant redo
 spider
 wolf
-rat
+rat redo
 snake
 dragonkin
 hydra

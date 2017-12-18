@@ -1,6 +1,7 @@
 
 const gulp = require('gulp');
 // var minifyHTML = require('gulp-minify-html'); // Minify HTML
+var clean = require('gulp-rimraf'); // delete folder contents
 var cleanCSS = require('gulp-clean-css'); // Minify the CSS
 var stripDebug = require('gulp-strip-debug'); // Remove debugging stuffs
 var concat = require('gulp-concat'); // Join all JS files together to save space
@@ -83,7 +84,7 @@ return gulp.src([
 ])
 .pipe(concat('nevergrind-online.js'))
 .pipe(gulp.dest('./js'))
-.pipe(stripDebug())
+//.pipe(stripDebug())
 .pipe(uglify())
 .pipe(rename('nevergrind-online.min.js'))
 .pipe(gulp.dest('./js'));
@@ -106,26 +107,71 @@ gulp.task('minify-png', function(){
 });
 
 gulp.task('minify-css', function(){
-    gulp.src([
-        './css/ng2.css'
-    ])
-        .pipe(cleanCSS({compatibility: 'ie8'}))
-        .pipe(rename('ng2.min.css'))
-        .pipe(gulp.dest('./css'));
+	gulp.src([
+		'./css/ng2.css'
+	])
+		.pipe(cleanCSS({compatibility: 'ie8'}))
+		.pipe(rename('ng2.min.css'))
+		.pipe(gulp.dest('./css'));
 
-    gulp.src([
-        './classic/css/nevergrind.css'
-    ])
-        .pipe(cleanCSS({compatibility: 'ie8'}))
-        .pipe(rename('nevergrind.min.css'))
-        .pipe(gulp.dest('./classic/css'));
+	gulp.src([
+		'./classic/css/nevergrind.css'
+	])
+		.pipe(cleanCSS({compatibility: 'ie8'}))
+		.pipe(rename('nevergrind.min.css'))
+		.pipe(gulp.dest('./classic/css'));
 
-    gulp.src([
-        './games/firmament-wars/css/firmament-wars.css'
-    ])
-        .pipe(cleanCSS({compatibility: 'ie8'}))
-        .pipe(rename('firmament-wars.min.css'))
-        .pipe(gulp.dest('./games/firmament-wars/css'));
+	gulp.src([
+		'./games/firmament-wars/css/firmament-wars.css'
+	])
+		.pipe(cleanCSS({compatibility: 'ie8'}))
+		.pipe(rename('firmament-wars.min.css'))
+		.pipe(gulp.dest('./games/firmament-wars/css'));
+});
+
+gulp.task('clean', [], function(){
+	console.info("Cleaning out build directory...");
+
+	return gulp.src("./build/*", { read: false }).pipe(clean());
+})
+
+gulp.task('build-ng2', [
+	'minify-css',
+	'minify-js',
+	'clean'], function(){
+	// move app files
+	gulp.src([
+		'./index.html',
+		'./package.json'
+	]).pipe(gulp.dest('./build'));
+
+	gulp.src([
+		'./css/**/*.*'
+	]).pipe(gulp.dest('./build/css'));
+
+	gulp.src([
+		'./fonts/*.*'
+	]).pipe(gulp.dest('./build/fonts'));
+
+	gulp.src([
+		'./js/**/*.*'
+	]).pipe(gulp.dest('./build/js'));
+
+	gulp.src([
+		'./sound/*.*'
+	]).pipe(gulp.dest('./build/sound'));
+
+	gulp.src([
+		'./music/*.*'
+	]).pipe(gulp.dest('./build/music'));
+
+	gulp.src([
+		'./img2/*.*'
+	]).pipe(gulp.dest('./build/img2'));
+
+	gulp.src([
+		'./mobs/*.*'
+	]).pipe(gulp.dest('./build/mobs'));
 });
 
 gulp.task('default', function(){

@@ -64,7 +64,7 @@ var modal = {
 	header: function(e){
 		var z = {
 			deleteCharacter: '<div id="modal-header">Delete '+ create.name +'?</div>',
-			unlockGame: '<div id="modal-header">$5 to purchase Nevergrind Online?</div>',
+			unlockGame: '<div id="modal-header">$5 to purchase Nevergrind 2?</div>',
 		}
 		return z[e.camelKey];
 	},
@@ -76,7 +76,7 @@ var modal = {
 			'</div>',
 			unlockGame:
 			'<div id="modal-body">'+
-				'<p>Purchasing Nevergrind Online unlocks:</p>'+
+				'<p>Purchasing Nevergrind 2 unlocks:</p>'+
 				'<div id="unlock-game-perks">'+
 					'<div>8 character slots!</div>'+
 					'<div>32-slot inventory per character!</div>'+

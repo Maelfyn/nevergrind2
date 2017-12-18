@@ -163,7 +163,7 @@ var create = {
 				f.shortJob = g.toJobShort(f.job);
 				// send to server
 				$.ajax({
-					url: 'php2/create/create-character.php',
+					url: g.url + 'php2/create/create-character.php',
 					data: {
 						form: f
 					}
@@ -190,7 +190,7 @@ var create = {
 		if (!g.locked){
 			g.lock();
 			$.ajax({
-				url: 'php2/create/delete-character.php',
+				url: g.url + 'php2/create/delete-character.php',
 				data: {
 					row: create.selected
 				}
@@ -653,7 +653,7 @@ g = Object.assign(g, {
 	ignore: [],
 	joinedGame: false,
 	searchingGame: false,
-	defaultTitle: 'Nevergrind Online',
+	defaultTitle: 'Nevergrind 2',
 	titleFlashing: false,
 	name: "",
 	password: "",
@@ -711,7 +711,7 @@ g = Object.assign(g, {
 				data.longitude += '';
 				g.geo = data;
 				$.ajax({
-					url: 'php/updateUserInfo.php',
+					url: g.url + 'php/updateUserInfo.php',
 					data: {
 						location: g.geo
 					}
@@ -763,7 +763,7 @@ g = Object.assign(g, {
 	keepAlive: function(){
 		$.ajax({
 			type: 'GET',
-			url: "php/keepAlive.php"
+			url: g.url + "php/keepAlive.php"
 		}).always(function() {
 			setTimeout(g.keepAlive, 120000);
 		});
@@ -871,7 +871,7 @@ g = Object.assign(g, {
 		socket.removePlayer(my.account);
 		$.ajax({
 			type: 'GET',
-			url: 'php/deleteFromFwtitle.php'
+			url: g.url + 'php/deleteFromFwtitle.php'
 		});
 		
 		try {
@@ -893,7 +893,7 @@ g = Object.assign(g, {
 		setTimeout(function(){
 			$.ajax({
 				type: 'GET',
-				url: 'php/logout.php'
+				url: g.url + 'php/logout.php'
 			}).done(function(data) {
 				g.msg("Logout successful");
 				localStorage.removeItem('email');
@@ -944,7 +944,7 @@ g = Object.assign(g, {
 		
 		$.ajax({
 			type: 'GET',
-			url: 'php2/create/getStatMap.php'
+			url: g.url + 'php2/create/getStatMap.php'
 		}).done(function(r){
 			var r = r.statMap;
 			g.races.forEach(function(v){
@@ -961,21 +961,21 @@ g = Object.assign(g, {
 	},
 	initGame: function(){
 		$.ajax({
-			type: 'GET',
-			url: 'php2/initGame.php'
+			type: 'POST',
+			url: g.url + 'php2/initGame.php'
 		}).done(function(r){
+			console.info("response: ", r);
+			g.initialized = 1;
 			if (r.account) {
-				console.info("Data: ", r);
 				my.account = r.account;
 				document.getElementById('logout').textContent = 'Logout ' + r.account;
 				g.displayAllCharacters(r.characterData);
 				g.checkPlayerData();
-				$("#login-modal").remove();
+				document.getElementById('login-modal').style.display = 'none';
 			}
 			else {
 				notLoggedIn();
 			}
-			g.initialized = 1;
 			document.getElementById('version').textContent = 'Version ' + g.version;
 		});
 	},
@@ -1078,7 +1078,7 @@ my = Object.assign(my, {
 		if (r || bypass || g.view !== 'game'){
 			g.lock(1);
 			$.ajax({
-				url: 'php/exitGame.php',
+				url: g.url + 'php/exitGame.php',
 				data: {
 					view: g.view
 				}
@@ -1165,7 +1165,7 @@ var modal = {
 	header: function(e){
 		var z = {
 			deleteCharacter: '<div id="modal-header">Delete '+ create.name +'?</div>',
-			unlockGame: '<div id="modal-header">$5 to purchase Nevergrind Online?</div>',
+			unlockGame: '<div id="modal-header">$5 to purchase Nevergrind 2?</div>',
 		}
 		return z[e.camelKey];
 	},
@@ -1177,7 +1177,7 @@ var modal = {
 			'</div>',
 			unlockGame:
 			'<div id="modal-body">'+
-				'<p>Purchasing Nevergrind Online unlocks:</p>'+
+				'<p>Purchasing Nevergrind 2 unlocks:</p>'+
 				'<div id="unlock-game-perks">'+
 					'<div>8 character slots!</div>'+
 					'<div>32-slot inventory per character!</div>'+
@@ -1343,6 +1343,7 @@ var audio = {
 		dom.bgmusic.onended = function(){
 			audio.gameMusicPlayNext();
 		}
+		console.info("PLAYING: ", nowPlaying);
 	},
 	fade: function(){
 		var x = {
@@ -1443,6 +1444,7 @@ audio.init = (function(){
 	}
 	initComplete = true;
 })();
+//audio.gameMusicInit();
 // game specific data
 var game = {
 	name: '',
@@ -1478,7 +1480,7 @@ var game = {
 		// or check that players are still online?
 		$.ajax({
 			type: 'GET',
-			url: "php/getGameState.php"
+			url: g.url + 'php/getGameState.php'
 		}).done(function(data){
 			console.info('getGameState ', data);
 			// get tile data
@@ -1496,7 +1498,7 @@ var title = {
 		e.innerHTML = '';
 		g.lock();
 		$.ajax({
-			url: 'php/leaderboard.php',
+			url: g.url + 'php/leaderboard.php',
 			data: {
 				type: type
 			}
@@ -1511,7 +1513,7 @@ var title = {
 			title.refreshTimer = Date.now();
 			$.ajax({
 				type: 'GET',
-				url: 'php/refreshGames.php'
+				url: g.url + 'php/refreshGames.php'
 			}).done(function(data) {
 				//console.info(data);
 				var e = document.getElementById('gameTableBody');
@@ -1563,10 +1565,6 @@ var title = {
 				title.sendMsg(true);
 			});
 			g.initGame();
-			// initial refresh of games
-			setTimeout(function(){
-				//title.refreshGames();
-			});
 			setTimeout(function(){
 				g.keepAlive();
 			}, 180000);
@@ -1585,7 +1583,7 @@ var title = {
 				if (g.view === 'title'){
 					$.ajax({
 						type: "POST",
-						url: "php/titleUpdate.php",
+						url: g.url + 'php/titleUpdate.php',
 						data: {
 							channel: my.channel
 						}
@@ -1826,7 +1824,7 @@ var title = {
 		g.teamMode = teamMode;
 		g.speed = speed;
 		$.ajax({
-			url: 'php/createGame.php',
+			url: g.url + 'php/createGame.php',
 			data: {
 				name: name,
 				pw: pw,
@@ -1864,7 +1862,7 @@ var title = {
 		g.lock();
 		audio.play('click');
 		$.ajax({
-			url: 'php/joinGame.php',
+			url: g.url + 'php/joinGame.php',
 			data: {
 				name: g.name,
 				password: g.password
@@ -2114,7 +2112,7 @@ var socket = {
 			if (channel !== my.channel){
 				$.ajax({
 					type: "POST",
-					url: "php/titleChangeChannel.php",
+					url: g.url + 'php/titleChangeChannel.php',
 					data: {
 						channel: channel
 					}
@@ -2163,7 +2161,7 @@ var socket = {
 					flag = flag[0].replace(/ /g, "-");
 					my.lastReceivedWhisper = data.account;
 					$.ajax({
-						url: 'php/insertWhisper.php',
+						url: g.url + 'php/insertWhisper.php',
 						data: {
 							action: "receive",
 							flag: data.flag,
@@ -2226,7 +2224,7 @@ var socket = {
 	enabled: false,
 	init: function(){
 		// is player logged in?
-		socket.zmq = new ab.Session('wss://' + location.hostname + '/wss2/', function(){
+		socket.zmq = new ab.Session('wss://' + g.socketUrl + '/wss2/', function(){
 			// on open
 			socket.connectionSuccess();
 		}, function(){
@@ -2297,7 +2295,7 @@ chat = Object.assign(chat, {
 		var flag = my.flag.split(".");
 		flag = flag[0].replace(/ /g, "-");
 		$.ajax({
-			url: 'php/insertWhisper.php',
+			url: g.url + 'php/insertWhisper.php',
 			data: {
 				account: account,
 				flag: flag,
@@ -2356,7 +2354,7 @@ chat = Object.assign(chat, {
 						// skip
 					} else {
 						$.ajax({
-							url: 'php/insertTitleChat.php',
+							url: g.url + 'php/insertTitleChat.php',
 							data: {
 								message: msg
 							}
@@ -2541,7 +2539,7 @@ chat = Object.assign(chat, {
 		g.chat('<div>Checking friends list...</div>');
 		if (g.friends.length){
 			$.ajax({
-				url: 'php/friendStatus.php',
+				url: g.url + 'php/friendStatus.php',
 				data: {
 					friends: g.friends
 				}
@@ -2582,7 +2580,7 @@ chat = Object.assign(chat, {
 		g.friends = [];
 		$.ajax({
 			type: 'GET',
-			url: 'php/friendGet.php',
+			url: g.url + 'php/friendGet.php',
 		}).done(function(data){
 			data.friends.forEach(function(friend){
 				g.friends.push(friend);
@@ -2594,7 +2592,7 @@ chat = Object.assign(chat, {
 		if (account !== my.account){
 			console.info('toggle: ', account, account.length);
 			$.ajax({
-				url: 'php/friendToggle.php',
+				url: g.url + 'php/friendToggle.php',
 				data: {
 					account: account
 				}
@@ -2657,7 +2655,7 @@ chat = Object.assign(chat, {
 	who: function(msg){
 		var a = msg.split("/who ");
 		$.ajax({
-			url: 'php/whoUser.php',
+			url: g.url + 'php/whoUser.php',
 			data: {
 				account: a[1]
 			}
@@ -2726,7 +2724,7 @@ chat = Object.assign(chat, {
 	},
 	broadcast: function(msg){
 		$.ajax({
-			url: 'php/insertBroadcast.php',
+			url: g.url + 'php/insertBroadcast.php',
 			data: {
 				message: msg
 			}
@@ -2734,7 +2732,7 @@ chat = Object.assign(chat, {
 	},
 	url: function(url){
 		$.ajax({
-			url: 'php/insertUrl.php',
+			url: g.url + 'php/insertUrl.php',
 			data: {
 				url: url
 			}
@@ -2742,7 +2740,7 @@ chat = Object.assign(chat, {
 	},
 	img: function(url){
 		$.ajax({
-			url: 'php/insertImg.php',
+			url: g.url + 'php/insertImg.php',
 			data: {
 				url: url
 			}
@@ -2750,7 +2748,7 @@ chat = Object.assign(chat, {
 	},
 	video: function(url){
 		$.ajax({
-			url: 'php/insertVideo.php',
+			url: g.url + 'php/insertVideo.php',
 			data: {
 				url: url
 			}
@@ -2758,7 +2756,7 @@ chat = Object.assign(chat, {
 	},
 	fwpaid: function(msg){
 		$.ajax({
-			url: 'php/fwpaid.php',
+			url: g.url + 'php/fwpaid.php',
 			data: {
 				message: msg
 			}
@@ -2825,12 +2823,12 @@ var payment = {
             g.lock();
             g.msg("Communicating with the server...");
             $.ajax({
-                url: 'php2/payment/unlockGame.php',
+                url: g.url + 'php2/payment/unlockGame.php',
                 data: {
                     stripeToken: response.id
                 }
             }).done(function(data) {
-                g.msg("You have unlocked the full game: Nevergrind Online<br>Thanks for your support!");
+                g.msg("You have unlocked the full game: Nevergrind 2<br>Thanks for your support!");
                 console.info(data);
                 modal.hide();
             }).fail(function(r) {

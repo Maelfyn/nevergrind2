@@ -98,6 +98,7 @@ var audio = {
 		dom.bgmusic.onended = function(){
 			audio.gameMusicPlayNext();
 		}
+		console.info("PLAYING: ", nowPlaying);
 	},
 	fade: function(){
 		var x = {
@@ -198,3 +199,4 @@ audio.init = (function(){
 	}
 	initComplete = true;
 })();
+//audio.gameMusicInit();

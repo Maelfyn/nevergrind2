@@ -152,7 +152,7 @@ var create = {
 				f.shortJob = g.toJobShort(f.job);
 				// send to server
 				$.ajax({
-					url: 'php2/create/create-character.php',
+					url: g.url + 'php2/create/create-character.php',
 					data: {
 						form: f
 					}
@@ -179,7 +179,7 @@ var create = {
 		if (!g.locked){
 			g.lock();
 			$.ajax({
-				url: 'php2/create/delete-character.php',
+				url: g.url + 'php2/create/delete-character.php',
 				data: {
 					row: create.selected
 				}
