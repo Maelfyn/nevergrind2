@@ -92,8 +92,8 @@ return gulp.src([
 });
 
 gulp.task('minify-png', function(){
-	var img = 'barghest';
-	return imagemin(['./mobs-huge/'+ img +'.png'], './mobs/', {
+	var img = 'balrog';
+	return imagemin(['./mobs-huge/'+ img +'/*'], './mobs/'+ img +'/', {
 		use: [imageminPngquant({
 			floyd: 1,
 			nofs: true, // disable FS
@@ -142,7 +142,8 @@ gulp.task('build-ng2', [
 	// move app files
 	gulp.src([
 		'./index.html',
-		'./package.json'
+		'./package.json',
+		'./nwjs/**/*'
 	]).pipe(gulp.dest('./build'));
 
 	gulp.src([
@@ -173,6 +174,20 @@ gulp.task('build-ng2', [
 		'./mobs/*.*'
 	]).pipe(gulp.dest('./build/mobs'));
 });
+
+gulp.task("build-icon", function(){
+
+	require('winresourcer')({
+		operation: "Update",
+		exeFile: "./build/nw.exe",
+		resourceType: "Icongroup",
+		resourceName: "IDR_MAINFRAME",
+		lang: 1033,
+		resourceFile: "./build/img2/desktop.ico"
+	}, function(error){
+		//stuff
+	});
+})
 
 gulp.task('default', function(){
 	gulp.run('minify-css', 'minify-js');

@@ -282,6 +282,14 @@ WIZ		250			250			250
 13 Ashenflow Peak
 
 == MOBS ==
+$files = Get-ChildItem D:\xampp\htdocs\mobs-huge\balrog\*; $id = 1; $files | foreach { Rename-Item -Path $_.fullname -NewName (($id++).tostring() + $_.extension) }
+animate with 105 frames:
+5 idle
+10 hit
+20 attack 1
+20 attack 2
+20 special
+30 death
 
 balrog redo
 beholder redo
