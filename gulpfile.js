@@ -82,11 +82,11 @@ return gulp.src([
 './js/test.js',
 './js/endWrap.js'
 ])
-.pipe(concat('nevergrind-online.js'))
+.pipe(concat('nevergrind-2.js'))
 .pipe(gulp.dest('./js'))
 //.pipe(stripDebug())
 .pipe(uglify())
-.pipe(rename('nevergrind-online.min.js'))
+.pipe(rename('nevergrind-2.min.js'))
 .pipe(gulp.dest('./js'));
 
 });
