@@ -9,6 +9,8 @@ var uglify = require('gulp-uglify'); // Minify JavaScript
 var rename = require('gulp-rename');
 var imagemin = require('imagemin');
 var imageminPngquant = require('imagemin-pngquant');
+var fs = require('fs');
+var resizeImg = require('resize-img');
 
 gulp.task('minify-ng-classic-js', function(){
 // classic NG
@@ -106,6 +108,16 @@ gulp.task('minify-png', function(){
 	});
 });
 
+gulp.task('resize-png', function(){
+	var img = 'balrog';
+	resizeImg(fs.readFileSync('./mobs/'+ img +'/*'), {
+		width: 850,
+		height: 500
+	}).then(function(buf){
+		fs.writeFileSync('./mobs/' + img + '/mobile/', buf);
+	})
+});
+
 gulp.task('minify-css', function(){
 	gulp.src([
 		'./css/ng2.css'
@@ -131,14 +143,16 @@ gulp.task('minify-css', function(){
 
 gulp.task('clean', [], function(){
 	console.info("Cleaning out build directory...");
-
-	return gulp.src("./build/*", { read: false }).pipe(clean());
+	return gulp.src("./build/*", {
+		read: false
+	}).pipe(clean());
 })
 
 gulp.task('build-ng2', [
 	'minify-css',
 	'minify-js',
-	'clean'], function(){
+	'clean'
+], function(){
 	// move app files
 	gulp.src([
 		'./index.html',
@@ -176,7 +190,7 @@ gulp.task('build-ng2', [
 });
 
 gulp.task("build-icon", function(){
-
+	// I think I used resource hacker instead?
 	require('winresourcer')({
 		operation: "Update",
 		exeFile: "./build/nw.exe",

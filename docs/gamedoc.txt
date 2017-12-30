@@ -282,6 +282,109 @@ WIZ		250			250			250
 13 Ashenflow Peak
 
 == MOBS ==
+1 Salubrin Forest
+    spider
+    rat
+    snake
+    wolf
+
+2 Tendolin Meadows
+    spider
+    rat
+    snake
+    boar
+
+3 Greenthorn Cavern
+    hobgoblin
+
+4 Riven Grotto
+    ghoul
+    mummy
+    skeleton
+    zombie
+    giant bat
+
+5 Lanfeld Outpost
+    orc
+    dark orc
+    dark elf
+
+
+6 Braxxen's Bastille
+    goblin
+    barghest
+    dark elf
+    stone golem
+    basilisk
+
+7 Kordata Plains
+    aviaks???
+    centaur???
+    elephant
+    hippo
+    lion
+    rhino
+    zebra?
+    unicorn
+
+8 Arcturin's Crypt
+    fungoid
+    ghoul
+    mummy
+    skeleton
+    zombie
+
+
+9 Temple of Prenssor
+    dragonkin
+    lizardman
+    golem
+    crocodile
+
+10 Fahlnir Citadel
+    werewolf
+    vampire
+    revenant
+    witch
+    gargoyle
+
+11 Sylong Mountains
+    minotaur
+    grizzly bear
+    treant
+    chimera
+    griffon
+    harpy
+    manticore
+    gorgon
+
+
+12 Kordata Ruins
+    crab
+    stingray?
+    scorpion
+    fungoid
+    weretoad/WERANGLERFISH?
+
+
+13 Galeblast Fortress
+    blue goblin
+    polar bear
+    wolf
+    ice golem
+    blue cyclops
+    blue dragon
+
+14 Ashenflow Peak
+    imp
+    kobold
+    balrog
+    cerberus
+    phoenix
+    red cyclops
+    red dragon
+
+
 $files = Get-ChildItem D:\xampp\htdocs\mobs-huge\balrog\*; $id = 1; $files | foreach { Rename-Item -Path $_.fullname -NewName (($id++).tostring() + $_.extension) }
 animate with 105 frames:
 5 idle

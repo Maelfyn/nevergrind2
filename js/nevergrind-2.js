@@ -2896,7 +2896,7 @@ var mob = {
 		e.id = 'sprite';
 		e.style.position = 'absolute';
 		e.style.bottom = '0%';
-		e.style.left = '0%';
+		e.style.left = '-25%';
 		e.style.pointerEvents = 'none';
 		e.style.width = mob.images[mob.lastKey].width + 'px';
 		e.style.height = mob.images[mob.lastKey].height + 'px';
@@ -2930,7 +2930,7 @@ var mob = {
 			yoyo: true,
 			repeat: -1,
 			repeatDelay: .06,
-			ease: Linear.easeNone,
+			ease: Sine.easeOut,
 			onUpdate: function(){
 				mob.setSrc(mob.lastKey, mob.frame);
 			}
@@ -2949,7 +2949,7 @@ var mob = {
 			frame: 15,
 			yoyo: true,
 			repeat: 1,
-			ease: Linear.easeNone,
+			ease: Quad.easeOut,
 			onUpdate: function(){
 				mob.setSrc(mob.lastKey, mob.frame);
 			},
@@ -2969,7 +2969,7 @@ var mob = {
 		var tl = g.TM(),
 			foo = force ? force : !Math.round(Math.random()) ? 1 : 2;
 		mob.frame = foo === 1 ? 16 : 36;
-		tl.to(mob, .5, {
+		tl.to(mob, .7, {
 			overwrite: 1,
 			frame: mob.frame + 19,
 			ease: Linear.easeNone,
@@ -2998,7 +2998,7 @@ var mob = {
 		mob.animationActive = 1;
 		mob.frame = 56;
 		var tl = g.TM();
-		tl.to(mob, .5, {
+		tl.to(mob, .6, {
 			overwrite: 1,
 			frame: mob.frame + 19,
 			ease: Linear.easeNone,
@@ -3023,7 +3023,7 @@ var mob = {
 		mob.deathState = 1;
 		mob.animationActive = 1;
 		var tl = g.TM();
-		tl.to(mob, .75, {
+		tl.to(mob, 1, {
 			overwrite: 1,
 			frame: mob.frame + 29,
 			ease: Quad.easeIn,
