@@ -94,7 +94,7 @@ return gulp.src([
 });
 
 gulp.task('minify-png', function(){
-	var img = 'balrog';
+	var img = 'cyclops';
 	return imagemin(['./mobs-huge/'+ img +'/*'], './mobs/'+ img +'/', {
 		use: [imageminPngquant({
 			floyd: 1,
@@ -104,7 +104,7 @@ gulp.task('minify-png', function(){
 		})
 		]
 	}).then(function(){
-		console.info("Image(s) minified with quant!")
+		console.info("Images minified with quant: " + img)
 	});
 });
 

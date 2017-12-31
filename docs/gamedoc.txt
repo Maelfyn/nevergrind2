@@ -338,7 +338,7 @@ WIZ		250			250			250
 9 Temple of Prenssor
     dragonkin
     lizardman
-    golem
+    clay golem
     crocodile
 
 10 Fahlnir Citadel
@@ -394,13 +394,13 @@ animate with 105 frames:
 20 special
 30 death
 
-balrog redo
-beholder redo
+balrog
+beholder
 golem
-treant redo
+treant
 spider
 wolf
-rat redo
+rat
 snake
 dragonkin
 hydra
@@ -421,9 +421,9 @@ ogre
 orc
 troll
 chimera
-griffon redo
+griffon
 harpy redo
-manticore redo
+manticore
 werewolf
 
 automaton

@@ -3,67 +3,193 @@ var mob = {
 	test: 1,
 	images: {
 		'balrog': {
-			w: 1700,
+			w: 2000,
+			h: 1200,
+			yFloor: 25,
+			yoyo: true,
+			cache: []
+		},
+		'ice golem': {
+			w: 1200,
+			h: 1000,
+			yFloor: 25,
+			yoyo: false,
+			cache: []
+		},
+		'stone golem': {
+			w: 1200,
+			h: 1000,
+			yFloor: 25,
+			yoyo: false,
+			cache: []
+		},
+		'clay golem': {
+			w: 1200,
+			h: 1000,
+			yFloor: 25,
+			yoyo: false,
+			cache: []
+		},
+		'treant': {
+			w: 1100,
+			h: 1000,
+			yFloor: 25,
+			yoyo: false,
+			cache: []
+		},
+		'spider': {
+			w: 1000,
+			h: 1000,
+			yFloor: 25,
+			yoyo: false,
+			cache: []
+		},
+		'wolf': {
+			w: 900,
+			h: 1000,
+			yFloor: 25,
+			yoyo: false,
+			cache: []
+		},
+		'rat': {
+			w: 1100,
+			h: 1000,
+			yFloor: 25,
+			yoyo: false,
+			cache: []
+		},
+		'snake': {
+			w: 1000,
+			h: 1000,
+			yFloor: 25,
+			yoyo: false,
+			cache: []
+		},
+		'dragonkin': {
+			w: 900,
+			h: 1000,
+			yFloor: 25,
+			yoyo: false,
+			cache: []
+		},
+		'lizardman': {
+			w: 1100,
 			h: 1000,
 			yFloor: 25,
 			yoyo: true,
 			cache: []
+		},
+		'dragon': {
+			w: 2000,
+			h: 1500,
+			yFloor: 25,
+			yoyo: true,
+			cache: []
+		},
+		'ghoul': {
+			w: 900,
+			h: 1000,
+			yFloor: 25,
+			yoyo: true,
+			cache: []
+		},
+		'mummy': {
+			w: 800,
+			h: 1000,
+			yFloor: 25,
+			yoyo: false,
+			cache: []
+		},
+		'skeleton': {
+			w: 900,
+			h: 1000,
+			yFloor: 25,
+			yoyo: false,
+			cache: []
+		},
+		'zombie': {
+			w: 900,
+			h: 1000,
+			yFloor: 25,
+			yoyo: true,
+			cache: []
+		},
+		'vampire': {
+			w: 1000,
+			h: 1000,
+			yFloor: 25,
+			yoyo: true,
+			cache: []
+		},
+		'cyclops': {
+			w: 1300,
+			h: 1100,
+			yFloor: 25,
+			yoyo: true,
+			cache: []
 		}
-		//'beholder',
-		//'golem',
-		//'treant',
-		//'spider',
-		//'wolf',
-		//'rat',
-		//'snake',
-		//'ghoul',
-		//'mummy',
-		//'skeleton',
-		//'zombie',
-		//'vampire',
-		//'goblin',
-		//'cyclops',
-		//'hobgoblin',
-		////'kobold',
-		//'ogre',
-		//'orc',
-		//'troll',
-		//'chimera',
-		//'griffon',
-		//'harpy',
-		//'manticore',
-		//'werewolf'
+		/* skipped mobs
+		beholder
+		wyvern
+		 */
 	},
 	imageKeys: 0,
-	imageIndex: 0,
+	index: 0,
 	cache: {},
 	count: 0,
 	preloadMob: function(type){
-		console.info("preloading ", type);
-		for (var i=1; i<105; i++) {
-			mob.images[type].cache[i] = new Image();
-			mob.images[type].cache[i].src = 'mobs/' + type +'/'+ i +'.png';
+		if (!mob.images[type].cache.length) {
+			console.info("preloading ", type);
+			for (var i = 1; i < 105; i++) {
+				mob.images[type].cache[i] = new Image();
+				mob.images[type].cache[i].src = 'mobs/' + type + '/' + i + '.png';
+			}
 		}
 	},
+	initialized: 0,
 	init: function(){
-		for (var key in mob.images) {
-			mob.lastKey = key;
+		if (!mob.initialized) {
+			mob.initialized = 1;
+			mob.imageKeys = Object.keys(mob.images);
+			mob.index = mob.imageKeys.length - 1;
 		}
+		mob.lastKey = mob.imageKeys[Math.abs(mob.index-- % mob.imageKeys.length)];
 		mob.preloadMob(mob.lastKey);
-		mob.imageKeys = Object.keys(mob.images).length;
-		var e = document.createElement('img');
+		var nextKey = mob.imageKeys[Math.abs(mob.index % mob.imageKeys.length)];
+		mob.preloadMob(nextKey);
+		var d = document.createElement('div'),
+			e = document.createElement('img'),
+			n = document.createElement('div');
+		// div parent
+		d.style.position = 'absolute';
+		d.style.bottom = '5px';
+		d.style.left = '50%';
+		d.style.right = '0';
+		d.style.margin = '0 auto';
+		d.style.borderLeft = '1px solid #0f0';
+		d.style.width = mob.images[mob.lastKey].w + 'px';
+		d.style.height = mob.images[mob.lastKey].h + 'px';
+		d.id = 'mob-parent';
+		// name
+		n.style.position = 'absolute';
+		n.style.top = '10%';
+		n.style.left = '-50%';
+		n.style.width = '100%';
+		n.style.font = '28px Roboto Condensed';
+		n.style.outline = '1px solid #f0f';
+		n.className = 'text-shadow';
+		n.style.textAlign = 'center';
+		n.innerHTML = mob.lastKey;
+		// img
 		e.id = 'sprite';
 		e.style.position = 'absolute';
-		e.style.bottom = '0%';
-		e.style.left = '-15%';
+		e.style.left = '-50%';
 		e.style.pointerEvents = 'none';
-		e.style.width = mob.images[mob.lastKey].width + 'px';
-		e.style.height = mob.images[mob.lastKey].height + 'px';
-		e.style.backgroundPosition = '0% 0%';
-		var nextKey = mob.imageKeys[++mob.imageIndex % mob.imageKeys.length];
-		console.info(nextKey);
-		// mob.preloadMob(nextKey);
-		document.getElementById('title-scene').appendChild(e);
+		e.style.width = mob.images[mob.lastKey].w + 'px';
+		e.style.height = mob.images[mob.lastKey].h + 'px';
+		d.appendChild(n);
+		d.appendChild(e);
+		document.getElementById('title-scene').appendChild(d);
 		mob.element = e;
 		mob.idle();
 	},
@@ -71,7 +197,7 @@ var mob = {
 	animationActive: 0,
 	frame: 1,
 	setSrc: function(type, frame){
-		frame = ~~frame;
+		frame = ~~(frame);
 		if (frame !== mob.frame) {
 			mob.element.src = 'mobs/' + type + '/' + frame + '.png';
 			mob.frame = frame;
@@ -84,8 +210,8 @@ var mob = {
 	idle: function(skip){
 		mob.frame = 1;
 
-		TweenMax.to(mob, .4, {
-			frame: 5,
+		TweenMax.to(mob, .5, {
+			frame: 6,
 			yoyo: true,
 			repeat: -1,
 			repeatDelay: .06,
@@ -102,13 +228,15 @@ var mob = {
 	hit: function(){
 		if (mob.animationActive) return;
 		mob.animationActive = 1;
-		TweenMax.to(mob, .5, {
+		TweenMax.to(mob, .3, {
 			startAt: {
-				frame: 15
+				frame: 6
 			},
 			overwrite: 1,
-			frame: 6,
-			ease: Quad.easeOut,
+			frame: 15,
+			ease: Linear.easeNone,
+			yoyo: true,
+			repeat: 1,
 			onUpdate: function(){
 				mob.setSrc(mob.lastKey, mob.frame);
 			},
@@ -128,9 +256,9 @@ var mob = {
 		var tl = g.TM(),
 			foo = force ? force : !Math.round(Math.random()) ? 1 : 2;
 		mob.frame = foo === 1 ? 16 : 36;
-		tl.to(mob, .7, {
+		tl.to(mob, .8, {
 			overwrite: 1,
-			frame: mob.frame + 19,
+			frame: mob.frame + 20,
 			ease: Linear.easeNone,
 			onUpdate: function() {
 				mob.setSrc(mob.lastKey, mob.frame);
@@ -157,9 +285,9 @@ var mob = {
 		mob.animationActive = 1;
 		mob.frame = 56;
 		var tl = g.TM();
-		tl.to(mob, .6, {
+		tl.to(mob, .8, {
 			overwrite: 1,
-			frame: mob.frame + 19,
+			frame: mob.frame + 20,
 			ease: Linear.easeNone,
 			yoyo: mob.images[mob.lastKey].yoyo,
 			repeat: mob.images[mob.lastKey].yoyo ? 1 : 0,
@@ -178,48 +306,49 @@ var mob = {
 	},
 	death: function(){
 		if (mob.deathState) return;
-		mob.frame = 76;
 		mob.deathState = 1;
 		mob.animationActive = 1;
 		var tl = g.TM();
-		tl.to(mob, 1, {
+		mob.frame = 76;
+		tl.to(mob, 1.5, {
 			overwrite: 1,
-			frame: mob.frame + 29,
-			ease: Quad.easeIn,
-			onUpdate: function(){
+			frame: mob.frame + 30,
+			ease: Linear.easeIn,
+			onUpdate: function () {
 				mob.setSrc(mob.lastKey, mob.frame);
-			},
-			onComplete: function(){
-				var filters = {
-					opacity: 'opacity(100%)',
-					brightness: "brightness(100%)"
-				};
-
-				var tl = new TimelineMax({
-					onUpdate: function(){
-						test.filters.death(mob.element, filters);
-					}
-				});
-				tl.to(filters, 1.5, {
-					opacity: 'opacity(0%)',
-					brightness: "brightness(0%)",
-					onComplete: function(){
-						if (mob.test){
-							$("#sprite").remove();
-							mob.init();
-						}
-						else {
-							mob.idle();
-						}
-						TweenMax.delayedCall(.1, function(){
-							mob.deathState = 0;
-							mob.animationActive = 0;
-							mob.element.style.filter = 'opacity(100%) brightness(100%)';
-						});
-					}
-				});
 			}
 		});
+		TweenMax.delayedCall(.5, function(){
+			var filters = {
+				opacity: 'opacity(100%)',
+				brightness: "brightness(100%)"
+			};
+
+			var tl = new TimelineMax({
+				onUpdate: function () {
+					test.filters.death(mob.element, filters);
+				}
+			});
+			tl.to(filters, 2, {
+				opacity: 'opacity(0%)',
+				brightness: "brightness(0%)",
+				ease: Linear.easeIn,
+				onComplete: function () {
+					if (mob.test) {
+						$("#mob-parent").remove();
+						mob.init();
+					}
+					else {
+						mob.idle();
+					}
+					TweenMax.delayedCall(.1, function () {
+						mob.deathState = 0;
+						mob.animationActive = 0;
+						mob.element.style.filter = 'opacity(100%) brightness(100%)';
+					});
+				}
+			});
+		})
 	},
 	deathState: 0,
 	blur: function(){

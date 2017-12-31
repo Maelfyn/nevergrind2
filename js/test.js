@@ -35,6 +35,18 @@ var test = {
 		}
 	},
 	filters: {
+		/*
+		blur(5px)
+		hue-rotate(360deg)
+		brightness(100%)
+		contrast(100%)
+		shadow(100%) (chrome not supported?)
+		grayscale(100%)
+		invert(100%)
+		opacity(100%)
+		saturate(100%)
+		sepia(100%)
+		 */
 		hueRotate: function(z, filters){
 			z.style.filter = 'grayscale(100%) sepia(100%) saturate(1000%) ' + filters.hue;
 		},
@@ -43,6 +55,11 @@ var test = {
 		},
 		effect: function(z, filters, key){
 			z.style.filter = filters[key];
+			/*
+			test.filters.effect(mob.element, {
+			  saturate: 'saturate(2500%)'
+			}, 'saturate');
+			 */
 		}
 	}
 }
