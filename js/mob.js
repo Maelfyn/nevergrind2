@@ -80,7 +80,7 @@ var mob = {
 			cache: []
 		},
 		'dragon': {
-			w: 2000,
+			w: 3000,
 			h: 1500,
 			yFloor: 25,
 			yoyo: true,
@@ -127,10 +127,125 @@ var mob = {
 			yFloor: 25,
 			yoyo: true,
 			cache: []
+		},
+		'goblin': {
+			w: 1000,
+			h: 1000,
+			yFloor: 25,
+			yoyo: false,
+			cache: []
+		},
+		'hobgoblin': {
+			w: 1000,
+			h: 1000,
+			yFloor: 25,
+			yoyo: false,
+			cache: []
+		},
+		'kobold': {
+			w: 1400,
+			h: 1000,
+			yFloor: 25,
+			yoyo: false,
+			cache: []
+		},
+		'orc': {
+			w: 1200,
+			h: 1000,
+			yFloor: 25,
+			yoyo: false,
+			cache: []
+		},
+		'griffon': {
+			w: 1800,
+			h: 1000,
+			yFloor: 25,
+			yoyo: false,
+			cache: []
+		},
+		'harpy': {
+			w: 1500,
+			h: 1000,
+			yFloor: 25,
+			yoyo: false,
+			cache: []
+		},
+		'werewolf': {
+			w: 1000,
+			h: 1000,
+			yFloor: 25,
+			yoyo: false,
+			cache: []
+		},
+		'centaur': {
+			w: 1500,
+			h: 1000,
+			yFloor: 25,
+			yoyo: false,
+			cache: []
+		},
+		'cerberus': {
+			w: 1300,
+			h: 1000,
+			yFloor: 25,
+			yoyo: false,
+			cache: []
+		},
+		'fungoid': {
+			w: 1000,
+			h: 1000,
+			yFloor: 25,
+			yoyo: true,
+			cache: []
+		},
+		'gargoyle': {
+			w: 1200,
+			h: 1000,
+			yFloor: 25,
+			yoyo: true,
+			cache: []
+		},
+		'beetle': {
+			w: 1000,
+			h: 1000,
+			yFloor: 25,
+			yoyo: false,
+			cache: []
+		},
+		'imp': {
+			w: 1250,
+			h: 1000,
+			yFloor: 25,
+			yoyo: true,
+			cache: []
 		}
 		/* skipped mobs
 		beholder
 		wyvern
+		ogre
+		troll
+		chimera
+		manticore
+		automaton
+		barghest
+		basilisk
+		black dragon
+		crasc
+		dark elf
+		darkness warlord
+		death skull
+		dwarf
+		halfling
+		crab
+		scropion
+		gnome
+		gorgon
+		hippogryph
+		kraken
+		lacodon
+		phoenix
+		undertaker (weird)
+		witch
 		 */
 	},
 	imageKeys: 0,
@@ -316,39 +431,39 @@ var mob = {
 			ease: Linear.easeIn,
 			onUpdate: function () {
 				mob.setSrc(mob.lastKey, mob.frame);
+			},
+			onComplete: function() {
+				var filters = {
+					opacity: 'opacity(100%)',
+					brightness: "brightness(100%)"
+				};
+
+				var tl = new TimelineMax({
+					onUpdate: function () {
+						test.filters.death(mob.element, filters);
+					}
+				});
+				tl.to(filters, 2, {
+					opacity: 'opacity(0%)',
+					brightness: "brightness(0%)",
+					ease: Linear.easeIn,
+					onComplete: function () {
+						if (mob.test) {
+							$("#mob-parent").remove();
+							mob.init();
+						}
+						else {
+							mob.idle();
+						}
+						TweenMax.delayedCall(.1, function () {
+							mob.deathState = 0;
+							mob.animationActive = 0;
+							mob.element.style.filter = 'opacity(100%) brightness(100%)';
+						});
+					}
+				});
 			}
 		});
-		TweenMax.delayedCall(.5, function(){
-			var filters = {
-				opacity: 'opacity(100%)',
-				brightness: "brightness(100%)"
-			};
-
-			var tl = new TimelineMax({
-				onUpdate: function () {
-					test.filters.death(mob.element, filters);
-				}
-			});
-			tl.to(filters, 2, {
-				opacity: 'opacity(0%)',
-				brightness: "brightness(0%)",
-				ease: Linear.easeIn,
-				onComplete: function () {
-					if (mob.test) {
-						$("#mob-parent").remove();
-						mob.init();
-					}
-					else {
-						mob.idle();
-					}
-					TweenMax.delayedCall(.1, function () {
-						mob.deathState = 0;
-						mob.animationActive = 0;
-						mob.element.style.filter = 'opacity(100%) brightness(100%)';
-					});
-				}
-			});
-		})
 	},
 	deathState: 0,
 	blur: function(){

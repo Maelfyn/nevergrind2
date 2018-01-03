@@ -284,15 +284,13 @@ WIZ		250			250			250
 == MOBS ==
 1 Salubrin Forest
     spider
-    rat
     snake
     wolf
 
 2 Tendolin Meadows
-    spider
     rat
     snake
-    boar
+    beetle
 
 3 Greenthorn Cavern
     hobgoblin
@@ -302,10 +300,10 @@ WIZ		250			250			250
     mummy
     skeleton
     zombie
-    giant bat
 
 5 Lanfeld Outpost
     orc
+    kobold?
     dark orc
     dark elf
 
@@ -352,11 +350,8 @@ WIZ		250			250			250
     minotaur
     grizzly bear
     treant
-    chimera
     griffon
     harpy
-    manticore
-    gorgon
 
 
 12 Kordata Ruins
