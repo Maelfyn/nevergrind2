@@ -7,217 +7,264 @@ var mob = {
 			h: 1200,
 			yFloor: 25,
 			yoyo: true,
-			cache: []
+			cache: [],
+			speed: .04
 		},
 		'ice golem': {
 			w: 1200,
 			h: 1000,
 			yFloor: 25,
 			yoyo: false,
-			cache: []
+			cache: [],
+			speed: .04
+		},
+		'fire golem': {
+			w: 1200,
+			h: 1000,
+			yFloor: 25,
+			yoyo: false,
+			cache: [],
+			speed: .04
 		},
 		'stone golem': {
 			w: 1200,
 			h: 1000,
 			yFloor: 25,
 			yoyo: false,
-			cache: []
+			cache: [],
+			speed: .04
 		},
 		'clay golem': {
 			w: 1200,
 			h: 1000,
 			yFloor: 25,
 			yoyo: false,
-			cache: []
+			cache: [],
+			speed: .04
 		},
 		'treant': {
 			w: 1100,
 			h: 1000,
 			yFloor: 25,
 			yoyo: false,
-			cache: []
+			cache: [],
+			speed: .04
 		},
 		'spider': {
 			w: 1000,
 			h: 1000,
 			yFloor: 25,
 			yoyo: false,
-			cache: []
+			cache: [],
+			speed: .04
 		},
 		'wolf': {
 			w: 900,
 			h: 1000,
 			yFloor: 25,
 			yoyo: false,
-			cache: []
+			cache: [],
+			speed: .04
 		},
 		'rat': {
 			w: 1100,
 			h: 1000,
 			yFloor: 25,
 			yoyo: false,
-			cache: []
+			cache: [],
+			speed: .04
 		},
 		'snake': {
 			w: 1000,
 			h: 1000,
 			yFloor: 25,
 			yoyo: false,
-			cache: []
+			cache: [],
+			speed: .04
 		},
 		'dragonkin': {
 			w: 900,
 			h: 1000,
 			yFloor: 25,
 			yoyo: false,
-			cache: []
+			cache: [],
+			speed: .055
 		},
 		'lizardman': {
 			w: 1100,
 			h: 1000,
 			yFloor: 25,
 			yoyo: true,
-			cache: []
+			cache: [],
+			speed: .04
 		},
 		'dragon': {
 			w: 3000,
 			h: 1500,
 			yFloor: 25,
 			yoyo: true,
-			cache: []
+			cache: [],
+			speed: .055
 		},
 		'ghoul': {
 			w: 900,
 			h: 1000,
 			yFloor: 25,
 			yoyo: true,
-			cache: []
+			cache: [],
+			speed: .04
 		},
 		'mummy': {
 			w: 800,
 			h: 1000,
 			yFloor: 25,
 			yoyo: false,
-			cache: []
+			cache: [],
+			speed: .04
 		},
 		'skeleton': {
 			w: 900,
 			h: 1000,
 			yFloor: 25,
 			yoyo: false,
-			cache: []
+			cache: [],
+			speed: .04
 		},
 		'zombie': {
 			w: 900,
 			h: 1000,
 			yFloor: 25,
 			yoyo: true,
-			cache: []
+			cache: [],
+			speed: .04
 		},
 		'vampire': {
 			w: 1000,
 			h: 1000,
 			yFloor: 25,
 			yoyo: true,
-			cache: []
+			cache: [],
+			speed: .04
 		},
 		'cyclops': {
 			w: 1300,
 			h: 1100,
 			yFloor: 25,
 			yoyo: true,
-			cache: []
+			cache: [],
+			speed: .04
 		},
 		'goblin': {
 			w: 1000,
 			h: 1000,
 			yFloor: 25,
 			yoyo: false,
-			cache: []
+			cache: [],
+			speed: .04
 		},
 		'hobgoblin': {
 			w: 1000,
 			h: 1000,
 			yFloor: 25,
 			yoyo: false,
-			cache: []
+			cache: [],
+			speed: .04
 		},
 		'kobold': {
 			w: 1400,
 			h: 1000,
 			yFloor: 25,
 			yoyo: false,
-			cache: []
+			cache: [],
+			speed: .04
 		},
 		'orc': {
 			w: 1200,
 			h: 1000,
 			yFloor: 25,
 			yoyo: false,
-			cache: []
+			cache: [],
+			speed: .04
 		},
 		'griffon': {
 			w: 1800,
 			h: 1000,
 			yFloor: 25,
 			yoyo: false,
-			cache: []
+			cache: [],
+			speed: .04
 		},
 		'harpy': {
 			w: 1500,
 			h: 1000,
 			yFloor: 25,
 			yoyo: false,
-			cache: []
+			cache: [],
+			speed: .04
 		},
 		'werewolf': {
 			w: 1000,
 			h: 1000,
 			yFloor: 25,
 			yoyo: false,
-			cache: []
+			cache: [],
+			speed: .04
 		},
 		'centaur': {
 			w: 1500,
 			h: 1000,
 			yFloor: 25,
 			yoyo: false,
-			cache: []
+			cache: [],
+			speed: .04
 		},
 		'cerberus': {
 			w: 1300,
 			h: 1000,
 			yFloor: 25,
 			yoyo: false,
-			cache: []
+			cache: [],
+			speed: .04
 		},
 		'fungoid': {
 			w: 1000,
 			h: 1000,
 			yFloor: 25,
 			yoyo: true,
-			cache: []
+			cache: [],
+			speed: .04
 		},
 		'gargoyle': {
 			w: 1200,
 			h: 1000,
 			yFloor: 25,
 			yoyo: true,
-			cache: []
+			cache: [],
+			speed: .04
 		},
 		'beetle': {
 			w: 1000,
 			h: 1000,
 			yFloor: 25,
 			yoyo: false,
-			cache: []
+			cache: [],
+			speed: .04
 		},
 		'imp': {
 			w: 1250,
 			h: 1000,
 			yFloor: 25,
 			yoyo: true,
-			cache: []
+			cache: [],
+			speed: .04
+		},
+		'minotaur': {
+			w: 1000,
+			h: 1000,
+			yFloor: 25,
+			yoyo: false,
+			cache: [],
+			speed: .04
 		}
 		/* skipped mobs
 		beholder
@@ -323,13 +370,18 @@ var mob = {
 		mob.idle(1);
 	},
 	idle: function(skip){
-		mob.frame = 1;
+		var startFrame = 1,
+			endFrame = 6,
+			diff = endFrame - startFrame;
 
-		TweenMax.to(mob, .5, {
-			frame: 6,
+		TweenMax.to(mob, mob.images[mob.lastKey].speed * diff * 2, {
+			startAt: {
+				frame: startFrame
+			},
+			frame: endFrame,
 			yoyo: true,
 			repeat: -1,
-			repeatDelay: .06,
+			repeatDelay: mob.images[mob.lastKey].speed,
 			ease: Sine.easeOut,
 			onUpdate: function(){
 				mob.setSrc(mob.lastKey, mob.frame);
@@ -343,12 +395,15 @@ var mob = {
 	hit: function(){
 		if (mob.animationActive) return;
 		mob.animationActive = 1;
-		TweenMax.to(mob, .3, {
+		var startFrame = 6,
+			endFrame = 16,
+			diff = endFrame - startFrame;
+		TweenMax.to(mob, mob.images[mob.lastKey].speed * diff, {
 			startAt: {
-				frame: 6
+				frame: startFrame
 			},
 			overwrite: 1,
-			frame: 15,
+			frame: endFrame,
 			ease: Linear.easeNone,
 			yoyo: true,
 			repeat: 1,
@@ -369,11 +424,18 @@ var mob = {
 		if (mob.animationActive) return;
 		mob.animationActive = 1;
 		var tl = g.TM(),
-			foo = force ? force : !Math.round(Math.random()) ? 1 : 2;
-		mob.frame = foo === 1 ? 16 : 36;
-		tl.to(mob, .8, {
+			foo = force ? force : !Math.round(Math.random()) ? 1 : 2,
+			startFrame = foo === 1 ?
+				16 : 36,
+			endFrame = startFrame + 20,
+			diff = endFrame - startFrame;
+
+		tl.to(mob, mob.images[mob.lastKey].speed * diff, {
+			startAt: {
+				frame: startFrame
+			},
 			overwrite: 1,
-			frame: mob.frame + 20,
+			frame: endFrame,
 			ease: Linear.easeNone,
 			onUpdate: function() {
 				mob.setSrc(mob.lastKey, mob.frame);
@@ -398,11 +460,17 @@ var mob = {
 	special: function(){
 		if (mob.animationActive) return;
 		mob.animationActive = 1;
-		mob.frame = 56;
+		var startFrame = 56,
+			endFrame = 76,
+			diff = endFrame - startFrame;
+
 		var tl = g.TM();
-		tl.to(mob, .8, {
+		tl.to(mob, mob.images[mob.lastKey].speed * diff, {
+			startAt: {
+				frame: startFrame
+			},
 			overwrite: 1,
-			frame: mob.frame + 20,
+			frame: endFrame,
 			ease: Linear.easeNone,
 			yoyo: mob.images[mob.lastKey].yoyo,
 			repeat: mob.images[mob.lastKey].yoyo ? 1 : 0,
@@ -423,12 +491,18 @@ var mob = {
 		if (mob.deathState) return;
 		mob.deathState = 1;
 		mob.animationActive = 1;
-		var tl = g.TM();
-		mob.frame = 76;
-		tl.to(mob, 1.5, {
+		var tl = g.TM(),
+			startFrame = 76,
+			endFrame = 106,
+			diff = endFrame - startFrame;
+
+		tl.to(mob, mob.images[mob.lastKey].speed * diff, {
+			startAt: {
+				frame: startFrame
+			},
 			overwrite: 1,
-			frame: mob.frame + 30,
-			ease: Linear.easeIn,
+			frame: endFrame,
+			ease: Linear.easeNone,
 			onUpdate: function () {
 				mob.setSrc(mob.lastKey, mob.frame);
 			},

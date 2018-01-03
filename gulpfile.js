@@ -94,7 +94,7 @@ return gulp.src([
 });
 
 gulp.task('minify-png', function(){
-	var img = 'imp';
+	var img = 'minotaur';
 	return imagemin(['./mobs-huge/'+ img +'/*'], './mobs/'+ img +'/', {
 		use: [imageminPngquant({
 			floyd: 1,

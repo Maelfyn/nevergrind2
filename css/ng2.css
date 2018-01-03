@@ -539,6 +539,15 @@ tbody {
 .text-shadow {
 	text-shadow: 1px 1px #000, -1px 0 #000, 1px 0 #000, -1px 1px #000, 1px -1px #000, -1px -1px #000
 }
+
+@keyframes flash-outline {
+	0% { outline-color: #0f0; }
+	100% { outline-color: #000; }
+}
+.flash-outline {
+	animation: flash-outline .5s linear infinite alternate;
+}
+
 .no-select {
 	-o-user-select: none;
 	-moz-user-select: none;
