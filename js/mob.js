@@ -8,9 +8,9 @@ var mob = {
 			yFloor: 25,
 			yoyo: true,
 			cache: [],
-			speed: .04
+			speed: .05
 		},
-		'ice golem': {
+		'ice-golem': {
 			w: 1200,
 			h: 1000,
 			yFloor: 25,
@@ -18,7 +18,7 @@ var mob = {
 			cache: [],
 			speed: .04
 		},
-		'fire golem': {
+		'fire-golem': {
 			w: 1200,
 			h: 1000,
 			yFloor: 25,
@@ -26,7 +26,7 @@ var mob = {
 			cache: [],
 			speed: .04
 		},
-		'stone golem': {
+		'stone-golem': {
 			w: 1200,
 			h: 1000,
 			yFloor: 25,
@@ -34,7 +34,7 @@ var mob = {
 			cache: [],
 			speed: .04
 		},
-		'clay golem': {
+		'clay-golem': {
 			w: 1200,
 			h: 1000,
 			yFloor: 25,
@@ -104,7 +104,7 @@ var mob = {
 			yFloor: 25,
 			yoyo: true,
 			cache: [],
-			speed: .055
+			speed: .06
 		},
 		'ghoul': {
 			w: 900,
@@ -146,14 +146,6 @@ var mob = {
 			cache: [],
 			speed: .04
 		},
-		'cyclops': {
-			w: 1300,
-			h: 1100,
-			yFloor: 25,
-			yoyo: true,
-			cache: [],
-			speed: .04
-		},
 		'goblin': {
 			w: 1000,
 			h: 1000,
@@ -176,7 +168,7 @@ var mob = {
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .045
 		},
 		'orc': {
 			w: 1200,
@@ -184,7 +176,7 @@ var mob = {
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .045
 		},
 		'griffon': {
 			w: 1800,
@@ -192,7 +184,7 @@ var mob = {
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .05
 		},
 		'harpy': {
 			w: 1500,
@@ -200,7 +192,7 @@ var mob = {
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .045
 		},
 		'werewolf': {
 			w: 1000,
@@ -216,7 +208,7 @@ var mob = {
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .045
 		},
 		'cerberus': {
 			w: 1300,
@@ -265,6 +257,110 @@ var mob = {
 			yoyo: false,
 			cache: [],
 			speed: .04
+		},
+		'aviak': {
+			w: 1200,
+			h: 1000,
+			yFloor: 25,
+			yoyo: false,
+			cache: [],
+			speed: .04
+		},
+		'elephant': {
+			w: 1300,
+			h: 1000,
+			yFloor: 25,
+			yoyo: false,
+			cache: [],
+			speed: .05
+		},
+		'lion': {
+			w: 900,
+			h: 1200,
+			yFloor: 25,
+			yoyo: false,
+			cache: [],
+			speed: .04
+		},
+		'crocodile': {
+			w: 1000,
+			h: 1000,
+			yFloor: 25,
+			yoyo: false,
+			cache: [],
+			speed: .04
+		},
+		'rhino': {
+			w: 1200,
+			h: 1200,
+			yFloor: 25,
+			yoyo: false,
+			cache: [],
+			speed: .045
+		},
+		'lioness': {
+			w: 900,
+			h: 1200,
+			yFloor: 25,
+			yoyo: false,
+			cache: [],
+			speed: .04
+		},
+		'bear': {
+			w: 1000,
+			h: 1000,
+			yFloor: 25,
+			yoyo: false,
+			cache: [],
+			speed: .04
+		},
+		'anuran': {
+			w: 1200,
+			h: 1000,
+			yFloor: 25,
+			yoyo: false,
+			cache: [],
+			speed: .04
+		},
+		'giant': {
+			w: 1400,
+			h: 1200,
+			yFloor: 25,
+			yoyo: false,
+			cache: [],
+			speed: .05
+		},
+		'ice-giant': {
+			w: 1400,
+			h: 1200,
+			yFloor: 25,
+			yoyo: false,
+			cache: [],
+			speed: .05
+		},
+		'fire-giant': {
+			w: 1400,
+			h: 1200,
+			yFloor: 25,
+			yoyo: false,
+			cache: [],
+			speed: .05
+		},
+		'spectre': {
+			w: 1500,
+			h: 1500,
+			yFloor: 25,
+			yoyo: false,
+			cache: [],
+			speed: .05
+		},
+		'angler': {
+			w: 1500,
+			h: 1200,
+			yFloor: 25,
+			yoyo: false,
+			cache: [],
+			speed: .045
 		}
 		/* skipped mobs
 		beholder
@@ -341,7 +437,7 @@ var mob = {
 		n.style.outline = '1px solid #f0f';
 		n.className = 'text-shadow';
 		n.style.textAlign = 'center';
-		n.innerHTML = mob.lastKey;
+		n.innerHTML = mob.lastKey.replace(/-/g, ' ');
 		// img
 		e.id = 'sprite';
 		e.style.position = 'absolute';
