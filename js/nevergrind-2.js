@@ -2859,14 +2859,6 @@ var mob = {
 			cache: [],
 			speed: .04
 		},
-		'fire-golem': {
-			w: 1200,
-			h: 1000,
-			yFloor: 25,
-			yoyo: false,
-			cache: [],
-			speed: .04
-		},
 		'stone-golem': {
 			w: 1200,
 			h: 1000,
@@ -3020,8 +3012,8 @@ var mob = {
 			speed: .045
 		},
 		'griffon': {
-			w: 1800,
-			h: 1000,
+			w: 2000,
+			h: 1200,
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
@@ -3251,6 +3243,7 @@ var mob = {
 			mob.initialized = 1;
 			mob.imageKeys = Object.keys(mob.images);
 			mob.index = mob.imageKeys.length - 1;
+			mob.index = 21;
 		}
 		mob.lastKey = mob.imageKeys[Math.abs(mob.index-- % mob.imageKeys.length)];
 		mob.preloadMob(mob.lastKey);
@@ -3266,6 +3259,7 @@ var mob = {
 		d.style.right = '0';
 		d.style.margin = '0 auto';
 		d.style.borderLeft = '1px solid #0f0';
+		d.className = 'text-shadow no-pointer';
 		d.style.width = mob.images[mob.lastKey].w + 'px';
 		d.style.height = mob.images[mob.lastKey].h + 'px';
 		d.id = 'mob-parent';
@@ -3276,7 +3270,6 @@ var mob = {
 		n.style.width = '100%';
 		n.style.font = '28px Roboto Condensed';
 		n.style.outline = '1px solid #f0f';
-		n.className = 'text-shadow';
 		n.style.textAlign = 'center';
 		n.innerHTML = mob.lastKey.replace(/-/g, ' ');
 		// img

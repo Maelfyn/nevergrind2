@@ -8,17 +8,21 @@ var mob = {
 			yFloor: 25,
 			yoyo: true,
 			cache: [],
-			speed: .05
+			speed: .05,
+			nameTop: 10,
+			bottomShadow: 10,
+			click: {
+				min: {
+					x: 0,
+					y: 0
+				},
+				max: {
+					x: 0,
+					y: 0
+				}
+			}
 		},
 		'ice-golem': {
-			w: 1200,
-			h: 1000,
-			yFloor: 25,
-			yoyo: false,
-			cache: [],
-			speed: .04
-		},
-		'fire-golem': {
 			w: 1200,
 			h: 1000,
 			yFloor: 25,
@@ -43,12 +47,12 @@ var mob = {
 			speed: .04
 		},
 		'treant': {
-			w: 1100,
-			h: 1000,
+			w: 1300,
+			h: 1200,
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .05
 		},
 		'spider': {
 			w: 1000,
@@ -83,8 +87,8 @@ var mob = {
 			speed: .04
 		},
 		'dragonkin': {
-			w: 900,
-			h: 1000,
+			w: 1300,
+			h: 1300,
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
@@ -168,7 +172,7 @@ var mob = {
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
-			speed: .045
+			speed: .04
 		},
 		'orc': {
 			w: 1200,
@@ -179,8 +183,8 @@ var mob = {
 			speed: .045
 		},
 		'griffon': {
-			w: 1800,
-			h: 1000,
+			w: 2000,
+			h: 1200,
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
@@ -314,7 +318,7 @@ var mob = {
 			cache: [],
 			speed: .04
 		},
-		'anuran': {
+		'toadlok': {
 			w: 1200,
 			h: 1000,
 			yFloor: 25,
@@ -336,7 +340,7 @@ var mob = {
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
-			speed: .05
+			speed: .06
 		},
 		'fire-giant': {
 			w: 1400,
@@ -344,7 +348,7 @@ var mob = {
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
-			speed: .05
+			speed: .06
 		},
 		'spectre': {
 			w: 1500,
@@ -352,7 +356,7 @@ var mob = {
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
-			speed: .05
+			speed: .055
 		},
 		'angler': {
 			w: 1500,
@@ -361,9 +365,32 @@ var mob = {
 			yoyo: false,
 			cache: [],
 			speed: .045
+		},
+		'beholder': {
+			w: 1200,
+			h: 1000,
+			yFloor: 25,
+			yoyo: false,
+			cache: [],
+			speed: .05
+		},
+		'unicorn': {
+			w: 2000,
+			h: 1200,
+			yFloor: 25,
+			yoyo: false,
+			cache: [],
+			speed: .055
+		},
+		'scorpion': {
+			w: 1000,
+			h: 1000,
+			yFloor: 25,
+			yoyo: false,
+			cache: [],
+			speed: .045
 		}
 		/* skipped mobs
-		beholder
 		wyvern
 		ogre
 		troll
@@ -410,7 +437,21 @@ var mob = {
 			mob.initialized = 1;
 			mob.imageKeys = Object.keys(mob.images);
 			mob.index = mob.imageKeys.length - 1;
+			var setMob = '';
+			if (setMob) {
+				var index = 0,
+					i = 0;
+				for (var key in mob.images){
+					if (setMob === key){
+						index = i;
+					}
+					i++;
+				}
+				mob.index = index;
+			}
 		}
+		var size = 1;
+
 		mob.lastKey = mob.imageKeys[Math.abs(mob.index-- % mob.imageKeys.length)];
 		mob.preloadMob(mob.lastKey);
 		var nextKey = mob.imageKeys[Math.abs(mob.index % mob.imageKeys.length)];
@@ -419,32 +460,23 @@ var mob = {
 			e = document.createElement('img'),
 			n = document.createElement('div');
 		// div parent
-		d.style.position = 'absolute';
 		d.style.bottom = '5px';
 		d.style.left = '50%';
 		d.style.right = '0';
 		d.style.margin = '0 auto';
-		d.style.borderLeft = '1px solid #0f0';
-		d.style.width = mob.images[mob.lastKey].w + 'px';
-		d.style.height = mob.images[mob.lastKey].h + 'px';
+		d.className = 'mob-wrap text-shadow';
+		d.style.width = size * mob.images[mob.lastKey].w + 'px';
+		d.style.height = size * mob.images[mob.lastKey].h + 'px';
 		d.id = 'mob-parent';
 		// name
-		n.style.position = 'absolute';
 		n.style.top = '10%';
-		n.style.left = '-50%';
-		n.style.width = '100%';
-		n.style.font = '28px Roboto Condensed';
-		n.style.outline = '1px solid #f0f';
-		n.className = 'text-shadow';
-		n.style.textAlign = 'center';
+		n.className = 'mob-name';
 		n.innerHTML = mob.lastKey.replace(/-/g, ' ');
 		// img
 		e.id = 'sprite';
-		e.style.position = 'absolute';
-		e.style.left = '-50%';
-		e.style.pointerEvents = 'none';
-		e.style.width = mob.images[mob.lastKey].w + 'px';
-		e.style.height = mob.images[mob.lastKey].h + 'px';
+		e.className = 'mob-image';
+		e.style.width = size * mob.images[mob.lastKey].w + 'px';
+		e.style.height = size * mob.images[mob.lastKey].h + 'px';
 		d.appendChild(n);
 		d.appendChild(e);
 		document.getElementById('title-scene').appendChild(d);

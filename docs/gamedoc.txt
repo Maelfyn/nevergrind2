@@ -1,4 +1,6 @@
 TODO:
+- add backstab, archery, shadow kick as skills. make casting spells conditionally added to separate table?
+- add hitbox coordinates + when dead
 - Finish insert items template files
 	establish low/high values from 1-50 items
 	create all items

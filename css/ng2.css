@@ -1085,6 +1085,35 @@ tbody {
 	background: -ms-linear-gradient(top, rgba(0, 24, 60, .8) 0, rgba(0, 24, 60, .8) 10%, rgba(0, 22, 54, .8) 10%, rgba(0, 22, 54, .8) 20%, rgba(0, 20, 48, .8) 20%, rgba(0, 20, 48, .8) 30%, rgba(0, 18, 42, .8) 30%, rgba(0, 18, 42, .8) 40%, rgba(0, 16, 36, .8) 40%, rgba(0, 16, 36, .8) 50%, rgba(0, 14, 30, .8) 50%, rgba(0, 14, 30, .8) 60%, rgba(0, 12, 24, .8) 60%, rgba(0, 12, 24, .8) 70%, rgba(0, 9, 18, .8) 70%, rgba(0, 9, 18, .8) 80%, rgba(0, 6, 12, .8) 80%, rgba(0, 6, 12, .8) 90%, rgba(0, 3, 8, .8) 90%, rgba(0, 3, 8, .8) 100%);
 	background: -o-linear-gradient(top, rgba(0, 24, 60, .8) 0, rgba(0, 24, 60, .8) 10%, rgba(0, 22, 54, .8) 10%, rgba(0, 22, 54, .8) 20%, rgba(0, 20, 48, .8) 20%, rgba(0, 20, 48, .8) 30%, rgba(0, 18, 42, .8) 30%, rgba(0, 18, 42, .8) 40%, rgba(0, 16, 36, .8) 40%, rgba(0, 16, 36, .8) 50%, rgba(0, 14, 30, .8) 50%, rgba(0, 14, 30, .8) 60%, rgba(0, 12, 24, .8) 60%, rgba(0, 12, 24, .8) 70%, rgba(0, 9, 18, .8) 70%, rgba(0, 9, 18, .8) 80%, rgba(0, 6, 12, .8) 80%, rgba(0, 6, 12, .8) 90%, rgba(0, 3, 8, .8) 90%, rgba(0, 3, 8, .8) 100%)
 }
+/* mob stuff
+		e.style.position = 'absolute';
+		e.style.left = '-50%';
+		e.style.pointerEvents = 'none';
+		*/
+.mob-wrap {
+	position: absolute;
+	border: 1px solid #0f0;
+}
+.mob-name {
+	position: absolute;
+	left: -50%;
+	width: 100%;
+	font: 28px Roboto Condensed;
+	text-align: center;
+	outline: 1px solid #f0f;
+	z-index: 1;
+}
+.mob-bar-wrap {
+
+}
+.mob-image {
+	position: absolute;
+	left: -50%;
+	cursor: pointer;
+}
+.mob-image-click {
+
+}
 
 body {
 	visibility: visible;

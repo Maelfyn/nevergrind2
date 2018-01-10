@@ -94,12 +94,12 @@ return gulp.src([
 });
 
 gulp.task('minify-png', function(){
-	var img = 'ice-giant';
+	var img = 'scorpion';
 	return imagemin(['./mobs-huge/'+ img +'/*'], './mobs/'+ img +'/', {
 		use: [imageminPngquant({
 			floyd: 1,
 			nofs: true, // disable FS
-			quality: '98',
+			quality: '90',
 			speed: 1
 		})
 		]
