@@ -80,6 +80,7 @@ return gulp.src([
 './js/socket.js',
 './js/chat.js',
 './js/payment.js',
+'./js/battle.js',
 './js/mob.js',
 './js/test.js',
 './js/endWrap.js'
@@ -109,12 +110,12 @@ gulp.task('minify-png', function(){
 });
 
 gulp.task('resize-png', function(){
-	var img = 'balrog';
+	var img = 'scorpion';
 	resizeImg(fs.readFileSync('./mobs/'+ img +'/*'), {
-		width: 850,
-		height: 500
+		width: 600,
+		height: 600
 	}).then(function(buf){
-		fs.writeFileSync('./mobs/' + img + '/mobile/', buf);
+		fs.writeFileSync('./mobs/' + img + '/sm', buf);
 	})
 });
 

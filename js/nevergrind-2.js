@@ -2849,7 +2849,23 @@ var mob = {
 			yFloor: 25,
 			yoyo: true,
 			cache: [],
-			speed: .05
+			speed: .05,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'ice-golem': {
 			w: 1200,
@@ -2857,7 +2873,23 @@ var mob = {
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'stone-golem': {
 			w: 1200,
@@ -2865,7 +2897,23 @@ var mob = {
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'clay-golem': {
 			w: 1200,
@@ -2873,15 +2921,47 @@ var mob = {
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'treant': {
-			w: 1100,
-			h: 1000,
+			w: 1300,
+			h: 1200,
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .05,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'spider': {
 			w: 1000,
@@ -2889,7 +2969,23 @@ var mob = {
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'wolf': {
 			w: 900,
@@ -2897,7 +2993,23 @@ var mob = {
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'rat': {
 			w: 1100,
@@ -2905,7 +3017,23 @@ var mob = {
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'snake': {
 			w: 1000,
@@ -2913,15 +3041,47 @@ var mob = {
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'dragonkin': {
-			w: 900,
-			h: 1000,
+			w: 1300,
+			h: 1300,
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
-			speed: .055
+			speed: .055,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'lizardman': {
 			w: 1100,
@@ -2929,7 +3089,23 @@ var mob = {
 			yFloor: 25,
 			yoyo: true,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'dragon': {
 			w: 3000,
@@ -2937,7 +3113,23 @@ var mob = {
 			yFloor: 25,
 			yoyo: true,
 			cache: [],
-			speed: .06
+			speed: .06,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'ghoul': {
 			w: 900,
@@ -2945,7 +3137,23 @@ var mob = {
 			yFloor: 25,
 			yoyo: true,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'mummy': {
 			w: 800,
@@ -2953,7 +3161,23 @@ var mob = {
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'skeleton': {
 			w: 900,
@@ -2961,7 +3185,23 @@ var mob = {
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'zombie': {
 			w: 900,
@@ -2969,7 +3209,23 @@ var mob = {
 			yFloor: 25,
 			yoyo: true,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'vampire': {
 			w: 1000,
@@ -2977,7 +3233,23 @@ var mob = {
 			yFloor: 25,
 			yoyo: true,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'goblin': {
 			w: 1000,
@@ -2985,7 +3257,23 @@ var mob = {
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'hobgoblin': {
 			w: 1000,
@@ -2993,7 +3281,23 @@ var mob = {
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'kobold': {
 			w: 1400,
@@ -3001,7 +3305,23 @@ var mob = {
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
-			speed: .045
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'orc': {
 			w: 1200,
@@ -3009,7 +3329,23 @@ var mob = {
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
-			speed: .045
+			speed: .045,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'griffon': {
 			w: 2000,
@@ -3017,7 +3353,23 @@ var mob = {
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
-			speed: .05
+			speed: .05,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'harpy': {
 			w: 1500,
@@ -3025,7 +3377,23 @@ var mob = {
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
-			speed: .045
+			speed: .045,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'werewolf': {
 			w: 1000,
@@ -3033,7 +3401,23 @@ var mob = {
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'centaur': {
 			w: 1500,
@@ -3041,7 +3425,23 @@ var mob = {
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
-			speed: .045
+			speed: .045,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'cerberus': {
 			w: 1300,
@@ -3049,7 +3449,23 @@ var mob = {
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'fungoid': {
 			w: 1000,
@@ -3057,7 +3473,23 @@ var mob = {
 			yFloor: 25,
 			yoyo: true,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'gargoyle': {
 			w: 1200,
@@ -3065,7 +3497,23 @@ var mob = {
 			yFloor: 25,
 			yoyo: true,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'beetle': {
 			w: 1000,
@@ -3073,7 +3521,23 @@ var mob = {
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'imp': {
 			w: 1250,
@@ -3081,7 +3545,23 @@ var mob = {
 			yFloor: 25,
 			yoyo: true,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'minotaur': {
 			w: 1000,
@@ -3089,7 +3569,23 @@ var mob = {
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'aviak': {
 			w: 1200,
@@ -3097,7 +3593,23 @@ var mob = {
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'elephant': {
 			w: 1300,
@@ -3105,7 +3617,23 @@ var mob = {
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
-			speed: .05
+			speed: .05,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'lion': {
 			w: 900,
@@ -3113,7 +3641,23 @@ var mob = {
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'crocodile': {
 			w: 1000,
@@ -3121,7 +3665,23 @@ var mob = {
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'rhino': {
 			w: 1200,
@@ -3129,7 +3689,23 @@ var mob = {
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
-			speed: .045
+			speed: .045,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'lioness': {
 			w: 900,
@@ -3137,7 +3713,23 @@ var mob = {
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'bear': {
 			w: 1000,
@@ -3145,15 +3737,47 @@ var mob = {
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
-		'anuran': {
+		'toadlok': {
 			w: 1200,
 			h: 1000,
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'giant': {
 			w: 1400,
@@ -3161,7 +3785,23 @@ var mob = {
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
-			speed: .05
+			speed: .05,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'ice-giant': {
 			w: 1400,
@@ -3169,7 +3809,23 @@ var mob = {
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
-			speed: .05
+			speed: .06,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'fire-giant': {
 			w: 1400,
@@ -3177,7 +3833,23 @@ var mob = {
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
-			speed: .05
+			speed: .06,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'spectre': {
 			w: 1500,
@@ -3185,7 +3857,23 @@ var mob = {
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
-			speed: .05
+			speed: .055,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'angler': {
 			w: 1500,
@@ -3193,10 +3881,97 @@ var mob = {
 			yFloor: 25,
 			yoyo: false,
 			cache: [],
-			speed: .045
+			speed: .045,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
+		},
+		'beholder': {
+			w: 1200,
+			h: 1000,
+			yFloor: 25,
+			yoyo: false,
+			cache: [],
+			speed: .05,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
+		},
+		'unicorn': {
+			w: 2000,
+			h: 1200,
+			yFloor: 25,
+			yoyo: false,
+			cache: [],
+			speed: .055,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
+		},
+		'scorpion': {
+			w: 1000,
+			h: 1000,
+			yFloor: 25,
+			yoyo: false,
+			cache: [],
+			speed: .045,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		}
 		/* skipped mobs
-		beholder
 		wyvern
 		ogre
 		troll
@@ -3243,46 +4018,61 @@ var mob = {
 			mob.initialized = 1;
 			mob.imageKeys = Object.keys(mob.images);
 			mob.index = mob.imageKeys.length - 1;
-			mob.index = 21;
+			var setMob = '';
+			if (setMob) {
+				var index = 0,
+					i = 0;
+				for (var key in mob.images){
+					if (setMob === key){
+						index = i;
+					}
+					i++;
+				}
+				mob.index = index;
+			}
 		}
+		var size = .7;
+
 		mob.lastKey = mob.imageKeys[Math.abs(mob.index-- % mob.imageKeys.length)];
 		mob.preloadMob(mob.lastKey);
 		var nextKey = mob.imageKeys[Math.abs(mob.index % mob.imageKeys.length)];
 		mob.preloadMob(nextKey);
 		var d = document.createElement('div'),
-			e = document.createElement('img'),
-			n = document.createElement('div');
+			bar = document.createElement('div'),
+			health = document.createElement('div'),
+			click = document.createElement('div'),
+			img = document.createElement('img'),
+			name = document.createElement('div');
 		// div parent
-		d.style.position = 'absolute';
-		d.style.bottom = '5px';
+		d.style.bottom = mob.images[mob.lastKey].yFloor + 'px';
 		d.style.left = '50%';
 		d.style.right = '0';
 		d.style.margin = '0 auto';
-		d.style.borderLeft = '1px solid #0f0';
-		d.className = 'text-shadow no-pointer';
-		d.style.width = mob.images[mob.lastKey].w + 'px';
-		d.style.height = mob.images[mob.lastKey].h + 'px';
+		d.className = 'mob-wrap text-shadow';
+		d.style.width = size * mob.images[mob.lastKey].w + 'px';
+		d.style.height = size * mob.images[mob.lastKey].h + 'px';
 		d.id = 'mob-parent';
+		// bar
+		bar.className = 'mob-bar';
+		// health
+		health.className = 'mob-health';
 		// name
-		n.style.position = 'absolute';
-		n.style.top = '10%';
-		n.style.left = '-50%';
-		n.style.width = '100%';
-		n.style.font = '28px Roboto Condensed';
-		n.style.outline = '1px solid #f0f';
-		n.style.textAlign = 'center';
-		n.innerHTML = mob.lastKey.replace(/-/g, ' ');
+		name.className = 'mob-name';
+		name.innerHTML = mob.lastKey.replace(/-/g, ' ');
+		// click area
+		click.className = 'mob-image-click';
 		// img
-		e.id = 'sprite';
-		e.style.position = 'absolute';
-		e.style.left = '-50%';
-		e.style.pointerEvents = 'none';
-		e.style.width = mob.images[mob.lastKey].w + 'px';
-		e.style.height = mob.images[mob.lastKey].h + 'px';
-		d.appendChild(n);
-		d.appendChild(e);
+		img.id = 'sprite';
+		img.className = 'mob-image';
+		img.style.width = size * mob.images[mob.lastKey].w + 'px';
+		img.style.height = size * mob.images[mob.lastKey].h + 'px';
+		d.appendChild(name);
+		name.appendChild(bar);
+		bar.appendChild(health);
+		d.appendChild(img);
+		d.appendChild(click);
 		document.getElementById('title-scene').appendChild(d);
-		mob.element = e;
+		mob.element = img;
 		mob.idle();
 	},
 	element: {},

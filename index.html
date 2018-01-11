@@ -31,7 +31,7 @@
 	<!--link rel="stylesheet" href="css/bootstrap-slider.min.css"-->
 	<script>
 		var g = {
-			version: '0.0.60',
+			version: '0.0.61',
 			initialized: 0,
 			session_id: '',
 			isApp: location.protocol === 'chrome-extension:' ? 1 : 0
@@ -150,14 +150,14 @@
 		</div>
 	</div>
 
-	<div id="title-scene" class="scene">
+	<div id="scene-title" class="scene">
 		<div id="ng2-logo-wrap" class="scene">
 			<img src="img2/ng2-bg.jpg" id="ng2-bg" alt="Nevergrind 2 Background">
 			<img id="neverworks-logo" src="/img2/neverworks.png">
 			<div id="version" class="text-shadow"></div>
 		</div>
 
-		<div id="title-scene-select-character">
+		<div id="scene-title-select-character">
 
 			<header id="title-header" class="text-primary text-shadow">
 				<div class="title-column">
@@ -260,9 +260,9 @@
 				</div>
 			</div>
 
-		</div> <!-- end title-scene-select-character -->
+		</div> <!-- end scene-title-select-character -->
 
-		<div id="title-scene-create-character" class="none">
+		<div id="scene-title-create-character" class="none">
 
 			<div class="container-fluid text-shadow">
 				<div class="row title-menu-row stag-blue">
@@ -586,10 +586,16 @@
 			</div>
 		</div>
 
-	</div> <!-- end title-scene -->
+	</div> <!-- end scene-title -->
 
-	<div id="game-wrap" class="scene">
-	</div> <!-- end game-wrap -->
+	<div id="scene-dungeon" class="scene none">
+	</div> <!-- end scene-dungeon -->
+
+	<div id="scene-battle" class="scene none">
+	</div> <!-- end scene-battle -->
+
+	<div id="scene-town" class="scene none">
+	</div> <!-- end scene-town -->
 
 	<audio id="bgmusic" autoplay loop preload="auto"></audio>
 
@@ -1005,6 +1011,7 @@
 				"socket",
 				"chat",
 				"payment",
+				"battle",
 				"mob",
 				"test"
 			]

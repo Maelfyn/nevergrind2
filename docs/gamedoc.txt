@@ -1,6 +1,13 @@
 TODO:
+100 height small
+150 height sm-md
+200 med
+300 height large
+400 height+ huge?
+
 - add backstab, archery, shadow kick as skills. make casting spells conditionally added to separate table?
 - add hitbox coordinates + when dead
+- on resize of window, must resize all mobs for responsiveness
 - Finish insert items template files
 	establish low/high values from 1-50 items
 	create all items

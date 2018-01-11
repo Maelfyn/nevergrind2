@@ -1,394 +1,1135 @@
 // test methods
+var mobs = [];
 var mob = {
 	test: 1,
 	images: {
 		'balrog': {
 			w: 2000,
 			h: 1200,
-			yFloor: 25,
+			yFloor: 3,
 			yoyo: true,
 			cache: [],
 			speed: .05,
 			nameTop: 10,
-			bottomShadow: 10,
+			shadowBottom: 10,
 			click: {
-				min: {
+				alive: {
 					x: 0,
-					y: 0
+					y: 0,
+					w: 0,
+					h: 0
 				},
-				max: {
+				dead: {
 					x: 0,
-					y: 0
+					y: 0,
+					w: 0,
+					h: 0
 				}
 			}
 		},
 		'ice-golem': {
 			w: 1200,
 			h: 1000,
-			yFloor: 25,
+			yFloor: 3,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'stone-golem': {
 			w: 1200,
 			h: 1000,
-			yFloor: 25,
+			yFloor: 3,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'clay-golem': {
 			w: 1200,
 			h: 1000,
-			yFloor: 25,
+			yFloor: 3,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'treant': {
 			w: 1300,
 			h: 1200,
-			yFloor: 25,
+			yFloor: 3,
 			yoyo: false,
 			cache: [],
-			speed: .05
+			speed: .05,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'spider': {
 			w: 1000,
 			h: 1000,
-			yFloor: 25,
+			yFloor: 3,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'wolf': {
 			w: 900,
 			h: 1000,
-			yFloor: 25,
+			yFloor: 3,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'rat': {
 			w: 1100,
 			h: 1000,
-			yFloor: 25,
+			yFloor: 3,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'snake': {
 			w: 1000,
 			h: 1000,
-			yFloor: 25,
+			yFloor: 3,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'dragonkin': {
 			w: 1300,
 			h: 1300,
-			yFloor: 25,
+			yFloor: 3,
 			yoyo: false,
 			cache: [],
-			speed: .055
+			speed: .055,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'lizardman': {
 			w: 1100,
 			h: 1000,
-			yFloor: 25,
+			yFloor: 3,
 			yoyo: true,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'dragon': {
 			w: 3000,
 			h: 1500,
-			yFloor: 25,
+			yFloor: 3,
 			yoyo: true,
 			cache: [],
-			speed: .06
+			speed: .06,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'ghoul': {
 			w: 900,
 			h: 1000,
-			yFloor: 25,
+			yFloor: 3,
 			yoyo: true,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'mummy': {
 			w: 800,
 			h: 1000,
-			yFloor: 25,
+			yFloor: 3,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'skeleton': {
 			w: 900,
 			h: 1000,
-			yFloor: 25,
+			yFloor: 3,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'zombie': {
 			w: 900,
 			h: 1000,
-			yFloor: 25,
+			yFloor: 3,
 			yoyo: true,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'vampire': {
 			w: 1000,
 			h: 1000,
-			yFloor: 25,
+			yFloor: 3,
 			yoyo: true,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'goblin': {
 			w: 1000,
 			h: 1000,
-			yFloor: 25,
+			yFloor: 3,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'hobgoblin': {
 			w: 1000,
 			h: 1000,
-			yFloor: 25,
+			yFloor: 3,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'kobold': {
 			w: 1400,
 			h: 1000,
-			yFloor: 25,
+			yFloor: 3,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'orc': {
 			w: 1200,
 			h: 1000,
-			yFloor: 25,
+			yFloor: 3,
 			yoyo: false,
 			cache: [],
-			speed: .045
+			speed: .045,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'griffon': {
 			w: 2000,
 			h: 1200,
-			yFloor: 25,
+			yFloor: 3,
 			yoyo: false,
 			cache: [],
-			speed: .05
+			speed: .05,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'harpy': {
 			w: 1500,
 			h: 1000,
-			yFloor: 25,
+			yFloor: 3,
 			yoyo: false,
 			cache: [],
-			speed: .045
+			speed: .045,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'werewolf': {
 			w: 1000,
 			h: 1000,
-			yFloor: 25,
+			yFloor: 3,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'centaur': {
 			w: 1500,
 			h: 1000,
-			yFloor: 25,
+			yFloor: 3,
 			yoyo: false,
 			cache: [],
-			speed: .045
+			speed: .045,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'cerberus': {
 			w: 1300,
 			h: 1000,
-			yFloor: 25,
+			yFloor: 3,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'fungoid': {
 			w: 1000,
 			h: 1000,
-			yFloor: 25,
+			yFloor: 3,
 			yoyo: true,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'gargoyle': {
 			w: 1200,
 			h: 1000,
-			yFloor: 25,
+			yFloor: 3,
 			yoyo: true,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'beetle': {
 			w: 1000,
 			h: 1000,
-			yFloor: 25,
+			yFloor: 3,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'imp': {
 			w: 1250,
 			h: 1000,
-			yFloor: 25,
+			yFloor: 3,
 			yoyo: true,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'minotaur': {
 			w: 1000,
 			h: 1000,
-			yFloor: 25,
+			yFloor: 3,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'aviak': {
 			w: 1200,
 			h: 1000,
-			yFloor: 25,
+			yFloor: 3,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'elephant': {
 			w: 1300,
 			h: 1000,
-			yFloor: 25,
+			yFloor: 3,
 			yoyo: false,
 			cache: [],
-			speed: .05
+			speed: .05,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'lion': {
 			w: 900,
 			h: 1200,
-			yFloor: 25,
+			yFloor: 3,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'crocodile': {
 			w: 1000,
 			h: 1000,
-			yFloor: 25,
+			yFloor: 3,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'rhino': {
 			w: 1200,
 			h: 1200,
-			yFloor: 25,
+			yFloor: 3,
 			yoyo: false,
 			cache: [],
-			speed: .045
+			speed: .045,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'lioness': {
 			w: 900,
 			h: 1200,
-			yFloor: 25,
+			yFloor: 3,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'bear': {
 			w: 1000,
 			h: 1000,
-			yFloor: 25,
+			yFloor: 3,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'toadlok': {
 			w: 1200,
 			h: 1000,
-			yFloor: 25,
+			yFloor: 3,
 			yoyo: false,
 			cache: [],
-			speed: .04
+			speed: .04,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'giant': {
 			w: 1400,
 			h: 1200,
-			yFloor: 25,
+			yFloor: 3,
 			yoyo: false,
 			cache: [],
-			speed: .05
+			speed: .05,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'ice-giant': {
 			w: 1400,
 			h: 1200,
-			yFloor: 25,
+			yFloor: -2,
 			yoyo: false,
 			cache: [],
-			speed: .06
+			speed: .06,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'fire-giant': {
 			w: 1400,
 			h: 1200,
-			yFloor: 25,
+			yFloor: -2,
 			yoyo: false,
 			cache: [],
-			speed: .06
+			speed: .06,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'spectre': {
 			w: 1500,
 			h: 1500,
-			yFloor: 25,
+			yFloor: -18,
 			yoyo: false,
 			cache: [],
-			speed: .055
+			speed: .055,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'angler': {
 			w: 1500,
 			h: 1200,
-			yFloor: 25,
+			yFloor: 1,
 			yoyo: false,
 			cache: [],
-			speed: .045
+			speed: .045,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'beholder': {
 			w: 1200,
 			h: 1000,
-			yFloor: 25,
+			yFloor: -4,
 			yoyo: false,
 			cache: [],
-			speed: .05
+			speed: .05,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'unicorn': {
 			w: 2000,
 			h: 1200,
-			yFloor: 25,
+			yFloor: 7,
 			yoyo: false,
 			cache: [],
-			speed: .055
+			speed: .055,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		},
 		'scorpion': {
-			w: 1000,
-			h: 1000,
-			yFloor: 25,
+			w: 600,
+			h: 600,
+			yFloor: 0, // back row is *2
 			yoyo: false,
 			cache: [],
-			speed: .045
+			speed: .045,
+			nameTop: 10,
+			shadowBottom: 10,
+			click: {
+				alive: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				},
+				dead: {
+					x: 0,
+					y: 0,
+					w: 0,
+					h: 0
+				}
+			}
 		}
 		/* skipped mobs
 		wyvern
@@ -432,101 +1173,78 @@ var mob = {
 		}
 	},
 	initialized: 0,
+	max: 8,
 	init: function(){
-		if (!mob.initialized) {
-			mob.initialized = 1;
-			mob.imageKeys = Object.keys(mob.images);
-			mob.index = mob.imageKeys.length - 1;
-			var setMob = '';
-			if (setMob) {
-				var index = 0,
-					i = 0;
-				for (var key in mob.images){
-					if (setMob === key){
-						index = i;
-					}
-					i++;
-				}
-				mob.index = index;
-			}
+		battle.show();
+		// init mob/dom connections
+		for (var i=0; i<mob.max; i++){
+			mobs[i] = {};
+			var m = mobs[i];
+			m.frame = 0;
+			m.lastFrame = 0;
+			m.animationActive = 0;
+			m.deathState = 0;
+			m.speed = 0;
+			m.type = 'scorpion';
+			m.wrap = document.getElementById('mob-wrap-' + i);
+			m.img = document.getElementById('mob-img-' + i);
+			m.name = document.getElementById('mob-name-' + i);
+			m.bar = document.getElementById('mob-bar-' + i);
 		}
-		var size = 1;
-
-		mob.lastKey = mob.imageKeys[Math.abs(mob.index-- % mob.imageKeys.length)];
-		mob.preloadMob(mob.lastKey);
-		var nextKey = mob.imageKeys[Math.abs(mob.index % mob.imageKeys.length)];
-		mob.preloadMob(nextKey);
-		var d = document.createElement('div'),
-			e = document.createElement('img'),
-			n = document.createElement('div');
-		// div parent
-		d.style.bottom = '5px';
-		d.style.left = '50%';
-		d.style.right = '0';
-		d.style.margin = '0 auto';
-		d.className = 'mob-wrap text-shadow';
-		d.style.width = size * mob.images[mob.lastKey].w + 'px';
-		d.style.height = size * mob.images[mob.lastKey].h + 'px';
-		d.id = 'mob-parent';
-		// name
-		n.style.top = '10%';
-		n.className = 'mob-name';
-		n.innerHTML = mob.lastKey.replace(/-/g, ' ');
-		// img
-		e.id = 'sprite';
-		e.className = 'mob-image';
-		e.style.width = size * mob.images[mob.lastKey].w + 'px';
-		e.style.height = size * mob.images[mob.lastKey].h + 'px';
-		d.appendChild(n);
-		d.appendChild(e);
-		document.getElementById('title-scene').appendChild(d);
-		mob.element = e;
-		mob.idle();
+		battle.init();
 	},
 	element: {},
 	animationActive: 0,
 	frame: 1,
-	setSrc: function(type, frame){
-		frame = ~~(frame);
-		if (frame !== mob.frame) {
-			mob.element.src = 'mobs/' + type + '/' + frame + '.png';
-			mob.frame = frame;
+	setMob: function(m, type){
+		var x = mob.images[type];
+		m.type = type;
+		m = Object.assign(m, mob.images[type]);
+		delete m.cache;
+	},
+	setSrc: function(m){
+		m.frame = ~~m.frame;
+		if (m.frame !== m.lastFrame) {
+			m.img.src = 'mobs/' + m.type + '/' + m.frame + '.png';
+			m.lastFrame = m.frame;
 		}
 	},
-	resetIdle: function(){
-		mob.animationActive = 0;
-		mob.idle(1);
+	resetIdle: function(m){
+		m.animationActive = 0;
+		mob.idle(m, 1);
 	},
-	idle: function(skip){
+	idle: function(m, skip){
 		var startFrame = 1,
-			endFrame = 6,
+			endFrame = 5.9,
 			diff = endFrame - startFrame;
 
-		TweenMax.to(mob, mob.images[mob.lastKey].speed * diff * 2, {
+		TweenMax.to(m, m.speed * diff * 2, {
 			startAt: {
 				frame: startFrame
 			},
 			frame: endFrame,
 			yoyo: true,
 			repeat: -1,
-			repeatDelay: mob.images[mob.lastKey].speed,
+			repeatDelay: m.speed,
 			ease: Sine.easeOut,
 			onUpdate: function(){
-				mob.setSrc(mob.lastKey, mob.frame);
+				mob.setSrc(m);
 			}
 		});
 		if (skip) return;
-		TweenMax.delayedCall(2, function(){
-			mob.test && mob.hit();
+		TweenMax.delayedCall(1, function(){
+			mob.test && mob.hit(m);
+			//mob.death();
 		})
 	},
-	hit: function(){
-		if (mob.animationActive) return;
-		mob.animationActive = 1;
+	hit: function(m){
+		if (m.animationActive) return;
+		m.animationActive = 1;
 		var startFrame = 6,
-			endFrame = 16,
+			endFrame = 15.9,
 			diff = endFrame - startFrame;
-		TweenMax.to(mob, mob.images[mob.lastKey].speed * diff, {
+
+		TweenMax.to(m, m.speed * diff, {
 			startAt: {
 				frame: startFrame
 			},
@@ -536,29 +1254,29 @@ var mob = {
 			yoyo: true,
 			repeat: 1,
 			onUpdate: function(){
-				mob.setSrc(mob.lastKey, mob.frame);
+				mob.setSrc(m);
 			},
 			onComplete: function(){
-				mob.resetIdle();
+				mob.resetIdle(m);
 				if (mob.test){
 					TweenMax.delayedCall(1, function() {
-						mob.attack(1);
+						mob.attack(m, 1);
 					});
 				}
 			}
 		});
 	},
-	attack: function(force){
-		if (mob.animationActive) return;
-		mob.animationActive = 1;
+	attack: function(m, force){
+		if (m.animationActive) return;
+		m.animationActive = 1;
 		var tl = g.TM(),
 			foo = force ? force : !Math.round(Math.random()) ? 1 : 2,
 			startFrame = foo === 1 ?
-				16 : 36,
+				15.9 : 35.9,
 			endFrame = startFrame + 20,
 			diff = endFrame - startFrame;
 
-		tl.to(mob, mob.images[mob.lastKey].speed * diff, {
+		tl.to(m, m.speed * diff, {
 			startAt: {
 				frame: startFrame
 			},
@@ -566,65 +1284,65 @@ var mob = {
 			frame: endFrame,
 			ease: Linear.easeNone,
 			onUpdate: function() {
-				mob.setSrc(mob.lastKey, mob.frame);
+				mob.setSrc(m);
 			},
 			onComplete: function() {
-				mob.resetIdle();
+				mob.resetIdle(m);
 				if (mob.test){
 					if (force === 1){
 						TweenMax.delayedCall(1, function() {
-							mob.attack(2);
+							mob.attack(m, 2);
 						});
 					}
 					else {
 						TweenMax.delayedCall(1, function() {
-							mob.special();
+							mob.special(m);
 						});
 					}
 				}
 			}
 		});
 	},
-	special: function(){
-		if (mob.animationActive) return;
-		mob.animationActive = 1;
+	special: function(m){
+		if (m.animationActive) return;
+		m.animationActive = 1;
 		var startFrame = 56,
-			endFrame = 76,
+			endFrame = 75.9,
 			diff = endFrame - startFrame;
 
 		var tl = g.TM();
-		tl.to(mob, mob.images[mob.lastKey].speed * diff, {
+		tl.to(m, m.speed * diff, {
 			startAt: {
 				frame: startFrame
 			},
 			overwrite: 1,
 			frame: endFrame,
 			ease: Linear.easeNone,
-			yoyo: mob.images[mob.lastKey].yoyo,
-			repeat: mob.images[mob.lastKey].yoyo ? 1 : 0,
+			yoyo: m.yoyo,
+			repeat: m.yoyo ? 1 : 0,
 			onUpdate: function(){
-				mob.setSrc(mob.lastKey, mob.frame);
+				mob.setSrc(m);
 			},
 			onComplete: function () {
-				mob.resetIdle();
+				mob.resetIdle(m);
 				if (mob.test) {
 					TweenMax.delayedCall(1, function () {
-						mob.death();
+						mob.death(m);
 					});
 				}
 			}
 		});
 	},
-	death: function(){
-		if (mob.deathState) return;
-		mob.deathState = 1;
-		mob.animationActive = 1;
+	death: function(m){
+		if (m.deathState) return;
+		m.deathState = 1;
+		m.animationActive = 1;
 		var tl = g.TM(),
 			startFrame = 76,
-			endFrame = 106,
+			endFrame = 105.9,
 			diff = endFrame - startFrame;
 
-		tl.to(mob, mob.images[mob.lastKey].speed * diff, {
+		tl.to(m, m.speed * diff, {
 			startAt: {
 				frame: startFrame
 			},
@@ -632,7 +1350,7 @@ var mob = {
 			frame: endFrame,
 			ease: Linear.easeNone,
 			onUpdate: function () {
-				mob.setSrc(mob.lastKey, mob.frame);
+				mob.setSrc(m);
 			},
 			onComplete: function() {
 				var filters = {
@@ -642,7 +1360,7 @@ var mob = {
 
 				var tl = new TimelineMax({
 					onUpdate: function () {
-						test.filters.death(mob.element, filters);
+						test.filters.death(m.img, filters);
 					}
 				});
 				tl.to(filters, 2, {
@@ -651,16 +1369,12 @@ var mob = {
 					ease: Linear.easeIn,
 					onComplete: function () {
 						if (mob.test) {
-							$("#mob-parent").remove();
-							mob.init();
-						}
-						else {
-							mob.idle();
+							mob.idle(m);
 						}
 						TweenMax.delayedCall(.1, function () {
-							mob.deathState = 0;
-							mob.animationActive = 0;
-							mob.element.style.filter = 'opacity(100%) brightness(100%)';
+							m.deathState = 0;
+							m.animationActive = 0;
+							m.img.style.filter = 'opacity(100%) brightness(100%)';
 						});
 					}
 				});

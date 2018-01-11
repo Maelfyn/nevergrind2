@@ -113,6 +113,11 @@ g = Object.assign(g, {
 	locked: 0,
 	loadAttempts: 0,
 	isModalOpen: false,
+	setScene: function(scene){
+		$(".scene").removeClass('none')
+			.css('display', 'none');
+		document.getElementById('scene-' + scene).style.display = 'block';
+	},
 	camel: function(str){
 		str = str.split("-");
 		for (var i=1, len=str.length; i<len; i++){
@@ -351,7 +356,7 @@ g = Object.assign(g, {
 	},
 	goCreateCharacter: function(){
 		g.lock(1);
-		var z = '#title-scene-select-character',
+		var z = '#scene-title-select-character',
 			prom = 0,
 			allDone = function(){
 				if (++prom === 2){
@@ -363,7 +368,7 @@ g = Object.assign(g, {
 					});
 					create.setRandomGender();
 					create.setRandomRace();
-					TweenMax.to('#title-scene-create-character', .6, {
+					TweenMax.to('#scene-title-create-character', .6, {
 						startAt: {
 							display: 'block',
 							y: 20,

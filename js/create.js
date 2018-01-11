@@ -103,7 +103,7 @@ var create = {
 		$("#create-character-back").on(x, function(){
 			g.lock(1);
 			g.initGame();
-			var z = document.getElementById('title-scene-create-character');
+			var z = document.getElementById('scene-title-create-character');
 			TweenMax.to(z, .6, {
 				y: 20,
 				opacity: 0,
@@ -112,7 +112,7 @@ var create = {
 						display: 'none',
 						opacity: 1
 					});
-					TweenMax.to('#title-scene-select-character', .6, {
+					TweenMax.to('#scene-title-select-character', .6, {
 						startAt: {
 							display: 'block',
 							y: 20,
