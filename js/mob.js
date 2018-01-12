@@ -4,14 +4,22 @@ var mob = {
 	test: 1,
 	images: {
 		'balrog': {
+			imgW: 2000,
+			imgH: 1200,
 			w: 2000,
 			h: 1200,
 			yFloor: 3,
 			yoyo: true,
 			cache: [],
+			size: 1,
 			speed: .05,
-			nameTop: 10,
+			nameBottom: 10,
 			shadowBottom: 10,
+			shadowWidth: 400,
+			center: {
+				x: 0,
+				y: 0
+			},
 			click: {
 				alive: {
 					x: 0,
@@ -28,14 +36,22 @@ var mob = {
 			}
 		},
 		'ice-golem': {
+			imgW: 1200,
+			imgH: 1000,
 			w: 1200,
 			h: 1000,
 			yFloor: 3,
 			yoyo: false,
 			cache: [],
+			size: 1,
 			speed: .04,
-			nameTop: 10,
+			nameBottom: 10,
 			shadowBottom: 10,
+			shadowWidth: 400,
+			center: {
+				x: 0,
+				y: 0
+			},
 			click: {
 				alive: {
 					x: 0,
@@ -52,14 +68,22 @@ var mob = {
 			}
 		},
 		'stone-golem': {
+			imgW: 1200,
+			imgH: 1000,
 			w: 1200,
 			h: 1000,
 			yFloor: 3,
 			yoyo: false,
 			cache: [],
+			size: 1,
 			speed: .04,
-			nameTop: 10,
+			nameBottom: 10,
 			shadowBottom: 10,
+			shadowWidth: 400,
+			center: {
+				x: 0,
+				y: 0
+			},
 			click: {
 				alive: {
 					x: 0,
@@ -76,14 +100,22 @@ var mob = {
 			}
 		},
 		'clay-golem': {
+			imgW: 1200,
+			imgH: 1000,
 			w: 1200,
 			h: 1000,
 			yFloor: 3,
 			yoyo: false,
 			cache: [],
+			size: 1,
 			speed: .04,
-			nameTop: 10,
+			nameBottom: 10,
 			shadowBottom: 10,
+			shadowWidth: 400,
+			center: {
+				x: 0,
+				y: 0
+			},
 			click: {
 				alive: {
 					x: 0,
@@ -100,14 +132,22 @@ var mob = {
 			}
 		},
 		'treant': {
+			imgW: 1300,
+			imgH: 1200,
 			w: 1300,
 			h: 1200,
 			yFloor: 3,
 			yoyo: false,
 			cache: [],
+			size: 1,
 			speed: .05,
-			nameTop: 10,
+			nameBottom: 10,
 			shadowBottom: 10,
+			shadowWidth: 400,
+			center: {
+				x: 0,
+				y: 0
+			},
 			click: {
 				alive: {
 					x: 0,
@@ -124,14 +164,22 @@ var mob = {
 			}
 		},
 		'spider': {
+			imgW: 1000,
+			imgH: 1000,
 			w: 1000,
 			h: 1000,
 			yFloor: 3,
 			yoyo: false,
 			cache: [],
+			size: 1,
 			speed: .04,
-			nameTop: 10,
+			nameBottom: 10,
 			shadowBottom: 10,
+			shadowWidth: 400,
+			center: {
+				x: 0,
+				y: 0
+			},
 			click: {
 				alive: {
 					x: 0,
@@ -148,14 +196,22 @@ var mob = {
 			}
 		},
 		'wolf': {
+			imgW: 900,
+			imgH: 1000,
 			w: 900,
 			h: 1000,
 			yFloor: 3,
 			yoyo: false,
 			cache: [],
+			size: 1,
 			speed: .04,
-			nameTop: 10,
+			nameBottom: 10,
 			shadowBottom: 10,
+			shadowWidth: 400,
+			center: {
+				x: 0,
+				y: 0
+			},
 			click: {
 				alive: {
 					x: 0,
@@ -172,14 +228,22 @@ var mob = {
 			}
 		},
 		'rat': {
+			imgW: 1100,
+			imgH: 1000,
 			w: 1100,
 			h: 1000,
 			yFloor: 3,
 			yoyo: false,
 			cache: [],
+			size: 1,
 			speed: .04,
-			nameTop: 10,
+			nameBottom: 10,
 			shadowBottom: 10,
+			shadowWidth: 400,
+			center: {
+				x: 0,
+				y: 0
+			},
 			click: {
 				alive: {
 					x: 0,
@@ -196,14 +260,22 @@ var mob = {
 			}
 		},
 		'snake': {
+			imgW: 1000,
+			imgH: 1000,
 			w: 1000,
 			h: 1000,
 			yFloor: 3,
 			yoyo: false,
 			cache: [],
+			size: 1,
 			speed: .04,
-			nameTop: 10,
+			nameBottom: 10,
 			shadowBottom: 10,
+			shadowWidth: 400,
+			center: {
+				x: 0,
+				y: 0
+			},
 			click: {
 				alive: {
 					x: 0,
@@ -220,14 +292,22 @@ var mob = {
 			}
 		},
 		'dragonkin': {
+			imgW: 1300,
+			imgH: 1300,
 			w: 1300,
 			h: 1300,
 			yFloor: 3,
 			yoyo: false,
 			cache: [],
+			size: 1,
 			speed: .055,
-			nameTop: 10,
+			nameBottom: 10,
 			shadowBottom: 10,
+			shadowWidth: 400,
+			center: {
+				x: 0,
+				y: 0
+			},
 			click: {
 				alive: {
 					x: 0,
@@ -244,14 +324,22 @@ var mob = {
 			}
 		},
 		'lizardman': {
+			imgW: 1100,
+			imgH: 1000,
 			w: 1100,
 			h: 1000,
 			yFloor: 3,
 			yoyo: true,
 			cache: [],
+			size: 1,
 			speed: .04,
-			nameTop: 10,
+			nameBottom: 10,
 			shadowBottom: 10,
+			shadowWidth: 400,
+			center: {
+				x: 0,
+				y: 0
+			},
 			click: {
 				alive: {
 					x: 0,
@@ -268,14 +356,22 @@ var mob = {
 			}
 		},
 		'dragon': {
+			imgW: 3000,
+			imgH: 1500,
 			w: 3000,
 			h: 1500,
 			yFloor: 3,
 			yoyo: true,
 			cache: [],
+			size: 1,
 			speed: .06,
-			nameTop: 10,
+			nameBottom: 10,
 			shadowBottom: 10,
+			shadowWidth: 400,
+			center: {
+				x: 0,
+				y: 0
+			},
 			click: {
 				alive: {
 					x: 0,
@@ -292,14 +388,22 @@ var mob = {
 			}
 		},
 		'ghoul': {
+			imgW: 900,
+			imgH: 1000,
 			w: 900,
 			h: 1000,
 			yFloor: 3,
 			yoyo: true,
 			cache: [],
+			size: 1,
 			speed: .04,
-			nameTop: 10,
+			nameBottom: 10,
 			shadowBottom: 10,
+			shadowWidth: 400,
+			center: {
+				x: 0,
+				y: 0
+			},
 			click: {
 				alive: {
 					x: 0,
@@ -316,14 +420,22 @@ var mob = {
 			}
 		},
 		'mummy': {
+			imgW: 800,
+			imgH: 1000,
 			w: 800,
 			h: 1000,
 			yFloor: 3,
 			yoyo: false,
 			cache: [],
+			size: 1,
 			speed: .04,
-			nameTop: 10,
+			nameBottom: 10,
 			shadowBottom: 10,
+			shadowWidth: 400,
+			center: {
+				x: 0,
+				y: 0
+			},
 			click: {
 				alive: {
 					x: 0,
@@ -340,14 +452,22 @@ var mob = {
 			}
 		},
 		'skeleton': {
+			imgW: 900,
+			imgH: 1000,
 			w: 900,
 			h: 1000,
 			yFloor: 3,
 			yoyo: false,
 			cache: [],
+			size: 1,
 			speed: .04,
-			nameTop: 10,
+			nameBottom: 10,
 			shadowBottom: 10,
+			shadowWidth: 400,
+			center: {
+				x: 0,
+				y: 0
+			},
 			click: {
 				alive: {
 					x: 0,
@@ -364,14 +484,22 @@ var mob = {
 			}
 		},
 		'zombie': {
+			imgW: 900,
+			imgH: 1000,
 			w: 900,
 			h: 1000,
 			yFloor: 3,
 			yoyo: true,
 			cache: [],
+			size: 1,
 			speed: .04,
-			nameTop: 10,
+			nameBottom: 10,
 			shadowBottom: 10,
+			shadowWidth: 400,
+			center: {
+				x: 0,
+				y: 0
+			},
 			click: {
 				alive: {
 					x: 0,
@@ -388,14 +516,22 @@ var mob = {
 			}
 		},
 		'vampire': {
+			imgW: 1000,
+			imgH: 1000,
 			w: 1000,
 			h: 1000,
 			yFloor: 3,
 			yoyo: true,
 			cache: [],
+			size: 1,
 			speed: .04,
-			nameTop: 10,
+			nameBottom: 10,
 			shadowBottom: 10,
+			shadowWidth: 400,
+			center: {
+				x: 0,
+				y: 0
+			},
 			click: {
 				alive: {
 					x: 0,
@@ -412,14 +548,22 @@ var mob = {
 			}
 		},
 		'goblin': {
+			imgW: 1000,
+			imgH: 1000,
 			w: 1000,
 			h: 1000,
 			yFloor: 3,
 			yoyo: false,
 			cache: [],
+			size: 1,
 			speed: .04,
-			nameTop: 10,
+			nameBottom: 10,
 			shadowBottom: 10,
+			shadowWidth: 400,
+			center: {
+				x: 0,
+				y: 0
+			},
 			click: {
 				alive: {
 					x: 0,
@@ -436,14 +580,22 @@ var mob = {
 			}
 		},
 		'hobgoblin': {
+			imgW: 1000,
+			imgH: 1000,
 			w: 1000,
 			h: 1000,
 			yFloor: 3,
 			yoyo: false,
 			cache: [],
+			size: 1,
 			speed: .04,
-			nameTop: 10,
+			nameBottom: 10,
 			shadowBottom: 10,
+			shadowWidth: 400,
+			center: {
+				x: 0,
+				y: 0
+			},
 			click: {
 				alive: {
 					x: 0,
@@ -460,14 +612,22 @@ var mob = {
 			}
 		},
 		'kobold': {
+			imgW: 1400,
+			imgH: 1000,
 			w: 1400,
 			h: 1000,
 			yFloor: 3,
 			yoyo: false,
 			cache: [],
+			size: 1,
 			speed: .04,
-			nameTop: 10,
+			nameBottom: 10,
 			shadowBottom: 10,
+			shadowWidth: 400,
+			center: {
+				x: 0,
+				y: 0
+			},
 			click: {
 				alive: {
 					x: 0,
@@ -484,14 +644,22 @@ var mob = {
 			}
 		},
 		'orc': {
+			imgW: 1200,
+			imgH: 1000,
 			w: 1200,
 			h: 1000,
 			yFloor: 3,
 			yoyo: false,
 			cache: [],
+			size: 1,
 			speed: .045,
-			nameTop: 10,
+			nameBottom: 10,
 			shadowBottom: 10,
+			shadowWidth: 400,
+			center: {
+				x: 0,
+				y: 0
+			},
 			click: {
 				alive: {
 					x: 0,
@@ -508,14 +676,22 @@ var mob = {
 			}
 		},
 		'griffon': {
+			imgW: 2000,
+			imgH: 1000,
 			w: 2000,
 			h: 1200,
 			yFloor: 3,
 			yoyo: false,
 			cache: [],
+			size: 1,
 			speed: .05,
-			nameTop: 10,
+			nameBottom: 10,
 			shadowBottom: 10,
+			shadowWidth: 400,
+			center: {
+				x: 0,
+				y: 0
+			},
 			click: {
 				alive: {
 					x: 0,
@@ -532,14 +708,22 @@ var mob = {
 			}
 		},
 		'harpy': {
+			imgW: 1500,
+			imgH: 1000,
 			w: 1500,
 			h: 1000,
 			yFloor: 3,
 			yoyo: false,
 			cache: [],
+			size: 1,
 			speed: .045,
-			nameTop: 10,
+			nameBottom: 10,
 			shadowBottom: 10,
+			shadowWidth: 400,
+			center: {
+				x: 0,
+				y: 0
+			},
 			click: {
 				alive: {
 					x: 0,
@@ -556,14 +740,22 @@ var mob = {
 			}
 		},
 		'werewolf': {
+			imgW: 1000,
+			imgH: 1000,
 			w: 1000,
 			h: 1000,
 			yFloor: 3,
 			yoyo: false,
 			cache: [],
+			size: 1,
 			speed: .04,
-			nameTop: 10,
+			nameBottom: 10,
 			shadowBottom: 10,
+			shadowWidth: 400,
+			center: {
+				x: 0,
+				y: 0
+			},
 			click: {
 				alive: {
 					x: 0,
@@ -580,14 +772,22 @@ var mob = {
 			}
 		},
 		'centaur': {
+			imgW: 1500,
+			imgH: 1000,
 			w: 1500,
 			h: 1000,
 			yFloor: 3,
 			yoyo: false,
 			cache: [],
+			size: 1,
 			speed: .045,
-			nameTop: 10,
+			nameBottom: 10,
 			shadowBottom: 10,
+			shadowWidth: 400,
+			center: {
+				x: 0,
+				y: 0
+			},
 			click: {
 				alive: {
 					x: 0,
@@ -604,14 +804,22 @@ var mob = {
 			}
 		},
 		'cerberus': {
+			imgW: 1300,
+			imgH: 1000,
 			w: 1300,
 			h: 1000,
 			yFloor: 3,
 			yoyo: false,
 			cache: [],
+			size: 1,
 			speed: .04,
-			nameTop: 10,
+			nameBottom: 10,
 			shadowBottom: 10,
+			shadowWidth: 400,
+			center: {
+				x: 0,
+				y: 0
+			},
 			click: {
 				alive: {
 					x: 0,
@@ -628,14 +836,22 @@ var mob = {
 			}
 		},
 		'fungoid': {
+			imgW: 1000,
+			imgH: 1000,
 			w: 1000,
 			h: 1000,
 			yFloor: 3,
 			yoyo: true,
 			cache: [],
+			size: 1,
 			speed: .04,
-			nameTop: 10,
+			nameBottom: 10,
 			shadowBottom: 10,
+			shadowWidth: 400,
+			center: {
+				x: 0,
+				y: 0
+			},
 			click: {
 				alive: {
 					x: 0,
@@ -652,14 +868,22 @@ var mob = {
 			}
 		},
 		'gargoyle': {
+			imgW: 1200,
+			imgH: 1000,
 			w: 1200,
 			h: 1000,
 			yFloor: 3,
 			yoyo: true,
 			cache: [],
+			size: 1,
 			speed: .04,
-			nameTop: 10,
+			nameBottom: 10,
 			shadowBottom: 10,
+			shadowWidth: 400,
+			center: {
+				x: 0,
+				y: 0
+			},
 			click: {
 				alive: {
 					x: 0,
@@ -676,14 +900,22 @@ var mob = {
 			}
 		},
 		'beetle': {
+			imgW: 1000,
+			imgH: 1000,
 			w: 1000,
 			h: 1000,
 			yFloor: 3,
 			yoyo: false,
 			cache: [],
+			size: 1,
 			speed: .04,
-			nameTop: 10,
+			nameBottom: 10,
 			shadowBottom: 10,
+			shadowWidth: 400,
+			center: {
+				x: 0,
+				y: 0
+			},
 			click: {
 				alive: {
 					x: 0,
@@ -700,14 +932,22 @@ var mob = {
 			}
 		},
 		'imp': {
+			imgW: 1250,
+			imgH: 1000,
 			w: 1250,
 			h: 1000,
 			yFloor: 3,
 			yoyo: true,
 			cache: [],
+			size: 1,
 			speed: .04,
-			nameTop: 10,
+			nameBottom: 10,
 			shadowBottom: 10,
+			shadowWidth: 400,
+			center: {
+				x: 0,
+				y: 0
+			},
 			click: {
 				alive: {
 					x: 0,
@@ -724,14 +964,22 @@ var mob = {
 			}
 		},
 		'minotaur': {
+			imgW: 1000,
+			imgH: 1000,
 			w: 1000,
 			h: 1000,
 			yFloor: 3,
 			yoyo: false,
 			cache: [],
+			size: 1,
 			speed: .04,
-			nameTop: 10,
+			nameBottom: 10,
 			shadowBottom: 10,
+			shadowWidth: 400,
+			center: {
+				x: 0,
+				y: 0
+			},
 			click: {
 				alive: {
 					x: 0,
@@ -748,14 +996,22 @@ var mob = {
 			}
 		},
 		'aviak': {
+			imgW: 1200,
+			imgH: 1000,
 			w: 1200,
 			h: 1000,
 			yFloor: 3,
 			yoyo: false,
 			cache: [],
+			size: 1,
 			speed: .04,
-			nameTop: 10,
+			nameBottom: 10,
 			shadowBottom: 10,
+			shadowWidth: 400,
+			center: {
+				x: 0,
+				y: 0
+			},
 			click: {
 				alive: {
 					x: 0,
@@ -772,14 +1028,22 @@ var mob = {
 			}
 		},
 		'elephant': {
+			imgW: 1300,
+			imgH: 1000,
 			w: 1300,
 			h: 1000,
 			yFloor: 3,
 			yoyo: false,
 			cache: [],
+			size: 1,
 			speed: .05,
-			nameTop: 10,
+			nameBottom: 10,
 			shadowBottom: 10,
+			shadowWidth: 400,
+			center: {
+				x: 0,
+				y: 0
+			},
 			click: {
 				alive: {
 					x: 0,
@@ -796,14 +1060,22 @@ var mob = {
 			}
 		},
 		'lion': {
+			imgW: 900,
+			imgH: 1200,
 			w: 900,
 			h: 1200,
 			yFloor: 3,
 			yoyo: false,
 			cache: [],
+			size: 1,
 			speed: .04,
-			nameTop: 10,
+			nameBottom: 10,
 			shadowBottom: 10,
+			shadowWidth: 400,
+			center: {
+				x: 0,
+				y: 0
+			},
 			click: {
 				alive: {
 					x: 0,
@@ -820,14 +1092,22 @@ var mob = {
 			}
 		},
 		'crocodile': {
+			imgW: 1000,
+			imgH: 1000,
 			w: 1000,
 			h: 1000,
 			yFloor: 3,
 			yoyo: false,
 			cache: [],
+			size: 1,
 			speed: .04,
-			nameTop: 10,
+			nameBottom: 10,
 			shadowBottom: 10,
+			shadowWidth: 400,
+			center: {
+				x: 0,
+				y: 0
+			},
 			click: {
 				alive: {
 					x: 0,
@@ -844,14 +1124,22 @@ var mob = {
 			}
 		},
 		'rhino': {
+			imgW: 1200,
+			imgH: 1200,
 			w: 1200,
 			h: 1200,
 			yFloor: 3,
 			yoyo: false,
 			cache: [],
+			size: 1,
 			speed: .045,
-			nameTop: 10,
+			nameBottom: 10,
 			shadowBottom: 10,
+			shadowWidth: 400,
+			center: {
+				x: 0,
+				y: 0
+			},
 			click: {
 				alive: {
 					x: 0,
@@ -868,14 +1156,22 @@ var mob = {
 			}
 		},
 		'lioness': {
+			imgW: 900,
+			imgH: 1200,
 			w: 900,
 			h: 1200,
 			yFloor: 3,
 			yoyo: false,
 			cache: [],
+			size: 1,
 			speed: .04,
-			nameTop: 10,
+			nameBottom: 10,
 			shadowBottom: 10,
+			shadowWidth: 400,
+			center: {
+				x: 0,
+				y: 0
+			},
 			click: {
 				alive: {
 					x: 0,
@@ -892,14 +1188,22 @@ var mob = {
 			}
 		},
 		'bear': {
+			imgW: 1000,
+			imgH: 1000,
 			w: 1000,
 			h: 1000,
 			yFloor: 3,
 			yoyo: false,
 			cache: [],
+			size: 1,
 			speed: .04,
-			nameTop: 10,
+			nameBottom: 10,
 			shadowBottom: 10,
+			shadowWidth: 400,
+			center: {
+				x: 0,
+				y: 0
+			},
 			click: {
 				alive: {
 					x: 0,
@@ -916,14 +1220,22 @@ var mob = {
 			}
 		},
 		'toadlok': {
+			imgW: 1200,
+			imgH: 1000,
 			w: 1200,
 			h: 1000,
 			yFloor: 3,
 			yoyo: false,
 			cache: [],
+			size: 1,
 			speed: .04,
-			nameTop: 10,
+			nameBottom: 10,
 			shadowBottom: 10,
+			shadowWidth: 400,
+			center: {
+				x: 0,
+				y: 0
+			},
 			click: {
 				alive: {
 					x: 0,
@@ -940,14 +1252,22 @@ var mob = {
 			}
 		},
 		'giant': {
+			imgW: 1400,
+			imgH: 1200,
 			w: 1400,
 			h: 1200,
 			yFloor: 3,
 			yoyo: false,
 			cache: [],
+			size: 1,
 			speed: .05,
-			nameTop: 10,
+			nameBottom: 10,
 			shadowBottom: 10,
+			shadowWidth: 400,
+			center: {
+				x: 0,
+				y: 0
+			},
 			click: {
 				alive: {
 					x: 0,
@@ -964,14 +1284,22 @@ var mob = {
 			}
 		},
 		'ice-giant': {
+			imgW: 1400,
+			imgH: 1200,
 			w: 1400,
 			h: 1200,
 			yFloor: -2,
 			yoyo: false,
 			cache: [],
+			size: 1,
 			speed: .06,
-			nameTop: 10,
+			nameBottom: 10,
 			shadowBottom: 10,
+			shadowWidth: 400,
+			center: {
+				x: 0,
+				y: 0
+			},
 			click: {
 				alive: {
 					x: 0,
@@ -988,14 +1316,22 @@ var mob = {
 			}
 		},
 		'fire-giant': {
+			imgW: 1400,
+			imgH: 1200,
 			w: 1400,
 			h: 1200,
 			yFloor: -2,
 			yoyo: false,
 			cache: [],
+			size: 1,
 			speed: .06,
-			nameTop: 10,
+			nameBottom: 10,
 			shadowBottom: 10,
+			shadowWidth: 400,
+			center: {
+				x: 0,
+				y: 0
+			},
 			click: {
 				alive: {
 					x: 0,
@@ -1012,14 +1348,22 @@ var mob = {
 			}
 		},
 		'spectre': {
+			imgW: 1500,
+			imgH: 1500,
 			w: 1500,
 			h: 1500,
 			yFloor: -18,
 			yoyo: false,
 			cache: [],
+			size: 1,
 			speed: .055,
-			nameTop: 10,
+			nameBottom: 10,
 			shadowBottom: 10,
+			shadowWidth: 400,
+			center: {
+				x: 0,
+				y: 0
+			},
 			click: {
 				alive: {
 					x: 0,
@@ -1036,14 +1380,22 @@ var mob = {
 			}
 		},
 		'angler': {
+			imgW: 1500,
+			imgH: 1200,
 			w: 1500,
 			h: 1200,
 			yFloor: 1,
 			yoyo: false,
 			cache: [],
+			size: 1,
 			speed: .045,
-			nameTop: 10,
+			nameBottom: 10,
 			shadowBottom: 10,
+			shadowWidth: 400,
+			center: {
+				x: 0,
+				y: 0
+			},
 			click: {
 				alive: {
 					x: 0,
@@ -1060,14 +1412,22 @@ var mob = {
 			}
 		},
 		'beholder': {
+			imgW: 1200,
+			imgH: 1000,
 			w: 1200,
 			h: 1000,
 			yFloor: -4,
 			yoyo: false,
 			cache: [],
+			size: 1,
 			speed: .05,
-			nameTop: 10,
+			nameBottom: 10,
 			shadowBottom: 10,
+			shadowWidth: 400,
+			center: {
+				x: 0,
+				y: 0
+			},
 			click: {
 				alive: {
 					x: 0,
@@ -1084,14 +1444,22 @@ var mob = {
 			}
 		},
 		'unicorn': {
+			imgW: 2000,
+			imgH: 1200,
 			w: 2000,
 			h: 1200,
 			yFloor: 7,
 			yoyo: false,
 			cache: [],
+			size: 1,
 			speed: .055,
-			nameTop: 10,
+			nameBottom: 10,
 			shadowBottom: 10,
+			shadowWidth: 400,
+			center: {
+				x: 0,
+				y: 0
+			},
 			click: {
 				alive: {
 					x: 0,
@@ -1108,14 +1476,22 @@ var mob = {
 			}
 		},
 		'scorpion': {
+			imgW: 1000,
+			imgH: 1000,
 			w: 600,
 			h: 600,
 			yFloor: 0, // back row is *2
 			yoyo: false,
 			cache: [],
+			size: 1,
 			speed: .045,
-			nameTop: 10,
-			shadowBottom: 10,
+			nameBottom: 450,
+			shadowBottom: 30,
+			shadowWidth: 400,
+			center: {
+				x: 296,
+				y: 135
+			},
 			click: {
 				alive: {
 					x: 0,
@@ -1131,38 +1507,17 @@ var mob = {
 				}
 			}
 		}
-		/* skipped mobs
-		wyvern
-		ogre
-		troll
-		chimera
-		manticore
-		automaton
-		barghest
-		basilisk
-		black dragon
-		crasc
-		dark elf
-		darkness warlord
-		death skull
-		dwarf
-		halfling
-		crab
-		scropion
-		gnome
-		gorgon
-		hippogryph
-		kraken
-		lacodon
-		phoenix
-		undertaker (weird)
-		witch
-		 */
 	},
 	imageKeys: 0,
+	imageKeysLen: 0,
 	index: 0,
 	cache: {},
 	count: 0,
+	imageKeys: [],
+	getRandomMobKey: function(){
+		var i = ~~(Math.random() * mob.imageKeysLen);
+		return mob.imageKeys[i];
+	},
 	preloadMob: function(type){
 		if (!mob.images[type].cache.length) {
 			console.info("preloading ", type);
@@ -1173,39 +1528,89 @@ var mob = {
 		}
 	},
 	initialized: 0,
-	max: 8,
+	max: 9,
 	init: function(){
+		mob.imageKeys = Object.keys(mob.images);
+		mob.imageKeysLen = mob.imageKeys.length;
 		battle.show();
 		// init mob/dom connections
 		for (var i=0; i<mob.max; i++){
 			mobs[i] = {};
 			var m = mobs[i];
+			m.index = i;
 			m.frame = 0;
 			m.lastFrame = 0;
 			m.animationActive = 0;
 			m.deathState = 0;
 			m.speed = 0;
-			m.type = 'scorpion';
-			m.wrap = document.getElementById('mob-wrap-' + i);
-			m.img = document.getElementById('mob-img-' + i);
-			m.name = document.getElementById('mob-name-' + i);
-			m.bar = document.getElementById('mob-bar-' + i);
+			m.type = '';
+			// cache mob elements
+			m.dom = {};
+			[
+				'wrap',
+				'center',
+				'alive',
+				'dead',
+				'img',
+				'details',
+				'name',
+				'shadow',
+				'bar'
+			].forEach(function(e){
+				m.dom[e] = document.getElementById('mob-'+ e +'-' + i);
+			});
 		}
 		battle.init();
 	},
 	element: {},
 	animationActive: 0,
 	frame: 1,
-	setMob: function(m, type){
-		var x = mob.images[type];
-		m.type = type;
-		m = Object.assign(m, mob.images[type]);
+	setMob: function(m){
+		// set memory
+		m.size = m.index <= 4 ? 1 : .9;
+		m = Object.assign(m, mob.images[m.type]);
 		delete m.cache;
+		mob.sizeMob(m);
+	},
+	sizeMob: function(m){
+		// TODO: perhaps modify this later responsively using window.innerWidth ?
+		// set dom
+		var w = ~~(m.size * (mob.images[m.type].w)),
+			h = ~~(m.size * (mob.images[m.type].h));
+		// wrapper
+		m.dom.wrap.style.width = w + 'px';
+		m.dom.wrap.style.height = h + 'px';
+		// name
+		m.dom.name.innerHTML = m.type.replace(/-/g, ' ');
+		// img
+		m.dom.img.style.width = w + 'px';
+		m.dom.img.style.bottom = mob.images[m.type].yFloor + 'px';
+		// details
+		m.dom.details.style.bottom = m.nameBottom + 'px';
+		// shadow
+		m.dom.shadow.style.width = m.shadowWidth + 'px';
+		m.dom.shadow.style.left = ~~(m.shadowWidth * -.5) + 'px';
+		m.dom.shadow.style.bottom = m.shadowBottom + 'px';
+		// test only
+		var b = battle.getBox(m.index);
+		console.info('box: ', m.index, b);
+		m.dom.center.style.bottom = b.centerY + 'px';
+		m.dom.center.style.left = b.centerX + 'px';
+		// alive box
+		m.dom.alive.style.bottom = '400px';
+		m.dom.alive.style.left = '200px';
+		m.dom.alive.style.width = '200px';
+		m.dom.alive.style.height = '400px';
+		// dead box
+		m.dom.dead.style.bottom = '400px';
+		m.dom.dead.style.left = '100px';
+		m.dom.dead.style.width = '400px';
+		m.dom.dead.style.height = '200px';
 	},
 	setSrc: function(m){
 		m.frame = ~~m.frame;
 		if (m.frame !== m.lastFrame) {
-			m.img.src = 'mobs/' + m.type + '/' + m.frame + '.png';
+			m.dom.img.src = 'mobs/' + m.type + '/' + m.frame + '.png';
 			m.lastFrame = m.frame;
 		}
 	},
@@ -1232,7 +1637,7 @@ var mob = {
 			}
 		});
 		if (skip) return;
-		TweenMax.delayedCall(1, function(){
+		TweenMax.delayedCall(Math.random()*3 + 1, function(){
 			mob.test && mob.hit(m);
 			//mob.death();
 		})
@@ -1354,13 +1759,14 @@ var mob = {
 			},
 			onComplete: function() {
 				var filters = {
-					opacity: 'opacity(100%)',
-					brightness: "brightness(100%)"
-				};
+						opacity: 'opacity(100%)',
+						brightness: "brightness(100%)"
+					},
+					e = m.dom.wrap;
 
 				var tl = new TimelineMax({
 					onUpdate: function () {
-						test.filters.death(m.img, filters);
+						test.filters.death(e, filters);
 					}
 				});
 				tl.to(filters, 2, {
@@ -1374,7 +1780,7 @@ var mob = {
 						TweenMax.delayedCall(.1, function () {
 							m.deathState = 0;
 							m.animationActive = 0;
-							m.img.style.filter = 'opacity(100%) brightness(100%)';
+							e.style.filter = 'opacity(100%) brightness(100%)';
 						});
 					}
 				});

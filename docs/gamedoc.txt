@@ -1,3 +1,16 @@
+// add hit box reference points; alive and dead
+
+1. resize all images?
+2. measure from floor
+3. measure shadow bottom and width
+4. measure where details goes
+5. click box measure
+6. dead box measure
+7. measure center point x,y
+
+///////////////
+add click events to name, health bar and mob box
+
 TODO:
 100 height small
 150 height sm-md

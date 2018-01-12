@@ -117,6 +117,7 @@ g = Object.assign(g, {
 		$(".scene").removeClass('none')
 			.css('display', 'none');
 		document.getElementById('scene-' + scene).style.display = 'block';
+		g.view = scene;
 	},
 	camel: function(str){
 		str = str.split("-");
