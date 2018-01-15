@@ -12,7 +12,13 @@ g = Object.assign(g, {
 			e.preventDefault();
 		});
 		$(window).on('resize orientationchange focus', function() {
-			env.resizeWindow();
+			// env.resizeWindow();
+			if (g.view === 'battle') {
+				for (var i=0; i<mob.max; i++) {
+					mob.sizeMob(mobs[i]);
+				}
+			}
+
 		}).on('load', function(){
 			env.resizeWindow();
 		});
@@ -422,7 +428,8 @@ g = Object.assign(g, {
 				document.getElementById('logout').textContent = 'Logout ' + r.account;
 				g.displayAllCharacters(r.characterData);
 				g.checkPlayerData();
-				document.getElementById('login-modal').style.display = 'none';
+				var e = document.getElementById('login-modal');
+				e.parentNode.removeChild(e);
 			}
 			else {
 				notLoggedIn();

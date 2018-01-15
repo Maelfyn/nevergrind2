@@ -1,3 +1,9 @@
+1. w & h
+2. yFloor
+3. imgCy
+4. rest
+// all done - resize all images??
+
 // add hit box reference points; alive and dead
 
 1. resize all images?

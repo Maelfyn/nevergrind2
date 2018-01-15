@@ -1105,33 +1105,37 @@ tbody {
 	position: absolute;
 	left: 50%;
 	bottom: 0;
+	width: 0;
+	height: 0;
 	overflow: visible;
 }
-#mob-wrap-0 { left: 10%; z-index: 1}
-#mob-wrap-1 { left: 30%; z-index: 1 }
-#mob-wrap-2 { left: 50%; z-index: 1 }
-#mob-wrap-3 { left: 70%; z-index: 1 }
-#mob-wrap-4 { left: 90%; z-index: 1 }
-#mob-wrap-5 { bottom: 108px; left: 20%}
-#mob-wrap-6 { bottom: 108px; left: 40%; }
-#mob-wrap-7 { bottom: 108px; left: 60%; }
-#mob-wrap-8 { bottom: 108px; left: 80%; }
+#mob-wrap-0 { bottom: 180px; left: 10%; z-index: 1}
+#mob-wrap-1 { bottom: 180px; left: 30%; z-index: 1 }
+#mob-wrap-2 { bottom: 180px; left: 50%; z-index: 1 }
+#mob-wrap-3 { bottom: 180px; left: 70%; z-index: 1 }
+#mob-wrap-4 { bottom: 180px; left: 90%; z-index: 1 }
+#mob-wrap-5 { bottom: 280px; left: 20%}
+#mob-wrap-6 { bottom: 280px; left: 40%; }
+#mob-wrap-7 { bottom: 280px; left: 60%; }
+#mob-wrap-8 { bottom: 280px; left: 80%; }
 .mob-details {
 	position: absolute;
-	left: -100%;
-	width: 200%;
-	bottom: 500px;
+	left: -100px;
+	width: 200px;
+	cursor: pointer;
 }
 .mob-name {
-	width: 100%;
 	font: 28px Roboto Condensed;
 	text-align: center;
 }
 .mob-bar {
+	position: relative;
 	width: 200px;
 	height: 20px;
 	border: 2px ridge #aaa;
 	box-shadow: 0 0 0 1px #111;
+	left: 0;
+	right: 0;
 	margin: 0 auto;
 }
 .mob-health {
@@ -1145,7 +1149,7 @@ tbody {
 	left: -200px;
 	bottom: 30px;
 	border-radius: 50%;
-	background: rgba(0,0,0,.2);
+	background: rgba(0,0,0,.3);
 	height: 40px;
 	width: 400px;
 	z-index: 0;
@@ -1156,14 +1160,10 @@ tbody {
 	bottom: 0;
 	pointer-events: none;
 }
-.mob-image-click {
-	position: absolute;
-	cursor: pointer;
-	z-index: 2;
-}
 .mob-center {
 	position: absolute;
 	border-radius: 50%;
+	border: 1px solid #000;
 	background: #0f0;
 	width: 7px;
 	height: 7px;
@@ -1172,16 +1172,24 @@ tbody {
 .mob-alive {
 	position: absolute;
 	outline: 2px dotted #0f0;
+	bottom: 0;
 	width: 1px;
 	height: 1px;
 	z-index: 5;
+	cursor: pointer;
 }
 .mob-dead {
 	position: absolute;
 	outline: 2px dotted #f00;
+	bottom: 0;
 	width: 1px;
 	height: 1px;
 	z-index: 5;
+	cursor: pointer;
+	display: none;
+}
+.test {
+	visibility: hidden;
 }
 
 body {
