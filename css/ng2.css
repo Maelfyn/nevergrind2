@@ -1172,7 +1172,6 @@ tbody {
 }
 .mob-alive {
 	position: absolute;
-	outline: 2px dotted #0f0;
 	bottom: 0;
 	width: 1px;
 	height: 1px;
@@ -1181,7 +1180,6 @@ tbody {
 }
 .mob-dead {
 	position: absolute;
-	outline: 2px dotted #f00;
 	bottom: 0;
 	width: 1px;
 	height: 1px;

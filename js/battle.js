@@ -5,10 +5,10 @@ var battle = {
 
 		for (var i=0; i<mob.max; i++){
 			var test = i === 2 ? "" : " test";
-			//var test = '';
+			var test = '';
 			s +=
-			'<div id="mob-center-' +i+ '" class="mob-center"></div>' +
-			'<div id="mob-wrap-' +i+ '" class="mob-wrap ' + test +'">' +
+			//'<div id="mob-center-' +i+ '" class="mob-center"></div>' +
+			'<div id="mob-wrap-' +i+ '" class="mob-wrap' + test +'">' +
 				'<div id="mob-details-' +i+ '" class="mob-details" index="' + i + '">' +
 					'<div id="mob-name-' +i+ '" class="mob-name text-shadow"></div>' +
 					'<div id="mob-bar-' +i+ '" class="mob-bar">' +
@@ -47,15 +47,15 @@ var battle = {
 		if (!mob.initialized) {
 			// initialization things only
 			mob.initialized = 1;
-			mob.imageKeys = Object.keys(mob.images);
+			mob.imageKeys = Object.keys(mobs.images);
 			mob.index = mob.imageKeys.length - 1;
 		}
 
 		for (var i=0; i<mob.max; i++){
 		//for (var i=2; i<3; i++){
 			var m = mobs[i],
-				//mobKey = mob.getRandomMobKey();
-				mobKey = 'dragon';
+				mobKey = mob.getRandomMobKey();
+				//mobKey = 'kobold';
 			mob.preloadMob(mobKey);
 			m.type = mobKey;
 			mob.setMob(m);
