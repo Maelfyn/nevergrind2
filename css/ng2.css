@@ -1163,10 +1163,11 @@ tbody {
 .mob-center {
 	position: absolute;
 	border-radius: 50%;
-	border: 1px solid #000;
-	background: #0f0;
-	width: 7px;
-	height: 7px;
+	border: 4px solid #000;
+	background: #f00;
+	left: -11px;
+	width: 22px;
+	height: 22px;
 	z-index: 5;
 }
 .mob-alive {

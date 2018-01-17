@@ -55,7 +55,7 @@ var battle = {
 		//for (var i=2; i<3; i++){
 			var m = mobs[i],
 				//mobKey = mob.getRandomMobKey();
-				mobKey = 'cerberus';
+				mobKey = 'dragon';
 			mob.preloadMob(mobKey);
 			m.type = mobKey;
 			mob.setMob(m);

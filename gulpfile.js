@@ -95,7 +95,7 @@ return gulp.src([
 });
 
 gulp.task('minify-png', function(){
-	var img = 'scorpion';
+	var img = 'zombie';
 	return imagemin(['./mobs-huge/'+ img +'/*'], './mobs/'+ img +'/', {
 		use: [imageminPngquant({
 			floyd: 1,
