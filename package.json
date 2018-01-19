@@ -1400,6 +1400,7 @@
     "compress": "^0.99.0",
     "gulp-clean-css": "^3.9.0",
     "gulp-htmlmin": "^3.0.0",
+    "gulp-image-resize": "^0.13.0",
     "gulp-imagemin": "^4.0.0",
     "gulp-minify": "^2.1.0",
     "gulp-plumber": "^1.1.0",

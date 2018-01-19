@@ -1161,6 +1161,7 @@ tbody {
 	pointer-events: none;
 }
 .mob-center {
+	display: none;
 	position: absolute;
 	border-radius: 50%;
 	border: 4px solid #000;
@@ -1172,6 +1173,7 @@ tbody {
 }
 .mob-alive {
 	position: absolute;
+	/*outline: 2px dotted #0f0;*/
 	bottom: 0;
 	width: 1px;
 	height: 1px;
@@ -1180,6 +1182,7 @@ tbody {
 }
 .mob-dead {
 	position: absolute;
+	/*outline: 2px dotted #f00;*/
 	bottom: 0;
 	width: 1px;
 	height: 1px;

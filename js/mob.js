@@ -41,7 +41,7 @@ var mob = {
 			};
 			[
 				'wrap',
-				//'center',
+				'center',
 				'alive',
 				'dead',
 				'img',
@@ -89,8 +89,8 @@ var mob = {
 		m.dom.shadow.style.bottom = ((m.shadowBottom - (m.shadowHeight * .3))* m.size) + 'px';
 		// test stuff below
 		// center dot
-		//m.dom.center.style.left = (m.box.cx - 11) + 'px';
-		//m.dom.center.style.bottom = (m.box.cy - 11) + 'px';
+		m.dom.center.style.left = (m.box.cx - 11) + 'px';
+		m.dom.center.style.bottom = (m.box.cy - 11) + 'px';
 		mob.setClickBox(m);
 	},
 	setClickBox: function(m){

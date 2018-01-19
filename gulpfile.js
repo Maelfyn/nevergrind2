@@ -10,7 +10,8 @@ var rename = require('gulp-rename');
 var imagemin = require('imagemin');
 var imageminPngquant = require('imagemin-pngquant');
 var fs = require('fs');
-var resizeImg = require('resize-img');
+// var resizeImg = require('resize-img');
+var imageResize = require('gulp-image-resize');
 
 gulp.task('minify-ng-classic-js', function(){
 // classic NG
@@ -96,28 +97,46 @@ return gulp.src([
 });
 
 gulp.task('minify-png', function(){
-	var img = 'zombie';
-	return imagemin(['./mobs-huge/'+ img +'/*'], './mobs/'+ img +'/', {
+	var img = 'beholder',
+		source = 'mobs';
+	return imagemin(['./mobs/'+ img +'/*'], './mobs/'+ img +'/', {
 		use: [imageminPngquant({
 			floyd: 1,
 			nofs: true, // disable FS
 			quality: '90',
 			speed: 1
-		})
-		]
+		})]
 	}).then(function(){
 		console.info("Images minified with quant: " + img)
 	});
 });
 
 gulp.task('resize-png', function(){
-	var img = 'scorpion';
-	resizeImg(fs.readFileSync('./mobs/'+ img +'/*'), {
-		width: 600,
-		height: 600
-	}).then(function(buf){
-		fs.writeFileSync('./mobs/' + img + '/sm', buf);
-	})
+	// add minify-png pipe
+	var img = 'iron-golem';
+	var promise = new Promise(function(resolve, reject) {
+		gulp.src('./mobs-huge/' + img + '/*')
+			.pipe(imageResize({
+				imageMagick: true,
+				width: 960,
+				height: 800
+			}))
+			.pipe(gulp.dest('./mobs/' + img + '/'))
+			.on('end', resolve);
+	});
+
+	promise.then(function(data){
+		imagemin(['./mobs/'+ img +'/*'], './mobs/'+ img +'/', {
+			use: [imageminPngquant({
+				floyd: 1,
+				nofs: true, // disable FS
+				quality: '90',
+				speed: 1
+			})]
+		}).then(function(){
+			console.info("Images minified with quant: " + img)
+		});
+	});
 });
 
 gulp.task('minify-css', function(){

@@ -7,7 +7,7 @@ var battle = {
 			var test = i === 2 ? "" : " test";
 			var test = '';
 			s +=
-			//'<div id="mob-center-' +i+ '" class="mob-center"></div>' +
+			'<div id="mob-center-' +i+ '" class="mob-center"></div>' +
 			'<div id="mob-wrap-' +i+ '" class="mob-wrap' + test +'">' +
 				'<div id="mob-details-' +i+ '" class="mob-details" index="' + i + '">' +
 					'<div id="mob-name-' +i+ '" class="mob-name text-shadow"></div>' +
@@ -54,8 +54,8 @@ var battle = {
 		for (var i=0; i<mob.max; i++){
 		//for (var i=2; i<3; i++){
 			var m = mobs[i],
-				mobKey = mob.getRandomMobKey();
-				//mobKey = 'kobold';
+				//mobKey = mob.getRandomMobKey();
+				mobKey = 'iron-golem';
 			mob.preloadMob(mobKey);
 			m.type = mobKey;
 			mob.setMob(m);

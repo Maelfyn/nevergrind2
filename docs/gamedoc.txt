@@ -1,3 +1,5 @@
+=== image config ====
+
 1. w & h
 2. yFloor
 3. imgCy
