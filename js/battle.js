@@ -1,7 +1,11 @@
 // battle
 var battle = {
+	go: function(){
+		mob.init();
+		g.setScene('battle');
+	},
 	html: function(){
-		var s = '<img id="battle-bg" class="abs view no-pointer" src="img2/bg/fw2.jpg">';
+		var s = '<img id="battle-bg" class="img-bg" src="img2/bg/fw2.jpg">';
 
 		for (var i=0; i<mob.max; i++){
 			var test = i === 2 ? "" : " test";
@@ -23,13 +27,10 @@ var battle = {
 		}
 		return s;
 	},
-	initEvents: function(){
+	events: function(){
 		$(".mob-alive, .mob-dead, .mob-details").on(env.click, function(){
 			battle.setTarget(this.getAttribute('index') * 1);
 		});
-	},
-	setTarget: function(i){
-		console.info("Setting target ", i, Date.now());
 	},
 	initialized: 0,
 	show: function(){
@@ -39,10 +40,14 @@ var battle = {
 		}
 		else {
 			document.getElementById('scene-battle').innerHTML = battle.html();
-			battle.initEvents();
+			battle.events();
 			battle.isInit = 1;
 		}
 	},
+	setTarget: function(i){
+		console.info("Setting target ", i, Date.now());
+	},
+	// MUST INIT THEN SHOW
 	init: function(){
 		if (!mob.initialized) {
 			// initialization things only
@@ -55,7 +60,7 @@ var battle = {
 		//for (var i=2; i<3; i++){
 			var m = mobs[i],
 				//mobKey = mob.getRandomMobKey();
-				mobKey = 'iron-golem';
+				mobKey = 'wolf';
 			mob.preloadMob(mobKey);
 			m.type = mobKey;
 			mob.setMob(m);

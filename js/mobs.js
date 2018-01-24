@@ -20,7 +20,9 @@ mobs.images = {
 		clickAliveH: 500,
 		clickDeadY: -70,
 		clickDeadW: 400,
-		clickDeadH: 200
+		clickDeadH: 200,
+		enableSecondary: 1,
+		enableSpecial: 1
 	},
 	'ice-golem': {
 		imgW: 1200,
@@ -42,7 +44,9 @@ mobs.images = {
 		clickAliveH: 500,
 		clickDeadY: -50,
 		clickDeadW: 500,
-		clickDeadH: 250
+		clickDeadH: 250,
+		enableSecondary: 1,
+		enableSpecial: 1
 	},
 	'stone-golem': {
 		imgW: 1200,
@@ -64,7 +68,9 @@ mobs.images = {
 		clickAliveH: 500,
 		clickDeadY: -50,
 		clickDeadW: 500,
-		clickDeadH: 250
+		clickDeadH: 250,
+		enableSecondary: 1,
+		enableSpecial: 1
 	},
 	'iron-golem': {
 		imgW: 1200,
@@ -86,7 +92,9 @@ mobs.images = {
 		clickAliveH: 500,
 		clickDeadY: -50,
 		clickDeadW: 500,
-		clickDeadH: 250
+		clickDeadH: 250,
+		enableSecondary: 1,
+		enableSpecial: 1
 	},
 	'treant': {
 		imgW: 1300,
@@ -108,7 +116,9 @@ mobs.images = {
 		clickAliveH: 600,
 		clickDeadY: -80,
 		clickDeadW: 350,
-		clickDeadH: 200
+		clickDeadH: 200,
+		enableSecondary: 1,
+		enableSpecial: 1
 	},
 	'spider': {
 		imgW: 1000,
@@ -130,29 +140,33 @@ mobs.images = {
 		clickAliveH: 280,
 		clickDeadY: 50,
 		clickDeadW: 500,
-		clickDeadH: 180
+		clickDeadH: 180,
+		enableSecondary: 1,
+		enableSpecial: 1
 	},
 	'wolf': {
-		imgW: 900,
+		imgW: 1000,
 		imgH: 1000,
 		imgCy: 240,
-		w: 630,
-		h: 700,
-		yFloor: -125,
-		yoyo: false,
+		w: 600,
+		h: 600,
+		yFloor: -40,
+		yoyo: true,
 		cache: [],
 		speed: .045,
-		detailAliveBottom: 410,
+		detailAliveBottom: 390,
 		detailDeathBottom: 220,
-		shadowBottom: 40,
+		shadowBottom: 20,
 		shadowWidth: 200,
 		shadowHeight: 100,
-		clickAliveY: 30,
-		clickAliveW: 150,
-		clickAliveH: 320,
+		clickAliveY: 10,
+		clickAliveW: 130,
+		clickAliveH: 330,
 		clickDeadY: 0,
-		clickDeadW: 250,
-		clickDeadH: 120
+		clickDeadW: 300,
+		clickDeadH: 120,
+		enableSecondary: 0,
+		enableSpecial: 1
 	},
 	'rat': {
 		imgW: 1100,
@@ -174,7 +188,9 @@ mobs.images = {
 		clickAliveH: 180,
 		clickDeadY: 20,
 		clickDeadW: 210,
-		clickDeadH: 120
+		clickDeadH: 120,
+		enableSecondary: 0,
+		enableSpecial: 1
 	},
 	'snake': {
 		imgW: 1000,
@@ -196,7 +212,9 @@ mobs.images = {
 		clickAliveH: 230,
 		clickDeadY: 0,
 		clickDeadW: 150,
-		clickDeadH: 100
+		clickDeadH: 100,
+		enableSecondary: 0,
+		enableSpecial: 1
 	},
 	'dragonkin': {
 		imgW: 1300,
@@ -218,7 +236,9 @@ mobs.images = {
 		clickAliveH: 440,
 		clickDeadY: -50,
 		clickDeadW: 250,
-		clickDeadH: 200
+		clickDeadH: 200,
+		enableSecondary: 1,
+		enableSpecial: 1
 	},
 	'lizardman': {
 		imgW: 1100,
@@ -240,7 +260,9 @@ mobs.images = {
 		clickAliveH: 450,
 		clickDeadY: 0,
 		clickDeadW: 300,
-		clickDeadH: 140
+		clickDeadH: 140,
+		enableSecondary: 1,
+		enableSpecial: 1
 	},
 	'dragon': {
 		imgW: 3000,
@@ -262,7 +284,9 @@ mobs.images = {
 		clickAliveH: 600,
 		clickDeadY: 0,
 		clickDeadW: 500,
-		clickDeadH: 250
+		clickDeadH: 250,
+		enableSecondary: 1,
+		enableSpecial: 1
 	},
 	'ghoul': {
 		imgW: 900,
@@ -284,7 +308,9 @@ mobs.images = {
 		clickAliveH: 450,
 		clickDeadY: -50,
 		clickDeadW: 250,
-		clickDeadH: 140
+		clickDeadH: 140,
+		enableSecondary: 1,
+		enableSpecial: 1
 	},
 	'mummy': {
 		imgW: 800,
@@ -306,7 +332,9 @@ mobs.images = {
 		clickAliveH: 480,
 		clickDeadY: 0,
 		clickDeadW: 160,
-		clickDeadH: 120
+		clickDeadH: 120,
+		enableSecondary: 1,
+		enableSpecial: 1
 	},
 	'skeleton': {
 		imgW: 900,
@@ -328,7 +356,9 @@ mobs.images = {
 		clickAliveH: 430,
 		clickDeadY: 50,
 		clickDeadW: 350,
-		clickDeadH: 100
+		clickDeadH: 100,
+		enableSecondary: 1,
+		enableSpecial: 1
 	},
 	// questionable
 	/*
@@ -352,8 +382,11 @@ mobs.images = {
 		clickAliveH: 520,
 		clickDeadY: 10,
 		clickDeadW: 240,
-		clickDeadH: 150
-	},*/
+		clickDeadH: 150,
+		enableSecondary: 1,
+		enableSpecial: 1
+	},
+	*/
 	'vampire': {
 		imgW: 1000,
 		imgH: 1000,
@@ -374,7 +407,9 @@ mobs.images = {
 		clickAliveH: 420,
 		clickDeadY: -50,
 		clickDeadW: 250,
-		clickDeadH: 200
+		clickDeadH: 200,
+		enableSecondary: 1,
+		enableSpecial: 1
 	},
 	'goblin': {
 		imgW: 1000,
@@ -396,7 +431,9 @@ mobs.images = {
 		clickAliveH: 330,
 		clickDeadY: 40,
 		clickDeadW: 300,
-		clickDeadH: 100
+		clickDeadH: 100,
+		enableSecondary: 1,
+		enableSpecial: 1
 	},
 	'hobgoblin': {
 		imgW: 1000,
@@ -418,7 +455,9 @@ mobs.images = {
 		clickAliveH: 450,
 		clickDeadY: 0,
 		clickDeadW: 330,
-		clickDeadH: 150
+		clickDeadH: 150,
+		enableSecondary: 1,
+		enableSpecial: 1
 	},
 	'kobold': {
 		imgW: 1400,
@@ -440,7 +479,9 @@ mobs.images = {
 		clickAliveH: 310,
 		clickDeadY: 10,
 		clickDeadW: 250,
-		clickDeadH: 100
+		clickDeadH: 100,
+		enableSecondary: 1,
+		enableSpecial: 1
 	},
 	'orc': {
 		imgW: 1200,
@@ -462,7 +503,9 @@ mobs.images = {
 		clickAliveH: 440,
 		clickDeadY: 0,
 		clickDeadW: 240,
-		clickDeadH: 150
+		clickDeadH: 150,
+		enableSecondary: 1,
+		enableSpecial: 1
 	},
 	'griffon': {
 		imgW: 2000,
@@ -484,7 +527,9 @@ mobs.images = {
 		clickAliveH: 380,
 		clickDeadY: 20,
 		clickDeadW: 400,
-		clickDeadH: 130
+		clickDeadH: 130,
+		enableSecondary: 1,
+		enableSpecial: 1
 	},
 	'harpy': {
 		imgW: 1500,
@@ -506,7 +551,9 @@ mobs.images = {
 		clickAliveH: 400,
 		clickDeadY: 50,
 		clickDeadW: 350,
-		clickDeadH: 130
+		clickDeadH: 130,
+		enableSecondary: 1,
+		enableSpecial: 1
 	},
 	'werewolf': {
 		imgW: 1000,
@@ -528,7 +575,9 @@ mobs.images = {
 		clickAliveH: 330,
 		clickDeadY: -20,
 		clickDeadW: 400,
-		clickDeadH: 200
+		clickDeadH: 200,
+		enableSecondary: 1,
+		enableSpecial: 1
 	},
 	'centaur': {
 		imgW: 1500,
@@ -550,7 +599,9 @@ mobs.images = {
 		clickAliveH: 470,
 		clickDeadY: 20,
 		clickDeadW: 380,
-		clickDeadH: 150
+		clickDeadH: 150,
+		enableSecondary: 1,
+		enableSpecial: 1
 	},
 	// dont like the cerberus
 	'cerberus': {
@@ -573,7 +624,9 @@ mobs.images = {
 		clickAliveH: 480,
 		clickDeadY: 0,
 		clickDeadW: 400,
-		clickDeadH: 250
+		clickDeadH: 250,
+		enableSecondary: 0,
+		enableSpecial: 1
 	},
 	'fungoid': {
 		imgW: 1000,
@@ -595,7 +648,9 @@ mobs.images = {
 		clickAliveH: 470,
 		clickDeadY: 0,
 		clickDeadW: 210,
-		clickDeadH: 140
+		clickDeadH: 140,
+		enableSecondary: 1,
+		enableSpecial: 1
 	},
 	'gargoyle': {
 		imgW: 1200,
@@ -617,7 +672,9 @@ mobs.images = {
 		clickAliveH: 400,
 		clickDeadY: 40,
 		clickDeadW: 200,
-		clickDeadH: 250
+		clickDeadH: 250,
+		enableSecondary: 1,
+		enableSpecial: 1
 	},
 	'beetle': {
 		imgW: 1000,
@@ -639,7 +696,9 @@ mobs.images = {
 		clickAliveH: 170,
 		clickDeadY: 20,
 		clickDeadW: 200,
-		clickDeadH: 170
+		clickDeadH: 170,
+		enableSecondary: 1,
+		enableSpecial: 1
 	},
 	'imp': {
 		imgW: 1250,
@@ -661,7 +720,9 @@ mobs.images = {
 		clickAliveH: 290,
 		clickDeadY: 0,
 		clickDeadW: 150,
-		clickDeadH: 140
+		clickDeadH: 140,
+		enableSecondary: 1,
+		enableSpecial: 1
 	},
 	'minotaur': {
 		imgW: 1000,
@@ -683,7 +744,9 @@ mobs.images = {
 		clickAliveH: 500,
 		clickDeadY: 0,
 		clickDeadW: 250,
-		clickDeadH: 150
+		clickDeadH: 150,
+		enableSecondary: 1,
+		enableSpecial: 1
 	},
 	'aviak': {
 		imgW: 1200,
@@ -705,7 +768,9 @@ mobs.images = {
 		clickAliveH: 380,
 		clickDeadY: 0,
 		clickDeadW: 350,
-		clickDeadH: 125
+		clickDeadH: 125,
+		enableSecondary: 1,
+		enableSpecial: 1
 	},
 	'elephant': {
 		imgW: 1300,
@@ -727,7 +792,9 @@ mobs.images = {
 		clickAliveH: 650,
 		clickDeadY: 0,
 		clickDeadW: 440,
-		clickDeadH: 250
+		clickDeadH: 250,
+		enableSecondary: 1,
+		enableSpecial: 1
 	},
 	'lion': {
 		imgW: 900,
@@ -749,7 +816,9 @@ mobs.images = {
 		clickAliveH: 420,
 		clickDeadY: 0,
 		clickDeadW: 320,
-		clickDeadH: 140
+		clickDeadH: 140,
+		enableSecondary: 0,
+		enableSpecial: 1
 	},
 	'crocodile': {
 		imgW: 1000,
@@ -771,7 +840,9 @@ mobs.images = {
 		clickAliveH: 240,
 		clickDeadY: 30,
 		clickDeadW: 370,
-		clickDeadH: 170
+		clickDeadH: 170,
+		enableSecondary: 1,
+		enableSpecial: 1
 	},
 	'rhino': {
 		imgW: 1200,
@@ -793,7 +864,9 @@ mobs.images = {
 		clickAliveH: 540,
 		clickDeadY: 0,
 		clickDeadW: 450,
-		clickDeadH: 240
+		clickDeadH: 240,
+		enableSecondary: 1,
+		enableSpecial: 0
 	},
 	'lioness': {
 		imgW: 900,
@@ -815,7 +888,9 @@ mobs.images = {
 		clickAliveH: 390,
 		clickDeadY: 0,
 		clickDeadW: 320,
-		clickDeadH: 140
+		clickDeadH: 140,
+		enableSecondary: 0,
+		enableSpecial: 1
 	},
 	'bear': {
 		imgW: 1000,
@@ -837,7 +912,9 @@ mobs.images = {
 		clickAliveH: 370,
 		clickDeadY: 50,
 		clickDeadW: 340,
-		clickDeadH: 240
+		clickDeadH: 240,
+		enableSecondary: 1,
+		enableSpecial: 1
 	},
 	'toadlok': {
 		imgW: 1200,
@@ -859,7 +936,9 @@ mobs.images = {
 		clickAliveH: 300,
 		clickDeadY: 30,
 		clickDeadW: 200,
-		clickDeadH: 170
+		clickDeadH: 170,
+		enableSecondary: 1,
+		enableSpecial: 1
 	},
 	'giant': {
 		imgW: 1400,
@@ -881,7 +960,9 @@ mobs.images = {
 		clickAliveH: 700,
 		clickDeadY: -50,
 		clickDeadW: 350,
-		clickDeadH: 400
+		clickDeadH: 400,
+		enableSecondary: 1,
+		enableSpecial: 1
 	},
 	'ice-giant': {
 		imgW: 1400,
@@ -903,7 +984,9 @@ mobs.images = {
 		clickAliveH: 700,
 		clickDeadY: -50,
 		clickDeadW: 350,
-		clickDeadH: 400
+		clickDeadH: 400,
+		enableSecondary: 1,
+		enableSpecial: 1
 	},
 	'fire-giant': {
 		imgW: 1400,
@@ -925,7 +1008,9 @@ mobs.images = {
 		clickAliveH: 700,
 		clickDeadY: -50,
 		clickDeadW: 350,
-		clickDeadH: 400
+		clickDeadH: 400,
+		enableSecondary: 1,
+		enableSpecial: 1
 	},
 	'spectre': {
 		imgW: 1500,
@@ -947,7 +1032,9 @@ mobs.images = {
 		clickAliveH: 470,
 		clickDeadY: 40,
 		clickDeadW: 190,
-		clickDeadH: 150
+		clickDeadH: 150,
+		enableSecondary: 1,
+		enableSpecial: 1
 	},
 	'angler': {
 		imgW: 1500,
@@ -969,7 +1056,9 @@ mobs.images = {
 		clickAliveH: 280,
 		clickDeadY: 10,
 		clickDeadW: 200,
-		clickDeadH: 120
+		clickDeadH: 120,
+		enableSecondary: 1,
+		enableSpecial: 1
 	},
 	'beholder': {
 		imgW: 1200,
@@ -991,7 +1080,9 @@ mobs.images = {
 		clickAliveH: 300,
 		clickDeadY: 50,
 		clickDeadW: 200,
-		clickDeadH: 200
+		clickDeadH: 200,
+		enableSecondary: 1,
+		enableSpecial: 1
 	},
 	'unicorn': {
 		imgW: 2000,
@@ -1013,7 +1104,9 @@ mobs.images = {
 		clickAliveH: 350,
 		clickDeadY: 50,
 		clickDeadW: 350,
-		clickDeadH: 100
+		clickDeadH: 100,
+		enableSecondary: 1,
+		enableSpecial: 1
 	},
 	'scorpion': {
 		imgW: 1000,
@@ -1035,6 +1128,8 @@ mobs.images = {
 		clickAliveH: 350,
 		clickDeadY: 50,
 		clickDeadW: 350,
-		clickDeadH: 100
+		clickDeadH: 100,
+		enableSecondary: 1,
+		enableSpecial: 1
 	}
 };

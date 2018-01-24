@@ -84,6 +84,7 @@ return gulp.src([
 './js/battle.js',
 './js/mobs.js',
 './js/mob.js',
+'./js/town.js',
 './js/test.js',
 './js/endWrap.js'
 ])
@@ -113,13 +114,13 @@ gulp.task('minify-png', function(){
 
 gulp.task('resize-png', function(){
 	// add minify-png pipe
-	var img = 'iron-golem';
-	var promise = new Promise(function(resolve, reject) {
+	var img = 'wolf';
+	var promise = new Promise(function(resolve) {
 		gulp.src('./mobs-huge/' + img + '/*')
 			.pipe(imageResize({
 				imageMagick: true,
-				width: 960,
-				height: 800
+				width: 600,
+				height: 600
 			}))
 			.pipe(gulp.dest('./mobs/' + img + '/'))
 			.on('end', resolve);

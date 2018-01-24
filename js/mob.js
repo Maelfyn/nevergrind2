@@ -175,9 +175,13 @@ var mob = {
 		if (m.animationActive) return;
 		m.animationActive = 1;
 		var tl = g.TM(),
-			foo = force ? force : !Math.round(Math.random()) ? 1 : 2,
-			startFrame = foo === 1 ?
-				15.9 : 35.9,
+			foo = force === 1 || force === 2 ?
+				force : !Math.round(Math.random()) ? 1 : 2;
+		if (!m.enableSecondary) {
+			foo = 1;
+		}
+		var startFrame = foo === 1 ?
+				16 : 35.9,
 			endFrame = startFrame + 20,
 			diff = endFrame - startFrame;
 
@@ -199,6 +203,11 @@ var mob = {
 							mob.attack(m, 2);
 						});
 					}
+					else if (force === 3){
+						TweenMax.delayedCall(.5, function() {
+							mob.death(m);
+						});
+					}
 					else {
 						TweenMax.delayedCall(.5, function() {
 							mob.special(m);
@@ -210,33 +219,38 @@ var mob = {
 	},
 	special: function(m){
 		if (m.animationActive) return;
-		m.animationActive = 1;
-		var startFrame = 56,
-			endFrame = 75.9,
-			diff = endFrame - startFrame;
+		if (!m.enableSpecial) {
+			mob.attack(m, 3);
+		}
+		else {
+			m.animationActive = 1;
+			var startFrame = 56,
+				endFrame = 75.9,
+				diff = endFrame - startFrame;
 
-		var tl = g.TM();
-		tl.to(m, m.speed * diff, {
-			startAt: {
-				frame: startFrame
-			},
-			overwrite: 1,
-			frame: endFrame,
-			ease: Linear.easeNone,
-			yoyo: m.yoyo,
-			repeat: m.yoyo ? 1 : 0,
-			onUpdate: function(){
-				mob.setSrc(m);
-			},
-			onComplete: function () {
-				mob.resetIdle(m);
-				if (mob.test) {
-					TweenMax.delayedCall(.5, function () {
-						mob.death(m);
-					});
+			var tl = g.TM();
+			tl.to(m, m.speed * diff, {
+				startAt: {
+					frame: startFrame
+				},
+				overwrite: 1,
+				frame: endFrame,
+				ease: Linear.easeNone,
+				yoyo: m.yoyo,
+				repeat: m.yoyo ? 1 : 0,
+				onUpdate: function () {
+					mob.setSrc(m);
+				},
+				onComplete: function () {
+					mob.resetIdle(m);
+					if (mob.test) {
+						TweenMax.delayedCall(.5, function () {
+							mob.death(m);
+						});
+					}
 				}
-			}
-		});
+			});
+		}
 	},
 	death: function(m){
 		if (m.deathState) return;
@@ -409,5 +423,12 @@ var mob = {
 		});
 	}
 }
-console.info('mobs: ', mobs.images);
-mob.init();
+setTimeout(function(){
+	var h = location.hash;
+	if (h === '#town') {
+		town.go();
+	}
+	else if (h === '#battle') {
+		battle.go();
+	}
+}, 100);

@@ -44,10 +44,8 @@
 		g.socketUrl = g.isApp ?
 			'nevergrind.com' : location.hostname;
 		g.isServer = 0;
-		if (!g.isApp){
-			if (location.hostname === 'nevergrind.com'){
-				g.isServer = 1;
-			}
+		if (!g.isApp && location.hostname === 'nevergrind.com'){
+			g.isServer = 1;
 		}
 		g.isLocal = location.hostname === 'localhost';
 		if (g.isLocal) {
@@ -106,7 +104,7 @@
 
 					<input id="login-btn" type="submit" value="Login" class="btn btn-primary strongShadow" />
 
-					<div class="error-msg blackOutline3"></div>
+					<div class="error-msg text-shadow"></div>
 
 					<div id="forgotPasswordWrap">
 						<a title="Neverworks Games will send you an email. Click the link to reset your password." id="forgotPassword">Forgot Password?</a>
@@ -150,9 +148,9 @@
 		</div>
 	</div>
 
-	<div id="scene-title" class="scene">
+	<div id="scene-title" class="scene no-select">
 		<div id="ng2-logo-wrap" class="scene">
-			<img src="img2/ng2-bg.jpg" id="ng2-bg" alt="Nevergrind 2 Background">
+			<img src="img2/ng2-bg.jpg" id="ng2-bg" class="img-bg">
 			<img id="neverworks-logo" src="/img2/neverworks.png">
 			<div id="version" class="text-shadow"></div>
 		</div>
@@ -588,14 +586,18 @@
 
 	</div> <!-- end scene-title -->
 
+	<div id="chat-wrap">
+	</div>
+
+	<div id="scene-town" class="scene none no-select">
+		<img src="img2/town.jpg" class="img-bg">
+	</div> <!-- end scene-town -->
+
 	<div id="scene-dungeon" class="scene none no-select">
 	</div> <!-- end scene-dungeon -->
 
 	<div id="scene-battle" class="scene none no-select">
 	</div> <!-- end scene-battle -->
-
-	<div id="scene-town" class="scene none no-select">
-	</div> <!-- end scene-town -->
 
 	<audio id="bgmusic" autoplay loop preload="auto"></audio>
 
@@ -988,7 +990,7 @@
 
 	var chat = {
 		testing: 1234,
-		channel: "usa-1"
+		channel: "town"
 	};
 
 	(function(d, s, x){
@@ -1014,6 +1016,7 @@
 				"battle",
 				"mobs",
 				"mob",
+				"town",
 				"test"
 			]
 		}

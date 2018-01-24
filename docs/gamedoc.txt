@@ -6,25 +6,7 @@
 4. rest
 // all done - resize all images??
 
-// add hit box reference points; alive and dead
-
-1. resize all images?
-2. measure from floor
-3. measure shadow bottom and width
-4. measure where details goes
-5. click box measure
-6. dead box measure
-7. measure center point x,y
-
 ///////////////
-add click events to name, health bar and mob box
-
-TODO:
-100 height small
-150 height sm-md
-200 med
-300 height large
-400 height+ huge?
 
 - add backstab, archery, shadow kick as skills. make casting spells conditionally added to separate table?
 - add hitbox coordinates + when dead

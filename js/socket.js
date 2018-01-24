@@ -72,17 +72,18 @@ var socket = {
 						//document.getElementById('titleChatBody').innerHTML = '';
 					}
 					//chat.updatePlayers(0);
-					location.hash = my.channel;
 				});
 			}
 		}
 	},
 	enableWhisper: function(){
 		var channel = 'account:' + my.account;
+		console.info("subscribing to whisper channel: ", channel);
 		socket.zmq.subscribe(channel, function(topic, data) {
+			console.info("receiving... ", data.action);
 			if (data.message){
 				if (data.action === 'send'){
-					//console.info("SENT: ", data.playerColor, data);
+					console.info("SENT: ", topic, data);
 					// message sent to user
 					var flag = my.flag.split(".");
 					flag = flag[0].replace(/ /g, "-");
@@ -103,7 +104,7 @@ var socket = {
 					chat.send(data);
 				} else {
 					// message receive confirmation to original sender
-					// console.info("CALLBACK: ", data);
+					console.info("CALLBACK: ", topic, data);
 					if (data.timestamp - chat.lastWhisper.timestamp < 500 &&
 						data.account === chat.lastWhisper.account &&
 						data.message === chat.lastWhisper.message){
@@ -123,12 +124,11 @@ var socket = {
 				}
 			}
 		});
-		if (location.host !== 'localhost'){
-			setInterval(console.clear, 600000); // 10 min
-		}
 		(function keepAliveWs(){
-			socket.zmq.publish('admin:broadcast', {});
-			setTimeout(keepAliveWs, 20000);
+			socket.zmq.publish('admin:broadcast', {
+				time: Date.now()
+			});
+			setTimeout(keepAliveWs, 30000);
 		})();
 	},
 	joinGame: function(){
@@ -166,12 +166,18 @@ var socket = {
 		socket.enabled = true;
 		console.info("Socket connection established with server");
 		// chat updates
-		if (g.view === 'title'){
+		if (g.view === 'town'){
 			if (socket.initialConnection){
-				socket.zmq.subscribe('title:refreshGames', function(topic, data) {
+				var missions = 'town:missions';
+				console.info("subscribing to channel: ", missions);
+				socket.zmq.subscribe(missions, function(topic, data) {
+					console.info("CALLBACK: ", topic, data);
 					title.updateGame(data);
 				});
-				socket.zmq.subscribe('admin:broadcast', function(topic, data) {
+				var admin = 'admin:broadcast';
+				console.info("subscribing to channel: ", admin);
+				socket.zmq.subscribe(admin, function(topic, data) {
+					console.info("CALLBACK: ", topic, data);
 					if (data.msg){
 						g.chat(data.msg, data.type);
 					}
@@ -179,14 +185,14 @@ var socket = {
 				(function repeat(){
 					if (my.account){
 						socket.enableWhisper();
-					} else {
-						setTimeout(repeat, 200);
+					}
+					else {
+						setTimeout(repeat, 1000);
 					}
 				})();
 			}
 			socket.initialConnection = false;
-			//document.getElementById('titleChatHeaderChannel').innerHTML = my.channel;
-			socket.setChannel(chat.initChannel);
+			socket.setChannel(chat.channel);
 		}
 		if (g.view === 'game'){
 			game.getGameState();
@@ -200,4 +206,3 @@ var socket = {
 		setTimeout(socket.init, socket.connectionRetryDuration);
 	}
 }
-socket.init();

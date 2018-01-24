@@ -1,28 +1,57 @@
 // core.js
 g = Object.assign(g, {
-	events: function(x){
+	events: function(){
 		$(window).focus(function(){
 			document.title = g.defaultTitle;
 			g.titleFlashing = false;
 			if (g.notification.close !== undefined){
 				g.notification.close();
 			}
-		});
-		$("img").on('dragstart', function(e) {
-			e.preventDefault();
-		});
-		$(window).on('resize orientationchange focus', function() {
-			// env.resizeWindow();
-			if (g.view === 'battle') {
-				for (var i=0; i<mob.max; i++) {
-					mob.sizeMob(mobs[i]);
+		}).on('keydown', function(e){
+			var code = e.keyCode,
+				key = e.key;
+			if (g.isLocal) {
+				// local only
+				console.info('keydown: ', e.key, e.keyCode, e.key === 'b');
+				if (key === 'b') {
+					battle.go();
+				}
+				else if (key === 't') {
+					town.go();
 				}
 			}
+		});
+		// should be delegating no drag start
+		$("body").on('dragstart', 'img', function(e) {
+			e.preventDefault();
+		});
+		// disable right-click in non-local
+		if (!g.isLocal) {
+			document.addEventListener("contextmenu", function (e) {
+				e.preventDefault();
+			}, false);
+		}
 
+		$("#enter-world").on(env.click, function(e){
+			town.go();
+		});
+
+		$(window).on('resize orientationchange focus', function() {
+			// env.resizeWindow();
+			// debounce resize
+			clearTimeout(g.resizeTimer);
+			g.resizeTimer = setTimeout(function(){
+				if (g.view === 'battle') {
+					for (var i=0; i<mob.max; i++) {
+						mob.sizeMob(mobs[i]);
+					}
+				}
+			}, 50);
 		}).on('load', function(){
 			env.resizeWindow();
 		});
 	},
+	resizeTimer: 0,
 	races: [
 		'Barbarian',
 		'Dark Elf',
@@ -120,6 +149,7 @@ g = Object.assign(g, {
 	loadAttempts: 0,
 	isModalOpen: false,
 	setScene: function(scene){
+		// remove defaults and set via js
 		$(".scene").removeClass('none')
 			.css('display', 'none');
 		document.getElementById('scene-' + scene).style.display = 'block';

@@ -9,28 +9,6 @@ fieldset {
 #social-login-wrap {
 	display: none;
 }
-.strongShadow{
-	text-shadow:
-			1px 1px #222,
-			-.4px .6px #222,
-			.6px -.6px #222,
-			-.4px 0 #222,
-			.6px 0 #222,
-			0 .6px #222,
-			0 -.6px #222,
-			.6px .6px #222;
-}
-.blackOutline3{
-	text-shadow:
-			.6px .6px #222,
-			-.4px .6px #222,
-			-.4px 0 #222,
-			.6px 0 #222,
-			0 .6px #222,
-			0 -.6px #222,
-			0px 0px 5px #222,
-			0px 0px 2px #222;
-}
 #login-header{
 	position:relative;
 	height:32px;
@@ -113,15 +91,6 @@ body{
 	right: 0;
 	margin: 0 auto;
 	max-width: 1920px
-}
-.fancy-hr {
-	border: 0;
-	height: 1px;
-	margin: 8px 0;
-	background-image: -webkit-linear-gradient(left, rgba(16, 64, 176, .4), rgba(32, 128, 232, 1), rgba(16, 64, 176, .4));
-	background-image: -moz-linear-gradient(left, rgba(16, 64, 176, .4), rgba(32, 128, 232, 1), rgba(16, 64, 176, .4));
-	background-image: -ms-linear-gradient(left, rgba(16, 64, 176, .4), rgba(32, 128, 232, 1), rgba(16, 64, 176, .4));
-	background-image: -o-linear-gradient(left, rgba(16, 64, 176, .4), rgba(32, 128, 232, 1), rgba(16, 64, 176, .4))
 }
 .abcRioButton{
 	margin: 5px auto;
@@ -538,9 +507,25 @@ tbody {
 	margin: 3px auto
 }
 .text-shadow {
-	text-shadow: 1px 1px #000, -1px 0 #000, 1px 0 #000, -1px 1px #000, 1px -1px #000, -1px -1px #000
+	text-shadow:
+			1px 1px #000,
+			-1px 0 #000,
+			1px 0 #000,
+			-1px 1px #000,
+			1px -1px #000,
+			-1px -1px #000
 }
-
+.text-shadow2{
+	text-shadow:
+			.6px .6px #000,
+			-.4px .6px #000,
+			-.4px 0 #000,
+			.6px 0 #000,
+			0 .6px #000,
+			0 -.6px #000,
+			0px 0px 5px #000,
+			0px 0px 2px #000;
+}
 @keyframes flash-outline {
 	0% { outline-color: #0f0; }
 	100% { outline-color: #000; }
@@ -575,7 +560,6 @@ tbody {
 	margin: 0 auto;
 	left: 0;
 	right: 0;
-	width: 1%
 }
 .w33 {
 	width: 33%
@@ -617,12 +601,13 @@ tbody {
 	background: #000;
 	overflow: hidden
 }
-#ng2-bg {
+.img-bg {
 	position: absolute;
 	width: 1920px;
 	height: 1080px;
-	left: 0;
-	top: 0
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
 }
 #ng2-logo {
 	position: relative;
@@ -1030,13 +1015,6 @@ tbody {
 	height: 100%;
 	overflow: hidden;
 }
-.view {
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-}
 #msg {
 	opacity: 0;
 	position: fixed;
@@ -1092,15 +1070,7 @@ tbody {
 	background: -ms-linear-gradient(top, rgba(0, 24, 60, .8) 0, rgba(0, 24, 60, .8) 10%, rgba(0, 22, 54, .8) 10%, rgba(0, 22, 54, .8) 20%, rgba(0, 20, 48, .8) 20%, rgba(0, 20, 48, .8) 30%, rgba(0, 18, 42, .8) 30%, rgba(0, 18, 42, .8) 40%, rgba(0, 16, 36, .8) 40%, rgba(0, 16, 36, .8) 50%, rgba(0, 14, 30, .8) 50%, rgba(0, 14, 30, .8) 60%, rgba(0, 12, 24, .8) 60%, rgba(0, 12, 24, .8) 70%, rgba(0, 9, 18, .8) 70%, rgba(0, 9, 18, .8) 80%, rgba(0, 6, 12, .8) 80%, rgba(0, 6, 12, .8) 90%, rgba(0, 3, 8, .8) 90%, rgba(0, 3, 8, .8) 100%);
 	background: -o-linear-gradient(top, rgba(0, 24, 60, .8) 0, rgba(0, 24, 60, .8) 10%, rgba(0, 22, 54, .8) 10%, rgba(0, 22, 54, .8) 20%, rgba(0, 20, 48, .8) 20%, rgba(0, 20, 48, .8) 30%, rgba(0, 18, 42, .8) 30%, rgba(0, 18, 42, .8) 40%, rgba(0, 16, 36, .8) 40%, rgba(0, 16, 36, .8) 50%, rgba(0, 14, 30, .8) 50%, rgba(0, 14, 30, .8) 60%, rgba(0, 12, 24, .8) 60%, rgba(0, 12, 24, .8) 70%, rgba(0, 9, 18, .8) 70%, rgba(0, 9, 18, .8) 80%, rgba(0, 6, 12, .8) 80%, rgba(0, 6, 12, .8) 90%, rgba(0, 3, 8, .8) 90%, rgba(0, 3, 8, .8) 100%)
 }
-/* mob stuff
-		e.style.position = 'absolute';
-		e.style.left = '-50%';
-		e.style.pointerEvents = 'none';
-		*/
-#scene-battle {
-}
-#battle-bg {
-}
+/* battle styles */
 .mob-wrap {
 	position: absolute;
 	left: 50%;
@@ -1182,7 +1152,9 @@ tbody {
 }
 .mob-dead {
 	position: absolute;
-	/*outline: 2px dotted #f00;*/
+	/*
+	outline: 2px dotted #f00;
+	*/
 	bottom: 0;
 	width: 1px;
 	height: 1px;
@@ -1193,7 +1165,115 @@ tbody {
 .test {
 	visibility: hidden;
 }
-
+/* town stuff */
+#town-footer {
+	font-family: Cinzel, Palatino Linotype, serif;
+	position: absolute;
+	font-size: 1.375rem;
+	text-align: center;
+	top: auto;
+	bottom: 0;
+	width: 100%;
+	background: #025;
+	background-image: -webkit-radial-gradient(center center, cover, #013 0%, #000 100%);
+	background-image: -moz-radial-gradient(center center, cover, #013 0%, #000 100%);
+	background-image: -ms-radial-gradient(center center, cover, #013 0%, #000 100%);
+	background-image: -o-radial-gradient(center center, cover, #013 0%, #000 100%);
+}
+#town-footer-flex {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+#town-mission-counter {
+	padding: 0 10px;
+	border: 2px ridge #468;
+	outline: 1px solid #000;
+	box-shadow:
+		-1px -1px #05b inset,
+		1px 1px #05b inset,
+		-1px 1px #05b inset,
+		1px -1px #05b inset;
+	background: #025;
+	background-image: -webkit-radial-gradient(center center, cover, #025 0%, #013 100%);
+	background-image: -moz-radial-gradient(center center, cover, #025 0%, #013 100%);
+	background-image: -ms-radial-gradient(center center, cover, #025 0%, #013 100%);
+	background-image: -o-radial-gradient(center center, cover, #025 0%, #013 100%);
+	cursor: pointer;
+}
+.footer-hr {
+	border: 0;
+	height: .1rem;
+	margin: 0;
+	background-image: -webkit-linear-gradient(left, rgba(32, 32, 32, .4), rgba(128, 128, 128, 1), rgba(32, 32, 32, .4));
+	background-image: -moz-linear-gradient(left, rgba(32, 32, 32, .4), rgba(128, 128, 128, 1), rgba(32, 32, 32, .4));
+	background-image: -o-linear-gradient(left, rgba(32, 32, 32, .4), rgba(128, 128, 128, 1), rgba(32, 32, 32, .4));
+	background-image: linear-gradient(left, rgba(32, 32, 32, .4), rgba(128, 128, 128, 1), rgba(32, 32, 32, .4))
+}
+#town-footer-hr1 {
+	margin-bottom: .2rem;
+}
+#town-footer-hr2 {
+	margin-top: .2rem;
+}
+/* chat styles */
+#chat-wrap {
+	display: none;
+	flex-direction: column;
+	font-family: Roboto Condensed, Roboto, sans-serif;
+	position: absolute;
+	top: .2rem;
+	right: .2rem;
+	font-size: 1rem;
+	border: 2px ridge #666;
+	background: rgba(0,0,0,.8);
+	width: 30rem;
+	height: 12rem;
+	z-index: 1;
+}
+#chat-log {
+	flex: 1;
+	padding: 2px;
+	height: 100%;
+	overflow: auto;
+	line-height: 1.2;
+	box-shadow: 0 0 5px 1px #025 inset;
+}
+#chat-input {
+	flex: 0;
+	font-size: 1rem;
+	color: #fff;
+	background: transparent;
+	border: 2px ridge #444;
+	cursor: pointer;
+	padding: .2rem .4rem;
+	box-shadow: 0 0 5px 1px #048 inset;
+}
+::-webkit-scrollbar {
+	/* addresses the background of the bar itself. It is usually covered by the other elements */
+	width: .3rem;
+}
+::-webkit-scrollbar-button {
+	/* addresses the directional buttons on the scrollbar */
+}
+::-webkit-scrollbar-track {
+	background: #333;
+	background-image: -webkit-radial-gradient(center center, cover, #222 0%, #000 100%);
+	box-shadow: inset 0 0 0 1px #444;
+}
+::-webkit-scrollbar-track-piece {
+	/*
+		is the top-most layer of the the progress bar not covered
+		by the draggable scrolling element (thumb)
+	*/
+}
+::-webkit-scrollbar-thumb {
+	/* addresses the draggable scrolling element that resizes depending on the size of the scrollable element */
+	background-color: #579;
+	background-image: -webkit-radial-gradient(center center, cover, #ace 0%, #135 100%);
+	outline: 1px solid #0f0;
+	border-radius: 30%;
+}
 body {
 	visibility: visible;
 }

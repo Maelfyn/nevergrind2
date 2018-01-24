@@ -1,6 +1,31 @@
 // chat.js
 chat = Object.assign(chat, {
 	// receives channel prop from index.php
+	html: function() {
+		var lorem = '"Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?"';
+		var s =
+			//'<div id="chat-log">Welcome to Vandamor.</div>' +
+			'<div id="chat-log">'+ lorem +'</div>' +
+			'<input id="chat-input" type="text" maxlength="240" autocomplete="off" spellcheck="false" />';
+
+		return s;
+	},
+	initialized: 0,
+	init: function() {
+		chat.initialized = 1;
+	},
+	set: function(z) {
+		var e = document.getElementById('chat-wrap');
+		e.style.display = z ? 'flex' : 'none';
+		if (z && !chat.initialized) {
+			// show
+			e.innerHTML = chat.html();
+			chat.init();
+		}
+		else {
+			// hide
+		}
+	},
 	players: [],
 	lastWhisper: {
 		timestamp: Date.now(),
@@ -38,42 +63,57 @@ chat = Object.assign(chat, {
 				// is it a command?
 				if (msg === '/friend'){
 					chat.listFriends();
-				} else if (msg.indexOf('/friend ') === 0){
+				}
+				else if (msg.indexOf('/friend ') === 0){
 					chat.toggleFriend(msg.slice(8));
-				} else if (msg.indexOf('/unignore ') === 0){
+				}
+				else if (msg.indexOf('/unignore ') === 0){
 					var account = msg.slice(10);
 					chat.removeIgnore(account);
-				} else if (msg === '/ignore'){
+				}
+				else if (msg === '/ignore'){
 					chat.listIgnore();
-				} else if (msg.indexOf('/ignore ') === 0){
-					var account = msg.slice(8);
-					chat.addIgnore(account);
-				} else if (msg.indexOf('/join ') === 0){
+				}
+				else if (msg.indexOf('/ignore ') === 0){
+					chat.addIgnore(msg.slice(8));
+				}
+				else if (msg.indexOf('/join ') === 0){
 					chat.changeChannel(msg, '/join ');
-				} else if (msg.indexOf('#') === 0){
+				}
+				else if (msg.indexOf('#') === 0){
 					chat.changeChannel(msg, '#');
-				} else if (msg.indexOf('/j ') === 0){
+				}
+				else if (msg.indexOf('/j ') === 0){
 					chat.changeChannel(msg, '/j ');
-				} else if (msg.indexOf('/whisper ') === 0){
+				}
+				else if (msg.indexOf('/whisper ') === 0){
 					chat.sendWhisper(msg , '/whisper ');
-				} else if (msg.indexOf('/w ') === 0){
+				}
+				else if (msg.indexOf('/w ') === 0){
 					chat.sendWhisper(msg , '/w ');
-				} else if (msg.indexOf('@') === 0){
+				}
+				else if (msg.indexOf('@') === 0){
 					chat.sendWhisper(msg , '@');
-				} else if (msg.indexOf('/who ') === 0){
+				}
+				else if (msg.indexOf('/who ') === 0){
 					chat.who(msg);
-				} else if (msg.indexOf('/broadcast ') === 0){
+				}
+				else if (msg.indexOf('/broadcast ') === 0){
 					chat.broadcast(msg);
-				} else if (msg.indexOf('/url ') === 0){
+				}
+				else if (msg.indexOf('/url ') === 0){
 					chat.url(msg);
-				} else if (msg.indexOf('/img ') === 0){
+				}
+				else if (msg.indexOf('/img ') === 0){
 					chat.img(msg);
-				} else if (msg.indexOf('/video ') === 0){
+				}
+				else if (msg.indexOf('/video ') === 0){
 					chat.video(msg);
-				} else if (msg.indexOf('/fw-paid ') === 0){
-					var account = msg.slice(8);
-					chat.fwpaid(account);
-				} else {
+				}
+				else if (msg.indexOf('/fw-paid ') === 0){
+					chat.fwpaid(msg.slice(8));
+				}
+				else {
 					if (msg.charAt(0) === '/' && msg.indexOf('/me') !== 0 || msg === '/me'){
 						// skip
 					} else {
