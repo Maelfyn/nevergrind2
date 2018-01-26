@@ -555,23 +555,58 @@ var create = {
 
 // core.js
 g = Object.assign(g, {
-	events: function(x){
+	events: function(){
 		$(window).focus(function(){
 			document.title = g.defaultTitle;
 			g.titleFlashing = false;
 			if (g.notification.close !== undefined){
 				g.notification.close();
 			}
+		}).on('keydown', function(e){
+			var code = e.keyCode,
+				key = e.key;
+			//if (g.isLocal) {
+				// local only
+				console.info('keydown: ', e.key, e.keyCode, e.key === 'b');
+				if (key === 'b') {
+					battle.go();
+				}
+				else if (key === 't') {
+					town.go();
+				}
+			//}
 		});
-		$("img").on('dragstart', function(e) {
+		// should be delegating no drag start
+		$("body").on('dragstart', 'img', function(e) {
 			e.preventDefault();
 		});
+		// disable right-click in non-local
+		if (!g.isLocal) {
+			document.addEventListener("contextmenu", function (e) {
+				e.preventDefault();
+			}, false);
+		}
+
+		$("#enter-world").on(env.click, function(e){
+			town.go();
+		});
+
 		$(window).on('resize orientationchange focus', function() {
-			env.resizeWindow();
+			// env.resizeWindow();
+			// debounce resize
+			clearTimeout(g.resizeTimer);
+			g.resizeTimer = setTimeout(function(){
+				if (g.view === 'battle') {
+					for (var i=0; i<mob.max; i++) {
+						mob.sizeMob(mobs[i]);
+					}
+				}
+			}, 50);
 		}).on('load', function(){
 			env.resizeWindow();
 		});
 	},
+	resizeTimer: 0,
 	races: [
 		'Barbarian',
 		'Dark Elf',
@@ -669,6 +704,7 @@ g = Object.assign(g, {
 	loadAttempts: 0,
 	isModalOpen: false,
 	setScene: function(scene){
+		// remove defaults and set via js
 		$(".scene").removeClass('none')
 			.css('display', 'none');
 		document.getElementById('scene-' + scene).style.display = 'block';
@@ -977,7 +1013,8 @@ g = Object.assign(g, {
 				document.getElementById('logout').textContent = 'Logout ' + r.account;
 				g.displayAllCharacters(r.characterData);
 				g.checkPlayerData();
-				document.getElementById('login-modal').style.display = 'none';
+				var e = document.getElementById('login-modal');
+				e.parentNode.removeChild(e);
 			}
 			else {
 				notLoggedIn();
@@ -2151,17 +2188,18 @@ var socket = {
 						//document.getElementById('titleChatBody').innerHTML = '';
 					}
 					//chat.updatePlayers(0);
-					location.hash = my.channel;
 				});
 			}
 		}
 	},
 	enableWhisper: function(){
 		var channel = 'account:' + my.account;
+		console.info("subscribing to whisper channel: ", channel);
 		socket.zmq.subscribe(channel, function(topic, data) {
+			console.info("receiving... ", data.action);
 			if (data.message){
 				if (data.action === 'send'){
-					//console.info("SENT: ", data.playerColor, data);
+					console.info("SENT: ", topic, data);
 					// message sent to user
 					var flag = my.flag.split(".");
 					flag = flag[0].replace(/ /g, "-");
@@ -2182,7 +2220,7 @@ var socket = {
 					chat.send(data);
 				} else {
 					// message receive confirmation to original sender
-					// console.info("CALLBACK: ", data);
+					console.info("CALLBACK: ", topic, data);
 					if (data.timestamp - chat.lastWhisper.timestamp < 500 &&
 						data.account === chat.lastWhisper.account &&
 						data.message === chat.lastWhisper.message){
@@ -2202,12 +2240,11 @@ var socket = {
 				}
 			}
 		});
-		if (location.host !== 'localhost'){
-			setInterval(console.clear, 600000); // 10 min
-		}
 		(function keepAliveWs(){
-			socket.zmq.publish('admin:broadcast', {});
-			setTimeout(keepAliveWs, 20000);
+			socket.zmq.publish('admin:broadcast', {
+				time: Date.now()
+			});
+			setTimeout(keepAliveWs, 30000);
 		})();
 	},
 	joinGame: function(){
@@ -2245,12 +2282,18 @@ var socket = {
 		socket.enabled = true;
 		console.info("Socket connection established with server");
 		// chat updates
-		if (g.view === 'title'){
+		if (g.view === 'town'){
 			if (socket.initialConnection){
-				socket.zmq.subscribe('title:refreshGames', function(topic, data) {
+				var missions = 'town:missions';
+				console.info("subscribing to channel: ", missions);
+				socket.zmq.subscribe(missions, function(topic, data) {
+					console.info("CALLBACK: ", topic, data);
 					title.updateGame(data);
 				});
-				socket.zmq.subscribe('admin:broadcast', function(topic, data) {
+				var admin = 'admin:broadcast';
+				console.info("subscribing to channel: ", admin);
+				socket.zmq.subscribe(admin, function(topic, data) {
+					console.info("CALLBACK: ", topic, data);
 					if (data.msg){
 						g.chat(data.msg, data.type);
 					}
@@ -2258,14 +2301,14 @@ var socket = {
 				(function repeat(){
 					if (my.account){
 						socket.enableWhisper();
-					} else {
-						setTimeout(repeat, 200);
+					}
+					else {
+						setTimeout(repeat, 1000);
 					}
 				})();
 			}
 			socket.initialConnection = false;
-			//document.getElementById('titleChatHeaderChannel').innerHTML = my.channel;
-			socket.setChannel(chat.initChannel);
+			socket.setChannel(chat.channel);
 		}
 		if (g.view === 'game'){
 			game.getGameState();
@@ -2279,10 +2322,34 @@ var socket = {
 		setTimeout(socket.init, socket.connectionRetryDuration);
 	}
 }
-socket.init();
 // chat.js
 chat = Object.assign(chat, {
 	// receives channel prop from index.php
+	html: function() {
+		var lorem = '"Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?"';
+		var s =
+			//'<div id="chat-log">Welcome to Vandamor.</div>' +
+			'<div id="chat-log">'+ lorem +'</div>' +
+			'<input id="chat-input" type="text" maxlength="240" autocomplete="off" spellcheck="false" />';
+
+		return s;
+	},
+	initialized: 0,
+	init: function() {
+		chat.initialized = 1;
+	},
+	set: function(z) {
+		var e = document.getElementById('chat-wrap');
+		e.style.display = z ? 'flex' : 'none';
+		if (z && !chat.initialized) {
+			// show
+			e.innerHTML = chat.html();
+			chat.init();
+		}
+		else {
+			// hide
+		}
+	},
 	players: [],
 	lastWhisper: {
 		timestamp: Date.now(),
@@ -2320,42 +2387,57 @@ chat = Object.assign(chat, {
 				// is it a command?
 				if (msg === '/friend'){
 					chat.listFriends();
-				} else if (msg.indexOf('/friend ') === 0){
+				}
+				else if (msg.indexOf('/friend ') === 0){
 					chat.toggleFriend(msg.slice(8));
-				} else if (msg.indexOf('/unignore ') === 0){
+				}
+				else if (msg.indexOf('/unignore ') === 0){
 					var account = msg.slice(10);
 					chat.removeIgnore(account);
-				} else if (msg === '/ignore'){
+				}
+				else if (msg === '/ignore'){
 					chat.listIgnore();
-				} else if (msg.indexOf('/ignore ') === 0){
-					var account = msg.slice(8);
-					chat.addIgnore(account);
-				} else if (msg.indexOf('/join ') === 0){
+				}
+				else if (msg.indexOf('/ignore ') === 0){
+					chat.addIgnore(msg.slice(8));
+				}
+				else if (msg.indexOf('/join ') === 0){
 					chat.changeChannel(msg, '/join ');
-				} else if (msg.indexOf('#') === 0){
+				}
+				else if (msg.indexOf('#') === 0){
 					chat.changeChannel(msg, '#');
-				} else if (msg.indexOf('/j ') === 0){
+				}
+				else if (msg.indexOf('/j ') === 0){
 					chat.changeChannel(msg, '/j ');
-				} else if (msg.indexOf('/whisper ') === 0){
+				}
+				else if (msg.indexOf('/whisper ') === 0){
 					chat.sendWhisper(msg , '/whisper ');
-				} else if (msg.indexOf('/w ') === 0){
+				}
+				else if (msg.indexOf('/w ') === 0){
 					chat.sendWhisper(msg , '/w ');
-				} else if (msg.indexOf('@') === 0){
+				}
+				else if (msg.indexOf('@') === 0){
 					chat.sendWhisper(msg , '@');
-				} else if (msg.indexOf('/who ') === 0){
+				}
+				else if (msg.indexOf('/who ') === 0){
 					chat.who(msg);
-				} else if (msg.indexOf('/broadcast ') === 0){
+				}
+				else if (msg.indexOf('/broadcast ') === 0){
 					chat.broadcast(msg);
-				} else if (msg.indexOf('/url ') === 0){
+				}
+				else if (msg.indexOf('/url ') === 0){
 					chat.url(msg);
-				} else if (msg.indexOf('/img ') === 0){
+				}
+				else if (msg.indexOf('/img ') === 0){
 					chat.img(msg);
-				} else if (msg.indexOf('/video ') === 0){
+				}
+				else if (msg.indexOf('/video ') === 0){
 					chat.video(msg);
-				} else if (msg.indexOf('/fw-paid ') === 0){
-					var account = msg.slice(8);
-					chat.fwpaid(account);
-				} else {
+				}
+				else if (msg.indexOf('/fw-paid ') === 0){
+					chat.fwpaid(msg.slice(8));
+				}
+				else {
 					if (msg.charAt(0) === '/' && msg.indexOf('/me') !== 0 || msg === '/me'){
 						// skip
 					} else {
@@ -2847,1620 +2929,1273 @@ var payment = {
 };
 // battle
 var battle = {
+	go: function(){
+		mob.init();
+		g.setScene('battle');
+		chat.set(1);
+	},
 	html: function(){
-		var s = '<img id="battle-bg" class="abs view no-pointer" src="img2/bg/fw2.jpg">';
+		var s = '<img id="battle-bg" class="img-bg" src="img2/bg/fw2.jpg">';
 
 		for (var i=0; i<mob.max; i++){
+			var test = i === 2 ? "" : " test";
+			var test = '';
 			s +=
 			'<div id="mob-center-' +i+ '" class="mob-center"></div>' +
-			'<div id="mob-alive-' +i+ '" class="mob-alive"></div>' +
-			'<div id="mob-dead-' +i+ '" class="mob-dead"></div>' +
-			'<div id="mob-wrap-' +i+ '" class="mob-wrap text-shadow">' +
-				'<div id="mob-details-' +i+ '" class="mob-details">' +
-					'<div id="mob-name-' +i+ '" class="mob-name">Scorpion</div>' +
+			'<div id="mob-wrap-' +i+ '" class="mob-wrap' + test +'">' +
+				'<div id="mob-details-' +i+ '" class="mob-details" index="' + i + '">' +
+					'<div id="mob-name-' +i+ '" class="mob-name text-shadow"></div>' +
 					'<div id="mob-bar-' +i+ '" class="mob-bar">' +
 						'<div id="mob-health-' +i+ '" class="mob-health"></div>' +
 					'</div>' +
 				'</div>' +
 				'<div id="mob-shadow-' +i+ '" class="mob-shadow"></div>' +
 				'<img id="mob-img-' +i+ '" class="mob-image" src="img2/blank.png">' +
-				'<div id="mob-image-click-' +i+ '" class="mob-image-click"></div>' +
+				'<div id="mob-alive-' +i+ '" class="mob-alive" index="' + i + '"></div>' +
+				'<div id="mob-dead-' +i+ '" class="mob-dead" index="' + i + '"></div>' +
 			'</div>';
 		}
 		return s;
 	},
+	events: function(){
+		$(".mob-alive, .mob-dead, .mob-details").on(env.click, function(){
+			battle.setTarget(this.getAttribute('index') * 1);
+		});
+	},
+	initialized: 0,
 	show: function(){
 		g.setScene('battle');
-		document.getElementById('scene-battle').innerHTML = battle.html();
+		if (battle.initialized) {
+			document.getElementById('scene-battle').style.display = 'block';
+		}
+		else {
+			document.getElementById('scene-battle').innerHTML = battle.html();
+			battle.events();
+			battle.isInit = 1;
+		}
 	},
+	setTarget: function(i){
+		console.info("Setting target ", i, Date.now());
+	},
+	// MUST INIT THEN SHOW
 	init: function(){
 		if (!mob.initialized) {
 			// initialization things only
 			mob.initialized = 1;
-			mob.imageKeys = Object.keys(mob.images);
+			mob.imageKeys = Object.keys(mobs.images);
 			mob.index = mob.imageKeys.length - 1;
 		}
 
 		for (var i=0; i<mob.max; i++){
+		//for (var i=2; i<3; i++){
 			var m = mobs[i],
-				//mobKey = mob.getRandomMobKey();
-				mobKey = 'scorpion';
+				mobKey = mob.getRandomMobKey();
+				//mobKey = 'wolf';
 			mob.preloadMob(mobKey);
 			m.type = mobKey;
 			mob.setMob(m);
 			mob.idle(m);
 		}
 	},
+	// 1080p defaults
 	boxCoordsCenter: [192,576,960,1344,1728,384,768,1152,1536],
-	boxCoordsBottom: [0,0,0,0,0,108,108,108,108],
-	getBoxCoordsLeft: function(i){
-		// based on 1080p
-		// abs left
-		return ~~((battle.boxCoordsCenter[i] * (window.innerWidth / 1920)) - ~~(mobs[i].w * .5));
+	// never changes
+	boxCoordsBottom: [180,180,180,180,180,280,280,280,280],
+	// changes based on width
+	getResponsiveCenter: function(i){
+		// responsive center
+		return ~~(battle.boxCoordsCenter[i] * (window.innerWidth / 1920));
 	},
 	getBox: function(i){
 		// return absolute positioning about a specific mob box
-		var m = mobs[i],
-			b = battle.boxCoordsBottom[i],
-			l = battle.getBoxCoordsLeft(i),
-			x = {
-				bottom: b,
-				left: l,
-				centerX: l + m.center.x,
-				centerY: b + m.center.y
-			};
-		return x;
+		var c = battle.getResponsiveCenter(i),
+			cy = ~~(battle.boxCoordsBottom[i] + (mobs[i].imgCy * mobs[i].size));
+
+		return x = {
+			x: ~~(c - (mobs[i].w * .5)),
+			y: battle.boxCoordsBottom[i],
+			cx: c,
+			cy: cy
+		}
 	}
 };
 
-// test methods
 var mobs = [];
+mobs.images = {
+	'balrog': {
+		imgW: 2000,
+		imgH: 1200,
+		imgCy: 360,
+		w: 2000,
+		h: 1200,
+		yFloor: -195,
+		yoyo: true,
+		cache: [],
+		speed: .05,
+		detailAliveBottom: 620,
+		detailDeathBottom: 240,
+		shadowBottom: 40,
+		shadowWidth: 400,
+		shadowHeight: 80,
+		clickAliveY: 20,
+		clickAliveW: 230,
+		clickAliveH: 500,
+		clickDeadY: -70,
+		clickDeadW: 400,
+		clickDeadH: 200,
+		enableSecondary: 1,
+		enableSpecial: 1
+	},
+	'ice-golem': {
+		imgW: 1200,
+		imgH: 1000,
+		imgCy: 360,
+		w: 960,
+		h: 800,
+		yFloor: -140,
+		yoyo: false,
+		cache: [],
+		speed: .045,
+		detailAliveBottom: 580,
+		detailDeathBottom: 300,
+		shadowBottom: 40,
+		shadowWidth: 370,
+		shadowHeight: 100,
+		clickAliveY: 40,
+		clickAliveW: 300,
+		clickAliveH: 500,
+		clickDeadY: -50,
+		clickDeadW: 500,
+		clickDeadH: 250,
+		enableSecondary: 1,
+		enableSpecial: 1
+	},
+	'stone-golem': {
+		imgW: 1200,
+		imgH: 1000,
+		imgCy: 360,
+		w: 960,
+		h: 800,
+		yFloor: -140,
+		yoyo: false,
+		cache: [],
+		speed: .045,
+		detailAliveBottom: 580,
+		detailDeathBottom: 300,
+		shadowBottom: 40,
+		shadowWidth: 370,
+		shadowHeight: 100,
+		clickAliveY: 40,
+		clickAliveW: 300,
+		clickAliveH: 500,
+		clickDeadY: -50,
+		clickDeadW: 500,
+		clickDeadH: 250,
+		enableSecondary: 1,
+		enableSpecial: 1
+	},
+	'iron-golem': {
+		imgW: 1200,
+		imgH: 1000,
+		imgCy: 360,
+		w: 960,
+		h: 800,
+		yFloor: -140,
+		yoyo: false,
+		cache: [],
+		speed: .045,
+		detailAliveBottom: 580,
+		detailDeathBottom: 300,
+		shadowBottom: 40,
+		shadowWidth: 370,
+		shadowHeight: 100,
+		clickAliveY: 40,
+		clickAliveW: 300,
+		clickAliveH: 500,
+		clickDeadY: -50,
+		clickDeadW: 500,
+		clickDeadH: 250,
+		enableSecondary: 1,
+		enableSpecial: 1
+	},
+	'treant': {
+		imgW: 1300,
+		imgH: 1200,
+		imgCy: 420,
+		w: 1170,
+		h: 1080,
+		yFloor: -135,
+		yoyo: false,
+		cache: [],
+		speed: .05,
+		detailAliveBottom: 750,
+		detailDeathBottom: 270,
+		shadowBottom: 40,
+		shadowWidth: 420,
+		shadowHeight: 70,
+		clickAliveY: 30,
+		clickAliveW: 200,
+		clickAliveH: 600,
+		clickDeadY: -80,
+		clickDeadW: 350,
+		clickDeadH: 200,
+		enableSecondary: 1,
+		enableSpecial: 1
+	},
+	'spider': {
+		imgW: 1000,
+		imgH: 1000,
+		imgCy: 190,
+		w: 1000,
+		h: 1000,
+		yFloor: -190,
+		yoyo: false,
+		cache: [],
+		speed: .045,
+		detailAliveBottom: 380,
+		detailDeathBottom: 270,
+		shadowBottom: 40,
+		shadowWidth: 900,
+		shadowHeight: 100,
+		clickAliveY: 10,
+		clickAliveW: 800,
+		clickAliveH: 280,
+		clickDeadY: 50,
+		clickDeadW: 500,
+		clickDeadH: 180,
+		enableSecondary: 1,
+		enableSpecial: 1
+	},
+	'wolf': {
+		imgW: 1000,
+		imgH: 1000,
+		imgCy: 240,
+		w: 600,
+		h: 600,
+		yFloor: -40,
+		yoyo: true,
+		cache: [],
+		speed: .045,
+		detailAliveBottom: 390,
+		detailDeathBottom: 220,
+		shadowBottom: 20,
+		shadowWidth: 200,
+		shadowHeight: 100,
+		clickAliveY: 10,
+		clickAliveW: 130,
+		clickAliveH: 330,
+		clickDeadY: 0,
+		clickDeadW: 300,
+		clickDeadH: 120,
+		enableSecondary: 0,
+		enableSpecial: 1
+	},
+	'rat': {
+		imgW: 1100,
+		imgH: 1000,
+		imgCy: 135,
+		w: 550,
+		h: 500,
+		yFloor: -70,
+		yoyo: false,
+		cache: [],
+		speed: .045,
+		detailAliveBottom: 260,
+		detailDeathBottom: 200,
+		shadowBottom: 40,
+		shadowWidth: 200,
+		shadowHeight: 80,
+		clickAliveY: 30,
+		clickAliveW: 150,
+		clickAliveH: 180,
+		clickDeadY: 20,
+		clickDeadW: 210,
+		clickDeadH: 120,
+		enableSecondary: 0,
+		enableSpecial: 1
+	},
+	'snake': {
+		imgW: 1000,
+		imgH: 1000,
+		imgCy: 160,
+		w: 500,
+		h: 500,
+		yFloor: -60,
+		yoyo: false,
+		cache: [],
+		speed: .045,
+		detailAliveBottom: 320,
+		detailDeathBottom: 200,
+		shadowBottom: 40,
+		shadowWidth: 200,
+		shadowHeight: 60,
+		clickAliveY: 30,
+		clickAliveW: 150,
+		clickAliveH: 230,
+		clickDeadY: 0,
+		clickDeadW: 150,
+		clickDeadH: 100,
+		enableSecondary: 0,
+		enableSpecial: 1
+	},
+	'dragonkin': {
+		imgW: 1300,
+		imgH: 1300,
+		imgCy: 340,
+		w: 845,
+		h: 845,
+		yFloor: -70,
+		yoyo: false,
+		cache: [],
+		speed: .055,
+		detailAliveBottom: 510,
+		detailDeathBottom: 240,
+		shadowBottom: 40,
+		shadowWidth: 360,
+		shadowHeight: 100,
+		clickAliveY: 30,
+		clickAliveW: 200,
+		clickAliveH: 440,
+		clickDeadY: -50,
+		clickDeadW: 250,
+		clickDeadH: 200,
+		enableSecondary: 1,
+		enableSpecial: 1
+	},
+	'lizardman': {
+		imgW: 1100,
+		imgH: 1000,
+		imgCy: 350,
+		w: 880,
+		h: 800,
+		yFloor: -130,
+		yoyo: true,
+		cache: [],
+		speed: .045,
+		detailAliveBottom: 520,
+		detailDeathBottom: 250,
+		shadowBottom: 40,
+		shadowWidth: 320,
+		shadowHeight: 60,
+		clickAliveY: 20,
+		clickAliveW: 160,
+		clickAliveH: 450,
+		clickDeadY: 0,
+		clickDeadW: 300,
+		clickDeadH: 140,
+		enableSecondary: 1,
+		enableSpecial: 1
+	},
+	'dragon': {
+		imgW: 3000,
+		imgH: 1500,
+		imgCy: 240,
+		w: 3000,
+		h: 1500,
+		yFloor: -80,
+		yoyo: true,
+		cache: [],
+		speed: .055,
+		detailAliveBottom: 650,
+		detailDeathBottom: 350,
+		shadowBottom: 40,
+		shadowWidth: 640,
+		shadowHeight: 160,
+		clickAliveY: -50,
+		clickAliveW: 500,
+		clickAliveH: 600,
+		clickDeadY: 0,
+		clickDeadW: 500,
+		clickDeadH: 250,
+		enableSecondary: 1,
+		enableSpecial: 1
+	},
+	'ghoul': {
+		imgW: 900,
+		imgH: 1000,
+		imgCy: 350,
+		w: 630,
+		h: 700,
+		yFloor: -80,
+		yoyo: true,
+		cache: [],
+		speed: .045,
+		detailAliveBottom: 510,
+		detailDeathBottom: 210,
+		shadowBottom: 40,
+		shadowWidth: 320,
+		shadowHeight: 40,
+		clickAliveY: 30,
+		clickAliveW: 270,
+		clickAliveH: 450,
+		clickDeadY: -50,
+		clickDeadW: 250,
+		clickDeadH: 140,
+		enableSecondary: 1,
+		enableSpecial: 1
+	},
+	'mummy': {
+		imgW: 800,
+		imgH: 1000,
+		imgCy: 370,
+		w: 560,
+		h: 700,
+		yFloor: -30,
+		yoyo: false,
+		cache: [],
+		speed: .04,
+		detailAliveBottom: 550,
+		detailDeathBottom: 210,
+		shadowBottom: 40,
+		shadowWidth: 260,
+		shadowHeight: 60,
+		clickAliveY: 40,
+		clickAliveW: 180,
+		clickAliveH: 480,
+		clickDeadY: 0,
+		clickDeadW: 160,
+		clickDeadH: 120,
+		enableSecondary: 1,
+		enableSpecial: 1
+	},
+	'skeleton': {
+		imgW: 900,
+		imgH: 1000,
+		imgCy: 340,
+		w: 720,
+		h: 800,
+		yFloor: -30,
+		yoyo: false,
+		cache: [],
+		speed: .045,
+		detailAliveBottom: 520,
+		detailDeathBottom: 240,
+		shadowBottom: 40,
+		shadowWidth: 280,
+		shadowHeight: 60,
+		clickAliveY: 30,
+		clickAliveW: 150,
+		clickAliveH: 430,
+		clickDeadY: 50,
+		clickDeadW: 350,
+		clickDeadH: 100,
+		enableSecondary: 1,
+		enableSpecial: 1
+	},
+	// questionable
+	/*
+	'zombie': {
+		imgW: 900,
+		imgH: 1000,
+		imgCy: 400,
+		w: 720,
+		h: 800,
+		yFloor: -15,
+		yoyo: true,
+		cache: [],
+		speed: .045,
+		detailAliveBottom: 590,
+		detailDeathBottom: 230,
+		shadowBottom: 40,
+		shadowWidth: 230,
+		shadowHeight: 70,
+		clickAliveY: 30,
+		clickAliveW: 160,
+		clickAliveH: 520,
+		clickDeadY: 10,
+		clickDeadW: 240,
+		clickDeadH: 150,
+		enableSecondary: 1,
+		enableSpecial: 1
+	},
+	*/
+	'vampire': {
+		imgW: 1000,
+		imgH: 1000,
+		imgCy: 350,
+		w: 650,
+		h: 650,
+		yFloor: -60,
+		yoyo: true,
+		cache: [],
+		speed: .04,
+		detailAliveBottom: 510,
+		detailDeathBottom: 230,
+		shadowBottom: 40,
+		shadowWidth: 300,
+		shadowHeight: 60,
+		clickAliveY: 40,
+		clickAliveW: 200,
+		clickAliveH: 420,
+		clickDeadY: -50,
+		clickDeadW: 250,
+		clickDeadH: 200,
+		enableSecondary: 1,
+		enableSpecial: 1
+	},
+	'goblin': {
+		imgW: 1000,
+		imgH: 1000,
+		imgCy: 250,
+		w: 700,
+		h: 700,
+		yFloor: -40,
+		yoyo: false,
+		cache: [],
+		speed: .042,
+		detailAliveBottom: 400,
+		detailDeathBottom: 220,
+		shadowBottom: 40,
+		shadowWidth: 200,
+		shadowHeight: 40,
+		clickAliveY: 50,
+		clickAliveW: 150,
+		clickAliveH: 330,
+		clickDeadY: 40,
+		clickDeadW: 300,
+		clickDeadH: 100,
+		enableSecondary: 1,
+		enableSpecial: 1
+	},
+	'hobgoblin': {
+		imgW: 1000,
+		imgH: 1000,
+		imgCy: 340,
+		w: 1000,
+		h: 1000,
+		yFloor: -120,
+		yoyo: false,
+		cache: [],
+		speed: .045,
+		detailAliveBottom: 530,
+		detailDeathBottom: 220,
+		shadowBottom: 40,
+		shadowWidth: 340,
+		shadowHeight: 70,
+		clickAliveY: 40,
+		clickAliveW: 220,
+		clickAliveH: 450,
+		clickDeadY: 0,
+		clickDeadW: 330,
+		clickDeadH: 150,
+		enableSecondary: 1,
+		enableSpecial: 1
+	},
+	'kobold': {
+		imgW: 1400,
+		imgH: 1000,
+		imgCy: 230,
+		w: 700,
+		h: 500,
+		yFloor: -40,
+		yoyo: false,
+		cache: [],
+		speed: .045,
+		detailAliveBottom: 380,
+		detailDeathBottom: 200,
+		shadowBottom: 40,
+		shadowWidth: 230,
+		shadowHeight: 60,
+		clickAliveY: 30,
+		clickAliveW: 170,
+		clickAliveH: 310,
+		clickDeadY: 10,
+		clickDeadW: 250,
+		clickDeadH: 100,
+		enableSecondary: 1,
+		enableSpecial: 1
+	},
+	'orc': {
+		imgW: 1200,
+		imgH: 1000,
+		imgCy: 340,
+		w: 960,
+		h: 800,
+		yFloor: -55,
+		yoyo: false,
+		cache: [],
+		speed: .045,
+		detailAliveBottom: 520,
+		detailDeathBottom: 250,
+		shadowBottom: 40,
+		shadowWidth: 260,
+		shadowHeight: 70,
+		clickAliveY: 30,
+		clickAliveW: 200,
+		clickAliveH: 440,
+		clickDeadY: 0,
+		clickDeadW: 240,
+		clickDeadH: 150,
+		enableSecondary: 1,
+		enableSpecial: 1
+	},
+	'griffon': {
+		imgW: 2000,
+		imgH: 1200,
+		imgCy: 250,
+		w: 1600,
+		h: 960,
+		yFloor: -40,
+		yoyo: false,
+		cache: [],
+		speed: .05,
+		detailAliveBottom: 520,
+		detailDeathBottom: 230,
+		shadowBottom: 40,
+		shadowWidth: 280,
+		shadowHeight: 80,
+		clickAliveY: 20,
+		clickAliveW: 180,
+		clickAliveH: 380,
+		clickDeadY: 20,
+		clickDeadW: 400,
+		clickDeadH: 130,
+		enableSecondary: 1,
+		enableSpecial: 1
+	},
+	'harpy': {
+		imgW: 1500,
+		imgH: 1000,
+		imgCy: 290,
+		w: 900,
+		h: 600,
+		yFloor: -30,
+		yoyo: false,
+		cache: [],
+		speed: .045,
+		detailAliveBottom: 490,
+		detailDeathBottom: 270,
+		shadowBottom: 40,
+		shadowWidth: 300,
+		shadowHeight: 40,
+		clickAliveY: 50,
+		clickAliveW: 200,
+		clickAliveH: 400,
+		clickDeadY: 50,
+		clickDeadW: 350,
+		clickDeadH: 130,
+		enableSecondary: 1,
+		enableSpecial: 1
+	},
+	'werewolf': {
+		imgW: 1000,
+		imgH: 1000,
+		imgCy: 260,
+		w: 800,
+		h: 800,
+		yFloor: -60,
+		yoyo: false,
+		cache: [],
+		speed: .045,
+		detailAliveBottom: 450,
+		detailDeathBottom: 220,
+		shadowBottom: 40,
+		shadowWidth: 380,
+		shadowHeight: 60,
+		clickAliveY: 40,
+		clickAliveW: 350,
+		clickAliveH: 330,
+		clickDeadY: -20,
+		clickDeadW: 400,
+		clickDeadH: 200,
+		enableSecondary: 1,
+		enableSpecial: 1
+	},
+	'centaur': {
+		imgW: 1500,
+		imgH: 1000,
+		imgCy: 330,
+		w: 1050,
+		h: 700,
+		yFloor: -25,
+		yoyo: false,
+		cache: [],
+		speed: .045,
+		detailAliveBottom: 560,
+		detailDeathBottom: 240,
+		shadowBottom: 40,
+		shadowWidth: 190,
+		shadowHeight: 80,
+		clickAliveY: 20,
+		clickAliveW: 150,
+		clickAliveH: 470,
+		clickDeadY: 20,
+		clickDeadW: 380,
+		clickDeadH: 150,
+		enableSecondary: 1,
+		enableSpecial: 1
+	},
+	// dont like the cerberus
+	'cerberus': {
+		imgW: 1800,
+		imgH: 1200,
+		imgCy: 300,
+		w: 1200,
+		h: 800,
+		yFloor: -50,
+		yoyo: false,
+		cache: [],
+		speed: .055,
+		detailAliveBottom: 530,
+		detailDeathBottom: 350,
+		shadowBottom: 40,
+		shadowWidth: 470,
+		shadowHeight: 180,
+		clickAliveY: 20,
+		clickAliveW: 420,
+		clickAliveH: 480,
+		clickDeadY: 0,
+		clickDeadW: 400,
+		clickDeadH: 250,
+		enableSecondary: 0,
+		enableSpecial: 1
+	},
+	'fungoid': {
+		imgW: 1000,
+		imgH: 1000,
+		imgCy: 340,
+		w: 800,
+		h: 800,
+		yFloor: -80,
+		yoyo: true,
+		cache: [],
+		speed: .045,
+		detailAliveBottom: 550,
+		detailDeathBottom: 270,
+		shadowBottom: 40,
+		shadowWidth: 260,
+		shadowHeight: 70,
+		clickAliveY: 40,
+		clickAliveW: 190,
+		clickAliveH: 470,
+		clickDeadY: 0,
+		clickDeadW: 210,
+		clickDeadH: 140,
+		enableSecondary: 1,
+		enableSpecial: 1
+	},
+	'gargoyle': {
+		imgW: 1200,
+		imgH: 1000,
+		imgCy: 300,
+		w: 1080,
+		h: 900,
+		yFloor: -20,
+		yoyo: true,
+		cache: [],
+		speed: .045,
+		detailAliveBottom: 530,
+		detailDeathBottom: 350,
+		shadowBottom: 40,
+		shadowWidth: 320,
+		shadowHeight: 60,
+		clickAliveY: 40,
+		clickAliveW: 200,
+		clickAliveH: 400,
+		clickDeadY: 40,
+		clickDeadW: 200,
+		clickDeadH: 250,
+		enableSecondary: 1,
+		enableSpecial: 1
+	},
+	'beetle': {
+		imgW: 1000,
+		imgH: 1000,
+		imgCy: 210,
+		w: 600,
+		h: 600,
+		yFloor: -60,
+		yoyo: false,
+		cache: [],
+		speed: .04,
+		detailAliveBottom: 370,
+		detailDeathBottom: 250,
+		shadowBottom: 40,
+		shadowWidth: 400,
+		shadowHeight: 90,
+		clickAliveY: 120,
+		clickAliveW: 190,
+		clickAliveH: 170,
+		clickDeadY: 20,
+		clickDeadW: 200,
+		clickDeadH: 170,
+		enableSecondary: 1,
+		enableSpecial: 1
+	},
+	'imp': {
+		imgW: 1250,
+		imgH: 1000,
+		imgCy: 200,
+		w: 625,
+		h: 500,
+		yFloor: -15,
+		yoyo: true,
+		cache: [],
+		speed: .045,
+		detailAliveBottom: 400,
+		detailDeathBottom: 230,
+		shadowBottom: 40,
+		shadowWidth: 220,
+		shadowHeight: 60,
+		clickAliveY: 30,
+		clickAliveW: 150,
+		clickAliveH: 290,
+		clickDeadY: 0,
+		clickDeadW: 150,
+		clickDeadH: 140,
+		enableSecondary: 1,
+		enableSpecial: 1
+	},
+	'minotaur': {
+		imgW: 1000,
+		imgH: 1000,
+		imgCy: 380,
+		w: 1000,
+		h: 1000,
+		yFloor: -100,
+		yoyo: false,
+		cache: [],
+		speed: .045,
+		detailAliveBottom: 620,
+		detailDeathBottom: 250,
+		shadowBottom: 40,
+		shadowWidth: 270,
+		shadowHeight: 80,
+		clickAliveY: 40,
+		clickAliveW: 200,
+		clickAliveH: 500,
+		clickDeadY: 0,
+		clickDeadW: 250,
+		clickDeadH: 150,
+		enableSecondary: 1,
+		enableSpecial: 1
+	},
+	'aviak': {
+		imgW: 1200,
+		imgH: 1000,
+		imgCy: 290,
+		w: 900,
+		h: 750,
+		yFloor: -110,
+		yoyo: false,
+		cache: [],
+		speed: .04,
+		detailAliveBottom: 450,
+		detailDeathBottom: 200,
+		shadowBottom: 40,
+		shadowWidth: 270,
+		shadowHeight: 40,
+		clickAliveY: 40,
+		clickAliveW: 190,
+		clickAliveH: 380,
+		clickDeadY: 0,
+		clickDeadW: 350,
+		clickDeadH: 125,
+		enableSecondary: 1,
+		enableSpecial: 1
+	},
+	'elephant': {
+		imgW: 1300,
+		imgH: 1000,
+		imgCy: 330,
+		w: 1300,
+		h: 1000,
+		yFloor: -100,
+		yoyo: false,
+		cache: [],
+		speed: .05,
+		detailAliveBottom: 720,
+		detailDeathBottom: 340,
+		shadowBottom: 40,
+		shadowWidth: 380,
+		shadowHeight: 110,
+		clickAliveY: 10,
+		clickAliveW: 290,
+		clickAliveH: 650,
+		clickDeadY: 0,
+		clickDeadW: 440,
+		clickDeadH: 250,
+		enableSecondary: 1,
+		enableSpecial: 1
+	},
+	'lion': {
+		imgW: 900,
+		imgH: 1200,
+		imgCy: 300,
+		w: 540,
+		h: 720,
+		yFloor: -20,
+		yoyo: false,
+		cache: [],
+		speed: .05,
+		detailAliveBottom: 500,
+		detailDeathBottom: 230,
+		shadowBottom: 40,
+		shadowWidth: 250,
+		shadowHeight: 90,
+		clickAliveY: 30,
+		clickAliveW: 180,
+		clickAliveH: 420,
+		clickDeadY: 0,
+		clickDeadW: 320,
+		clickDeadH: 140,
+		enableSecondary: 0,
+		enableSpecial: 1
+	},
+	'crocodile': {
+		imgW: 1000,
+		imgH: 1000,
+		imgCy: 120,
+		w: 800,
+		h: 800,
+		yFloor: -50,
+		yoyo: false,
+		cache: [],
+		speed: .05,
+		detailAliveBottom: 320,
+		detailDeathBottom: 250,
+		shadowBottom: 40,
+		shadowWidth: 420,
+		shadowHeight: 110,
+		clickAliveY: 10,
+		clickAliveW: 330,
+		clickAliveH: 240,
+		clickDeadY: 30,
+		clickDeadW: 370,
+		clickDeadH: 170,
+		enableSecondary: 1,
+		enableSpecial: 1
+	},
+	'rhino': {
+		imgW: 1200,
+		imgH: 1200,
+		imgCy: 275,
+		w: 1000,
+		h: 1000,
+		yFloor: -90,
+		yoyo: false,
+		cache: [],
+		speed: .05,
+		detailAliveBottom: 620,
+		detailDeathBottom: 320,
+		shadowBottom: 40,
+		shadowWidth: 370,
+		shadowHeight: 130,
+		clickAliveY: 20,
+		clickAliveW: 280,
+		clickAliveH: 540,
+		clickDeadY: 0,
+		clickDeadW: 450,
+		clickDeadH: 240,
+		enableSecondary: 1,
+		enableSpecial: 0
+	},
+	'lioness': {
+		imgW: 900,
+		imgH: 1200,
+		imgCy: 300,
+		w: 540,
+		h: 720,
+		yFloor: -20,
+		yoyo: false,
+		cache: [],
+		speed: .045,
+		detailAliveBottom: 460,
+		detailDeathBottom: 230,
+		shadowBottom: 40,
+		shadowWidth: 250,
+		shadowHeight: 90,
+		clickAliveY: 30,
+		clickAliveW: 180,
+		clickAliveH: 390,
+		clickDeadY: 0,
+		clickDeadW: 320,
+		clickDeadH: 140,
+		enableSecondary: 0,
+		enableSpecial: 1
+	},
+	'bear': {
+		imgW: 1000,
+		imgH: 1000,
+		imgCy: 260,
+		w: 600,
+		h: 600,
+		yFloor: -10,
+		yoyo: false,
+		cache: [],
+		speed: .05,
+		detailAliveBottom: 470,
+		detailDeathBottom: 320,
+		shadowBottom: 40,
+		shadowWidth: 280,
+		shadowHeight: 100,
+		clickAliveY: 50,
+		clickAliveW: 240,
+		clickAliveH: 370,
+		clickDeadY: 50,
+		clickDeadW: 340,
+		clickDeadH: 240,
+		enableSecondary: 1,
+		enableSpecial: 1
+	},
+	'toadlok': {
+		imgW: 1200,
+		imgH: 1000,
+		imgCy: 200,
+		w: 600,
+		h: 500,
+		yFloor: -35,
+		yoyo: false,
+		cache: [],
+		speed: .045,
+		detailAliveBottom: 390,
+		detailDeathBottom: 270,
+		shadowBottom: 40,
+		shadowWidth: 200,
+		shadowHeight: 70,
+		clickAliveY: 50,
+		clickAliveW: 200,
+		clickAliveH: 300,
+		clickDeadY: 30,
+		clickDeadW: 200,
+		clickDeadH: 170,
+		enableSecondary: 1,
+		enableSpecial: 1
+	},
+	'giant': {
+		imgW: 1400,
+		imgH: 1200,
+		imgCy: 480,
+		w: 1400,
+		h: 1200,
+		yFloor: -150,
+		yoyo: false,
+		cache: [],
+		speed: .05,
+		detailAliveBottom: 830,
+		detailDeathBottom: 370,
+		shadowBottom: 40,
+		shadowWidth: 480,
+		shadowHeight: 120,
+		clickAliveY: 50,
+		clickAliveW: 350,
+		clickAliveH: 700,
+		clickDeadY: -50,
+		clickDeadW: 350,
+		clickDeadH: 400,
+		enableSecondary: 1,
+		enableSpecial: 1
+	},
+	'ice-giant': {
+		imgW: 1400,
+		imgH: 1200,
+		imgCy: 480,
+		w: 1400,
+		h: 1200,
+		yFloor: -150,
+		yoyo: false,
+		cache: [],
+		speed: .06,
+		detailAliveBottom: 830,
+		detailDeathBottom: 370,
+		shadowBottom: 40,
+		shadowWidth: 480,
+		shadowHeight: 120,
+		clickAliveY: 50,
+		clickAliveW: 350,
+		clickAliveH: 700,
+		clickDeadY: -50,
+		clickDeadW: 350,
+		clickDeadH: 400,
+		enableSecondary: 1,
+		enableSpecial: 1
+	},
+	'fire-giant': {
+		imgW: 1400,
+		imgH: 1200,
+		imgCy: 480,
+		w: 1400,
+		h: 1200,
+		yFloor: -150,
+		yoyo: false,
+		cache: [],
+		speed: .06,
+		detailAliveBottom: 830,
+		detailDeathBottom: 370,
+		shadowBottom: 40,
+		shadowWidth: 480,
+		shadowHeight: 120,
+		clickAliveY: 50,
+		clickAliveW: 350,
+		clickAliveH: 700,
+		clickDeadY: -50,
+		clickDeadW: 350,
+		clickDeadH: 400,
+		enableSecondary: 1,
+		enableSpecial: 1
+	},
+	'spectre': {
+		imgW: 1500,
+		imgH: 1500,
+		imgCy: 455,
+		w: 1200,
+		h: 1200,
+		yFloor: -220,
+		yoyo: false,
+		cache: [],
+		speed: .055,
+		detailAliveBottom: 610,
+		detailDeathBottom: 270,
+		shadowBottom: 40,
+		shadowWidth: 200,
+		shadowHeight: 80,
+		clickAliveY: 100,
+		clickAliveW: 150,
+		clickAliveH: 470,
+		clickDeadY: 40,
+		clickDeadW: 190,
+		clickDeadH: 150,
+		enableSecondary: 1,
+		enableSpecial: 1
+	},
+	'angler': {
+		imgW: 1500,
+		imgH: 1200,
+		imgCy: 235,
+		w: 900,
+		h: 720,
+		yFloor: -60,
+		yoyo: false,
+		cache: [],
+		speed: .045,
+		detailAliveBottom: 400,
+		detailDeathBottom: 270,
+		shadowBottom: 40,
+		shadowWidth: 240,
+		shadowHeight: 60,
+		clickAliveY: 50,
+		clickAliveW: 200,
+		clickAliveH: 280,
+		clickDeadY: 10,
+		clickDeadW: 200,
+		clickDeadH: 120,
+		enableSecondary: 1,
+		enableSpecial: 1
+	},
+	'beholder': {
+		imgW: 1200,
+		imgH: 1000,
+		imgCy: 240,
+		w: 720,
+		h: 600,
+		yFloor: -100,
+		yoyo: false,
+		cache: [],
+		speed: .05,
+		detailAliveBottom: 410,
+		detailDeathBottom: 270,
+		shadowBottom: 40,
+		shadowWidth: 250,
+		shadowHeight: 80,
+		clickAliveY: 50,
+		clickAliveW: 200,
+		clickAliveH: 300,
+		clickDeadY: 50,
+		clickDeadW: 200,
+		clickDeadH: 200,
+		enableSecondary: 1,
+		enableSpecial: 1
+	},
+	'unicorn': {
+		imgW: 2000,
+		imgH: 1200,
+		imgCy: 280,
+		w: 1600,
+		h: 960,
+		yFloor: -40,
+		yoyo: false,
+		cache: [],
+		speed: .055,
+		detailAliveBottom: 450,
+		detailDeathBottom: 260,
+		shadowBottom: 40,
+		shadowWidth: 220,
+		shadowHeight: 70,
+		clickAliveY: 50,
+		clickAliveW: 120,
+		clickAliveH: 350,
+		clickDeadY: 50,
+		clickDeadW: 350,
+		clickDeadH: 100,
+		enableSecondary: 1,
+		enableSpecial: 1
+	},
+	'scorpion': {
+		imgW: 1000,
+		imgH: 1000,
+		imgCy: 135,
+		w: 600,
+		h: 600,
+		yFloor: 0, // back row is *2
+		yoyo: false,
+		cache: [],
+		speed: .045,
+		detailAliveBottom: 450,
+		detailDeathBottom: 270,
+		shadowBottom: 40,
+		shadowWidth: 400,
+		shadowHeight: 80,
+		clickAliveY: 50,
+		clickAliveW: 350,
+		clickAliveH: 350,
+		clickDeadY: 50,
+		clickDeadW: 350,
+		clickDeadH: 100,
+		enableSecondary: 1,
+		enableSpecial: 1
+	}
+};
+// test methods
 var mob = {
 	test: 1,
-	images: {
-		'balrog': {
-			imgW: 2000,
-			imgH: 1200,
-			w: 2000,
-			h: 1200,
-			yFloor: 3,
-			yoyo: true,
-			cache: [],
-			size: 1,
-			speed: .05,
-			nameBottom: 10,
-			shadowBottom: 10,
-			shadowWidth: 400,
-			center: {
-				x: 0,
-				y: 0
-			},
-			click: {
-				alive: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				},
-				dead: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				}
-			}
-		},
-		'ice-golem': {
-			imgW: 1200,
-			imgH: 1000,
-			w: 1200,
-			h: 1000,
-			yFloor: 3,
-			yoyo: false,
-			cache: [],
-			size: 1,
-			speed: .04,
-			nameBottom: 10,
-			shadowBottom: 10,
-			shadowWidth: 400,
-			center: {
-				x: 0,
-				y: 0
-			},
-			click: {
-				alive: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				},
-				dead: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				}
-			}
-		},
-		'stone-golem': {
-			imgW: 1200,
-			imgH: 1000,
-			w: 1200,
-			h: 1000,
-			yFloor: 3,
-			yoyo: false,
-			cache: [],
-			size: 1,
-			speed: .04,
-			nameBottom: 10,
-			shadowBottom: 10,
-			shadowWidth: 400,
-			center: {
-				x: 0,
-				y: 0
-			},
-			click: {
-				alive: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				},
-				dead: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				}
-			}
-		},
-		'clay-golem': {
-			imgW: 1200,
-			imgH: 1000,
-			w: 1200,
-			h: 1000,
-			yFloor: 3,
-			yoyo: false,
-			cache: [],
-			size: 1,
-			speed: .04,
-			nameBottom: 10,
-			shadowBottom: 10,
-			shadowWidth: 400,
-			center: {
-				x: 0,
-				y: 0
-			},
-			click: {
-				alive: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				},
-				dead: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				}
-			}
-		},
-		'treant': {
-			imgW: 1300,
-			imgH: 1200,
-			w: 1300,
-			h: 1200,
-			yFloor: 3,
-			yoyo: false,
-			cache: [],
-			size: 1,
-			speed: .05,
-			nameBottom: 10,
-			shadowBottom: 10,
-			shadowWidth: 400,
-			center: {
-				x: 0,
-				y: 0
-			},
-			click: {
-				alive: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				},
-				dead: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				}
-			}
-		},
-		'spider': {
-			imgW: 1000,
-			imgH: 1000,
-			w: 1000,
-			h: 1000,
-			yFloor: 3,
-			yoyo: false,
-			cache: [],
-			size: 1,
-			speed: .04,
-			nameBottom: 10,
-			shadowBottom: 10,
-			shadowWidth: 400,
-			center: {
-				x: 0,
-				y: 0
-			},
-			click: {
-				alive: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				},
-				dead: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				}
-			}
-		},
-		'wolf': {
-			imgW: 900,
-			imgH: 1000,
-			w: 900,
-			h: 1000,
-			yFloor: 3,
-			yoyo: false,
-			cache: [],
-			size: 1,
-			speed: .04,
-			nameBottom: 10,
-			shadowBottom: 10,
-			shadowWidth: 400,
-			center: {
-				x: 0,
-				y: 0
-			},
-			click: {
-				alive: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				},
-				dead: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				}
-			}
-		},
-		'rat': {
-			imgW: 1100,
-			imgH: 1000,
-			w: 1100,
-			h: 1000,
-			yFloor: 3,
-			yoyo: false,
-			cache: [],
-			size: 1,
-			speed: .04,
-			nameBottom: 10,
-			shadowBottom: 10,
-			shadowWidth: 400,
-			center: {
-				x: 0,
-				y: 0
-			},
-			click: {
-				alive: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				},
-				dead: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				}
-			}
-		},
-		'snake': {
-			imgW: 1000,
-			imgH: 1000,
-			w: 1000,
-			h: 1000,
-			yFloor: 3,
-			yoyo: false,
-			cache: [],
-			size: 1,
-			speed: .04,
-			nameBottom: 10,
-			shadowBottom: 10,
-			shadowWidth: 400,
-			center: {
-				x: 0,
-				y: 0
-			},
-			click: {
-				alive: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				},
-				dead: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				}
-			}
-		},
-		'dragonkin': {
-			imgW: 1300,
-			imgH: 1300,
-			w: 1300,
-			h: 1300,
-			yFloor: 3,
-			yoyo: false,
-			cache: [],
-			size: 1,
-			speed: .055,
-			nameBottom: 10,
-			shadowBottom: 10,
-			shadowWidth: 400,
-			center: {
-				x: 0,
-				y: 0
-			},
-			click: {
-				alive: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				},
-				dead: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				}
-			}
-		},
-		'lizardman': {
-			imgW: 1100,
-			imgH: 1000,
-			w: 1100,
-			h: 1000,
-			yFloor: 3,
-			yoyo: true,
-			cache: [],
-			size: 1,
-			speed: .04,
-			nameBottom: 10,
-			shadowBottom: 10,
-			shadowWidth: 400,
-			center: {
-				x: 0,
-				y: 0
-			},
-			click: {
-				alive: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				},
-				dead: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				}
-			}
-		},
-		'dragon': {
-			imgW: 3000,
-			imgH: 1500,
-			w: 3000,
-			h: 1500,
-			yFloor: 3,
-			yoyo: true,
-			cache: [],
-			size: 1,
-			speed: .06,
-			nameBottom: 10,
-			shadowBottom: 10,
-			shadowWidth: 400,
-			center: {
-				x: 0,
-				y: 0
-			},
-			click: {
-				alive: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				},
-				dead: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				}
-			}
-		},
-		'ghoul': {
-			imgW: 900,
-			imgH: 1000,
-			w: 900,
-			h: 1000,
-			yFloor: 3,
-			yoyo: true,
-			cache: [],
-			size: 1,
-			speed: .04,
-			nameBottom: 10,
-			shadowBottom: 10,
-			shadowWidth: 400,
-			center: {
-				x: 0,
-				y: 0
-			},
-			click: {
-				alive: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				},
-				dead: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				}
-			}
-		},
-		'mummy': {
-			imgW: 800,
-			imgH: 1000,
-			w: 800,
-			h: 1000,
-			yFloor: 3,
-			yoyo: false,
-			cache: [],
-			size: 1,
-			speed: .04,
-			nameBottom: 10,
-			shadowBottom: 10,
-			shadowWidth: 400,
-			center: {
-				x: 0,
-				y: 0
-			},
-			click: {
-				alive: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				},
-				dead: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				}
-			}
-		},
-		'skeleton': {
-			imgW: 900,
-			imgH: 1000,
-			w: 900,
-			h: 1000,
-			yFloor: 3,
-			yoyo: false,
-			cache: [],
-			size: 1,
-			speed: .04,
-			nameBottom: 10,
-			shadowBottom: 10,
-			shadowWidth: 400,
-			center: {
-				x: 0,
-				y: 0
-			},
-			click: {
-				alive: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				},
-				dead: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				}
-			}
-		},
-		'zombie': {
-			imgW: 900,
-			imgH: 1000,
-			w: 900,
-			h: 1000,
-			yFloor: 3,
-			yoyo: true,
-			cache: [],
-			size: 1,
-			speed: .04,
-			nameBottom: 10,
-			shadowBottom: 10,
-			shadowWidth: 400,
-			center: {
-				x: 0,
-				y: 0
-			},
-			click: {
-				alive: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				},
-				dead: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				}
-			}
-		},
-		'vampire': {
-			imgW: 1000,
-			imgH: 1000,
-			w: 1000,
-			h: 1000,
-			yFloor: 3,
-			yoyo: true,
-			cache: [],
-			size: 1,
-			speed: .04,
-			nameBottom: 10,
-			shadowBottom: 10,
-			shadowWidth: 400,
-			center: {
-				x: 0,
-				y: 0
-			},
-			click: {
-				alive: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				},
-				dead: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				}
-			}
-		},
-		'goblin': {
-			imgW: 1000,
-			imgH: 1000,
-			w: 1000,
-			h: 1000,
-			yFloor: 3,
-			yoyo: false,
-			cache: [],
-			size: 1,
-			speed: .04,
-			nameBottom: 10,
-			shadowBottom: 10,
-			shadowWidth: 400,
-			center: {
-				x: 0,
-				y: 0
-			},
-			click: {
-				alive: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				},
-				dead: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				}
-			}
-		},
-		'hobgoblin': {
-			imgW: 1000,
-			imgH: 1000,
-			w: 1000,
-			h: 1000,
-			yFloor: 3,
-			yoyo: false,
-			cache: [],
-			size: 1,
-			speed: .04,
-			nameBottom: 10,
-			shadowBottom: 10,
-			shadowWidth: 400,
-			center: {
-				x: 0,
-				y: 0
-			},
-			click: {
-				alive: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				},
-				dead: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				}
-			}
-		},
-		'kobold': {
-			imgW: 1400,
-			imgH: 1000,
-			w: 1400,
-			h: 1000,
-			yFloor: 3,
-			yoyo: false,
-			cache: [],
-			size: 1,
-			speed: .04,
-			nameBottom: 10,
-			shadowBottom: 10,
-			shadowWidth: 400,
-			center: {
-				x: 0,
-				y: 0
-			},
-			click: {
-				alive: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				},
-				dead: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				}
-			}
-		},
-		'orc': {
-			imgW: 1200,
-			imgH: 1000,
-			w: 1200,
-			h: 1000,
-			yFloor: 3,
-			yoyo: false,
-			cache: [],
-			size: 1,
-			speed: .045,
-			nameBottom: 10,
-			shadowBottom: 10,
-			shadowWidth: 400,
-			center: {
-				x: 0,
-				y: 0
-			},
-			click: {
-				alive: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				},
-				dead: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				}
-			}
-		},
-		'griffon': {
-			imgW: 2000,
-			imgH: 1000,
-			w: 2000,
-			h: 1200,
-			yFloor: 3,
-			yoyo: false,
-			cache: [],
-			size: 1,
-			speed: .05,
-			nameBottom: 10,
-			shadowBottom: 10,
-			shadowWidth: 400,
-			center: {
-				x: 0,
-				y: 0
-			},
-			click: {
-				alive: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				},
-				dead: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				}
-			}
-		},
-		'harpy': {
-			imgW: 1500,
-			imgH: 1000,
-			w: 1500,
-			h: 1000,
-			yFloor: 3,
-			yoyo: false,
-			cache: [],
-			size: 1,
-			speed: .045,
-			nameBottom: 10,
-			shadowBottom: 10,
-			shadowWidth: 400,
-			center: {
-				x: 0,
-				y: 0
-			},
-			click: {
-				alive: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				},
-				dead: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				}
-			}
-		},
-		'werewolf': {
-			imgW: 1000,
-			imgH: 1000,
-			w: 1000,
-			h: 1000,
-			yFloor: 3,
-			yoyo: false,
-			cache: [],
-			size: 1,
-			speed: .04,
-			nameBottom: 10,
-			shadowBottom: 10,
-			shadowWidth: 400,
-			center: {
-				x: 0,
-				y: 0
-			},
-			click: {
-				alive: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				},
-				dead: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				}
-			}
-		},
-		'centaur': {
-			imgW: 1500,
-			imgH: 1000,
-			w: 1500,
-			h: 1000,
-			yFloor: 3,
-			yoyo: false,
-			cache: [],
-			size: 1,
-			speed: .045,
-			nameBottom: 10,
-			shadowBottom: 10,
-			shadowWidth: 400,
-			center: {
-				x: 0,
-				y: 0
-			},
-			click: {
-				alive: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				},
-				dead: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				}
-			}
-		},
-		'cerberus': {
-			imgW: 1300,
-			imgH: 1000,
-			w: 1300,
-			h: 1000,
-			yFloor: 3,
-			yoyo: false,
-			cache: [],
-			size: 1,
-			speed: .04,
-			nameBottom: 10,
-			shadowBottom: 10,
-			shadowWidth: 400,
-			center: {
-				x: 0,
-				y: 0
-			},
-			click: {
-				alive: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				},
-				dead: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				}
-			}
-		},
-		'fungoid': {
-			imgW: 1000,
-			imgH: 1000,
-			w: 1000,
-			h: 1000,
-			yFloor: 3,
-			yoyo: true,
-			cache: [],
-			size: 1,
-			speed: .04,
-			nameBottom: 10,
-			shadowBottom: 10,
-			shadowWidth: 400,
-			center: {
-				x: 0,
-				y: 0
-			},
-			click: {
-				alive: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				},
-				dead: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				}
-			}
-		},
-		'gargoyle': {
-			imgW: 1200,
-			imgH: 1000,
-			w: 1200,
-			h: 1000,
-			yFloor: 3,
-			yoyo: true,
-			cache: [],
-			size: 1,
-			speed: .04,
-			nameBottom: 10,
-			shadowBottom: 10,
-			shadowWidth: 400,
-			center: {
-				x: 0,
-				y: 0
-			},
-			click: {
-				alive: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				},
-				dead: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				}
-			}
-		},
-		'beetle': {
-			imgW: 1000,
-			imgH: 1000,
-			w: 1000,
-			h: 1000,
-			yFloor: 3,
-			yoyo: false,
-			cache: [],
-			size: 1,
-			speed: .04,
-			nameBottom: 10,
-			shadowBottom: 10,
-			shadowWidth: 400,
-			center: {
-				x: 0,
-				y: 0
-			},
-			click: {
-				alive: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				},
-				dead: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				}
-			}
-		},
-		'imp': {
-			imgW: 1250,
-			imgH: 1000,
-			w: 1250,
-			h: 1000,
-			yFloor: 3,
-			yoyo: true,
-			cache: [],
-			size: 1,
-			speed: .04,
-			nameBottom: 10,
-			shadowBottom: 10,
-			shadowWidth: 400,
-			center: {
-				x: 0,
-				y: 0
-			},
-			click: {
-				alive: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				},
-				dead: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				}
-			}
-		},
-		'minotaur': {
-			imgW: 1000,
-			imgH: 1000,
-			w: 1000,
-			h: 1000,
-			yFloor: 3,
-			yoyo: false,
-			cache: [],
-			size: 1,
-			speed: .04,
-			nameBottom: 10,
-			shadowBottom: 10,
-			shadowWidth: 400,
-			center: {
-				x: 0,
-				y: 0
-			},
-			click: {
-				alive: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				},
-				dead: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				}
-			}
-		},
-		'aviak': {
-			imgW: 1200,
-			imgH: 1000,
-			w: 1200,
-			h: 1000,
-			yFloor: 3,
-			yoyo: false,
-			cache: [],
-			size: 1,
-			speed: .04,
-			nameBottom: 10,
-			shadowBottom: 10,
-			shadowWidth: 400,
-			center: {
-				x: 0,
-				y: 0
-			},
-			click: {
-				alive: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				},
-				dead: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				}
-			}
-		},
-		'elephant': {
-			imgW: 1300,
-			imgH: 1000,
-			w: 1300,
-			h: 1000,
-			yFloor: 3,
-			yoyo: false,
-			cache: [],
-			size: 1,
-			speed: .05,
-			nameBottom: 10,
-			shadowBottom: 10,
-			shadowWidth: 400,
-			center: {
-				x: 0,
-				y: 0
-			},
-			click: {
-				alive: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				},
-				dead: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				}
-			}
-		},
-		'lion': {
-			imgW: 900,
-			imgH: 1200,
-			w: 900,
-			h: 1200,
-			yFloor: 3,
-			yoyo: false,
-			cache: [],
-			size: 1,
-			speed: .04,
-			nameBottom: 10,
-			shadowBottom: 10,
-			shadowWidth: 400,
-			center: {
-				x: 0,
-				y: 0
-			},
-			click: {
-				alive: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				},
-				dead: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				}
-			}
-		},
-		'crocodile': {
-			imgW: 1000,
-			imgH: 1000,
-			w: 1000,
-			h: 1000,
-			yFloor: 3,
-			yoyo: false,
-			cache: [],
-			size: 1,
-			speed: .04,
-			nameBottom: 10,
-			shadowBottom: 10,
-			shadowWidth: 400,
-			center: {
-				x: 0,
-				y: 0
-			},
-			click: {
-				alive: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				},
-				dead: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				}
-			}
-		},
-		'rhino': {
-			imgW: 1200,
-			imgH: 1200,
-			w: 1200,
-			h: 1200,
-			yFloor: 3,
-			yoyo: false,
-			cache: [],
-			size: 1,
-			speed: .045,
-			nameBottom: 10,
-			shadowBottom: 10,
-			shadowWidth: 400,
-			center: {
-				x: 0,
-				y: 0
-			},
-			click: {
-				alive: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				},
-				dead: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				}
-			}
-		},
-		'lioness': {
-			imgW: 900,
-			imgH: 1200,
-			w: 900,
-			h: 1200,
-			yFloor: 3,
-			yoyo: false,
-			cache: [],
-			size: 1,
-			speed: .04,
-			nameBottom: 10,
-			shadowBottom: 10,
-			shadowWidth: 400,
-			center: {
-				x: 0,
-				y: 0
-			},
-			click: {
-				alive: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				},
-				dead: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				}
-			}
-		},
-		'bear': {
-			imgW: 1000,
-			imgH: 1000,
-			w: 1000,
-			h: 1000,
-			yFloor: 3,
-			yoyo: false,
-			cache: [],
-			size: 1,
-			speed: .04,
-			nameBottom: 10,
-			shadowBottom: 10,
-			shadowWidth: 400,
-			center: {
-				x: 0,
-				y: 0
-			},
-			click: {
-				alive: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				},
-				dead: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				}
-			}
-		},
-		'toadlok': {
-			imgW: 1200,
-			imgH: 1000,
-			w: 1200,
-			h: 1000,
-			yFloor: 3,
-			yoyo: false,
-			cache: [],
-			size: 1,
-			speed: .04,
-			nameBottom: 10,
-			shadowBottom: 10,
-			shadowWidth: 400,
-			center: {
-				x: 0,
-				y: 0
-			},
-			click: {
-				alive: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				},
-				dead: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				}
-			}
-		},
-		'giant': {
-			imgW: 1400,
-			imgH: 1200,
-			w: 1400,
-			h: 1200,
-			yFloor: 3,
-			yoyo: false,
-			cache: [],
-			size: 1,
-			speed: .05,
-			nameBottom: 10,
-			shadowBottom: 10,
-			shadowWidth: 400,
-			center: {
-				x: 0,
-				y: 0
-			},
-			click: {
-				alive: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				},
-				dead: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				}
-			}
-		},
-		'ice-giant': {
-			imgW: 1400,
-			imgH: 1200,
-			w: 1400,
-			h: 1200,
-			yFloor: -2,
-			yoyo: false,
-			cache: [],
-			size: 1,
-			speed: .06,
-			nameBottom: 10,
-			shadowBottom: 10,
-			shadowWidth: 400,
-			center: {
-				x: 0,
-				y: 0
-			},
-			click: {
-				alive: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				},
-				dead: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				}
-			}
-		},
-		'fire-giant': {
-			imgW: 1400,
-			imgH: 1200,
-			w: 1400,
-			h: 1200,
-			yFloor: -2,
-			yoyo: false,
-			cache: [],
-			size: 1,
-			speed: .06,
-			nameBottom: 10,
-			shadowBottom: 10,
-			shadowWidth: 400,
-			center: {
-				x: 0,
-				y: 0
-			},
-			click: {
-				alive: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				},
-				dead: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				}
-			}
-		},
-		'spectre': {
-			imgW: 1500,
-			imgH: 1500,
-			w: 1500,
-			h: 1500,
-			yFloor: -18,
-			yoyo: false,
-			cache: [],
-			size: 1,
-			speed: .055,
-			nameBottom: 10,
-			shadowBottom: 10,
-			shadowWidth: 400,
-			center: {
-				x: 0,
-				y: 0
-			},
-			click: {
-				alive: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				},
-				dead: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				}
-			}
-		},
-		'angler': {
-			imgW: 1500,
-			imgH: 1200,
-			w: 1500,
-			h: 1200,
-			yFloor: 1,
-			yoyo: false,
-			cache: [],
-			size: 1,
-			speed: .045,
-			nameBottom: 10,
-			shadowBottom: 10,
-			shadowWidth: 400,
-			center: {
-				x: 0,
-				y: 0
-			},
-			click: {
-				alive: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				},
-				dead: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				}
-			}
-		},
-		'beholder': {
-			imgW: 1200,
-			imgH: 1000,
-			w: 1200,
-			h: 1000,
-			yFloor: -4,
-			yoyo: false,
-			cache: [],
-			size: 1,
-			speed: .05,
-			nameBottom: 10,
-			shadowBottom: 10,
-			shadowWidth: 400,
-			center: {
-				x: 0,
-				y: 0
-			},
-			click: {
-				alive: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				},
-				dead: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				}
-			}
-		},
-		'unicorn': {
-			imgW: 2000,
-			imgH: 1200,
-			w: 2000,
-			h: 1200,
-			yFloor: 7,
-			yoyo: false,
-			cache: [],
-			size: 1,
-			speed: .055,
-			nameBottom: 10,
-			shadowBottom: 10,
-			shadowWidth: 400,
-			center: {
-				x: 0,
-				y: 0
-			},
-			click: {
-				alive: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				},
-				dead: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				}
-			}
-		},
-		'scorpion': {
-			imgW: 1000,
-			imgH: 1000,
-			w: 600,
-			h: 600,
-			yFloor: 0, // back row is *2
-			yoyo: false,
-			cache: [],
-			size: 1,
-			speed: .045,
-			nameBottom: 450,
-			shadowBottom: 30,
-			shadowWidth: 400,
-			center: {
-				x: 296,
-				y: 135
-			},
-			click: {
-				alive: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				},
-				dead: {
-					x: 0,
-					y: 0,
-					w: 0,
-					h: 0
-				}
-			}
-		}
-	},
-	imageKeys: 0,
 	imageKeysLen: 0,
 	index: 0,
 	cache: {},
-	count: 0,
 	imageKeys: [],
 	getRandomMobKey: function(){
 		var i = ~~(Math.random() * mob.imageKeysLen);
 		return mob.imageKeys[i];
 	},
 	preloadMob: function(type){
-		if (!mob.images[type].cache.length) {
-			console.info("preloading ", type);
+		if (!mobs.images[type].cache.length) {
+			//console.info("preloading ", type);
 			for (var i = 1; i < 105; i++) {
-				mob.images[type].cache[i] = new Image();
-				mob.images[type].cache[i].src = 'mobs/' + type + '/' + i + '.png';
+				mobs.images[type].cache[i] = new Image();
+				mobs.images[type].cache[i].src = 'mobs/' + type + '/' + i + '.png';
 			}
 		}
 	},
 	initialized: 0,
 	max: 9,
 	init: function(){
-		mob.imageKeys = Object.keys(mob.images);
+		mob.imageKeys = Object.keys(mobs.images);
 		mob.imageKeysLen = mob.imageKeys.length;
 		battle.show();
 		// init mob/dom connections
 		for (var i=0; i<mob.max; i++){
-			mobs[i] = {};
-			var m = mobs[i];
-			m.index = i;
-			m.frame = 0;
-			m.lastFrame = 0;
-			m.animationActive = 0;
-			m.deathState = 0;
-			m.speed = 0;
-			m.type = '';
-			// cache mob elements
-			m.dom = {};
+			mobs[i] = {
+				hp: 1,
+				index: i,
+				frame: 0,
+				lastFrame: 0,
+				animationActive: 0,
+				size: i < 5 ? 1 : .85,
+				deathState: 0,
+				speed: 0,
+				type: '',
+				box: {},
+				dom: {}
+			};
 			[
 				'wrap',
 				'center',
@@ -4472,7 +4207,7 @@ var mob = {
 				'shadow',
 				'bar'
 			].forEach(function(e){
-				m.dom[e] = document.getElementById('mob-'+ e +'-' + i);
+				mobs[i].dom[e] = document.getElementById('mob-'+ e +'-' + i);
 			});
 		}
 		battle.init();
@@ -4482,45 +4217,52 @@ var mob = {
 	frame: 1,
 	setMob: function(m){
 		// set memory
-		m.size = m.index <= 4 ? 1 : .9;
-		m = Object.assign(m, mob.images[m.type]);
+		m.size = m.size;
+		m = Object.assign(m, mobs.images[m.type]);
 		delete m.cache;
 		mob.sizeMob(m);
 	},
 	sizeMob: function(m){
 		// TODO: perhaps modify this later responsively using window.innerWidth ?
 		// set dom
-		var w = ~~(m.size * (mob.images[m.type].w)),
-			h = ~~(m.size * (mob.images[m.type].h));
+		var w = ~~(m.size * (mobs.images[m.type].w));
+
+		m.box = battle.getBox(m.index);
 		// wrapper
-		m.dom.wrap.style.width = w + 'px';
-		m.dom.wrap.style.height = h + 'px';
 		// name
 		m.dom.name.innerHTML = m.type.replace(/-/g, ' ');
 		// img
+		m.dom.img.style.left = (w * -.5) + 'px';
 		m.dom.img.style.width = w + 'px';
-		m.dom.img.style.bottom = mob.images[m.type].yFloor + 'px';
+		m.dom.img.style.bottom = (mobs.images[m.type].yFloor * m.size) + 'px';
 		// details
-		m.dom.details.style.bottom = m.nameBottom + 'px';
+		TweenMax.set(m.dom.details, {
+			bottom: m.detailAliveBottom * m.size
+		});
 		// shadow
-		m.dom.shadow.style.width = m.shadowWidth + 'px';
-		m.dom.shadow.style.left = ~~(m.shadowWidth * -.5) + 'px';
-		m.dom.shadow.style.bottom = m.shadowBottom + 'px';
-		// test only
-		var b = battle.getBox(m.index);
-		console.info('box: ', m.index, b);
-		m.dom.center.style.bottom = b.centerY + 'px';
-		m.dom.center.style.left = b.centerX + 'px';
+		m.dom.shadow.style.width = (m.shadowWidth * m.size) + 'px';
+		m.dom.shadow.style.height = (m.shadowHeight * m.size) + 'px';
+		m.dom.shadow.style.left = ((m.shadowWidth * m.size ) * -.5) + 'px';
+		m.dom.shadow.style.bottom = ((m.shadowBottom - (m.shadowHeight * .3))* m.size) + 'px';
+		// test stuff below
+		// center dot
+		m.dom.center.style.left = (m.box.cx - 11) + 'px';
+		m.dom.center.style.bottom = (m.box.cy - 11) + 'px';
+		mob.setClickBox(m);
+	},
+	setClickBox: function(m){
 		// alive box
-		m.dom.alive.style.bottom = '400px';
-		m.dom.alive.style.left = '200px';
-		m.dom.alive.style.width = '200px';
-		m.dom.alive.style.height = '400px';
+		m.dom.alive.style.left = ((m.clickAliveW  * m.size) * -.5) + 'px';
+		m.dom.alive.style.bottom = (m.clickAliveY  * m.size) + 'px';
+		m.dom.alive.style.width = (m.clickAliveW  * m.size) + 'px';
+		m.dom.alive.style.height = (m.clickAliveH * m.size) + 'px';
+		m.dom.alive.style.display = m.hp ? 'block' : 'none';
 		// dead box
-		m.dom.dead.style.bottom = '400px';
-		m.dom.dead.style.left = '100px';
-		m.dom.dead.style.width = '400px';
-		m.dom.dead.style.height = '200px';
+		m.dom.dead.style.left = ((m.clickDeadW * m.size) * -.5) + 'px';
+		m.dom.dead.style.bottom = (m.clickDeadY * m.size) + 'px';
+		m.dom.dead.style.width = (m.clickDeadW * m.size) + 'px';
+		m.dom.dead.style.height = (m.clickDeadH * m.size) + 'px';
+		m.dom.dead.style.display = m.hp ? 'none' : 'block';
 	},
 	setSrc: function(m){
 		m.frame = ~~m.frame;
@@ -4552,7 +4294,7 @@ var mob = {
 			}
 		});
 		if (skip) return;
-		TweenMax.delayedCall(Math.random()*3 + 1, function(){
+		TweenMax.delayedCall(.25, function(){
 			mob.test && mob.hit(m);
 			//mob.death();
 		})
@@ -4579,7 +4321,7 @@ var mob = {
 			onComplete: function(){
 				mob.resetIdle(m);
 				if (mob.test){
-					TweenMax.delayedCall(1, function() {
+					TweenMax.delayedCall(.5, function() {
 						mob.attack(m, 1);
 					});
 				}
@@ -4590,9 +4332,13 @@ var mob = {
 		if (m.animationActive) return;
 		m.animationActive = 1;
 		var tl = g.TM(),
-			foo = force ? force : !Math.round(Math.random()) ? 1 : 2,
-			startFrame = foo === 1 ?
-				15.9 : 35.9,
+			foo = force === 1 || force === 2 ?
+				force : !Math.round(Math.random()) ? 1 : 2;
+		if (!m.enableSecondary) {
+			foo = 1;
+		}
+		var startFrame = foo === 1 ?
+				16 : 35.9,
 			endFrame = startFrame + 20,
 			diff = endFrame - startFrame;
 
@@ -4610,12 +4356,17 @@ var mob = {
 				mob.resetIdle(m);
 				if (mob.test){
 					if (force === 1){
-						TweenMax.delayedCall(1, function() {
+						TweenMax.delayedCall(.5, function() {
 							mob.attack(m, 2);
 						});
 					}
+					else if (force === 3){
+						TweenMax.delayedCall(.5, function() {
+							mob.death(m);
+						});
+					}
 					else {
-						TweenMax.delayedCall(1, function() {
+						TweenMax.delayedCall(.5, function() {
 							mob.special(m);
 						});
 					}
@@ -4625,44 +4376,55 @@ var mob = {
 	},
 	special: function(m){
 		if (m.animationActive) return;
-		m.animationActive = 1;
-		var startFrame = 56,
-			endFrame = 75.9,
-			diff = endFrame - startFrame;
+		if (!m.enableSpecial) {
+			mob.attack(m, 3);
+		}
+		else {
+			m.animationActive = 1;
+			var startFrame = 56,
+				endFrame = 75.9,
+				diff = endFrame - startFrame;
 
-		var tl = g.TM();
-		tl.to(m, m.speed * diff, {
-			startAt: {
-				frame: startFrame
-			},
-			overwrite: 1,
-			frame: endFrame,
-			ease: Linear.easeNone,
-			yoyo: m.yoyo,
-			repeat: m.yoyo ? 1 : 0,
-			onUpdate: function(){
-				mob.setSrc(m);
-			},
-			onComplete: function () {
-				mob.resetIdle(m);
-				if (mob.test) {
-					TweenMax.delayedCall(1, function () {
-						mob.death(m);
-					});
+			var tl = g.TM();
+			tl.to(m, m.speed * diff, {
+				startAt: {
+					frame: startFrame
+				},
+				overwrite: 1,
+				frame: endFrame,
+				ease: Linear.easeNone,
+				yoyo: m.yoyo,
+				repeat: m.yoyo ? 1 : 0,
+				onUpdate: function () {
+					mob.setSrc(m);
+				},
+				onComplete: function () {
+					mob.resetIdle(m);
+					if (mob.test) {
+						TweenMax.delayedCall(.5, function () {
+							mob.death(m);
+						});
+					}
 				}
-			}
-		});
+			});
+		}
 	},
 	death: function(m){
 		if (m.deathState) return;
 		m.deathState = 1;
+		m.hp = 0;
+		mob.setClickBox(m);
 		m.animationActive = 1;
 		var tl = g.TM(),
 			startFrame = 76,
 			endFrame = 105.9,
-			diff = endFrame - startFrame;
-
-		tl.to(m, m.speed * diff, {
+			diff = endFrame - startFrame,
+			d = m.speed * diff;
+		TweenMax.to(m.dom.details, d, {
+			bottom: m.detailDeathBottom * m.size,
+			ease: Quart.easeIn
+		});
+		tl.to(m, d, {
 			startAt: {
 				frame: startFrame
 			},
@@ -4690,6 +4452,8 @@ var mob = {
 					ease: Linear.easeIn,
 					onComplete: function () {
 						if (mob.test) {
+							m.hp = 1;
+							mob.sizeMob(m);
 							mob.idle(m);
 						}
 						TweenMax.delayedCall(.1, function () {
@@ -4816,8 +4580,46 @@ var mob = {
 		});
 	}
 }
-mob.count = mob.images.length - 1;
-mob.init();
+setTimeout(function(){
+	var h = location.hash;
+	if (h === '#town') {
+		town.go();
+	}
+	else if (h === '#battle') {
+		battle.go();
+	}
+}, 100);
+var town = {
+	go: function(){
+		town.init();
+		g.setScene('town');
+		socket.init();
+		chat.set(1);
+	},
+	html: function(){
+		var s =
+			'<img id="town-bg" class="img-bg" src="img2/town.jpg">'+
+			'<div id="town-footer" class="text-shadow2">' +
+				'<hr id="town-footer-hr1" class="footer-hr">' +
+				'<div id="town-footer-flex">' +
+					'<span id="town-mission-counter" class="center">Mission Counter</span>' +
+				'</div>' +
+				'<hr id="town-footer-hr2"  class="footer-hr">' +
+			'</div>';
+
+		return s;
+	},
+	events: function(){
+
+	},
+	initialized: 0,
+	init: function(){
+		town.initialized = 1;
+		document.getElementById('scene-town').innerHTML = town.html();
+		town.events();
+		$("#scene-title").remove();
+	}
+}
 // test methods
 var test = {
 	orcs: function(){

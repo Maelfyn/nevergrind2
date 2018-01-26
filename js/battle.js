@@ -3,6 +3,7 @@ var battle = {
 	go: function(){
 		mob.init();
 		g.setScene('battle');
+		chat.set(1);
 	},
 	html: function(){
 		var s = '<img id="battle-bg" class="img-bg" src="img2/bg/fw2.jpg">';
@@ -59,8 +60,8 @@ var battle = {
 		for (var i=0; i<mob.max; i++){
 		//for (var i=2; i<3; i++){
 			var m = mobs[i],
-				//mobKey = mob.getRandomMobKey();
-				mobKey = 'wolf';
+				mobKey = mob.getRandomMobKey();
+				//mobKey = 'wolf';
 			mob.preloadMob(mobKey);
 			m.type = mobKey;
 			mob.setMob(m);

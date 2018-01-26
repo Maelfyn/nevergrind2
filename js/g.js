@@ -10,7 +10,7 @@ g = Object.assign(g, {
 		}).on('keydown', function(e){
 			var code = e.keyCode,
 				key = e.key;
-			if (g.isLocal) {
+			//if (g.isLocal) {
 				// local only
 				console.info('keydown: ', e.key, e.keyCode, e.key === 'b');
 				if (key === 'b') {
@@ -19,7 +19,7 @@ g = Object.assign(g, {
 				else if (key === 't') {
 					town.go();
 				}
-			}
+			//}
 		});
 		// should be delegating no drag start
 		$("body").on('dragstart', 'img', function(e) {
