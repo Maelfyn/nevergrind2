@@ -120,7 +120,7 @@ gulp.task('resize-png', function(){
 		gulp.src('./mobs-huge/' + img + '/*')
 			.pipe(imageResize({
 				imageMagick: true,
-				width: 600,
+				width: 3000,
 				height: 600
 			}))
 			.pipe(gulp.dest('./mobs/' + img + '/'))

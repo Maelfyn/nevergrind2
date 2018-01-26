@@ -2,10 +2,9 @@ $(document).on('keydown', function(e){
 	var code = e.keyCode,
 		key = e.key;
 
-	console.info('keydown: ', key, code, e.key === 'b');
-	//if (g.isLocal) {
+	console.info('keydown: ', key, code);
 	// local only
-	if (!chat.hasFocus) {
+	if (g.isLocal && !chat.hasFocus) {
 		if (key === 'b') {
 			battle.go();
 		}
@@ -14,7 +13,6 @@ $(document).on('keydown', function(e){
 		}
 
 	}
-	//}
 	if (code >= 112 && code <= 121 || code === 123) {
 		// disable all F keys except F11
 		if (!g.isLocal) {
@@ -39,10 +37,7 @@ $(document).on('keydown', function(e){
 
 
 	if (e.altKey) {
-		console.info('altkey');
-		if (code === 37 || code === 39) {
-			return false;
-		}
+		return false;
 	} else if (e.ctrlKey){
 		if (code === 82){
 			// ctrl+r refresh

@@ -1,4 +1,4 @@
-(function($,Math,document,location,TweenMax,TimelineMax,Power0,Power1,Power2,Power3,Power4,Back,Elastic,Bounce,SteppedEase,Circ,Expo,Sine,setTimeout,setInterval,undefined){
+(function($,Math,document,location,TweenMax,TimelineMax,Power0,Power1,Power2,Power3,Power4,Back,Elastic,Bounce,SteppedEase,Circ,Expo,Sine,setTimeout,setInterval,clearTimeout,clearInterval,webkitRequestAnimationFrame,webkitCancelAnimationFrame,getComputedStyle,requestAnimationFrame,cancelAnimationFrame,window,Array,JSON,Date,Object,undefined){
 // stuff that must exist before everything
 var init = {
 	checkMobile: function(){
@@ -562,19 +562,6 @@ g = Object.assign(g, {
 			if (g.notification.close !== undefined){
 				g.notification.close();
 			}
-		}).on('keydown', function(e){
-			var code = e.keyCode,
-				key = e.key;
-			//if (g.isLocal) {
-				// local only
-				console.info('keydown: ', e.key, e.keyCode, e.key === 'b');
-				if (key === 'b') {
-					battle.go();
-				}
-				else if (key === 't') {
-					town.go();
-				}
-			//}
 		});
 		// should be delegating no drag start
 		$("body").on('dragstart', 'img', function(e) {
@@ -1006,7 +993,7 @@ g = Object.assign(g, {
 			type: 'POST',
 			url: g.url + 'php2/initGame.php'
 		}).done(function(r){
-			console.info("response: ", r);
+			console.info("initGame: ", r);
 			g.initialized = 1;
 			if (r.account) {
 				my.account = r.account;
@@ -1581,32 +1568,13 @@ var title = {
 				e.innerHTML = str;
 			}).fail(function(e){
 				console.info(e.responseText);
-				//Msg("Server error.");
+				//g.msg("Server error.");
 			});
 		}
 	},
 	init: (function(){
 		$(document).ready(function(){
 			// console.info("Initializing title screen...");
-			// prevents auto scroll while scrolling
-			$("#titleChatLog").on('mousedown', function(){
-				title.chatDrag = true;
-			}).on('mouseup', function(){
-				title.chatDrag = false;
-			});
-			$("#title-chat-input").on('focus', function(){
-				title.chatOn = true;
-			}).on('blur', function(){
-				title.chatOn = false;
-			});
-			$(".createGameInput").on('focus', function(){
-				title.createGameFocus = true;
-			}).on('blur', function(){
-				title.createGameFocus = false;
-			});
-			$("#titleChatSend").on(env.click, function(){
-				title.sendMsg(true);
-			});
 			g.initGame();
 			setTimeout(function(){
 				g.keepAlive();
@@ -1850,12 +1818,12 @@ var title = {
 			speed = g.speed;
 			
 		if (!g.rankedMode && (name.length < 4 || name.length > 32)){
-			Msg("Game name must be at least 4-32 characters.", 1);
+			g.msg("Game name must be at least 4-32 characters.", 1);
 			setTimeout(function(){
 				$("#gameName").focus().select();
 			}, 100);
 		} else if (!g.rankedMode && (max < 2 || max > 8 || max % 1 !== 0)){
-			Msg("Game must have 2-8 players.", 1);
+			g.msg("Game must have 2-8 players.", 1);
 		} else {
 			title.createGameService(name, pw, title.mapData[g.map.key].name, max, g.rankedMode, g.teamMode, speed);
 		}
@@ -1890,14 +1858,14 @@ var title = {
 			socket.joinGame();
 			lobby.styleStartGame();
 		}).fail(function(e){
-			Msg(e.statusText);
+			g.msg(e.statusText);
 			g.unlock(1);
 		});
 	},
 	joinGame: function(){
 		g.name = $("#joinGame").val();
 		if (!g.name){
-			Msg("Game name is not valid!", 1.5);
+			g.msg("Game name is not valid!", 1.5);
 			$("#joinGame").focus().select();
 			return;
 		}
@@ -1914,7 +1882,7 @@ var title = {
 			title.joinGameCallback(data);
 		}).fail(function(data){
 			console.info(data);
-			Msg(data.statusText, 1.5);
+			g.msg(data.statusText, 1.5);
 		}).always(function(){
 			g.unlock();
 		});
@@ -1938,22 +1906,63 @@ var title = {
 	}
 };
 $(document).on('keydown', function(e){
-	var x = e.keyCode;
-	if (e.ctrlKey){
-		if (x === 82){
+	var code = e.keyCode,
+		key = e.key;
+
+	console.info('keydown: ', key, code);
+	// local only
+	if (g.isLocal && !chat.hasFocus) {
+		if (key === 'b') {
+			battle.go();
+		}
+		else if (key === 't') {
+			town.go();
+		}
+
+	}
+	if (code >= 112 && code <= 121 || code === 123) {
+		// disable all F keys except F11
+		if (!g.isLocal) {
+			return false;
+		}
+	}
+	// normal hotkeys
+	if (g.view === 'title') {
+		// title hotkeys? Any?
+	}
+	else {
+		if (chat.hasFocus) {
+			if (code === 13) {
+				// enter
+				chat.sendMsg();
+			}
+		}
+		else {
+			// battle, town, dungeon
+		}
+	}
+
+
+	if (e.altKey) {
+		console.info('altkey');
+		if (code === 37 || code === 39) {
+			return false;
+		}
+	} else if (e.ctrlKey){
+		if (code === 82){
 			// ctrl+r refresh
 			return false;
 		}
 	} else {
 		if (g.view === 'title'){
 			if (!g.isModalOpen){
-				$("#title-chat-input").focus();
+				$("#chat-input").focus();
 			}
 		} else if (g.view === 'lobby'){
 			$("#lobby-chat-input").focus();
 		} else {
 			// game
-			if (x === 9){
+			if (code === 9){
 				// tab
 				if (!e.shiftKey){
 					my.nextTarget(false);
@@ -1961,7 +1970,7 @@ $(document).on('keydown', function(e){
 					my.nextTarget(true);
 				}
 				e.preventDefault();
-			} else if (x === 86){
+			} else if (code === 86){
 				// v
 				if (g.view === 'game' && !g.chatOn){
 					game.toggleGameWindows(1);
@@ -2044,9 +2053,9 @@ $(document).on('keydown', function(e){
 						var x = my.lastReceivedWhisper;
 						if (x){
 							if (g.view === 'title'){
-								$("#title-chat-input").val('/w ' + x + ' ').focus();
+								$("#chat-input").val('/w ' + x + ' ').focus();
 							} else if (g.view === 'lobby'){
-								$("#lobby-chat-input").val('/w ' + x + ' ').focus();
+								$("#chat-input").val('/w ' + x + ' ').focus();
 							} else {
 								if (!g.chatOn){
 									toggleChatMode();
@@ -2173,11 +2182,11 @@ var socket = {
 					data.skip = true;
 					data.message = "You have joined channel: " + data.channel;
 					data.type = "chat-warning";
-					chat.send(data);
+					chat.log(data);
 					socket.zmq.subscribe('title:' + data.channel, function(topic, data) {
-						console.info("Receiving data! ", topic, data);
+						console.info("title:' + data.channel ", topic, data);
 						if (g.ignore.indexOf(data.account) === -1){
-							chat.send(data);
+							chat.log(data);
 						}
 					});
 					// add id
@@ -2196,7 +2205,7 @@ var socket = {
 		var channel = 'account:' + my.account;
 		console.info("subscribing to whisper channel: ", channel);
 		socket.zmq.subscribe(channel, function(topic, data) {
-			console.info("receiving... ", data.action);
+			console.info(channel, data.action);
 			if (data.message){
 				if (data.action === 'send'){
 					console.info("SENT: ", topic, data);
@@ -2217,7 +2226,7 @@ var socket = {
 					data.type = 'chat-whisper';
 					data.msg = data.message;
 					data.message = data.chatFlag + data.account + ' whispers: ' + data.message;
-					chat.send(data);
+					chat.log(data);
 				} else {
 					// message receive confirmation to original sender
 					console.info("CALLBACK: ", topic, data);
@@ -2284,16 +2293,17 @@ var socket = {
 		// chat updates
 		if (g.view === 'town'){
 			if (socket.initialConnection){
-				var missions = 'town:missions';
-				console.info("subscribing to channel: ", missions);
-				socket.zmq.subscribe(missions, function(topic, data) {
-					console.info("CALLBACK: ", topic, data);
-					title.updateGame(data);
+				var town = 'ng2:town-1';
+				console.info("subscribing to channel: ", town);
+				chat.log("You have joined channel: town-1", 'chat-warning');
+				socket.zmq.subscribe(town, function(topic, data) {
+					console.info("ng2:town-1: ", topic, data);
+					route.town(data, data.route);
 				});
 				var admin = 'admin:broadcast';
 				console.info("subscribing to channel: ", admin);
 				socket.zmq.subscribe(admin, function(topic, data) {
-					console.info("CALLBACK: ", topic, data);
+					console.info("admin:broadcast: ", topic, data);
 					if (data.msg){
 						g.chat(data.msg, data.type);
 					}
@@ -2326,63 +2336,83 @@ var socket = {
 chat = Object.assign(chat, {
 	// receives channel prop from index.php
 	html: function() {
-		var lorem = '"Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?"';
+		var lorem = '<div>"Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?"</div>';
+
 		var s =
-			//'<div id="chat-log">Welcome to Vandamor.</div>' +
-			'<div id="chat-log">'+ lorem +'</div>' +
+			'<div id="chat-log">Welcome to Vandamor.</div>' +
+			//'<div id="chat-log">'+ lorem +'</div>' +
 			'<input id="chat-input" type="text" maxlength="240" autocomplete="off" spellcheck="false" />';
 
 		return s;
 	},
 	initialized: 0,
-	init: function() {
-		chat.initialized = 1;
-	},
-	set: function(z) {
-		var e = document.getElementById('chat-wrap');
-		e.style.display = z ? 'flex' : 'none';
-		if (z && !chat.initialized) {
-			// show
-			e.innerHTML = chat.html();
-			chat.init();
-		}
-		else {
-			// hide
-		}
-	},
+	isClicked: false,
+	hasFocus: false,
+	count: 1, // total msgs in chat; used to count messages in memory instead of by DOM
 	players: [],
 	lastWhisper: {
 		timestamp: Date.now(),
 		account: '',
 		message: ''
 	},
-	// to server
-	sendWhisper: function(msg, splitter){
-		// account
-		var arr = msg.split(splitter);
-		var account = arr[1].split(" ").shift();
-		// message
-		var splitLen = splitter.length;
-		var accountLen = account.length;
-		var msg = msg.substr(splitLen + accountLen + 1);
-		var flag = my.flag.split(".");
-		flag = flag[0].replace(/ /g, "-");
-		$.ajax({
-			url: g.url + 'php/insertWhisper.php',
-			data: {
-				account: account,
-				flag: flag,
-				playerColor: my.playerColor,
-				message: msg,
-				action: 'send'
-			}
+	init: function(z) {
+		// default initialization of chat
+		var e = document.getElementById('chat-wrap');
+		e.innerHTML = '';
+		e.style.display = z ? 'flex' : 'none';
+		if (z && !chat.initialized) {
+			// show
+		}
+		else {
+			// hide
+		}
+		e.innerHTML = chat.html();
+		// prevents auto scroll while scrolling
+		$("#chat-wrap").on('mousedown', function(){
+			console.info('mousedown');
+			chat.isClicked = 1;
+		}).on('mouseup', function(){
+			console.info('mouseup');
+			chat.isClicked = 0;
 		});
+		$("#chat-input").on('focus', function(){
+			chat.hasFocus = 1;
+		}).on('blur', function(){
+			chat.hasFocus = 0;
+		});
+		// dom
+		dom.chatLog = document.getElementById('chat-log');
+		dom.chatInput = document.getElementById('chat-input');
+		chat.count = dom.chatLog.childElementCount;
+		chat.initialized = 1;
+	},
+	// report to chat-log
+	log: function(msg, type){
+		var o = {
+			msg: msg,
+			type: type
+		};
+		if (o.msg){
+			if (chat.count >= 500) {
+				dom.chatLog.removeChild(dom.chatLog.firstChild);
+			}
+			else {
+				chat.count++;
+			}
+			var z = document.createElement('div');
+			if (o.type){
+				z.className = o.type;
+			}
+			z.innerHTML = o.msg;
+			dom.chatLog.appendChild(z);
+			chat.scrollBottom();
+		}
 	},
 	// send to server
 	sendMsg: function(bypass){
-		var msg = $dom.chatInput.val().trim();
+		var msg = dom.chatInput.value.trim();
 		// bypass via ENTER or chat has focus
-		if (bypass || title.chatOn){
+		if (bypass || chat.hasFocus){
 			if (msg){
 				// is it a command?
 				if (msg === '/friend'){
@@ -2425,24 +2455,13 @@ chat = Object.assign(chat, {
 				else if (msg.indexOf('/broadcast ') === 0){
 					chat.broadcast(msg);
 				}
-				else if (msg.indexOf('/url ') === 0){
-					chat.url(msg);
-				}
-				else if (msg.indexOf('/img ') === 0){
-					chat.img(msg);
-				}
-				else if (msg.indexOf('/video ') === 0){
-					chat.video(msg);
-				}
-				else if (msg.indexOf('/fw-paid ') === 0){
-					chat.fwpaid(msg.slice(8));
-				}
 				else {
 					if (msg.charAt(0) === '/' && msg.indexOf('/me') !== 0 || msg === '/me'){
 						// skip
 					} else {
+						console.info("Sending", msg);
 						$.ajax({
-							url: g.url + 'php/insertTitleChat.php',
+							url: g.url + 'php2/chat/insertTitleChat.php',
 							data: {
 								message: msg
 							}
@@ -2450,53 +2469,31 @@ chat = Object.assign(chat, {
 					}
 				}
 			}
-			dom.chatInput.val('');
+			dom.chatInput.value = '';
 		}
 	},
-	// report to client
-	send: function(msg, type){
-		var o = {
-			message: msg,
-			type: type
-		};
-		if (o.message && dom.chatLog !== null){
-			while (dom.chatLog.childNodes.length > 500) {
-				dom.chatLog.removeChild(dom.chatLog.firstChild);
+	// to server
+	sendWhisper: function(msg, splitter){
+		// account
+		var arr = msg.split(splitter);
+		var account = arr[1].split(" ").shift();
+		// message
+		var splitLen = splitter.length;
+		var accountLen = account.length;
+		var msg = msg.substr(splitLen + accountLen + 1);
+		$.ajax({
+			url: g.url + 'php/insertWhisper.php',
+			data: {
+				account: account,
+				playerColor: my.playerColor,
+				message: msg,
+				action: 'send'
 			}
-			if (o.type === 'inserted-image'){
-				(function repeat(count){
-					if (++count < 10){
-						chat.scrollBottom();
-						setTimeout(repeat, 200, count);
-					}
-				})(0);
-			}
-			var z = document.createElement('div'); 
-			if (o.type){
-				z.className = o.type;
-			}
-			z.innerHTML = o.message;
-			dom.chatLog.appendChild(z);
-			chat.scrollBottom();
-			if (o.notify){
-				g.sendNotification(data);
-			}
-		}
+		});
 	},
-	// routing
+	// rx routing
 	chatReceive: function(data){
-		if (g.view === 'title'){
-			// title
-			if (data.type === 'remove'){
-				title.removePlayer(data);
-			} else if (data.type === 'add'){
-				title.addPlayer(data.account, data.flag, data.rating);
-			} else {
-				if (data.message !== undefined){
-					title.chat(data);
-				}
-			}
-		} else if (g.view === 'lobby'){
+		if (g.view === 'lobby'){
 			// lobby
 			//console.info('lobby receive: ', data);
 			if (data.type === 'hostLeft'){
@@ -2590,36 +2587,13 @@ chat = Object.assign(chat, {
 		var arr = msg.split(splitter);
 		socket.setChannel(arr[1]);
 	},
-	chatDrag: false,
-	chatOn: false,
+	scrollBottomTimer: 0,
 	scrollBottom: function(){
-		if (!title.chatDrag){
-			dom.chatLog.scrollTop = dom.chatLog.scrollHeight;
-		}
-	},
-	chat: function (data){
-		if (g.view === 'title' && data.message){
-			while (dom.chatLog.childNodes.length > 500) {
-				dom.chatLog.removeChild(dom.chatLog.firstChild);
-			}
-			if (data.type === 'inserted-image'){
-				(function repeat(count){
-					if (++count < 10){
-						chat.scrollBottom();
-						setTimeout(repeat, 200, count);
-					}
-				})(0);
-			}
-			var z = document.createElement('div'); 
-			if (data.type){
-				z.className = data.type;
-			}
-			z.innerHTML = data.message;
-			dom.chatLog.appendChild(z);
-			chat.scrollBottom();
-			if (!data.skip){
-				g.sendNotification(data);
-			}
+		if (!chat.isClicked){
+			clearTimeout(chat.scrollBottomTimer);
+			chat.scrollBottomTimer = setTimeout(function(){
+				dom.chatLog.scrollTop = dom.chatLog.scrollHeight;
+			}, 33);
 		}
 	},
 	listFriends: function(){
@@ -2817,38 +2791,6 @@ chat = Object.assign(chat, {
 				message: msg
 			}
 		});
-	},
-	url: function(url){
-		$.ajax({
-			url: g.url + 'php/insertUrl.php',
-			data: {
-				url: url
-			}
-		});
-	},
-	img: function(url){
-		$.ajax({
-			url: g.url + 'php/insertImg.php',
-			data: {
-				url: url
-			}
-		});
-	},
-	video: function(url){
-		$.ajax({
-			url: g.url + 'php/insertVideo.php',
-			data: {
-				url: url
-			}
-		});
-	},
-	fwpaid: function(msg){
-		$.ajax({
-			url: g.url + 'php/fwpaid.php',
-			data: {
-				message: msg
-			}
-		});
 	}
 });
 var payment = {
@@ -2932,7 +2874,7 @@ var battle = {
 	go: function(){
 		mob.init();
 		g.setScene('battle');
-		chat.set(1);
+		chat.init(1);
 	},
 	html: function(){
 		var s = '<img id="battle-bg" class="img-bg" src="img2/bg/fw2.jpg">';
@@ -2950,7 +2892,9 @@ var battle = {
 					'</div>' +
 				'</div>' +
 				'<div id="mob-shadow-' +i+ '" class="mob-shadow"></div>' +
-				'<img id="mob-img-' +i+ '" class="mob-image" src="img2/blank.png">' +
+				'<div class="mob-img-wrap">' +
+					'<img id="mob-img-' +i+ '" class="mob-image" src="img2/blank.png">' +
+				'</div>' +
 				'<div id="mob-alive-' +i+ '" class="mob-alive" index="' + i + '"></div>' +
 				'<div id="mob-dead-' +i+ '" class="mob-dead" index="' + i + '"></div>' +
 			'</div>';
@@ -4168,8 +4112,7 @@ var mob = {
 	},
 	preloadMob: function(type){
 		if (!mobs.images[type].cache.length) {
-			//console.info("preloading ", type);
-			for (var i = 1; i < 105; i++) {
+			for (var i = 1; i <= 105; i++) {
 				mobs.images[type].cache[i] = new Image();
 				mobs.images[type].cache[i].src = 'mobs/' + type + '/' + i + '.png';
 			}
@@ -4582,19 +4525,39 @@ var mob = {
 }
 setTimeout(function(){
 	var h = location.hash;
-	if (h === '#town') {
-		town.go();
-	}
-	else if (h === '#battle') {
-		battle.go();
+	if (g.isLocal) {
+		if (h === '#town') {
+			town.go();
+		}
+		else if (h === '#battle') {
+			battle.go();
+		}
 	}
 }, 100);
+var p = {};
 var town = {
 	go: function(){
-		town.init();
-		g.setScene('town');
-		socket.init();
-		chat.set(1);
+		if (create.selected) {
+			g.lock(1);
+			$.ajax({
+				url: g.url + 'php2/character/loadCharacter.php',
+				data: {
+					row: create.selected
+				}
+			}).done(function(data) {
+				p[data.characterData.name] = data.characterData;
+				console.info('loadCharacter: ', p[data.characterData.name]);
+				town.init();
+				g.setScene('town');
+				socket.init();
+				chat.init(1);
+			}).fail(function(data){
+				console.info(data);
+				g.msg(data.responseText, 1.5);
+			}).always(function(){
+				g.unlock();
+			});
+		}
 	},
 	html: function(){
 		var s =
@@ -4618,6 +4581,13 @@ var town = {
 		document.getElementById('scene-town').innerHTML = town.html();
 		town.events();
 		$("#scene-title").remove();
+	}
+}
+var route = {
+	town: function(data, r) {
+		if (r === 'rx-chat') {
+			chat.log(data.msg, data.type);
+		}
 	}
 }
 // test methods
@@ -4685,4 +4655,4 @@ var test = {
 		}
 	}
 }
-})($,Math,document,location,TweenMax,TimelineMax,Power0,Power1,Power2,Power3,Power4,Back,Elastic,Bounce,SteppedEase,Circ,Expo,Sine,setTimeout,setInterval,undefined);
+})($,Math,document,location,TweenMax,TimelineMax,Power0,Power1,Power2,Power3,Power4,Back,Elastic,Bounce,SteppedEase,Circ,Expo,Sine,setTimeout,setInterval,clearTimeout,clearInterval,webkitRequestAnimationFrame,webkitCancelAnimationFrame,getComputedStyle,requestAnimationFrame,cancelAnimationFrame,window,Array,JSON,Date,Object);
