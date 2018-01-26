@@ -21,9 +21,11 @@ var battle = {
 					'</div>' +
 				'</div>' +
 				'<div id="mob-shadow-' +i+ '" class="mob-shadow"></div>' +
-				'<div class="mob-img-wrap">' +
-					'<img id="mob-img-' +i+ '" class="mob-image" src="img2/blank.png">' +
-				'</div>' +
+				'<div class="mob-img-wrap-' + i + '">';
+					for (var ii=1; ii <= 105; ii++) {
+						s += '<img id="mob-img-' + i + '-' +ii+ '" class="mob-img mob-img-' + i +'" src="img2/blank.png">';
+					}
+				s += '</div>' +
 				'<div id="mob-alive-' +i+ '" class="mob-alive" index="' + i + '"></div>' +
 				'<div id="mob-dead-' +i+ '" class="mob-dead" index="' + i + '"></div>' +
 			'</div>';

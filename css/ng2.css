@@ -1124,11 +1124,15 @@ tbody {
 	width: 400px;
 	z-index: 0;
 }
-.mob-image {
+.mob-img {
+	display: none;
 	position: absolute;
 	left: -50%;
 	bottom: 0;
 	pointer-events: none;
+}
+.mob-img:last-child {
+	display: block;
 }
 .mob-center {
 	display: none;

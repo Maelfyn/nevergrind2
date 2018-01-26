@@ -12,7 +12,8 @@ var mob = {
 	preloadMob: function(type){
 		if (!mobs.images[type].cache.length) {
 			//console.info("preloading ", type);
-			for (var i = 1; i < 105; i++) {
+			for (var i = 1; i <= 105; i++) {
+				// stores in memory
 				mobs.images[type].cache[i] = new Image();
 				mobs.images[type].cache[i].src = 'mobs/' + type + '/' + i + '.png';
 			}
@@ -44,7 +45,6 @@ var mob = {
 				'center',
 				'alive',
 				'dead',
-				'img',
 				'details',
 				'name',
 				'shadow',
@@ -52,6 +52,11 @@ var mob = {
 			].forEach(function(e){
 				mobs[i].dom[e] = document.getElementById('mob-'+ e +'-' + i);
 			});
+			mobs[i].dom.img = [];
+			for (var ii=1; ii <= 105; ii++){
+				var e = document.getElementsByClassName('mob-img-' + i);
+				mobs[i].dom.img[ii] = e[ii - 1];
+			}
 		}
 		battle.init();
 	},
@@ -75,9 +80,12 @@ var mob = {
 		// name
 		m.dom.name.innerHTML = m.type.replace(/-/g, ' ');
 		// img
-		m.dom.img.style.left = (w * -.5) + 'px';
-		m.dom.img.style.width = w + 'px';
-		m.dom.img.style.bottom = (mobs.images[m.type].yFloor * m.size) + 'px';
+		for (var i=1; i <= 105; i++) {
+			m.dom.img[i].style.left = (w * -.5) + 'px';
+			m.dom.img[i].style.width = w + 'px';
+			m.dom.img[i].style.bottom = (mobs.images[m.type].yFloor * m.size) + 'px';
+			m.dom.img[i].src = 'mobs/' + m.type + '/' + i + '.png';
+		}
 		// details
 		TweenMax.set(m.dom.details, {
 			bottom: m.detailAliveBottom * m.size
@@ -110,7 +118,7 @@ var mob = {
 	setSrc: function(m){
 		m.frame = ~~m.frame;
 		if (m.frame !== m.lastFrame) {
-			m.dom.img.src = 'mobs/' + m.type + '/' + m.frame + '.png';
+			m.dom.img[m.frame].parentNode.appendChild(m.dom.img[m.frame]);
 			m.lastFrame = m.frame;
 		}
 	},
