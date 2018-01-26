@@ -2,63 +2,83 @@
 chat = Object.assign(chat, {
 	// receives channel prop from index.php
 	html: function() {
-		var lorem = '"Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?"';
+		var lorem = '<div>"Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?"</div>';
+
 		var s =
-			//'<div id="chat-log">Welcome to Vandamor.</div>' +
-			'<div id="chat-log">'+ lorem +'</div>' +
+			'<div id="chat-log">Welcome to Vandamor.</div>' +
+			//'<div id="chat-log">'+ lorem +'</div>' +
 			'<input id="chat-input" type="text" maxlength="240" autocomplete="off" spellcheck="false" />';
 
 		return s;
 	},
 	initialized: 0,
-	init: function() {
-		chat.initialized = 1;
-	},
-	set: function(z) {
-		var e = document.getElementById('chat-wrap');
-		e.style.display = z ? 'flex' : 'none';
-		if (z && !chat.initialized) {
-			// show
-			e.innerHTML = chat.html();
-			chat.init();
-		}
-		else {
-			// hide
-		}
-	},
+	isClicked: false,
+	hasFocus: false,
+	count: 1, // total msgs in chat; used to count messages in memory instead of by DOM
 	players: [],
 	lastWhisper: {
 		timestamp: Date.now(),
 		account: '',
 		message: ''
 	},
-	// to server
-	sendWhisper: function(msg, splitter){
-		// account
-		var arr = msg.split(splitter);
-		var account = arr[1].split(" ").shift();
-		// message
-		var splitLen = splitter.length;
-		var accountLen = account.length;
-		var msg = msg.substr(splitLen + accountLen + 1);
-		var flag = my.flag.split(".");
-		flag = flag[0].replace(/ /g, "-");
-		$.ajax({
-			url: g.url + 'php/insertWhisper.php',
-			data: {
-				account: account,
-				flag: flag,
-				playerColor: my.playerColor,
-				message: msg,
-				action: 'send'
-			}
+	init: function(z) {
+		// default initialization of chat
+		var e = document.getElementById('chat-wrap');
+		e.innerHTML = '';
+		e.style.display = z ? 'flex' : 'none';
+		if (z && !chat.initialized) {
+			// show
+		}
+		else {
+			// hide
+		}
+		e.innerHTML = chat.html();
+		// prevents auto scroll while scrolling
+		$("#chat-wrap").on('mousedown', function(){
+			console.info('mousedown');
+			chat.isClicked = 1;
+		}).on('mouseup', function(){
+			console.info('mouseup');
+			chat.isClicked = 0;
 		});
+		$("#chat-input").on('focus', function(){
+			chat.hasFocus = 1;
+		}).on('blur', function(){
+			chat.hasFocus = 0;
+		});
+		// dom
+		dom.chatLog = document.getElementById('chat-log');
+		dom.chatInput = document.getElementById('chat-input');
+		chat.count = dom.chatLog.childElementCount;
+		chat.initialized = 1;
+	},
+	// report to chat-log
+	log: function(msg, type){
+		var o = {
+			msg: msg,
+			type: type
+		};
+		if (o.msg){
+			if (chat.count >= 500) {
+				dom.chatLog.removeChild(dom.chatLog.firstChild);
+			}
+			else {
+				chat.count++;
+			}
+			var z = document.createElement('div');
+			if (o.type){
+				z.className = o.type;
+			}
+			z.innerHTML = o.msg;
+			dom.chatLog.appendChild(z);
+			chat.scrollBottom();
+		}
 	},
 	// send to server
 	sendMsg: function(bypass){
-		var msg = $dom.chatInput.val().trim();
+		var msg = dom.chatInput.value.trim();
 		// bypass via ENTER or chat has focus
-		if (bypass || title.chatOn){
+		if (bypass || chat.hasFocus){
 			if (msg){
 				// is it a command?
 				if (msg === '/friend'){
@@ -101,24 +121,13 @@ chat = Object.assign(chat, {
 				else if (msg.indexOf('/broadcast ') === 0){
 					chat.broadcast(msg);
 				}
-				else if (msg.indexOf('/url ') === 0){
-					chat.url(msg);
-				}
-				else if (msg.indexOf('/img ') === 0){
-					chat.img(msg);
-				}
-				else if (msg.indexOf('/video ') === 0){
-					chat.video(msg);
-				}
-				else if (msg.indexOf('/fw-paid ') === 0){
-					chat.fwpaid(msg.slice(8));
-				}
 				else {
 					if (msg.charAt(0) === '/' && msg.indexOf('/me') !== 0 || msg === '/me'){
 						// skip
 					} else {
+						console.info("Sending", msg);
 						$.ajax({
-							url: g.url + 'php/insertTitleChat.php',
+							url: g.url + 'php2/chat/insertTitleChat.php',
 							data: {
 								message: msg
 							}
@@ -126,53 +135,31 @@ chat = Object.assign(chat, {
 					}
 				}
 			}
-			dom.chatInput.val('');
+			dom.chatInput.value = '';
 		}
 	},
-	// report to client
-	send: function(msg, type){
-		var o = {
-			message: msg,
-			type: type
-		};
-		if (o.message && dom.chatLog !== null){
-			while (dom.chatLog.childNodes.length > 500) {
-				dom.chatLog.removeChild(dom.chatLog.firstChild);
+	// to server
+	sendWhisper: function(msg, splitter){
+		// account
+		var arr = msg.split(splitter);
+		var account = arr[1].split(" ").shift();
+		// message
+		var splitLen = splitter.length;
+		var accountLen = account.length;
+		var msg = msg.substr(splitLen + accountLen + 1);
+		$.ajax({
+			url: g.url + 'php/insertWhisper.php',
+			data: {
+				account: account,
+				playerColor: my.playerColor,
+				message: msg,
+				action: 'send'
 			}
-			if (o.type === 'inserted-image'){
-				(function repeat(count){
-					if (++count < 10){
-						chat.scrollBottom();
-						setTimeout(repeat, 200, count);
-					}
-				})(0);
-			}
-			var z = document.createElement('div'); 
-			if (o.type){
-				z.className = o.type;
-			}
-			z.innerHTML = o.message;
-			dom.chatLog.appendChild(z);
-			chat.scrollBottom();
-			if (o.notify){
-				g.sendNotification(data);
-			}
-		}
+		});
 	},
-	// routing
+	// rx routing
 	chatReceive: function(data){
-		if (g.view === 'title'){
-			// title
-			if (data.type === 'remove'){
-				title.removePlayer(data);
-			} else if (data.type === 'add'){
-				title.addPlayer(data.account, data.flag, data.rating);
-			} else {
-				if (data.message !== undefined){
-					title.chat(data);
-				}
-			}
-		} else if (g.view === 'lobby'){
+		if (g.view === 'lobby'){
 			// lobby
 			//console.info('lobby receive: ', data);
 			if (data.type === 'hostLeft'){
@@ -266,36 +253,13 @@ chat = Object.assign(chat, {
 		var arr = msg.split(splitter);
 		socket.setChannel(arr[1]);
 	},
-	chatDrag: false,
-	chatOn: false,
+	scrollBottomTimer: 0,
 	scrollBottom: function(){
-		if (!title.chatDrag){
-			dom.chatLog.scrollTop = dom.chatLog.scrollHeight;
-		}
-	},
-	chat: function (data){
-		if (g.view === 'title' && data.message){
-			while (dom.chatLog.childNodes.length > 500) {
-				dom.chatLog.removeChild(dom.chatLog.firstChild);
-			}
-			if (data.type === 'inserted-image'){
-				(function repeat(count){
-					if (++count < 10){
-						chat.scrollBottom();
-						setTimeout(repeat, 200, count);
-					}
-				})(0);
-			}
-			var z = document.createElement('div'); 
-			if (data.type){
-				z.className = data.type;
-			}
-			z.innerHTML = data.message;
-			dom.chatLog.appendChild(z);
-			chat.scrollBottom();
-			if (!data.skip){
-				g.sendNotification(data);
-			}
+		if (!chat.isClicked){
+			clearTimeout(chat.scrollBottomTimer);
+			chat.scrollBottomTimer = setTimeout(function(){
+				dom.chatLog.scrollTop = dom.chatLog.scrollHeight;
+			}, 33);
 		}
 	},
 	listFriends: function(){
@@ -489,38 +453,6 @@ chat = Object.assign(chat, {
 	broadcast: function(msg){
 		$.ajax({
 			url: g.url + 'php/insertBroadcast.php',
-			data: {
-				message: msg
-			}
-		});
-	},
-	url: function(url){
-		$.ajax({
-			url: g.url + 'php/insertUrl.php',
-			data: {
-				url: url
-			}
-		});
-	},
-	img: function(url){
-		$.ajax({
-			url: g.url + 'php/insertImg.php',
-			data: {
-				url: url
-			}
-		});
-	},
-	video: function(url){
-		$.ajax({
-			url: g.url + 'php/insertVideo.php',
-			data: {
-				url: url
-			}
-		});
-	},
-	fwpaid: function(msg){
-		$.ajax({
-			url: g.url + 'php/fwpaid.php',
 			data: {
 				message: msg
 			}

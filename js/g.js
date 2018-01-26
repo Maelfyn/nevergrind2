@@ -7,19 +7,6 @@ g = Object.assign(g, {
 			if (g.notification.close !== undefined){
 				g.notification.close();
 			}
-		}).on('keydown', function(e){
-			var code = e.keyCode,
-				key = e.key;
-			//if (g.isLocal) {
-				// local only
-				console.info('keydown: ', e.key, e.keyCode, e.key === 'b');
-				if (key === 'b') {
-					battle.go();
-				}
-				else if (key === 't') {
-					town.go();
-				}
-			//}
 		});
 		// should be delegating no drag start
 		$("body").on('dragstart', 'img', function(e) {
@@ -451,7 +438,7 @@ g = Object.assign(g, {
 			type: 'POST',
 			url: g.url + 'php2/initGame.php'
 		}).done(function(r){
-			console.info("response: ", r);
+			console.info("initGame: ", r);
 			g.initialized = 1;
 			if (r.account) {
 				my.account = r.account;

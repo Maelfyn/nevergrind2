@@ -47,32 +47,13 @@ var title = {
 				e.innerHTML = str;
 			}).fail(function(e){
 				console.info(e.responseText);
-				//Msg("Server error.");
+				//g.msg("Server error.");
 			});
 		}
 	},
 	init: (function(){
 		$(document).ready(function(){
 			// console.info("Initializing title screen...");
-			// prevents auto scroll while scrolling
-			$("#titleChatLog").on('mousedown', function(){
-				title.chatDrag = true;
-			}).on('mouseup', function(){
-				title.chatDrag = false;
-			});
-			$("#title-chat-input").on('focus', function(){
-				title.chatOn = true;
-			}).on('blur', function(){
-				title.chatOn = false;
-			});
-			$(".createGameInput").on('focus', function(){
-				title.createGameFocus = true;
-			}).on('blur', function(){
-				title.createGameFocus = false;
-			});
-			$("#titleChatSend").on(env.click, function(){
-				title.sendMsg(true);
-			});
 			g.initGame();
 			setTimeout(function(){
 				g.keepAlive();
@@ -316,12 +297,12 @@ var title = {
 			speed = g.speed;
 			
 		if (!g.rankedMode && (name.length < 4 || name.length > 32)){
-			Msg("Game name must be at least 4-32 characters.", 1);
+			g.msg("Game name must be at least 4-32 characters.", 1);
 			setTimeout(function(){
 				$("#gameName").focus().select();
 			}, 100);
 		} else if (!g.rankedMode && (max < 2 || max > 8 || max % 1 !== 0)){
-			Msg("Game must have 2-8 players.", 1);
+			g.msg("Game must have 2-8 players.", 1);
 		} else {
 			title.createGameService(name, pw, title.mapData[g.map.key].name, max, g.rankedMode, g.teamMode, speed);
 		}
@@ -356,14 +337,14 @@ var title = {
 			socket.joinGame();
 			lobby.styleStartGame();
 		}).fail(function(e){
-			Msg(e.statusText);
+			g.msg(e.statusText);
 			g.unlock(1);
 		});
 	},
 	joinGame: function(){
 		g.name = $("#joinGame").val();
 		if (!g.name){
-			Msg("Game name is not valid!", 1.5);
+			g.msg("Game name is not valid!", 1.5);
 			$("#joinGame").focus().select();
 			return;
 		}
@@ -380,7 +361,7 @@ var title = {
 			title.joinGameCallback(data);
 		}).fail(function(data){
 			console.info(data);
-			Msg(data.statusText, 1.5);
+			g.msg(data.statusText, 1.5);
 		}).always(function(){
 			g.unlock();
 		});

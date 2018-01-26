@@ -11,8 +11,7 @@ var mob = {
 	},
 	preloadMob: function(type){
 		if (!mobs.images[type].cache.length) {
-			//console.info("preloading ", type);
-			for (var i = 1; i < 105; i++) {
+			for (var i = 1; i <= 105; i++) {
 				mobs.images[type].cache[i] = new Image();
 				mobs.images[type].cache[i].src = 'mobs/' + type + '/' + i + '.png';
 			}

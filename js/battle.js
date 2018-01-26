@@ -3,7 +3,7 @@ var battle = {
 	go: function(){
 		mob.init();
 		g.setScene('battle');
-		chat.set(1);
+		chat.init(1);
 	},
 	html: function(){
 		var s = '<img id="battle-bg" class="img-bg" src="img2/bg/fw2.jpg">';

@@ -1,9 +1,27 @@
+var p = {};
 var town = {
 	go: function(){
-		town.init();
-		g.setScene('town');
-		socket.init();
-		chat.set(1);
+		if (create.selected) {
+			g.lock(1);
+			$.ajax({
+				url: g.url + 'php2/character/loadCharacter.php',
+				data: {
+					row: create.selected
+				}
+			}).done(function(data) {
+				p[data.characterData.name] = data.characterData;
+				console.info('loadCharacter: ', p[data.characterData.name]);
+				town.init();
+				g.setScene('town');
+				socket.init();
+				chat.init(1);
+			}).fail(function(data){
+				console.info(data);
+				g.msg(data.responseText, 1.5);
+			}).always(function(){
+				g.unlock();
+			});
+		}
 	},
 	html: function(){
 		var s =

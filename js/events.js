@@ -1,20 +1,63 @@
 $(document).on('keydown', function(e){
-	var x = e.keyCode;
-	if (e.ctrlKey){
-		if (x === 82){
+	var code = e.keyCode,
+		key = e.key;
+
+	console.info('keydown: ', key, code, e.key === 'b');
+	//if (g.isLocal) {
+	// local only
+	if (!chat.hasFocus) {
+		if (key === 'b') {
+			battle.go();
+		}
+		else if (key === 't') {
+			town.go();
+		}
+
+	}
+	//}
+	if (code >= 112 && code <= 121 || code === 123) {
+		// disable all F keys except F11
+		if (!g.isLocal) {
+			return false;
+		}
+	}
+	// normal hotkeys
+	if (g.view === 'title') {
+		// title hotkeys? Any?
+	}
+	else {
+		if (chat.hasFocus) {
+			if (code === 13) {
+				// enter
+				chat.sendMsg();
+			}
+		}
+		else {
+			// battle, town, dungeon
+		}
+	}
+
+
+	if (e.altKey) {
+		console.info('altkey');
+		if (code === 37 || code === 39) {
+			return false;
+		}
+	} else if (e.ctrlKey){
+		if (code === 82){
 			// ctrl+r refresh
 			return false;
 		}
 	} else {
 		if (g.view === 'title'){
 			if (!g.isModalOpen){
-				$("#title-chat-input").focus();
+				$("#chat-input").focus();
 			}
 		} else if (g.view === 'lobby'){
 			$("#lobby-chat-input").focus();
 		} else {
 			// game
-			if (x === 9){
+			if (code === 9){
 				// tab
 				if (!e.shiftKey){
 					my.nextTarget(false);
@@ -22,7 +65,7 @@ $(document).on('keydown', function(e){
 					my.nextTarget(true);
 				}
 				e.preventDefault();
-			} else if (x === 86){
+			} else if (code === 86){
 				// v
 				if (g.view === 'game' && !g.chatOn){
 					game.toggleGameWindows(1);
@@ -105,9 +148,9 @@ $(document).on('keydown', function(e){
 						var x = my.lastReceivedWhisper;
 						if (x){
 							if (g.view === 'title'){
-								$("#title-chat-input").val('/w ' + x + ' ').focus();
+								$("#chat-input").val('/w ' + x + ' ').focus();
 							} else if (g.view === 'lobby'){
-								$("#lobby-chat-input").val('/w ' + x + ' ').focus();
+								$("#chat-input").val('/w ' + x + ' ').focus();
 							} else {
 								if (!g.chatOn){
 									toggleChatMode();

@@ -57,11 +57,11 @@ var socket = {
 					data.skip = true;
 					data.message = "You have joined channel: " + data.channel;
 					data.type = "chat-warning";
-					chat.send(data);
+					chat.log(data);
 					socket.zmq.subscribe('title:' + data.channel, function(topic, data) {
-						console.info("Receiving data! ", topic, data);
+						console.info("title:' + data.channel ", topic, data);
 						if (g.ignore.indexOf(data.account) === -1){
-							chat.send(data);
+							chat.log(data);
 						}
 					});
 					// add id
@@ -80,7 +80,7 @@ var socket = {
 		var channel = 'account:' + my.account;
 		console.info("subscribing to whisper channel: ", channel);
 		socket.zmq.subscribe(channel, function(topic, data) {
-			console.info("receiving... ", data.action);
+			console.info(channel, data.action);
 			if (data.message){
 				if (data.action === 'send'){
 					console.info("SENT: ", topic, data);
@@ -101,7 +101,7 @@ var socket = {
 					data.type = 'chat-whisper';
 					data.msg = data.message;
 					data.message = data.chatFlag + data.account + ' whispers: ' + data.message;
-					chat.send(data);
+					chat.log(data);
 				} else {
 					// message receive confirmation to original sender
 					console.info("CALLBACK: ", topic, data);
@@ -168,16 +168,17 @@ var socket = {
 		// chat updates
 		if (g.view === 'town'){
 			if (socket.initialConnection){
-				var missions = 'town:missions';
-				console.info("subscribing to channel: ", missions);
-				socket.zmq.subscribe(missions, function(topic, data) {
-					console.info("CALLBACK: ", topic, data);
-					title.updateGame(data);
+				var town = 'ng2:town-1';
+				console.info("subscribing to channel: ", town);
+				chat.log("You have joined channel: town-1", 'chat-warning');
+				socket.zmq.subscribe(town, function(topic, data) {
+					console.info("ng2:town-1: ", topic, data);
+					route.town(data, data.route);
 				});
 				var admin = 'admin:broadcast';
 				console.info("subscribing to channel: ", admin);
 				socket.zmq.subscribe(admin, function(topic, data) {
-					console.info("CALLBACK: ", topic, data);
+					console.info("admin:broadcast: ", topic, data);
 					if (data.msg){
 						g.chat(data.msg, data.type);
 					}

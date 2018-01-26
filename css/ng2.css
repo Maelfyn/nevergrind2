@@ -1237,7 +1237,11 @@ tbody {
 	height: 100%;
 	overflow: auto;
 	line-height: 1.2;
+	color: #fdd;
 	box-shadow: 0 0 5px 1px #025 inset;
+}
+#chat-log div {
+	text-shadow: 1px 1px #000;
 }
 #chat-input {
 	flex: 0;
@@ -1249,16 +1253,181 @@ tbody {
 	padding: .2rem .4rem;
 	box-shadow: 0 0 5px 1px #048 inset;
 }
+
+.chat-white {
+	color: #fff;
+}
+.chat-muted {
+	color: #aaa;
+}
+.chat-whisper {
+	color: #c8f;
+}
+.chat-group {
+	color: #8ef;
+}
+.chat-shout {
+	color: #dd1a1a;
+}
+.chat-ooc {
+	color: #090;
+}
+.chat-guild {
+	color: #2e2;
+}
+.chat-warning {
+	color: #ffff1a;
+}
+.chat-broadcast {
+	text-transform: uppercase;
+	font-weight: bold;
+	color: #f80;
+}
+.chat-exp {
+	color: gold;
+}
+.chat-join {
+	cursor: pointer
+}
+.chat-implying {
+	color: #1e1;
+}
+.chat-hidden {
+	font-family: Consolas, monospace;
+	color: #000;
+	background: #000;
+	text-shadow: none;
+	pointer-events: auto
+}
+.chat-hidden:hover {
+	color: #fff;
+	pointer-events: auto
+}
+/* chat class colors */
+
+.chat-WAR {
+	color:#a73;
+}
+.chat-ROG {
+	color:#888;
+}
+.chat-MNK {
+	color:#f85;
+}
+.chat-PAL {
+	color:#c5e;
+}
+.chat-SHD {
+	color:#f0f;
+}
+.chat-RNG {
+	color:#090;
+}
+.chat-BRD {
+	color:#7ff;
+}
+.chat-DRU {
+	color:#8f0;
+}
+.chat-CLR {
+	color:#ff5;
+}
+.chat-SHM {
+	color:#08f;
+}
+.chat-NEC {
+	color:#84f;
+}
+.chat-ENC {
+	color:#0df;
+}
+.chat-MAG {
+	color:#f90;
+}
+.chat-WIZ {
+	color:#f22;
+}
+.Warrior{
+	background:#3a220a;
+	background:url('/classic/images1/classPlate.png') 0 0;
+	text-shadow:inherit;
+}
+.Rogue{
+	background:#3d353d;
+	background:url('/classic/images1/classPlate.png') 0 -100%;
+	text-shadow:inherit;
+}
+.Monk{
+	background:#44441a;
+	background:url('/classic/images1/classPlate.png') 0 -200%;
+	text-shadow:inherit;
+}
+.Paladin{
+	background:#620582;
+	background:url('/classic/images1/classPlate.png') 0 -300%;
+	text-shadow:inherit;
+}
+.ShadowKnight{
+	background:#48043a;
+	background:url('/classic/images1/classPlate.png') 0 -400%;
+	text-shadow:inherit;
+}
+.Ranger{
+	background:#0a2b00;
+	background:url('/classic/images1/classPlate.png') 0 -500%;
+	text-shadow:inherit;
+}
+.Bard{
+	background:#1a006a;
+	background:url('/classic/images1/classPlate.png') 0 -600%;
+	text-shadow:inherit;
+}
+.Druid{
+	background:#1a5b0a;
+	background:url('/classic/images1/classPlate.png') 0 -700%;
+	text-shadow:inherit;
+}
+.Cleric{
+	background:#77770a;
+	background:url('/classic/images1/classPlate.png') 0 -800%;
+	text-shadow:inherit;
+}
+.Shaman{
+	background:#001a7a;
+	background:url('/classic/images1/classPlate.png') 0 -900%;
+	text-shadow:inherit;
+}
+.Necromancer{
+	background:#482a5a;
+	background:url('/classic/images1/classPlate.png') 0 -1000%;
+	text-shadow:inherit;
+}
+.Enchanter{
+	background:#123a6a;
+	background:url('/classic/images1/classPlate.png') 0 -1100%;
+	text-shadow:inherit;
+}
+.Magician{
+	background:#7a4a12;
+	background:url('/classic/images1/classPlate.png') 0 -1200%;
+	text-shadow:inherit;
+}
+.Wizard{
+	background:#5a0111;
+	background:url('/classic/images1/classPlate.png') 0 -1300%;
+	text-shadow:inherit;
+}
+/* webkit scrollbar */
 ::-webkit-scrollbar {
 	/* addresses the background of the bar itself. It is usually covered by the other elements */
-	width: .3rem;
+	width: .5rem;
 }
 ::-webkit-scrollbar-button {
 	/* addresses the directional buttons on the scrollbar */
 }
 ::-webkit-scrollbar-track {
 	background: #333;
-	background-image: -webkit-radial-gradient(center center, cover, #222 0%, #000 100%);
+	background-image: -webkit-linear-gradient(left, #013 0%, #103860 100%);
 	box-shadow: inset 0 0 0 1px #444;
 }
 ::-webkit-scrollbar-track-piece {
@@ -1270,9 +1439,8 @@ tbody {
 ::-webkit-scrollbar-thumb {
 	/* addresses the draggable scrolling element that resizes depending on the size of the scrollable element */
 	background-color: #579;
-	background-image: -webkit-radial-gradient(center center, cover, #ace 0%, #135 100%);
+	background-image: -webkit-linear-gradient(top, #579 0%, #bdf 50%, #579 100%);
 	outline: 1px solid #0f0;
-	border-radius: 30%;
 }
 body {
 	visibility: visible;
