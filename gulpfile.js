@@ -141,6 +141,38 @@ gulp.task('resize-png', function(){
 	});
 });
 
+gulp.task('resize-sprite', function(){
+	// add minify-png pipe
+	var img = 'dragon',
+		h = 3000,
+		w = 1500,
+		totalHeight = h * 15,
+		totalWidth = w * 7;
+	var promise = new Promise(function(resolve) {
+		gulp.src('./mobs-huge/' + img + '.png')
+			.pipe(imageResize({
+				imageMagick: true,
+				width: totalHeight,
+				height: totalWidth
+			}))
+			.pipe(gulp.dest('./mobs/' + img))
+			.on('end', resolve);
+	});
+
+	promise.then(function(data){
+		imagemin(['./mobs/'+ img], './mobs/'+ img, {
+			use: [imageminPngquant({
+				floyd: 1,
+				nofs: true, // disable FS
+				quality: '90',
+				speed: 1
+			})]
+		}).then(function(){
+			console.info("Spritemap minified with quant: " + img)
+		});
+	});
+});
+
 gulp.task('minify-css', function(){
 	gulp.src([
 		'./css/ng2.css'

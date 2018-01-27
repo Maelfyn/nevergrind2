@@ -22,7 +22,7 @@ var battle = {
 				'</div>' +
 				'<div id="mob-shadow-' +i+ '" class="mob-shadow"></div>' +
 				'<div class="mob-img-wrap">' +
-					'<img id="mob-img-' +i+ '" class="mob-image" src="img2/blank.png">' +
+					'<img id="mob-img-' +i+ '" class="mob-img" src="img2/blank.png">' +
 				'</div>' +
 				'<div id="mob-alive-' +i+ '" class="mob-alive" index="' + i + '"></div>' +
 				'<div id="mob-dead-' +i+ '" class="mob-dead" index="' + i + '"></div>' +
@@ -62,8 +62,8 @@ var battle = {
 		for (var i=0; i<mob.max; i++){
 		//for (var i=2; i<3; i++){
 			var m = mobs[i],
-				mobKey = mob.getRandomMobKey();
-				//mobKey = 'wolf';
+				//mobKey = mob.getRandomMobKey();
+				mobKey = 'dragon';
 			mob.preloadMob(mobKey);
 			m.type = mobKey;
 			mob.setMob(m);

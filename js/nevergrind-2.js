@@ -1,4 +1,38 @@
-(function($,Math,document,location,TweenMax,TimelineMax,Power0,Power1,Power2,Power3,Power4,Back,Elastic,Bounce,SteppedEase,Circ,Expo,Sine,setTimeout,setInterval,clearTimeout,clearInterval,webkitRequestAnimationFrame,webkitCancelAnimationFrame,getComputedStyle,requestAnimationFrame,cancelAnimationFrame,window,Array,JSON,Date,Object,undefined){
+(function(
+	$,
+	Math,
+	document,
+	location,
+	TweenMax,
+	TimelineMax,
+	Power0,
+	Power1,
+	Power2,
+	Power3,
+	Power4,
+	Back,
+	Elastic,
+	Bounce,
+	SteppedEase,
+	Circ,
+	Expo,
+	Sine,
+	setTimeout,
+	setInterval,
+	clearTimeout,
+	clearInterval,
+	webkitRequestAnimationFrame,
+	webkitCancelAnimationFrame,
+	getComputedStyle,
+	requestAnimationFrame,
+	cancelAnimationFrame,
+	window,
+	Array,
+	JSON,
+	Date,
+	Object,
+	undefined
+){
 // stuff that must exist before everything
 var init = {
 	checkMobile: function(){
@@ -1944,10 +1978,7 @@ $(document).on('keydown', function(e){
 
 
 	if (e.altKey) {
-		console.info('altkey');
-		if (code === 37 || code === 39) {
-			return false;
-		}
+		return false;
 	} else if (e.ctrlKey){
 		if (code === 82){
 			// ctrl+r refresh
@@ -4655,4 +4686,37 @@ var test = {
 		}
 	}
 }
-})($,Math,document,location,TweenMax,TimelineMax,Power0,Power1,Power2,Power3,Power4,Back,Elastic,Bounce,SteppedEase,Circ,Expo,Sine,setTimeout,setInterval,clearTimeout,clearInterval,webkitRequestAnimationFrame,webkitCancelAnimationFrame,getComputedStyle,requestAnimationFrame,cancelAnimationFrame,window,Array,JSON,Date,Object);
+})(
+	$,
+	Math,
+	document,
+	location,
+	TweenMax,
+	TimelineMax,
+	Power0,
+	Power1,
+	Power2,
+	Power3,
+	Power4,
+	Back,
+	Elastic,
+	Bounce,
+	SteppedEase,
+	Circ,
+	Expo,
+	Sine,
+	setTimeout,
+	setInterval,
+	clearTimeout,
+	clearInterval,
+	window.webkitRequestAnimationFrame === undefined ? undefined : webkitRequestAnimationFrame,
+	window.webkitCancelAnimationFrame === undefined ? undefined : webkitCancelAnimationFrame,
+	getComputedStyle,
+	requestAnimationFrame,
+	cancelAnimationFrame,
+	window,
+	Array,
+	JSON,
+	Date,
+	Object
+);

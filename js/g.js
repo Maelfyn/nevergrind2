@@ -12,10 +12,17 @@ g = Object.assign(g, {
 		$("body").on('dragstart', 'img', function(e) {
 			e.preventDefault();
 		});
-		// disable right-click in non-local
-		if (!g.isLocal) {
+		// disable stuff in app to appear more "native"
+		if (g.isApp) {
 			document.addEventListener("contextmenu", function (e) {
+				// disable default right-click menu
 				e.preventDefault();
+			}, false);
+			window.addEventListener("wheel", function(e){
+				if (e.ctrlKey) {
+					// disable wheel zoom
+					e.preventDefault();
+				}
 			}, false);
 		}
 
