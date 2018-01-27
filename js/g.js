@@ -13,6 +13,7 @@ g = Object.assign(g, {
 			e.preventDefault();
 		});
 		// disable stuff in app to appear more "native"
+		/*
 		if (g.isApp) {
 			document.addEventListener("contextmenu", function (e) {
 				// disable default right-click menu
@@ -25,7 +26,7 @@ g = Object.assign(g, {
 				}
 			}, false);
 		}
-
+		*/
 		$("#enter-world").on(env.click, function(e){
 			town.go();
 		});

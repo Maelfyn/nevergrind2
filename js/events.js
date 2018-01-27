@@ -4,21 +4,22 @@ $(document).on('keydown', function(e){
 
 	console.info('keydown: ', key, code);
 	// local only
-	if (g.isLocal && !chat.hasFocus) {
+	//if (g.isLocal && !chat.hasFocus) {
 		if (key === 'b') {
 			battle.go();
 		}
 		else if (key === 't') {
 			town.go();
 		}
-
-	}
+	//}
+	/*
 	if (code >= 112 && code <= 121 || code === 123) {
 		// disable all F keys except F11
 		if (!g.isLocal) {
 			return false;
 		}
 	}
+	*/
 	// normal hotkeys
 	if (g.view === 'title') {
 		// title hotkeys? Any?

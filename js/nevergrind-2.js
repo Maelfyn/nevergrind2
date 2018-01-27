@@ -601,13 +601,21 @@ g = Object.assign(g, {
 		$("body").on('dragstart', 'img', function(e) {
 			e.preventDefault();
 		});
-		// disable right-click in non-local
-		if (!g.isLocal) {
+		// disable stuff in app to appear more "native"
+		/*
+		if (g.isApp) {
 			document.addEventListener("contextmenu", function (e) {
+				// disable default right-click menu
 				e.preventDefault();
 			}, false);
+			window.addEventListener("wheel", function(e){
+				if (e.ctrlKey) {
+					// disable wheel zoom
+					e.preventDefault();
+				}
+			}, false);
 		}
-
+		*/
 		$("#enter-world").on(env.click, function(e){
 			town.go();
 		});
@@ -1945,21 +1953,22 @@ $(document).on('keydown', function(e){
 
 	console.info('keydown: ', key, code);
 	// local only
-	if (g.isLocal && !chat.hasFocus) {
+	//if (g.isLocal && !chat.hasFocus) {
 		if (key === 'b') {
 			battle.go();
 		}
 		else if (key === 't') {
 			town.go();
 		}
-
-	}
+	//}
+	/*
 	if (code >= 112 && code <= 121 || code === 123) {
 		// disable all F keys except F11
 		if (!g.isLocal) {
 			return false;
 		}
 	}
+	*/
 	// normal hotkeys
 	if (g.view === 'title') {
 		// title hotkeys? Any?
@@ -2924,7 +2933,7 @@ var battle = {
 				'</div>' +
 				'<div id="mob-shadow-' +i+ '" class="mob-shadow"></div>' +
 				'<div class="mob-img-wrap">' +
-					'<img id="mob-img-' +i+ '" class="mob-image" src="img2/blank.png">' +
+					'<img id="mob-img-' +i+ '" class="mob-img" src="img2/blank.png">' +
 				'</div>' +
 				'<div id="mob-alive-' +i+ '" class="mob-alive" index="' + i + '"></div>' +
 				'<div id="mob-dead-' +i+ '" class="mob-dead" index="' + i + '"></div>' +
@@ -2964,8 +2973,8 @@ var battle = {
 		for (var i=0; i<mob.max; i++){
 		//for (var i=2; i<3; i++){
 			var m = mobs[i],
-				mobKey = mob.getRandomMobKey();
-				//mobKey = 'wolf';
+				//mobKey = mob.getRandomMobKey();
+				mobKey = 'dragon';
 			mob.preloadMob(mobKey);
 			m.type = mobKey;
 			mob.setMob(m);

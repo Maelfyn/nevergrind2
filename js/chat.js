@@ -35,11 +35,13 @@ chat = Object.assign(chat, {
 		e.innerHTML = chat.html();
 		// prevents auto scroll while scrolling
 		$("#chat-wrap").on('mousedown', function(){
-			console.info('mousedown');
 			chat.isClicked = 1;
 		}).on('mouseup', function(){
-			console.info('mouseup');
 			chat.isClicked = 0;
+			chat.sendTimer = Date.now();
+			socket.zmq.publish('admin:broadcast', {
+				time: Date.now()
+			});
 		});
 		$("#chat-input").on('focus', function(){
 			chat.hasFocus = 1;
@@ -74,6 +76,7 @@ chat = Object.assign(chat, {
 			chat.scrollBottom();
 		}
 	},
+	sendTimer: 0,
 	// send to server
 	sendMsg: function(bypass){
 		var msg = dom.chatInput.value.trim();
@@ -126,6 +129,7 @@ chat = Object.assign(chat, {
 						// skip
 					} else {
 						console.info("Sending", msg);
+						chat.sendTimer = Date.now();
 						$.ajax({
 							url: g.url + 'php2/chat/insertTitleChat.php',
 							data: {

@@ -30,7 +30,7 @@
     "max_width": 1920,
     "max_height": 1080,
     "resizeable": true,
-    "fullscreen": false
+    "fullscreen": true
   },
   "permissions": [
     "cookies",

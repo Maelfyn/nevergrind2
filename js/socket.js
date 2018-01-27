@@ -124,12 +124,14 @@ var socket = {
 				}
 			}
 		});
+		/*
 		(function keepAliveWs(){
 			socket.zmq.publish('admin:broadcast', {
 				time: Date.now()
 			});
 			setTimeout(keepAliveWs, 30000);
 		})();
+		*/
 	},
 	joinGame: function(){
 		(function repeat(){
@@ -166,38 +168,33 @@ var socket = {
 		socket.enabled = true;
 		console.info("Socket connection established with server");
 		// chat updates
-		if (g.view === 'town'){
-			if (socket.initialConnection){
-				var town = 'ng2:town-1';
-				console.info("subscribing to channel: ", town);
-				chat.log("You have joined channel: town-1", 'chat-warning');
-				socket.zmq.subscribe(town, function(topic, data) {
-					console.info("ng2:town-1: ", topic, data);
-					route.town(data, data.route);
-				});
-				var admin = 'admin:broadcast';
-				console.info("subscribing to channel: ", admin);
-				socket.zmq.subscribe(admin, function(topic, data) {
-					console.info("admin:broadcast: ", topic, data);
-					if (data.msg){
-						g.chat(data.msg, data.type);
-					}
-				});
-				(function repeat(){
-					if (my.account){
-						socket.enableWhisper();
-					}
-					else {
-						setTimeout(repeat, 1000);
-					}
-				})();
-			}
-			socket.initialConnection = false;
-			socket.setChannel(chat.channel);
+		if (socket.initialConnection){
+			var town = 'ng2:town-1';
+			console.info("subscribing to channel: ", town);
+			chat.log("You have joined channel: town-1", 'chat-warning');
+			socket.zmq.subscribe(town, function(topic, data) {
+				console.info("ng2:town-1: ", topic, data);
+				route.town(data, data.route);
+			});
+			var admin = 'admin:broadcast';
+			console.info("subscribing to channel: ", admin);
+			socket.zmq.subscribe(admin, function(topic, data) {
+				console.info("socket rx time: ", Date.now() - chat.sendTimer, topic, data);
+				if (data.msg){
+					g.chat(data.msg, data.type);
+				}
+			});
+			(function repeat(){
+				if (my.account){
+					socket.enableWhisper();
+				}
+				else {
+					setTimeout(repeat, 1000);
+				}
+			})();
 		}
-		if (g.view === 'game'){
-			game.getGameState();
-		}
+		socket.initialConnection = false;
+		socket.setChannel(chat.channel);
 	},
 	connectionTries: 0,
 	connectionRetryDuration: 100,

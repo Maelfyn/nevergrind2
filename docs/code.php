@@ -1,4 +1,17 @@
 <script>
+	(function(resist){
+
+		var i = 0, max = 75, total = 0;
+		while (i++ < resist){
+			total += (.5 * (1 - (total / max));
+		}
+		console.info(resist, ~~total);
+		return ~~total;
+
+	})
+
+
+
 	idle: function(skip){
 		TweenMax.to(mob.element, .4, {
 			startAt: {

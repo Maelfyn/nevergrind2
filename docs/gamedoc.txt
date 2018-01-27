@@ -25,6 +25,7 @@
 	tooltip for all items
 	ability to destroy items
 	ability to buy items
+- needs ESC menu to feel "native"
 
 
 Town

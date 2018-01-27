@@ -1229,7 +1229,7 @@ tbody {
 	background: rgba(0,0,0,.8);
 	width: 30rem;
 	height: 12rem;
-	z-index: 1;
+	z-index: 2;
 }
 #chat-log {
 	flex: 1;

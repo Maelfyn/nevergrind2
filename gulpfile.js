@@ -216,31 +216,35 @@ gulp.task('build-ng2', [
 	]).pipe(gulp.dest('./build'));
 
 	gulp.src([
-		'./css/**/*.*'
+		'./css/**/*'
 	]).pipe(gulp.dest('./build/css'));
 
 	gulp.src([
-		'./fonts/*.*'
+		'./fonts/*'
 	]).pipe(gulp.dest('./build/fonts'));
 
 	gulp.src([
-		'./js/**/*.*'
+		'./js/**/*'
 	]).pipe(gulp.dest('./build/js'));
 
 	gulp.src([
-		'./sound/*.*'
+		'./sound/*'
 	]).pipe(gulp.dest('./build/sound'));
 
 	gulp.src([
-		'./music/*.*'
+		'./music/*'
 	]).pipe(gulp.dest('./build/music'));
 
 	gulp.src([
-		'./img2/*.*'
+		'./img2/**/*'
 	]).pipe(gulp.dest('./build/img2'));
 
 	gulp.src([
-		'./mobs/*.*'
+		'./mobs/**/*'
+	]).pipe(gulp.dest('./build/mobs'));
+
+	gulp.src([
+		'./mobs/*'
 	]).pipe(gulp.dest('./build/mobs'));
 });
 
