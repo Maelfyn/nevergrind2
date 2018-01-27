@@ -1,6 +1,7 @@
 var p = {};
 var town = {
 	go: function(){
+		console.warn("ROUTING: ", create.selected);
 		if (create.selected) {
 			g.lock(1);
 			$.ajax({
@@ -9,11 +10,11 @@ var town = {
 					row: create.selected
 				}
 			}).done(function(data) {
+				socket.init();
 				p[data.characterData.name] = data.characterData;
 				console.info('loadCharacter: ', p[data.characterData.name]);
-				town.init();
 				g.setScene('town');
-				socket.init();
+				town.init();
 				chat.init(1);
 			}).fail(function(data){
 				console.info(data);
@@ -41,9 +42,11 @@ var town = {
 	},
 	initialized: 0,
 	init: function(){
-		town.initialized = 1;
-		document.getElementById('scene-town').innerHTML = town.html();
-		town.events();
-		$("#scene-title").remove();
+		if (g.view !== 'town' && !town.initialized) {
+			town.initialized = 1;
+			document.getElementById('scene-town').innerHTML = town.html();
+			town.events();
+			$("#scene-title").remove();
+		}
 	}
 }

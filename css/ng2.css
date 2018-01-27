@@ -1239,6 +1239,7 @@ tbody {
 	line-height: 1.2;
 	color: #ffdada;
 	box-shadow: 0 0 5px 1px #025 inset;
+	word-break: break-word;
 }
 #chat-log div {
 	text-shadow: 1px 1px #000;

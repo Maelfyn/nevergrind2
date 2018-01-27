@@ -422,14 +422,3 @@ var mob = {
 		});
 	}
 }
-setTimeout(function(){
-	var h = location.hash;
-	if (g.isLocal) {
-		if (h === '#town') {
-			town.go();
-		}
-		else if (h === '#battle') {
-			battle.go();
-		}
-	}
-}, 100);

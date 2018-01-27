@@ -19,48 +19,41 @@ chat = Object.assign(chat, {
 	lastWhisper: {
 		timestamp: Date.now(),
 		account: '',
-		message: ''
+		msg: ''
 	},
 	init: function(z) {
 		// default initialization of chat
-		var e = document.getElementById('chat-wrap');
-		e.innerHTML = '';
-		e.style.display = z ? 'flex' : 'none';
 		if (z && !chat.initialized) {
+			var e = document.getElementById('chat-wrap');
+			e.innerHTML = '';
+			e.style.display = z ? 'flex' : 'none';
+			e.innerHTML = chat.html();
+
+			chat.initialized = 1;
 			// show
+			// prevents auto scroll while scrolling
+			$("#chat-log").on('mousedown', function(){
+				chat.isClicked = 1;
+			}).on('mouseup', function(){
+				chat.isClicked = 0;
+			});
+			$("#chat-input").on('focus', function(){
+				chat.hasFocus = 1;
+			}).on('blur', function(){
+				chat.hasFocus = 0;
+			});
 		}
 		else {
 			// hide
 		}
-		e.innerHTML = chat.html();
-		// prevents auto scroll while scrolling
-		$("#chat-wrap").on('mousedown', function(){
-			chat.isClicked = 1;
-		}).on('mouseup', function(){
-			chat.isClicked = 0;
-			chat.sendTimer = Date.now();
-			socket.zmq.publish('admin:broadcast', {
-				time: Date.now()
-			});
-		});
-		$("#chat-input").on('focus', function(){
-			chat.hasFocus = 1;
-		}).on('blur', function(){
-			chat.hasFocus = 0;
-		});
 		// dom
 		dom.chatLog = document.getElementById('chat-log');
 		dom.chatInput = document.getElementById('chat-input');
 		chat.count = dom.chatLog.childElementCount;
-		chat.initialized = 1;
 	},
 	// report to chat-log
-	log: function(msg, type){
-		var o = {
-			msg: msg,
-			type: type
-		};
-		if (o.msg){
+	log: function(msg, route){
+		if (msg){
 			if (chat.count >= 500) {
 				dom.chatLog.removeChild(dom.chatLog.firstChild);
 			}
@@ -68,15 +61,14 @@ chat = Object.assign(chat, {
 				chat.count++;
 			}
 			var z = document.createElement('div');
-			if (o.type){
-				z.className = o.type;
+			if (route){
+				z.className = route;
 			}
-			z.innerHTML = o.msg;
+			z.innerHTML = msg;
 			dom.chatLog.appendChild(z);
 			chat.scrollBottom();
 		}
 	},
-	sendTimer: 0,
 	// send to server
 	sendMsg: function(bypass){
 		var msg = dom.chatInput.value.trim();
@@ -125,21 +117,21 @@ chat = Object.assign(chat, {
 					chat.broadcast(msg);
 				}
 				else {
-					if (msg.charAt(0) === '/' && msg.indexOf('/me') !== 0 || msg === '/me'){
+					if (msg[0] === '/' &&
+						msg.indexOf('/me') !== 0 || msg === '/me'){
 						// skip
 					} else {
-						console.info("Sending", msg);
-						chat.sendTimer = Date.now();
 						$.ajax({
-							url: g.url + 'php2/chat/insertTitleChat.php',
+							url: g.url + 'php2/chat/send.php',
 							data: {
-								message: msg
+								msg: msg,
+								route: 'chat-normal'
 							}
 						});
 					}
 				}
+				dom.chatInput.value = '';
 			}
-			dom.chatInput.value = '';
 		}
 	},
 	// to server
@@ -156,7 +148,7 @@ chat = Object.assign(chat, {
 			data: {
 				account: account,
 				playerColor: my.playerColor,
-				message: msg,
+				msg: msg,
 				action: 'send'
 			}
 		});
@@ -183,7 +175,7 @@ chat = Object.assign(chat, {
 			} else if (data.type === 'updateLobbyCPU'){
 				lobby.updateCPU(data);
 			} else {
-				if (data.message !== undefined){
+				if (data.msg !== undefined){
 					lobby.chat(data);
 				}
 			}
@@ -236,7 +228,7 @@ chat = Object.assign(chat, {
 				game.eliminatePlayer(data);
 			}
 			
-			if (data.message){
+			if (data.msg){
 				if (data.type === 'gunfire'){
 					// ? when I'm attacked?
 					if (data.defender === my.account){
@@ -449,7 +441,7 @@ chat = Object.assign(chat, {
 			<div>/video youtube_url: share video</div>\
 			';
 		var o = {
-			message: str,
+			msg: str,
 			type: 'chat-muted'
 		};
 		title.chat(o);
@@ -458,7 +450,7 @@ chat = Object.assign(chat, {
 		$.ajax({
 			url: g.url + 'php/insertBroadcast.php',
 			data: {
-				message: msg
+				msg: msg
 			}
 		});
 	}

@@ -124,14 +124,6 @@ var socket = {
 				}
 			}
 		});
-		/*
-		(function keepAliveWs(){
-			socket.zmq.publish('admin:broadcast', {
-				time: Date.now()
-			});
-			setTimeout(keepAliveWs, 30000);
-		})();
-		*/
 	},
 	joinGame: function(){
 		(function repeat(){
@@ -153,16 +145,18 @@ var socket = {
 	enabled: false,
 	init: function(){
 		// is player logged in?
-		socket.zmq = new ab.Session('wss://' + g.socketUrl + '/wss2/', function(){
-			// on open
-			socket.connectionSuccess();
-		}, function(){
-			// on close/fail
-			socket.reconnect();
-		}, {
-			// options
-			'skipSubprotocolCheck': true
-		});
+		if (!socket.enabled) {
+			socket.zmq = new ab.Session('wss://' + g.socketUrl + '/wss2/', function () {
+				// on open
+				socket.connectionSuccess();
+			}, function () {
+				// on close/fail
+				socket.reconnect();
+			}, {
+				// options
+				'skipSubprotocolCheck': true
+			});
+		}
 	},
 	connectionSuccess: function(){
 		socket.enabled = true;
@@ -173,15 +167,15 @@ var socket = {
 			console.info("subscribing to channel: ", town);
 			chat.log("You have joined channel: town-1", 'chat-warning');
 			socket.zmq.subscribe(town, function(topic, data) {
-				console.info("ng2:town-1: ", topic, data);
+				//console.info('rx ', topic, data);
 				route.town(data, data.route);
 			});
 			var admin = 'admin:broadcast';
 			console.info("subscribing to channel: ", admin);
 			socket.zmq.subscribe(admin, function(topic, data) {
-				console.info("socket rx time: ", Date.now() - chat.sendTimer, topic, data);
+				console.info('rx ', topic, data);
 				if (data.msg){
-					g.chat(data.msg, data.type);
+					// g.chat(data.msg, data.type);
 				}
 			});
 			(function repeat(){

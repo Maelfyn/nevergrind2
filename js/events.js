@@ -2,7 +2,7 @@ $(document).on('keydown', function(e){
 	var code = e.keyCode,
 		key = e.key;
 
-	console.info('keydown: ', key, code);
+	//console.info('keydown: ', key, code);
 	// local only
 	//if (g.isLocal && !chat.hasFocus) {
 		if (key === 'b') {
@@ -25,11 +25,13 @@ $(document).on('keydown', function(e){
 		// title hotkeys? Any?
 	}
 	else {
-		if (chat.hasFocus) {
-			if (code === 13) {
-				// enter
-				chat.sendMsg();
-			}
+		if (g.view === 'town' && !chat.hasFocus) {
+			$("#chat-input").focus();
+		}
+
+		if (code === 13 && chat.hasFocus) {
+			// enter
+			chat.sendMsg();
 		}
 		else {
 			// battle, town, dungeon

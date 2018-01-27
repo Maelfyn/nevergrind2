@@ -30,8 +30,13 @@
 
 	<!--link rel="stylesheet" href="css/bootstrap-slider.min.css"-->
 	<script>
-		var g = {
-			version: '0.0.64',
+		var local_domains = [
+				'localhost',
+				'127.0.0.1',
+				'neverworks-pc',
+			],
+			g = {
+			version: '0.0.65',
 			initialized: 0,
 			session_id: '',
 			isApp: location.protocol === 'chrome-extension:' ? 1 : 0
@@ -47,7 +52,7 @@
 		if (!g.isApp && location.hostname === 'nevergrind.com'){
 			g.isServer = 1;
 		}
-		g.isLocal = location.hostname === 'localhost';
+		g.isLocal = local_domains.indexOf(location.hostname) > -1;
 		if (g.isLocal) {
 			g.loginUrl = '';
 		}

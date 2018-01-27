@@ -26,6 +26,7 @@
 	ability to destroy items
 	ability to buy items
 - needs ESC menu to feel "native"
+- nw.App.closeAllWindows() on exit!
 
 
 Town

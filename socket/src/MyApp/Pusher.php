@@ -8,6 +8,7 @@ class Pusher implements WampServerInterface {
      * A lookup of all the topics clients have subscribed to
      */
     protected $subscribedTopics = array();
+    protected $path = '/xampp/htdocs/';
 
     public function onSubscribe(ConnectionInterface $conn, $topic) {
 		if (!array_key_exists($topic->getId(), $this->subscribedTopics)){
@@ -41,12 +42,9 @@ class Pusher implements WampServerInterface {
         $conn->callError($id, $topic, 'You are not allowed to make calls')->close();
     }
     public function onPublish(ConnectionInterface $conn, $topic, $event, array $exclude, array $eligible){
-        // In this application if clients send data it's because the user hacked around in console
-		/*
-		if (isset($event['message'])){
+		/*if (isset($event['message'])){
 			$event = strip_tags($event['message']);
-		}
-		*/
+		}*/
 		$topic->broadcast($event);
         // $conn->close();
     }

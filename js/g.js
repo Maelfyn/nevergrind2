@@ -2,11 +2,8 @@
 g = Object.assign(g, {
 	events: function(){
 		$(window).focus(function(){
-			document.title = g.defaultTitle;
-			g.titleFlashing = false;
-			if (g.notification.close !== undefined){
-				g.notification.close();
-			}
+			/*document.title = g.defaultTitle;
+			g.titleFlashing = false;*/
 		});
 		// should be delegating no drag start
 		$("body").on('dragstart', 'img', function(e) {
@@ -27,7 +24,7 @@ g = Object.assign(g, {
 			}, false);
 		}
 		*/
-		$("#enter-world").on(env.click, function(e){
+		$("#enter-world").on(env.click, function(){
 			town.go();
 		});
 
@@ -250,49 +247,6 @@ g = Object.assign(g, {
 			setTimeout(g.keepAlive, 120000);
 		});
 	},
-	notification: {},
-	sendNotification: function(data){
-		if (!document.hasFocus() && g.view !== 'game' && typeof Notification === 'function'){
-			
-			Notification.requestPermission().then(function(permission){
-				if (permission === 'granted'){
-					// it's a player message
-					var type = ' says: ';
-					if (data.flag && (data.msg || data.message)){
-						// sent by a player
-						if (data.type === 'chat-whisper'){
-							type = ' whispers: ';
-						}
-						var prefix = data.account + type;
-						var flagFile = data.flag.replace(/-/g, ' ') + (data.flag === 'Nepal' ? '.png' : '.jpg');
-						g.notification = new Notification(prefix, {
-							icon: 'images/flags/' + flagFile,
-							tag: "Firmament Wars",
-							body: data.msg ? data.msg : data.message
-						});
-						g.notification.onclick = function(){
-							window.focus();
-						}
-						// title flash
-						if (!g.titleFlashing){
-							g.titleFlashing = true;
-							(function repeat(toggle){
-								if (!document.hasFocus()){
-									if (toggle % 2 === 0){
-										document.title = prefix;
-									} else {
-										document.title = g.defaultTitle;
-									}
-									setTimeout(repeat, 3000, ++toggle);
-								}
-							})(0);
-						}
-						audio.play('chat');
-					}
-				}
-			});
-		}
-	},
 	msg: function(msg, d){
 		dom.msg.innerHTML = msg;
 		if (d === undefined || d < 2){
@@ -460,6 +414,17 @@ g = Object.assign(g, {
 				notLoggedIn();
 			}
 			document.getElementById('version').textContent = 'Version ' + g.version;
+
+			var h = location.hash;
+			if (g.isLocal) {
+				if (h === '#town') {
+					town.go();
+					console.warn("ROUTING: ", h);
+				}
+				else if (h === '#battle') {
+					battle.go();
+				}
+			}
 		});
 	},
 	displayAllCharacters: function(r){
