@@ -591,18 +591,14 @@ var create = {
 g = Object.assign(g, {
 	events: function(){
 		$(window).focus(function(){
-			document.title = g.defaultTitle;
-			g.titleFlashing = false;
-			if (g.notification.close !== undefined){
-				g.notification.close();
-			}
+			/*document.title = g.defaultTitle;
+			g.titleFlashing = false;*/
 		});
 		// should be delegating no drag start
 		$("body").on('dragstart', 'img', function(e) {
 			e.preventDefault();
 		});
 		// disable stuff in app to appear more "native"
-		/*
 		if (g.isApp) {
 			document.addEventListener("contextmenu", function (e) {
 				// disable default right-click menu
@@ -615,8 +611,7 @@ g = Object.assign(g, {
 				}
 			}, false);
 		}
-		*/
-		$("#enter-world").on(env.click, function(e){
+		$("#enter-world").on(env.click, function(){
 			town.go();
 		});
 
@@ -839,49 +834,6 @@ g = Object.assign(g, {
 			setTimeout(g.keepAlive, 120000);
 		});
 	},
-	notification: {},
-	sendNotification: function(data){
-		if (!document.hasFocus() && g.view !== 'game' && typeof Notification === 'function'){
-			
-			Notification.requestPermission().then(function(permission){
-				if (permission === 'granted'){
-					// it's a player message
-					var type = ' says: ';
-					if (data.flag && (data.msg || data.message)){
-						// sent by a player
-						if (data.type === 'chat-whisper'){
-							type = ' whispers: ';
-						}
-						var prefix = data.account + type;
-						var flagFile = data.flag.replace(/-/g, ' ') + (data.flag === 'Nepal' ? '.png' : '.jpg');
-						g.notification = new Notification(prefix, {
-							icon: 'images/flags/' + flagFile,
-							tag: "Firmament Wars",
-							body: data.msg ? data.msg : data.message
-						});
-						g.notification.onclick = function(){
-							window.focus();
-						}
-						// title flash
-						if (!g.titleFlashing){
-							g.titleFlashing = true;
-							(function repeat(toggle){
-								if (!document.hasFocus()){
-									if (toggle % 2 === 0){
-										document.title = prefix;
-									} else {
-										document.title = g.defaultTitle;
-									}
-									setTimeout(repeat, 3000, ++toggle);
-								}
-							})(0);
-						}
-						audio.play('chat');
-					}
-				}
-			});
-		}
-	},
 	msg: function(msg, d){
 		dom.msg.innerHTML = msg;
 		if (d === undefined || d < 2){
@@ -1049,6 +1001,16 @@ g = Object.assign(g, {
 				notLoggedIn();
 			}
 			document.getElementById('version').textContent = 'Version ' + g.version;
+
+			var h = location.hash;
+			if (g.isLocal) {
+				if (h === '#town') {
+					town.go();
+				}
+				else if (h === '#battle') {
+					battle.go();
+				}
+			}
 		});
 	},
 	displayAllCharacters: function(r){
@@ -1521,31 +1483,6 @@ audio.init = (function(){
 var game = {
 	name: '',
 	initialized: false,
-	chat: function(data){
-		while (DOM.chatContent.childNodes.length > 10) {
-			DOM.chatContent.removeChild(DOM.chatContent.firstChild);
-		}
-		var z = document.createElement('div');
-		if (data.type){
-			z.className = data.type;
-		}
-		z.innerHTML = data.message;
-		DOM.chatContent.appendChild(z);
-		setTimeout(function(){
-			if (z !== undefined){
-				if (z.parentNode !== null){
-					TweenMax.to(z, ui.delay(.125), {
-						alpha: 0,
-						onComplete: function(){
-							if (z.parentNode !== null){
-								z.parentNode.removeChild(z);
-							}
-						}
-					});
-				}
-			}
-		}, 12000);
-	},
 	getGameState: function(){
 		// use as a reality check in case zmq messes up 
 		// or to init game state?
@@ -1951,34 +1888,37 @@ $(document).on('keydown', function(e){
 	var code = e.keyCode,
 		key = e.key;
 
-	console.info('keydown: ', key, code);
+	//console.info('keydown: ', key, code);
 	// local only
-	//if (g.isLocal && !chat.hasFocus) {
-		if (key === 'b') {
-			battle.go();
+	if (!g.isApp) {
+		if (!chat.hasFocus) {
+			// view router
+			if (key === 'b') {
+				battle.go();
+			}
+			else if (key === 't') {
+				town.go();
+			}
 		}
-		else if (key === 't') {
-			town.go();
-		}
-	//}
-	/*
-	if (code >= 112 && code <= 121 || code === 123) {
-		// disable all F keys except F11
-		if (!g.isLocal) {
-			return false;
+		if (code >= 112 && code <= 121 || code === 123) {
+			// disable all F keys except F11
+			if (!g.isLocal) {
+				return false;
+			}
 		}
 	}
-	*/
 	// normal hotkeys
 	if (g.view === 'title') {
 		// title hotkeys? Any?
 	}
 	else {
-		if (chat.hasFocus) {
-			if (code === 13) {
-				// enter
-				chat.sendMsg();
-			}
+		if (g.view === 'town' && !chat.hasFocus) {
+			$("#chat-input").focus();
+		}
+
+		if (code === 13 && chat.hasFocus) {
+			// enter
+			chat.sendMsg();
 		}
 		else {
 			// battle, town, dungeon
@@ -2289,14 +2229,6 @@ var socket = {
 				}
 			}
 		});
-		/*
-		(function keepAliveWs(){
-			socket.zmq.publish('admin:broadcast', {
-				time: Date.now()
-			});
-			setTimeout(keepAliveWs, 30000);
-		})();
-		*/
 	},
 	joinGame: function(){
 		(function repeat(){
@@ -2318,16 +2250,18 @@ var socket = {
 	enabled: false,
 	init: function(){
 		// is player logged in?
-		socket.zmq = new ab.Session('wss://' + g.socketUrl + '/wss2/', function(){
-			// on open
-			socket.connectionSuccess();
-		}, function(){
-			// on close/fail
-			socket.reconnect();
-		}, {
-			// options
-			'skipSubprotocolCheck': true
-		});
+		if (!socket.enabled) {
+			socket.zmq = new ab.Session('wss://' + g.socketUrl + '/wss2/', function () {
+				// on open
+				socket.connectionSuccess();
+			}, function () {
+				// on close/fail
+				socket.reconnect();
+			}, {
+				// options
+				'skipSubprotocolCheck': true
+			});
+		}
 	},
 	connectionSuccess: function(){
 		socket.enabled = true;
@@ -2338,15 +2272,15 @@ var socket = {
 			console.info("subscribing to channel: ", town);
 			chat.log("You have joined channel: town-1", 'chat-warning');
 			socket.zmq.subscribe(town, function(topic, data) {
-				console.info("ng2:town-1: ", topic, data);
+				console.info('rx ', topic, data);
 				route.town(data, data.route);
 			});
 			var admin = 'admin:broadcast';
 			console.info("subscribing to channel: ", admin);
 			socket.zmq.subscribe(admin, function(topic, data) {
-				console.info("socket rx time: ", Date.now() - chat.sendTimer, topic, data);
+				console.info('rx ', topic, data);
 				if (data.msg){
-					g.chat(data.msg, data.type);
+					// g.chat(data.msg, data.type);
 				}
 			});
 			(function repeat(){
@@ -2390,48 +2324,41 @@ chat = Object.assign(chat, {
 	lastWhisper: {
 		timestamp: Date.now(),
 		account: '',
-		message: ''
+		msg: ''
 	},
 	init: function(z) {
 		// default initialization of chat
-		var e = document.getElementById('chat-wrap');
-		e.innerHTML = '';
-		e.style.display = z ? 'flex' : 'none';
 		if (z && !chat.initialized) {
+			var e = document.getElementById('chat-wrap');
+			e.innerHTML = '';
+			e.style.display = z ? 'flex' : 'none';
+			e.innerHTML = chat.html();
+
+			chat.initialized = 1;
 			// show
+			// prevents auto scroll while scrolling
+			$("#chat-log").on('mousedown', function(){
+				chat.isClicked = 1;
+			}).on('mouseup', function(){
+				chat.isClicked = 0;
+			});
+			$("#chat-input").on('focus', function(){
+				chat.hasFocus = 1;
+			}).on('blur', function(){
+				chat.hasFocus = 0;
+			});
 		}
 		else {
 			// hide
 		}
-		e.innerHTML = chat.html();
-		// prevents auto scroll while scrolling
-		$("#chat-wrap").on('mousedown', function(){
-			chat.isClicked = 1;
-		}).on('mouseup', function(){
-			chat.isClicked = 0;
-			chat.sendTimer = Date.now();
-			socket.zmq.publish('admin:broadcast', {
-				time: Date.now()
-			});
-		});
-		$("#chat-input").on('focus', function(){
-			chat.hasFocus = 1;
-		}).on('blur', function(){
-			chat.hasFocus = 0;
-		});
 		// dom
 		dom.chatLog = document.getElementById('chat-log');
 		dom.chatInput = document.getElementById('chat-input');
 		chat.count = dom.chatLog.childElementCount;
-		chat.initialized = 1;
 	},
 	// report to chat-log
-	log: function(msg, type){
-		var o = {
-			msg: msg,
-			type: type
-		};
-		if (o.msg){
+	log: function(msg, route){
+		if (msg){
 			if (chat.count >= 500) {
 				dom.chatLog.removeChild(dom.chatLog.firstChild);
 			}
@@ -2439,78 +2366,75 @@ chat = Object.assign(chat, {
 				chat.count++;
 			}
 			var z = document.createElement('div');
-			if (o.type){
-				z.className = o.type;
+			if (route){
+				z.className = route;
 			}
-			z.innerHTML = o.msg;
+			z.innerHTML = msg;
 			dom.chatLog.appendChild(z);
 			chat.scrollBottom();
 		}
 	},
-	sendTimer: 0,
 	// send to server
+	setMsgType: function(msg){
+		var r = '',
+			arr =  msg.split(" ");
+		firstWord = arr[0];
+
+		// is it a command?
+		if (firstWord === '/friend'){
+			chat.listFriends();
+		}
+		else if (firstWord === '/friend '){
+			chat.toggleFriend(msg.slice(8));
+		}
+		else if (firstWord === '/unignore '){
+			var account = msg.slice(10);
+			chat.removeIgnore(account);
+		}
+		else if (firstWord === '/ignore'){
+			chat.listIgnore();
+		}
+		else if (msg === '/ignore '){
+			chat.addIgnore(msg.slice(8));
+		}
+		else if (firstWord === '/join ' || firstWord[0] === '#' || firstWord === '/j '){
+			chat.changeChannel(msg, firstWord);
+		}
+		else if (firstWord === '/whisper ' || firstWord === '/w ' || firstWord[0] === '@'){
+			chat.sendWhisper(msg , firstWord);
+		}
+		else if (firstWord === '/who '){
+			chat.who(msg);
+		}
+		else if (firstWord === '/broadcast '){
+			chat.broadcast(msg);
+		}
+		else if (firstWord === '/me') {
+
+		}
+		else if (firstWord[0] === '/'){
+
+		}
+		else {
+			r = 'chat-normal';
+		}
+		return r;
+	},
 	sendMsg: function(bypass){
 		var msg = dom.chatInput.value.trim();
 		// bypass via ENTER or chat has focus
 		if (bypass || chat.hasFocus){
 			if (msg){
-				// is it a command?
-				if (msg === '/friend'){
-					chat.listFriends();
-				}
-				else if (msg.indexOf('/friend ') === 0){
-					chat.toggleFriend(msg.slice(8));
-				}
-				else if (msg.indexOf('/unignore ') === 0){
-					var account = msg.slice(10);
-					chat.removeIgnore(account);
-				}
-				else if (msg === '/ignore'){
-					chat.listIgnore();
-				}
-				else if (msg.indexOf('/ignore ') === 0){
-					chat.addIgnore(msg.slice(8));
-				}
-				else if (msg.indexOf('/join ') === 0){
-					chat.changeChannel(msg, '/join ');
-				}
-				else if (msg.indexOf('#') === 0){
-					chat.changeChannel(msg, '#');
-				}
-				else if (msg.indexOf('/j ') === 0){
-					chat.changeChannel(msg, '/j ');
-				}
-				else if (msg.indexOf('/whisper ') === 0){
-					chat.sendWhisper(msg , '/whisper ');
-				}
-				else if (msg.indexOf('/w ') === 0){
-					chat.sendWhisper(msg , '/w ');
-				}
-				else if (msg.indexOf('@') === 0){
-					chat.sendWhisper(msg , '@');
-				}
-				else if (msg.indexOf('/who ') === 0){
-					chat.who(msg);
-				}
-				else if (msg.indexOf('/broadcast ') === 0){
-					chat.broadcast(msg);
-				}
-				else {
-					if (msg.charAt(0) === '/' && msg.indexOf('/me') !== 0 || msg === '/me'){
-						// skip
-					} else {
-						console.info("Sending", msg);
-						chat.sendTimer = Date.now();
-						$.ajax({
-							url: g.url + 'php2/chat/insertTitleChat.php',
-							data: {
-								message: msg
-							}
-						});
+				var route = chat.setMsgType(msg);
+				$.ajax({
+					url: g.url + 'php2/chat/send.php',
+					data: {
+						msg: msg,
+						route: route
 					}
-				}
+				});
+				dom.chatInput.value = '';
 			}
-			dom.chatInput.value = '';
 		}
 	},
 	// to server
@@ -2527,7 +2451,7 @@ chat = Object.assign(chat, {
 			data: {
 				account: account,
 				playerColor: my.playerColor,
-				message: msg,
+				msg: msg,
 				action: 'send'
 			}
 		});
@@ -2554,7 +2478,7 @@ chat = Object.assign(chat, {
 			} else if (data.type === 'updateLobbyCPU'){
 				lobby.updateCPU(data);
 			} else {
-				if (data.message !== undefined){
+				if (data.msg !== undefined){
 					lobby.chat(data);
 				}
 			}
@@ -2607,7 +2531,7 @@ chat = Object.assign(chat, {
 				game.eliminatePlayer(data);
 			}
 			
-			if (data.message){
+			if (data.msg){
 				if (data.type === 'gunfire'){
 					// ? when I'm attacked?
 					if (data.defender === my.account){
@@ -2820,7 +2744,7 @@ chat = Object.assign(chat, {
 			<div>/video youtube_url: share video</div>\
 			';
 		var o = {
-			message: str,
+			msg: str,
 			type: 'chat-muted'
 		};
 		title.chat(o);
@@ -2829,7 +2753,7 @@ chat = Object.assign(chat, {
 		$.ajax({
 			url: g.url + 'php/insertBroadcast.php',
 			data: {
-				message: msg
+				msg: msg
 			}
 		});
 	}
@@ -2915,7 +2839,6 @@ var battle = {
 	go: function(){
 		mob.init();
 		g.setScene('battle');
-		chat.init(1);
 	},
 	html: function(){
 		var s = '<img id="battle-bg" class="img-bg" src="img2/bg/fw2.jpg">';
@@ -4564,17 +4487,6 @@ var mob = {
 		});
 	}
 }
-setTimeout(function(){
-	var h = location.hash;
-	if (g.isLocal) {
-		if (h === '#town') {
-			town.go();
-		}
-		else if (h === '#battle') {
-			battle.go();
-		}
-	}
-}, 100);
 var p = {};
 var town = {
 	go: function(){
@@ -4586,11 +4498,11 @@ var town = {
 					row: create.selected
 				}
 			}).done(function(data) {
+				socket.init();
 				p[data.characterData.name] = data.characterData;
 				console.info('loadCharacter: ', p[data.characterData.name]);
-				town.init();
 				g.setScene('town');
-				socket.init();
+				town.init();
 				chat.init(1);
 			}).fail(function(data){
 				console.info(data);
@@ -4618,17 +4530,18 @@ var town = {
 	},
 	initialized: 0,
 	init: function(){
-		town.initialized = 1;
-		document.getElementById('scene-town').innerHTML = town.html();
-		town.events();
-		$("#scene-title").remove();
+		if (g.view !== 'town' && !town.initialized) {
+			town.initialized = 1;
+			document.getElementById('scene-town').innerHTML = town.html();
+			town.events();
+			$("#scene-title").remove();
+		}
 	}
 }
 var route = {
 	town: function(data, r) {
-		if (r === 'rx-chat') {
-			chat.log(data.msg, data.type);
-			console.info('msg rx time: ', Date.now() - chat.sendTimer);
+		if (r === 'chat-normal') {
+			chat.log(data.msg, data.route);
 		}
 	}
 }

@@ -1,7 +1,7 @@
 var route = {
 	town: function(data, r) {
-		if (r === 'chat-normal') {
-			chat.log(data.msg, data.route);
+		if (r === 'chat.log') {
+			chat.log(data.msg, data.class);
 		}
 	}
 }

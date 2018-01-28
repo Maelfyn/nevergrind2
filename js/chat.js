@@ -70,65 +70,74 @@ chat = Object.assign(chat, {
 		}
 	},
 	// send to server
+	getMsgObject: function(msg){
+		var o = {
+				msg: msg,
+				class: 'chat-normal'
+			},
+			arr = msg.split(" "),
+			firstWord = arr[0].trim(),
+			commandMsg = arr.shift(),
+			commandMsg = arr.join(' ');
+
+		console.info("getMsgObject: ", firstWord, commandMsg);
+
+		// is it a command?
+		if (firstWord === '/friend'){
+			chat.listFriends();
+		}
+		else if (firstWord === '/friend '){
+			chat.toggleFriend(msg.slice(8));
+		}
+		else if (firstWord === '/unignore '){
+			var account = msg.slice(10);
+			chat.removeIgnore(account);
+		}
+		else if (firstWord === '/ignore'){
+			chat.listIgnore();
+		}
+		else if (msg === '/ignore '){
+			chat.addIgnore(msg.slice(8));
+		}
+		else if (firstWord === '/join ' || firstWord[0] === '#' || firstWord === '/j '){
+			chat.changeChannel(msg, firstWord);
+		}
+		else if (firstWord === '/whisper ' || firstWord === '/w ' || firstWord[0] === '@'){
+			chat.sendWhisper(msg , firstWord);
+		}
+		else if (firstWord[0] === '`'){
+			o.msg = msg.substr(1);
+			o.class = 'chat-hidden';
+		}
+		else if (firstWord[0] === '>'){
+			o.msg = msg;
+			o.class = 'chat-implying';
+		}
+		else if (firstWord === '/me') {
+			o.msg = commandMsg;
+			o.class = 'chat-emote';
+		}
+		return o;
+	},
+	historyIndex: 0,
+	history: [],
 	sendMsg: function(bypass){
 		var msg = dom.chatInput.value.trim();
 		// bypass via ENTER or chat has focus
 		if (bypass || chat.hasFocus){
 			if (msg){
-				// is it a command?
-				if (msg === '/friend'){
-					chat.listFriends();
-				}
-				else if (msg.indexOf('/friend ') === 0){
-					chat.toggleFriend(msg.slice(8));
-				}
-				else if (msg.indexOf('/unignore ') === 0){
-					var account = msg.slice(10);
-					chat.removeIgnore(account);
-				}
-				else if (msg === '/ignore'){
-					chat.listIgnore();
-				}
-				else if (msg.indexOf('/ignore ') === 0){
-					chat.addIgnore(msg.slice(8));
-				}
-				else if (msg.indexOf('/join ') === 0){
-					chat.changeChannel(msg, '/join ');
-				}
-				else if (msg.indexOf('#') === 0){
-					chat.changeChannel(msg, '#');
-				}
-				else if (msg.indexOf('/j ') === 0){
-					chat.changeChannel(msg, '/j ');
-				}
-				else if (msg.indexOf('/whisper ') === 0){
-					chat.sendWhisper(msg , '/whisper ');
-				}
-				else if (msg.indexOf('/w ') === 0){
-					chat.sendWhisper(msg , '/w ');
-				}
-				else if (msg.indexOf('@') === 0){
-					chat.sendWhisper(msg , '@');
-				}
-				else if (msg.indexOf('/who ') === 0){
-					chat.who(msg);
-				}
-				else if (msg.indexOf('/broadcast ') === 0){
-					chat.broadcast(msg);
-				}
-				else {
-					if (msg[0] === '/' &&
-						msg.indexOf('/me') !== 0 || msg === '/me'){
-						// skip
-					} else {
-						$.ajax({
-							url: g.url + 'php2/chat/send.php',
-							data: {
-								msg: msg,
-								route: 'chat-normal'
-							}
-						});
-					}
+				var o = chat.getMsgObject(msg);
+				if (o.msg[0] !== '/'){
+					chat.history.push(msg);
+					chat.historyIndex = chat.history.length;
+					$.ajax({
+						url: g.url + 'php2/chat/send.php',
+						data: {
+							msg: o.msg,
+							class: o.class,
+							route: 'chat.log'
+						}
+					});
 				}
 				dom.chatInput.value = '';
 			}

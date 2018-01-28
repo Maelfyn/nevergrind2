@@ -1258,7 +1258,7 @@ tbody {
 .chat-white {
 	color: #fff;
 }
-.chat-muted {
+.chat-emote {
 	color: #aaa;
 }
 .chat-whisper {
@@ -1274,7 +1274,7 @@ tbody {
 	color: #090;
 }
 .chat-guild {
-	color: #2e2;
+	color: #0f0;
 }
 .chat-warning {
 	color: #ffff1a;
@@ -1291,13 +1291,11 @@ tbody {
 	cursor: pointer
 }
 .chat-implying {
-	color: #1e1;
+	color: #0c0;
 }
 .chat-hidden {
-	font-family: Consolas, monospace;
 	color: #000;
 	background: #000;
-	text-shadow: none;
 	pointer-events: auto
 }
 .chat-hidden:hover {

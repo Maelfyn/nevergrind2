@@ -1,7 +1,6 @@
 var p = {};
 var town = {
 	go: function(){
-		console.warn("ROUTING: ", create.selected);
 		if (create.selected) {
 			g.lock(1);
 			$.ajax({

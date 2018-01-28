@@ -2,42 +2,26 @@ $(document).on('keydown', function(e){
 	var code = e.keyCode,
 		key = e.key;
 
-	//console.info('keydown: ', key, code);
+	console.info('keydown: ', key, code);
 	// local only
-	//if (g.isLocal && !chat.hasFocus) {
-		if (key === 'b') {
-			battle.go();
+	if (g.isLocal) {
+		if (!chat.hasFocus) {
+			// key input view router
+			if (key === 'b') {
+				battle.go();
+			}
+			else if (key === 't') {
+				town.go();
+			}
 		}
-		else if (key === 't') {
-			town.go();
-		}
-	//}
-	/*
-	if (code >= 112 && code <= 121 || code === 123) {
-		// disable all F keys except F11
-		if (!g.isLocal) {
+	}
+	else {
+		// not local
+		if (code >= 112 && code <= 121 || code === 123) {
+			// disable all F keys except F11
 			return false;
 		}
 	}
-	*/
-	// normal hotkeys
-	if (g.view === 'title') {
-		// title hotkeys? Any?
-	}
-	else {
-		if (g.view === 'town' && !chat.hasFocus) {
-			$("#chat-input").focus();
-		}
-
-		if (code === 13 && chat.hasFocus) {
-			// enter
-			chat.sendMsg();
-		}
-		else {
-			// battle, town, dungeon
-		}
-	}
-
 
 	if (e.altKey) {
 		return false;
@@ -49,10 +33,32 @@ $(document).on('keydown', function(e){
 	} else {
 		if (g.view === 'title'){
 			if (!g.isModalOpen){
-				$("#chat-input").focus();
+				$("#create-character-name").focus();
 			}
-		} else if (g.view === 'lobby'){
-			$("#lobby-chat-input").focus();
+		} else if (g.view === 'town'){
+			if (!chat.hasFocus) {
+				// no chat focus
+				$("#chat-input").focus();
+			} else {
+				// has chat focus
+				if (code === 38) {
+					// chat focus history nav up
+					if (chat.history[chat.historyIndex - 1] !== undefined) {
+						var msg = chat.history[--chat.historyIndex];
+						dom.chatInput.value = msg;
+					}
+				}
+				else if (code === 40) {
+					// chat focus history nav down
+					if (chat.history[chat.historyIndex + 1] !== undefined) {
+						var msg = chat.history[++chat.historyIndex];
+						dom.chatInput.value = msg;
+					}
+				} else if (code === 13) {
+					// enter
+					chat.sendMsg();
+				}
+			}
 		} else {
 			// game
 			if (code === 9){

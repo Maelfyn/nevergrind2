@@ -4,13 +4,13 @@ g = Object.assign(g, {
 		$(window).focus(function(){
 			/*document.title = g.defaultTitle;
 			g.titleFlashing = false;*/
+			socket.init(1);
 		});
 		// should be delegating no drag start
 		$("body").on('dragstart', 'img', function(e) {
 			e.preventDefault();
 		});
 		// disable stuff in app to appear more "native"
-		/*
 		if (g.isApp) {
 			document.addEventListener("contextmenu", function (e) {
 				// disable default right-click menu
@@ -23,7 +23,6 @@ g = Object.assign(g, {
 				}
 			}, false);
 		}
-		*/
 		$("#enter-world").on(env.click, function(){
 			town.go();
 		});
@@ -417,9 +416,9 @@ g = Object.assign(g, {
 
 			var h = location.hash;
 			if (g.isLocal) {
+				// hastag routing
 				if (h === '#town') {
 					town.go();
-					console.warn("ROUTING: ", h);
 				}
 				else if (h === '#battle') {
 					battle.go();

@@ -143,9 +143,9 @@ var socket = {
 		})();
 	},
 	enabled: false,
-	init: function(){
+	init: function(bypass){
 		// is player logged in?
-		if (!socket.enabled) {
+		if (bypass || !socket.enabled) {
 			socket.zmq = new ab.Session('wss://' + g.socketUrl + '/wss2/', function () {
 				// on open
 				socket.connectionSuccess();
@@ -163,13 +163,16 @@ var socket = {
 		console.info("Socket connection established with server");
 		// chat updates
 		if (socket.initialConnection){
+
 			var town = 'ng2:town-1';
 			console.info("subscribing to channel: ", town);
 			chat.log("You have joined channel: town-1", 'chat-warning');
+
 			socket.zmq.subscribe(town, function(topic, data) {
-				//console.info('rx ', topic, data);
+				console.info('rx ', topic, data);
 				route.town(data, data.route);
 			});
+
 			var admin = 'admin:broadcast';
 			console.info("subscribing to channel: ", admin);
 			socket.zmq.subscribe(admin, function(topic, data) {
@@ -178,6 +181,7 @@ var socket = {
 					// g.chat(data.msg, data.type);
 				}
 			});
+
 			(function repeat(){
 				if (my.account){
 					socket.enableWhisper();
@@ -196,5 +200,6 @@ var socket = {
 		console.warn('WebSocket connection failed. Retrying...');
 		socket.enabled = false;
 		setTimeout(socket.init, socket.connectionRetryDuration);
+		socket.init();
 	}
 }

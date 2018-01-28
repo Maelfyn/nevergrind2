@@ -1,4 +1,5 @@
 // stuff that must exist before everything
+'use strict';
 var init = {
 	checkMobile: function(){
 		var x = false;
