@@ -178,7 +178,7 @@ g = Object.assign(g, {
 		});
 	},
 	updateUserInfo: function(){
-		if (location.host !== 'localhost'){
+		if (location.hostname !== 'localhost'){
 			$.ajax({
 				async: true,
 				type: 'GET',
@@ -303,7 +303,7 @@ g = Object.assign(g, {
 	},
 	logout: function(){
 		g.lock();
-		socket.removePlayer(my.account);
+		// socket.removePlayer(my.account);
 		$.ajax({
 			type: 'GET',
 			url: g.url + 'php/deleteFromFwtitle.php'
@@ -408,6 +408,8 @@ g = Object.assign(g, {
 				g.checkPlayerData();
 				var e = document.getElementById('login-modal');
 				e.parentNode.removeChild(e);
+
+
 			}
 			else {
 				notLoggedIn();

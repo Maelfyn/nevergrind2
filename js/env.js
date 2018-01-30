@@ -13,10 +13,11 @@ var env = {
     isOpera: !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0,
     isFirefox: typeof InstallTrigger !== 'undefined',
     isSafari: Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0,
-    isChrome: !!window.chrome && !this.isOpera,
     isMSIE: /*@cc_on!@*/ false,
     isMSIE11: !!navigator.userAgent.match(/Trident\/7\./)
 };
+env.isChrome = !!window.chrome && !env.isOpera;
+
 // browser dependent
 (function(){
 	var x = localStorage.getItem('isMobile');

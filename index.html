@@ -30,13 +30,8 @@
 
 	<!--link rel="stylesheet" href="css/bootstrap-slider.min.css"-->
 	<script>
-		var local_domains = [
-				'localhost',
-				'127.0.0.1',
-				'neverworks-pc',
-			],
-			g = {
-			version: '0.0.66',
+		var g = {
+			version: '0.0.70',
 			initialized: 0,
 			session_id: '',
 			isApp: location.protocol === 'chrome-extension:' ? 1 : 0
@@ -52,7 +47,7 @@
 		if (!g.isApp && location.hostname === 'nevergrind.com'){
 			g.isServer = 1;
 		}
-		g.isLocal = local_domains.indexOf(location.hostname) > -1;
+		g.isLocal = location.hostname.indexOf('localhost') > -1;
 		if (g.isLocal) {
 			g.loginUrl = '';
 		}
@@ -999,7 +994,7 @@
 
 	(function(d, s, x){
 
-		if (location.hostname === 'localhost'){
+		if (location.hostname === 'localhost' && location.hash !== '#test'){
 			x = ".js";
 			s = [
 				"init",

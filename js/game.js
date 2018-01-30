@@ -1,5 +1,29 @@
 // game specific data
 var game = {
+	heartbeat: {
+		timer: 0,
+		start: function() {
+			game.heartbeat.send();
+			game.heartbeat.update();
+		},
+		update: function() {
+			clearTimeout(game.heartbeat.timer);
+			game.heartbeat.timer = setTimeout(function(){
+				game.heartbeat.send();
+				game.heartbeat.update();
+			}, 5000);
+		},
+		send: function() {
+			clearTimeout(title.keepAliveTimer);
+			$.ajax({
+				type: 'GET',
+				url: g.url + 'php2/heartbeat.php'
+			}).done(function(data){
+				console.info('heartbeat ', data);
+			})
+
+		}
+	},
 	name: '',
 	initialized: false,
 	getGameState: function(){

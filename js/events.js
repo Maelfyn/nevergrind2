@@ -50,7 +50,11 @@ $(document).on('keydown', function(e){
 				}
 				else if (code === 40) {
 					// chat focus history nav down
-					if (chat.history[chat.historyIndex + 1] !== undefined) {
+					if (chat.history.length === chat.historyIndex + 1) {
+						chat.historyIndex++;
+						chat.clear();
+					}
+					else if (chat.history[chat.historyIndex + 1] !== undefined) {
 						var msg = chat.history[++chat.historyIndex];
 						dom.chatInput.value = msg;
 					}

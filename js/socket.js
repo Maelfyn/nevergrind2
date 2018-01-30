@@ -1,6 +1,5 @@
 // ws.js
 var socket = {
-	initialConnection: true,
 	removePlayer: function(account){
 		// instant update of clients
 		var o = {
@@ -46,7 +45,7 @@ var socket = {
 				}).done(function(data){
 					console.info("You have changed channel to: ", data.channel);
 					// removes id
-					socket.removePlayer(my.account);
+					//socket.removePlayer(my.account);
 					// unsubs
 					my.channel && socket.unsubscribe('title:' + my.channel);
 					// set new channel data
@@ -76,55 +75,6 @@ var socket = {
 			}
 		}
 	},
-	enableWhisper: function(){
-		var channel = 'account:' + my.account;
-		console.info("subscribing to whisper channel: ", channel);
-		socket.zmq.subscribe(channel, function(topic, data) {
-			console.info(channel, data.action);
-			if (data.message){
-				if (data.action === 'send'){
-					console.info("SENT: ", topic, data);
-					// message sent to user
-					var flag = my.flag.split(".");
-					flag = flag[0].replace(/ /g, "-");
-					my.lastReceivedWhisper = data.account;
-					$.ajax({
-						url: g.url + 'php/insertWhisper.php',
-						data: {
-							action: "receive",
-							flag: data.flag,
-							playerColor: data.playerColor,
-							account: data.account,
-							message: data.message
-						}
-					});
-					data.type = 'chat-whisper';
-					data.msg = data.message;
-					data.message = data.chatFlag + data.account + ' whispers: ' + data.message;
-					chat.log(data);
-				} else {
-					// message receive confirmation to original sender
-					console.info("CALLBACK: ", topic, data);
-					if (data.timestamp - chat.lastWhisper.timestamp < 500 &&
-						data.account === chat.lastWhisper.account &&
-						data.message === chat.lastWhisper.message){
-						// skip message
-					} else {
-						// reference values to avoid receiving double messages when a player is in the lobby multiple times
-						// this causes multiple response callbacks
-						chat.lastWhisper.account = data.account;
-						chat.lastWhisper.timestamp = data.timestamp;
-						chat.lastWhisper.message = data.message;
-						// send message
-						data.msg = data.message;
-						data.message = data.chatFlag + 'To ' + data.account + ': ' + data.message;
-						data.type = 'chat-whisper';
-						chat.receiveWhisper(data);
-					}
-				}
-			}
-		});
-	},
 	joinGame: function(){
 		(function repeat(){
 			if (socket.enabled){
@@ -142,6 +92,24 @@ var socket = {
 			}
 		})();
 	},
+	initWhisper: function() {
+		if (socket.enabled) {
+			var channel = 'name:' + my.name;
+			console.info("subscribing to whisper channel: ", channel);
+			socket.zmq.subscribe(channel, function(topic, data) {
+				console.info('rx ', topic, data);
+				if (data.action === 'send') {
+					route.town(data, data.route);
+					data.action = 'receive';
+					socket.zmq.publish(data.from, data);
+				}
+				else if (data.action === 'receive') {
+					console.info('received whisper ', data);
+					route.town(chat.whispers[data.date], 'chat.log');
+				}
+			});
+		}
+	},
 	enabled: false,
 	init: function(bypass){
 		// is player logged in?
@@ -158,40 +126,57 @@ var socket = {
 			});
 		}
 	},
+	initialConnection: true,
 	connectionSuccess: function(){
 		socket.enabled = true;
 		console.info("Socket connection established with server");
 		// chat updates
 		if (socket.initialConnection){
-
+			socket.initialConnection = false;
+			// subscribe to town-1 default channel - general chat
 			var town = 'ng2:town-1';
 			console.info("subscribing to channel: ", town);
 			chat.log("You have joined channel: town-1", 'chat-warning');
-
+			my.channel = town;
 			socket.zmq.subscribe(town, function(topic, data) {
 				console.info('rx ', topic, data);
 				route.town(data, data.route);
 			});
 
+			// subscribe to admin broadcasts
 			var admin = 'admin:broadcast';
 			console.info("subscribing to channel: ", admin);
 			socket.zmq.subscribe(admin, function(topic, data) {
 				console.info('rx ', topic, data);
-				if (data.msg){
-					// g.chat(data.msg, data.type);
-				}
+				route.town(data, data.route);
+			});
+
+			// subscribe to test guild for now
+			var guild = 'guild:' + Date.now();
+			my.guild = guild;
+			console.info("subscribing to channel: ", guild);
+			socket.zmq.subscribe(guild, function(topic, data) {
+				console.info('rx ', topic, data);
+				route.town(data, data.route);
+			});
+
+			// subscribe to test party for now
+			var party = 'party:' + Date.now();
+			my.party = party;
+			console.info("subscribing to channel: ", party);
+			socket.zmq.subscribe(party, function(topic, data) {
+				console.info('rx ', topic, data);
+				route.town(data, data.route);
 			});
 
 			(function repeat(){
-				if (my.account){
-					socket.enableWhisper();
-				}
-				else {
-					setTimeout(repeat, 1000);
+				if (my.name){
+					socket.initWhisper();
+				} else {
+					setTimeout(repeat, 200);
 				}
 			})();
 		}
-		socket.initialConnection = false;
 		socket.setChannel(chat.channel);
 	},
 	connectionTries: 0,
@@ -200,6 +185,5 @@ var socket = {
 		console.warn('WebSocket connection failed. Retrying...');
 		socket.enabled = false;
 		setTimeout(socket.init, socket.connectionRetryDuration);
-		socket.init();
 	}
 }

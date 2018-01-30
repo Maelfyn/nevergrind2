@@ -1,5 +1,4 @@
-})(
-	$,
+})($,
 	Math,
 	document,
 	location,

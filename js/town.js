@@ -10,11 +10,16 @@ var town = {
 				}
 			}).done(function(data) {
 				socket.init();
-				p[data.characterData.name] = data.characterData;
-				console.info('loadCharacter: ', p[data.characterData.name]);
+				my.name = data.characterData.name;
+				my.race = data.characterData.race;
+				my.leader = '';
+				p[my.name] = data.characterData;
+				console.info('loadCharacter: ', p[my.name]);
 				g.setScene('town');
 				town.init();
 				chat.init(1);
+				chat.friendGet();
+				game.heartbeat.start();
 			}).fail(function(data){
 				console.info(data);
 				g.msg(data.responseText, 1.5);
@@ -48,4 +53,4 @@ var town = {
 			$("#scene-title").remove();
 		}
 	}
-}
+};

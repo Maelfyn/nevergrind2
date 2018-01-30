@@ -55,7 +55,8 @@ var title = {
 		$(document).ready(function(){
 			// console.info("Initializing title screen...");
 			g.initGame();
-			setTimeout(function(){
+			clearTimeout(game.heartbeat.timer);
+			game.heartbeat.timer = setTimeout(function(){
 				g.keepAlive();
 			}, 180000);
 			// init events
@@ -108,7 +109,7 @@ var title = {
 											account: key
 										}
 										// console.info("REMOVING PLAYER: " + x.account);
-										title.removePlayer(x);
+										//title.removePlayer(x);
 									}
 								}
 							}
@@ -325,7 +326,7 @@ var title = {
 				speed: speed
 			}
 		}).done(function(data) {
-			socket.removePlayer(my.account);
+			//socket.removePlayer(my.account);
 			my.player = data.player;
 			my.playerColor = data.playerColor;
 			my.team = data.team;
@@ -367,7 +368,7 @@ var title = {
 		});
 	},
 	joinGameCallback: function(data){
-		socket.removePlayer(my.account);
+		//socket.removePlayer(my.account);
 		// console.info(data);
 		my.player = data.player;
 		my.playerColor = data.player;

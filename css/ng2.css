@@ -1233,13 +1233,13 @@ tbody {
 }
 #chat-log {
 	flex: 1;
-	padding: 2px;
 	height: 100%;
 	overflow: auto;
 	line-height: 1.2;
 	color: #ffdada;
 	box-shadow: 0 0 5px 1px #025 inset;
 	word-break: break-word;
+	padding: .2rem;
 }
 #chat-log div {
 	text-shadow: 1px 1px #000;
@@ -1264,7 +1264,7 @@ tbody {
 .chat-whisper {
 	color: #c8f;
 }
-.chat-group {
+.chat-party {
 	color: #8ef;
 }
 .chat-shout {
@@ -1289,9 +1289,6 @@ tbody {
 }
 .chat-join {
 	cursor: pointer
-}
-.chat-implying {
-	color: #0c0;
 }
 .chat-hidden {
 	color: #000;

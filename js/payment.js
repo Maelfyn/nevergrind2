@@ -1,6 +1,6 @@
 var payment = {
     init: function(){
-        if (location.host==="localhost"){
+        if (location.hostname === "localhost"){
             Stripe.setPublishableKey('pk_test_GtNfTRB1vYUiMv1GY2kSSRRh');
         }
         else {
