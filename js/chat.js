@@ -141,8 +141,8 @@ var chat = {
 		for (var i=0, len=s.length; i<len; i++) {
 			chat.log(s[i]);
 		}
-		chat.clear();
 	},
+	// player hit ENTER
 	sendMsg: function(bypass){
 		var msg = dom.chatInput.value.trim();
 		// bypass via ENTER or chat has focus
@@ -150,24 +150,58 @@ var chat = {
 			chat.help();
 		}
 		/*
-		if (msg === '/friend '){
-			chat.toggleFriend(msg.slice(8));
+		allow to form parties
+			invite
+			disband
+			leader
+		allow to form guilds
+			invite
+			disband
+			leader
+		 */
+		else if (msg === '/i' || msg === '/ignore') {
+			chat.ignore.list();
 		}
-		else if (msg === '/unignore '){
-			var account = msg.slice(10);
-			chat.removeIgnore(account);
+		else if (msg.indexOf('/i remove') === 0 || msg.indexOf('/ignore remove') === 0) {
+			chat.ignore.remove(chat.friend.parse(msg));
 		}
-		else if (msg === '/ignore'){
-			chat.listIgnore();
+		else if (msg.indexOf('/i add') === 0 || msg.indexOf('/ignore add') === 0) {
+			chat.ignore.add(chat.friend.parse(msg));
 		}
-		else if (msg === '/ignore '){
-			chat.addIgnore(msg.slice(8));
-		}*/
 		else if (msg === '/f' || msg === '/friend') {
-			chat.listFriends();
+			chat.friend.list();
+		}
+		else if (msg.indexOf('/f remove') === 0 || msg.indexOf('/friend remove') === 0) {
+			chat.friend.remove(chat.friend.parse(msg));
+		}
+		else if (msg.indexOf('/f add') === 0 || msg.indexOf('/friend add') === 0) {
+			chat.friend.add(chat.friend.parse(msg));
 		}
 		else if (msg[0] === '@'){
-			chat.sendWhisper(msg);
+			// whisper
+			var parse = chat.parseMsg(msg),
+				name = parse.first.substr(1);
+			name = name.toLowerCase();
+			name = name[0].toUpperCase() + name.substr(1);
+			if (my.name !== name) {
+				// date stamp for callback
+				var d = Date.now();
+				chat.whispers[d] = {
+					msg: 'You told ' + name + ': ' + parse.command,
+					class: 'chat-whisper'
+				};
+
+				$.ajax({
+					url: g.url + 'php2/chat/send.php',
+					data: {
+						date: d,
+						action: 'send',
+						msg: parse.command,
+						class: 'chat-whisper',
+						category: 'name:' + name
+					}
+				});
+			}
 		}
 		else {
 			if (bypass || chat.hasFocus) {
@@ -181,15 +215,14 @@ var chat = {
 							data: {
 								msg: o.msg,
 								class: o.class,
-								route: 'chat.log',
 								category: o.category
 							}
 						});
 					}
-					chat.clear();
 				}
 			}
 		}
+		chat.clear();
 	},
 	getPrefix: function() {
 		var z = p[my.name],
@@ -197,200 +230,125 @@ var chat = {
 		return s;
 	},
 	whispers: {},
-	sendWhisper: function(msg, account){
-		var parse = chat.parseMsg(msg),
-			name = parse.first.substr(1);
-		name = name.toLowerCase();
-		name = name[0].toUpperCase() + name.substr(1);
-
-		if (my.name !== name) {
-			var d = Date.now();
-			chat.whispers[d] = {
-				msg: 'You told ' + name + ': ' + parse.command,
-				class: 'chat-whisper'
-			};
-
-			var o = {
-				msg: chat.getPrefix() + ' told you: ' + parse.command,
-				from: 'name:' + my.name,
-				date: d,
-				class: 'chat-whisper',
-				route: 'chat.log',
-				action: 'send',
-				category: 'name:' + name
-			};
-			console.info("SENDING: ", o);
-			socket.zmq.publish(o.category, o);
-		}
-		chat.clear();
-	},
 	clear: function() {
 		dom.chatInput.value = '';
-	},
-	// rx routing
-	chatReceive: function(data){
-		if (g.view === 'lobby'){
-			// lobby
-			//console.info('lobby receive: ', data);
-			if (data.type === 'hostLeft'){
-				lobby.hostLeft();
-			} else if (data.type === 'lobby-set-cpu-difficulty'){
-				lobby.updateDifficulty(data);
-			} else if (data.type === 'updateGovernment'){
-				lobby.updateGovernment(data);
-			} else if (data.type === 'updatePlayerColor'){
-				lobby.updatePlayerColor(data);
-			} else if (data.type === 'updateTeamNumber'){
-				lobby.updateTeamNumber(data);
-			} else if (data.type === 'countdown'){
-				lobby.countdown(data);
-			} else if (data.type === 'updateLobbyPlayer'){
-				lobby.updatePlayer(data);
-			} else if (data.type === 'updateLobbyCPU'){
-				lobby.updateCPU(data);
-			} else {
-				if (data.msg !== undefined){
-					lobby.chat(data);
-				}
-			}
-		} else {
-			// game
-			// console.info('game receive: ', data);
-			if (data.type === 'cannons'){
-				animate.cannons(data.attackerTile, data.tile, false);
-				game.updateTile(data);
-			} else if (data.type === 'missile'){
-				animate.missile(data.attacker, data.defender, true);
-			} else if (data.type === 'nuke'){
-				setTimeout(function(){
-					animate.nuke(data.tile, data.attacker);
-				}, 5000);
-			} else if (data.type === 'nukeHit'){
-				game.updateTile(data);
-				game.updateDefense(data);
-			} else if (data.type === 'gunfire'){
-				// defender tile update
-				animate.gunfire(data.attackerTile, data.tile, data.player === my.player || data.playerB === my.player); 
-				animate.cannons(data.attackerTile, data.tile, false, 0, .175, 10);  
-				game.updateTile(data);
-				if (data.rewardUnits){
-					animate.upgrade(data.tile, 'troops', data.rewardUnits);
-				}
-			} else if (data.type === 'updateTile'){
-				// attacker tile update 
-				game.updateTile(data);
-				game.setSumValues();
-				if (data.rewardUnits){
-					animate.upgrade(data.tile, 'troops', data.rewardUnits);
-				}
-				if (data.sfx === 'sniper0'){
-					animate.upgrade(data.tile, 'culture');
-				}
-			} else if (data.type === 'food'){
-				if (data.account.indexOf(my.account) > -1){
-					audio.play('hup2');
-				}
-			} else if (data.type === 'upgrade'){
-				// fetch updated tile defense data
-				game.updateDefense(data);
-				animate.upgrade(data.tile, 'shield');
-			} else if (data.type === 'eliminated'){
-				game.eliminatePlayer(data);
-			} else if (data.type === 'endTurnCheck'){
-				game.triggerNextTurn(data);
-			} else if (data.type === 'disconnect'){
-				game.eliminatePlayer(data);
-			}
-			
-			if (data.msg){
-				if (data.type === 'gunfire'){
-					// ? when I'm attacked?
-					if (data.defender === my.account){
-						// display msg?
-						game.chat(data);
-					}
-					// lost attack
-				} else {
-					game.chat(data);
-				}
-			}
-			if (data.sfx){
-				audio.play(data.sfx);
-			}
-		}
 	},
 	changeChannel: function(msg, splitter){
 		var arr = msg.split(splitter);
 		socket.setChannel(arr[1]);
 	},
-	listFriends: function(){
-		var len = g.friends.length;
-		chat.log('<div class="chat-warning">Checking friends list...</div>');
-		if (g.friends.length){
-			$.ajax({
-				url: g.url + 'php2/chat/friendStatus.php',
-				data: {
-					friends: g.friends
-				}
-			}).done(function(data){
-				var p = data.players;
-				console.info(data);
-				var str = '<div>Friend List ('+ len +')</div>';
-				for (var i=0; i<len; i++){
-					var index = p.indexOf(g.friends[i]);
-					if (index > -1){
-						var s = data.stats[i];
-						// online
-						str +=
-							'<div class="chat-whisper">[' +
-								s.level +' '+ g.jobLong[s.job] +'] '+ g.friends[i] + ' ('+ s.race +
-							')</div>';
-					} else {
-						// offline
-						str += '<div class="chat-emote">' + g.friends[i] +' [Offline]</div>';
-					}
-				}
-				chat.log(str);
-			});
-		} else {
-			chat.log("<div>You don't have any friends!</div>");
-			chat.log("<div class='chat-emote'>Use /friend [name] to add a new friend.</div>");
+	ignore: {
+		init: function() {
+			g.ignore = JSON.parse(localStorage.getItem('ignore')) || g.ignore;
+		},
+		list: function() {
+			if (g.ignore.length) {
+				var s = '<div class="chat-warning">Checking ignore list...</div>';
+				g.ignore.forEach(function(v) {
+					s += '<div class="chat-emote">' + v + '</div>';
+				});
+				chat.log(s);
+			}
+			else {
+				chat.log("Nobody is on your friends list yet.", 'chat-warning');
+			}
+		},
+		add: function(o) {
+			g.ignore.push(o);
+			localStorage.setItem('ignore', JSON.stringify(g.ignore));
+			chat.log('You have added ' + o + ' to your ignore list.', 'chat-warning');
+		},
+		remove: function(o) {
+			var index = g.ignore.indexOf(o);
+			g.ignore.splice(index, 1);
+			localStorage.setItem('ignore', JSON.stringify(g.ignore));
+			chat.log('You have removed ' + o + ' from your ignore list.', 'chat-warning');
 		}
-		chat.clear();
 	},
-	friendGet: function(){
-		// friend list
-		g.friends = [];
-		$.ajax({
-			type: 'GET',
-			url: g.url + 'php2/chat/friendGet.php',
-		}).done(function(data){
-			g.friends = data;
-		});
-	},
-	toggleFriend: function(account){
-		account = account.trim();
-		if (account !== my.account){
-			console.info('toggle: ', account, account.length);
+	friend: {
+		parse: function(o) {
+			var a = o.split(" ");
+			return a[2][0].toUpperCase() + a[2].substr(1);
+		},
+		init: function() {
+			g.friends = g.friends || [];
 			$.ajax({
-				url: g.url + 'php2/friendToggle.php',
-				data: {
-					account: account
-				}
+				type: 'GET',
+				url: g.url + 'php2/chat/friend-get.php',
 			}).done(function(data){
-				if (data.action === 'fail'){
-					g.chat('You cannot have more than 20 friends!');
-				} else if (data.action === 'remove'){
-					g.chat('Removed '+ account +' from your friend list');
-					chat.friendGet();
-				} else if (data.action === 'add'){
-					g.chat('Added '+ account +' to your friend list');
-					chat.friendGet();
-				}
+				g.friends = data;
 			});
-		} else {
-			// cannot add yourself
-			g.chat("You can't be friends with yourself!", 'chat-muted');
+		},
+		list: function() {
+			var len = g.friends.length;
+			chat.log('<div class="chat-warning">Checking friends list...</div>');
+			if (g.friends.length){
+				$.ajax({
+					url: g.url + 'php2/chat/friend-status.php',
+					data: {
+						friends: g.friends
+					}
+				}).done(function(data){
+					var p = data.players;
+					console.info(data);
+					var str = '<div>Friend List ('+ len +')</div>';
+					for (var i=0; i<len; i++){
+						var index = p.indexOf(g.friends[i]);
+						if (index > -1){
+							var s = data.stats[i];
+							// online
+							str +=
+								'<div class="chat-whisper">[' +
+								s.level +' '+ g.jobLong[s.job] +'] '+ g.friends[i] + ' ('+ s.race +
+								')</div>';
+						} else {
+							// offline
+							str += '<div class="chat-emote">' + g.friends[i] +' [Offline]</div>';
+						}
+					}
+					chat.log(str);
+				});
+			} else {
+				chat.log("<div>You don't have any friends!</div>");
+				chat.log("<div class='chat-emote'>Use /friend [name] to add a new friend.</div>");
+			}
+		},
+		add: function(o) {
+			if (o.length > 1) {
+				$.ajax({
+					url: g.url + 'php2/chat/friend-add.php',
+					data: {
+						friend: o
+					}
+				}).done(function(data){
+					if (data.error) {
+						chat.log(data.error, 'chat-warning');
+					}
+					else {
+						chat.log('You have added ' + o + ' to your friends list.', 'chat-warning');
+						g.friends.push(o);
+					}
+				});
+			}
+		},
+		remove: function(o) {
+			if (o.length > 1) {
+				$.ajax({
+					url: g.url + 'php2/chat/friend-remove.php',
+					data: {
+						friend: o
+					}
+				}).done(function(data){
+					if (data.error) {
+						chat.log(data.error, 'chat-warning');
+					}
+					else {
+						chat.log('You have removed ' + o + ' from your friends list.', 'chat-warning');
+						var index = g.friends.indexOf(o);
+						g.friends.splice(index, 1);
+					}
+				});
+			}
 		}
 	},
 	listIgnore: function(){
@@ -488,4 +446,96 @@ var chat = {
 			dom.chatLog.scrollTop = dom.chatLog.scrollHeight;
 		}
 	},
+	// rx routing - not used now
+	chatReceive: function(data){
+		if (g.view === 'lobby'){
+			// lobby
+			//console.info('lobby receive: ', data);
+			if (data.type === 'hostLeft'){
+				lobby.hostLeft();
+			} else if (data.type === 'lobby-set-cpu-difficulty'){
+				lobby.updateDifficulty(data);
+			} else if (data.type === 'updateGovernment'){
+				lobby.updateGovernment(data);
+			} else if (data.type === 'updatePlayerColor'){
+				lobby.updatePlayerColor(data);
+			} else if (data.type === 'updateTeamNumber'){
+				lobby.updateTeamNumber(data);
+			} else if (data.type === 'countdown'){
+				lobby.countdown(data);
+			} else if (data.type === 'updateLobbyPlayer'){
+				lobby.updatePlayer(data);
+			} else if (data.type === 'updateLobbyCPU'){
+				lobby.updateCPU(data);
+			} else {
+				if (data.msg !== undefined){
+					lobby.chat(data);
+				}
+			}
+		} else {
+			// game
+			// console.info('game receive: ', data);
+			if (data.type === 'cannons'){
+				animate.cannons(data.attackerTile, data.tile, false);
+				game.updateTile(data);
+			} else if (data.type === 'missile'){
+				animate.missile(data.attacker, data.defender, true);
+			} else if (data.type === 'nuke'){
+				setTimeout(function(){
+					animate.nuke(data.tile, data.attacker);
+				}, 5000);
+			} else if (data.type === 'nukeHit'){
+				game.updateTile(data);
+				game.updateDefense(data);
+			} else if (data.type === 'gunfire'){
+				// defender tile update
+				animate.gunfire(data.attackerTile, data.tile, data.player === my.player || data.playerB === my.player);
+				animate.cannons(data.attackerTile, data.tile, false, 0, .175, 10);
+				game.updateTile(data);
+				if (data.rewardUnits){
+					animate.upgrade(data.tile, 'troops', data.rewardUnits);
+				}
+			} else if (data.type === 'updateTile'){
+				// attacker tile update
+				game.updateTile(data);
+				game.setSumValues();
+				if (data.rewardUnits){
+					animate.upgrade(data.tile, 'troops', data.rewardUnits);
+				}
+				if (data.sfx === 'sniper0'){
+					animate.upgrade(data.tile, 'culture');
+				}
+			} else if (data.type === 'food'){
+				if (data.account.indexOf(my.account) > -1){
+					audio.play('hup2');
+				}
+			} else if (data.type === 'upgrade'){
+				// fetch updated tile defense data
+				game.updateDefense(data);
+				animate.upgrade(data.tile, 'shield');
+			} else if (data.type === 'eliminated'){
+				game.eliminatePlayer(data);
+			} else if (data.type === 'endTurnCheck'){
+				game.triggerNextTurn(data);
+			} else if (data.type === 'disconnect'){
+				game.eliminatePlayer(data);
+			}
+
+			if (data.msg){
+				if (data.type === 'gunfire'){
+					// ? when I'm attacked?
+					if (data.defender === my.account){
+						// display msg?
+						game.chat(data);
+					}
+					// lost attack
+				} else {
+					game.chat(data);
+				}
+			}
+			if (data.sfx){
+				audio.play(data.sfx);
+			}
+		}
+	}
 };

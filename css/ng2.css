@@ -1236,10 +1236,11 @@ tbody {
 	height: 100%;
 	overflow: auto;
 	line-height: 1.2;
-	color: #ffdada;
+	color: #f2f2f2;
 	box-shadow: 0 0 5px 1px #025 inset;
 	word-break: break-word;
-	padding: .2rem;
+	padding: .1rem 0 0 .2rem;
+	margin-bottom: .1rem;
 }
 #chat-log div {
 	text-shadow: 1px 1px #000;
@@ -1252,7 +1253,14 @@ tbody {
 	border: 2px ridge #444;
 	cursor: pointer;
 	padding: .2rem .4rem;
-	box-shadow: 0 0 5px 1px #048 inset;
+	box-shadow: 0 0 5px 1px rgba(0, 64, 128, .3) inset;
+}
+#chat-input:focus {
+	border: 2px ridge #555;
+	box-shadow:
+		0 0 3px #fff  rgba(255, 255, 255, .5),
+		0 0 5px 1px rgba(0, 64, 128, .6) inset;
+	background: rgba(12,12,12,.3);
 }
 
 .chat-white {
@@ -1422,6 +1430,7 @@ tbody {
 	/* addresses the directional buttons on the scrollbar */
 }
 ::-webkit-scrollbar-track {
+	/* background */
 	background: #333;
 	background-image: -webkit-linear-gradient(left, #013 0%, #103860 100%);
 	box-shadow: inset 0 0 0 1px #444;
@@ -1433,9 +1442,9 @@ tbody {
 	*/
 }
 ::-webkit-scrollbar-thumb {
-	/* addresses the draggable scrolling element that resizes depending on the size of the scrollable element */
-	background-color: #579;
-	background-image: -webkit-linear-gradient(top, #579 0%, #bdf 50%, #579 100%);
+	/* draggable thing */
+	background-color: #248;
+	/*background-image: -webkit-linear-gradient(top, #579 0%, #bdf 50%, #579 100%);*/
 	outline: 1px solid #0f0;
 }
 body {

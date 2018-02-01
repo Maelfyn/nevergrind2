@@ -30,6 +30,9 @@ $(document).on('keydown', function(e){
 			// ctrl+r refresh
 			return false;
 		}
+		else if (!chat.hasFocus && code === 65) {
+			e.preventDefault();
+		}
 	} else {
 		if (g.view === 'title'){
 			if (!g.isModalOpen){

@@ -18,7 +18,9 @@ var town = {
 				g.setScene('town');
 				town.init();
 				chat.init(1);
-				chat.friendGet();
+				chat.log("There are currently " + data.count + " players exploring Vandamor", 'chat-emote');
+				chat.friend.init();
+				chat.ignore.init();
 				game.heartbeat.start();
 			}).fail(function(data){
 				console.info(data);

@@ -9,13 +9,14 @@
 ///////////////
 
 - add backstab, archery, shadow kick as skills. make casting spells conditionally added to separate table?
-- add hitbox coordinates + when dead
-- on resize of window, must resize all mobs for responsiveness
 - Finish insert items template files
 	establish low/high values from 1-50 items
 	create all items
 - add ng2_item inventory (8 slots to 32 upon purchase for active characters)
-- options audio etc
+- exit menu
+    options
+    audio
+    etc
 	<!--i id="options" class="pointer options fa fa-volume-up"></i-->
 - enter town
 	ability to open inventory

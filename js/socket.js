@@ -99,13 +99,14 @@ var socket = {
 			socket.zmq.subscribe(channel, function(topic, data) {
 				console.info('rx ', topic, data);
 				if (data.action === 'send') {
+					// report message
 					route.town(data, data.route);
+					// callback to sender
 					data.action = 'receive';
-					socket.zmq.publish(data.from, data);
+					socket.zmq.publish('name:' + data.name, data);
 				}
 				else if (data.action === 'receive') {
-					console.info('received whisper ', data);
-					route.town(chat.whispers[data.date], 'chat.log');
+					route.town(chat.whispers[data.date], 'chat->log');
 				}
 			});
 		}
