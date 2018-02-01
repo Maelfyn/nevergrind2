@@ -407,9 +407,7 @@ g = Object.assign(g, {
 				g.displayAllCharacters(r.characterData);
 				g.checkPlayerData();
 				var e = document.getElementById('login-modal');
-				e.parentNode.removeChild(e);
-
-
+				!e && e.parentNode.removeChild(e);
 			}
 			else {
 				notLoggedIn();

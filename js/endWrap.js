@@ -29,5 +29,9 @@
 	Array,
 	JSON,
 	Date,
-	Object
+	Object,
+	g
 );
+// remove global reference
+g = null;
+console.info('g', g);

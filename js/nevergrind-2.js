@@ -31,6 +31,7 @@
 	JSON,
 	Date,
 	Object,
+	g,
 	undefined
 ){
 // stuff that must exist before everything
@@ -997,9 +998,7 @@ g = Object.assign(g, {
 				g.displayAllCharacters(r.characterData);
 				g.checkPlayerData();
 				var e = document.getElementById('login-modal');
-				e.parentNode.removeChild(e);
-
-
+				!e && e.parentNode.removeChild(e);
 			}
 			else {
 				notLoggedIn();
@@ -1501,6 +1500,7 @@ var game = {
 			}, 5000);
 		},
 		send: function() {
+			clearTimeout(title.keepAliveTimer);
 			$.ajax({
 				type: 'GET',
 				url: g.url + 'php2/heartbeat.php'
@@ -1584,7 +1584,8 @@ var title = {
 		$(document).ready(function(){
 			// console.info("Initializing title screen...");
 			g.initGame();
-			setTimeout(function(){
+			clearTimeout(game.heartbeat.timer);
+			game.heartbeat.timer = setTimeout(function(){
 				g.keepAlive();
 			}, 180000);
 			// init events
@@ -2331,13 +2332,14 @@ var socket = {
 	}
 }
 // chat.js
-chat = Object.assign(chat, {
+var chat = {
+	channel: "town",
 	// receives channel prop from index.php
 	html: function() {
 		var s =
 			'<div id="chat-log">' +
 				'<div>Welcome to Vandamor.</div>' +
-				'<div class="chat-emote">Type /help for a list of chat commands.</div>' +
+				'<div class="chat-emote">Type /help or /h for a list of chat commands.</div>' +
 			'</div>' +
 			'<input id="chat-input" type="text" maxlength="240" autocomplete="off" spellcheck="false" />';
 
@@ -2422,17 +2424,12 @@ chat = Object.assign(chat, {
 		console.info("getMsgObject: ", parse.first, parse.command);
 
 		// is it a command?
-		if (parse.first === '/broadcast'){
-			o.category = 'admin:broadcast';
-			o.msg = parse.command;
-			o.class = 'chat-broadcast';
-		}
-		else if (parse.first.indexOf('/p') === 0){
+		if (parse.first === '/p' || parse.first === '/party'){
 			o.category = my.party;
 			o.msg = parse.command;
 			o.class = 'chat-party';
 		}
-		else if (parse.first.indexOf('/g') === 0){
+		else if (parse.first === '/g' || parse.first === '/guild'){
 			o.category = my.guild;
 			o.msg = parse.command;
 			o.class = 'chat-guild';
@@ -2441,7 +2438,7 @@ chat = Object.assign(chat, {
 			o.msg = parse.command;
 			o.class = 'chat-ooc';
 		}
-		else if (parse.first.indexOf('/s') === 0){
+		else if (parse.first === '/s' || parse.first === '/shout'){
 			o.msg = parse.command;
 			o.class = 'chat-shout';
 		}
@@ -2452,6 +2449,11 @@ chat = Object.assign(chat, {
 		else if (parse.first === '/me') {
 			o.msg = parse.command;
 			o.class = 'chat-emote';
+		}
+		else if (parse.first === '/broadcast'){
+			o.category = 'admin:broadcast';
+			o.msg = parse.command;
+			o.class = 'chat-broadcast';
 		}
 		return o;
 	},
@@ -2477,7 +2479,7 @@ chat = Object.assign(chat, {
 	sendMsg: function(bypass){
 		var msg = dom.chatInput.value.trim();
 		// bypass via ENTER or chat has focus
-		if (msg === '/help') {
+		if (msg === '/h' || msg === '/help') {
 			chat.help();
 		}
 		/*
@@ -2494,7 +2496,7 @@ chat = Object.assign(chat, {
 		else if (msg === '/ignore '){
 			chat.addIgnore(msg.slice(8));
 		}*/
-		else if (msg === '/friend') {
+		else if (msg === '/f' || msg === '/friend') {
 			chat.listFriends();
 		}
 		else if (msg[0] === '@'){
@@ -2814,16 +2816,12 @@ chat = Object.assign(chat, {
 			g.chat('No data found.');
 		});
 	},
-	scrollBottomTimer: 0,
 	scrollBottom: function(){
 		if (!chat.isClicked){
-			clearTimeout(chat.scrollBottomTimer);
-			chat.scrollBottomTimer = setTimeout(function(){
-				dom.chatLog.scrollTop = dom.chatLog.scrollHeight;
-			}, 33);
+			dom.chatLog.scrollTop = dom.chatLog.scrollHeight;
 		}
 	},
-});
+};
 var payment = {
     init: function(){
         if (location.hostname === "localhost"){
@@ -4713,5 +4711,9 @@ var test = {
 	Array,
 	JSON,
 	Date,
-	Object
+	Object,
+	g
 );
+// remove global reference
+g = null;
+console.info('g', g);

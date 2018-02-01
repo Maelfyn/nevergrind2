@@ -612,6 +612,7 @@
 <script src="js/libs/libs.min.js"></script>
 <script>
 	// kongregate
+	/*
 	if (g.isServer) {
 		(function(d, s, id) {
 			var js, fjs = d.getElementsByTagName(s)[0];
@@ -621,6 +622,7 @@
 			fjs.parentNode.insertBefore(js, fjs);
 		}(document, 'script', 'Kongregate-OAuth'));
 	}
+	*/
 </script>
 
 <script src="https://js.stripe.com/v2/"></script>
@@ -939,7 +941,7 @@
 		});
 
 		if (g.isServer) {
-			kongregateAPI.loadAPI(function () {
+			/*kongregateAPI.loadAPI(function () {
 				function loginKong() {
 					loginAuthenticationLock = true;
 					var kongGames = {
@@ -983,14 +985,9 @@
 						loginKong();
 					});
 				}
-			});
+			});*/
 		}
 	}
-
-	var chat = {
-		testing: 1234,
-		channel: "town"
-	};
 
 	(function(d, s, x){
 
