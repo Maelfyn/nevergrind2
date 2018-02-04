@@ -9,7 +9,7 @@ var modal = {
 		var s = '<div class="stag-blue">'+
 					modal.header(e) +
 					modal.body(e) +
-					modal.footer(e) +
+					(e.hideFooter ? '' : modal.footer(e)) +
 				'</div>';
 		modal.wrap.innerHTML = s;
 		
@@ -63,6 +63,7 @@ var modal = {
 	},
 	header: function(e){
 		var z = {
+			playerIdleBoot: '<div id="modal-header">Disconnected</div>',
 			deleteCharacter: '<div id="modal-header">Delete '+ create.name +'?</div>',
 			unlockGame: '<div id="modal-header">$5 to purchase Nevergrind 2?</div>',
 		}
@@ -70,6 +71,10 @@ var modal = {
 	},
 	body: function(e){
 		var z = {
+			playerIdleBoot:
+			'<div id="modal-body">'+
+				'<p>You have been disconnected from the server.</p>'+
+			'</div>',
 			deleteCharacter:
 			'<div id="modal-body">'+
 				'<p>Are you sure you want to delete this character?</p>'+

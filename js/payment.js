@@ -58,7 +58,7 @@ var payment = {
             g.lock();
             g.msg("Communicating with the server...");
             $.ajax({
-                url: g.url + 'php2/payment/unlockGame.php',
+                url: app.url + 'php2/payment/unlockGame.php',
                 data: {
                     stripeToken: response.id
                 }

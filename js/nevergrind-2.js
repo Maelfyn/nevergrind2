@@ -31,7 +31,6 @@
 	JSON,
 	Date,
 	Object,
-	g,
 	undefined
 ){
 // stuff that must exist before everything
@@ -199,7 +198,7 @@ var create = {
 				f.shortJob = g.toJobShort(f.job);
 				// send to server
 				$.ajax({
-					url: g.url + 'php2/create/create-character.php',
+					url: app.url + 'php2/create/create-character.php',
 					data: {
 						form: f
 					}
@@ -226,7 +225,7 @@ var create = {
 		if (!g.locked){
 			g.lock();
 			$.ajax({
-				url: g.url + 'php2/create/delete-character.php',
+				url: app.url + 'php2/create/delete-character.php',
 				data: {
 					row: create.selected
 				}
@@ -590,19 +589,19 @@ var create = {
 
 
 // core.js
-g = Object.assign(g, {
+var g = {
 	events: function(){
 		$(window).focus(function(){
 			/*document.title = g.defaultTitle;
 			g.titleFlashing = false;*/
-			socket.init(1);
+			// my.name && socket.init(1);
 		});
 		// should be delegating no drag start
 		$("body").on('dragstart', 'img', function(e) {
 			e.preventDefault();
 		});
 		// disable stuff in app to appear more "native"
-		if (g.isApp) {
+		if (app.isApp) {
 			document.addEventListener("contextmenu", function (e) {
 				// disable default right-click menu
 				e.preventDefault();
@@ -722,8 +721,6 @@ g = Object.assign(g, {
 	view: "title",
 	resizeX: 1,
 	resizeY: 1,
-	sfxFood: false,
-	sfxCulture: false,
 	chatOn: false,
 	lockOverlay: document.getElementById("lock-overlay"),
 	startTime: Date.now(),
@@ -780,7 +777,7 @@ g = Object.assign(g, {
 				data.longitude += '';
 				g.geo = data;
 				$.ajax({
-					url: g.url + 'php/updateUserInfo.php',
+					url: app.url + 'php/updateUserInfo.php',
 					data: {
 						location: g.geo
 					}
@@ -832,7 +829,7 @@ g = Object.assign(g, {
 	keepAlive: function(){
 		$.ajax({
 			type: 'GET',
-			url: g.url + "php/keepAlive.php"
+			url: app.url + "php/keepAlive.php"
 		}).always(function() {
 			setTimeout(g.keepAlive, 120000);
 		});
@@ -897,7 +894,7 @@ g = Object.assign(g, {
 		// socket.removePlayer(my.account);
 		$.ajax({
 			type: 'GET',
-			url: g.url + 'php/deleteFromFwtitle.php'
+			url: app.url + 'php/deleteFromFwtitle.php'
 		});
 		
 		try {
@@ -919,7 +916,7 @@ g = Object.assign(g, {
 		setTimeout(function(){
 			$.ajax({
 				type: 'GET',
-				url: g.url + 'php/logout.php'
+				url: app.url + 'php/logout.php'
 			}).done(function(data) {
 				g.msg("Logout successful");
 				localStorage.removeItem('email');
@@ -970,7 +967,7 @@ g = Object.assign(g, {
 		
 		$.ajax({
 			type: 'GET',
-			url: g.url + 'php2/create/getStatMap.php'
+			url: app.url + 'php2/create/getStatMap.php'
 		}).done(function(r){
 			var r = r.statMap;
 			g.races.forEach(function(v){
@@ -988,25 +985,24 @@ g = Object.assign(g, {
 	initGame: function(){
 		$.ajax({
 			type: 'POST',
-			url: g.url + 'php2/initGame.php'
+			url: app.url + 'php2/initGame.php'
 		}).done(function(r){
 			console.info("initGame: ", r);
-			g.initialized = 1;
+			app.initialized = 1;
 			if (r.account) {
-				my.account = r.account;
+				app.account = my.account = r.account; // for global reference
 				document.getElementById('logout').textContent = 'Logout ' + r.account;
 				g.displayAllCharacters(r.characterData);
 				g.checkPlayerData();
-				var e = document.getElementById('login-modal');
-				!e && e.parentNode.removeChild(e);
+				$("#login-modal").remove();
 			}
 			else {
 				notLoggedIn();
 			}
-			document.getElementById('version').textContent = 'Version ' + g.version;
+			document.getElementById('version').textContent = 'Version ' + app.version;
 
 			var h = location.hash;
-			if (g.isLocal) {
+			if (app.isLocal) {
 				// hastag routing
 				if (h === '#town') {
 					town.go();
@@ -1032,7 +1028,8 @@ g = Object.assign(g, {
 		document.getElementById('ch-card-list').innerHTML = s;
 		$(".select-player-card:first").trigger(env.click);
 	}
-});
+};
+
 g.init = (function(){
 	// console.info("Initializing game...");
 	$.ajaxSetup({
@@ -1041,7 +1038,6 @@ g.init = (function(){
 	});
 	TweenLite.defaultEase = Quad.easeOut;
 })();
-location.search === '?create' && g.goCreateCharacter();
 // env.js
 
 var env = {
@@ -1084,8 +1080,9 @@ env.isChrome = !!window.chrome && !env.isOpera;
 	localStorage.setItem('isMobile', init.isMobile);
 })();
 
+
 // player data values
-my = Object.assign(my, {
+var my = {
 	lastReceivedWhisper: '',
 	team: 0,
 	gameName: 'Earth Alpha',
@@ -1117,7 +1114,7 @@ my = Object.assign(my, {
 		if (r || bypass || g.view !== 'game'){
 			g.lock(1);
 			$.ajax({
-				url: g.url + 'php/exitGame.php',
+				url: app.url + 'php/exitGame.php',
 				data: {
 					view: g.view
 				}
@@ -1126,7 +1123,7 @@ my = Object.assign(my, {
 			});
 		}
 	}
-});
+};
 // dom.js
 var dom;
 (function(d){
@@ -1491,6 +1488,7 @@ var game = {
 		start: function() {
 			game.heartbeat.send();
 			game.heartbeat.update();
+			game.played.start();
 		},
 		update: function() {
 			clearTimeout(game.heartbeat.timer);
@@ -1503,12 +1501,25 @@ var game = {
 			clearTimeout(title.keepAliveTimer);
 			$.ajax({
 				type: 'GET',
-				url: g.url + 'php2/heartbeat.php'
+				url: app.url + 'php2/heartbeat.php'
 			}).done(function(data){
 				console.info('heartbeat ', data);
 			})
 
 		}
+	},
+	played: {
+		timer: 0,
+		start: function() {
+			clearInterval(game.played.timer);
+			game.played.timer = setInterval(function(){
+				$.ajax({
+					type: 'GET',
+					url: app.url + 'php2/update-played.php'
+				})
+			}, 60000);
+		}
+
 	},
 	name: '',
 	initialized: false,
@@ -1518,7 +1529,7 @@ var game = {
 		// or check that players are still online?
 		$.ajax({
 			type: 'GET',
-			url: g.url + 'php/getGameState.php'
+			url: app.url + 'php/getGameState.php'
 		}).done(function(data){
 			console.info('getGameState ', data);
 			// get tile data
@@ -1536,7 +1547,7 @@ var title = {
 		e.innerHTML = '';
 		g.lock();
 		$.ajax({
-			url: g.url + 'php/leaderboard.php',
+			url: app.url + 'php/leaderboard.php',
 			data: {
 				type: type
 			}
@@ -1551,7 +1562,7 @@ var title = {
 			title.refreshTimer = Date.now();
 			$.ajax({
 				type: 'GET',
-				url: g.url + 'php/refreshGames.php'
+				url: app.url + 'php/refreshGames.php'
 			}).done(function(data) {
 				//console.info(data);
 				var e = document.getElementById('gameTableBody');
@@ -1603,7 +1614,7 @@ var title = {
 				if (g.view === 'title'){
 					$.ajax({
 						type: "POST",
-						url: g.url + 'php/titleUpdate.php',
+						url: app.url + 'php/titleUpdate.php',
 						data: {
 							channel: my.channel
 						}
@@ -1698,7 +1709,7 @@ var title = {
 		}
 		var e = document.getElementById('titlePlayer' + account);
 		if (e !== null){
-			e.parentNode.removeChild(e);
+			//e.parentNode.removeChild(e);
 		}
 		var e = document.createElement('div');
 		e.className = "titlePlayer";
@@ -1715,7 +1726,7 @@ var title = {
 		delete title.players[data.account];
 		var z = document.getElementById('titlePlayer' + data.account);
 		if (z !== null){
-			z.parentNode.removeChild(z);
+			//z.parentNode.removeChild(z);
 		}
 	},
 	updateGame: function(data){
@@ -1794,7 +1805,7 @@ var title = {
 		delete title.games[data.id];
 		var e = document.getElementById('game_' + data.id);
 		if (e !== null){
-			e.parentNode.removeChild(e);
+			//e.parentNode.removeChild(e);
 		}
 	},
 	showBackdrop: function(e){
@@ -1844,7 +1855,7 @@ var title = {
 		g.teamMode = teamMode;
 		g.speed = speed;
 		$.ajax({
-			url: g.url + 'php/createGame.php',
+			url: app.url + 'php/createGame.php',
 			data: {
 				name: name,
 				pw: pw,
@@ -1882,7 +1893,7 @@ var title = {
 		g.lock();
 		audio.play('click');
 		$.ajax({
-			url: g.url + 'php/joinGame.php',
+			url: app.url + 'php/joinGame.php',
 			data: {
 				name: g.name,
 				password: g.password
@@ -1920,7 +1931,7 @@ $(document).on('keydown', function(e){
 
 	console.info('keydown: ', key, code);
 	// local only
-	if (g.isLocal) {
+	if (app.isLocal) {
 		if (!chat.hasFocus) {
 			// key input view router
 			if (key === 'b') {
@@ -1954,48 +1965,52 @@ $(document).on('keydown', function(e){
 			if (!g.isModalOpen){
 				$("#create-character-name").focus();
 			}
-		} else if (g.view === 'town'){
-			if (!chat.hasFocus) {
-				// no chat focus
-				$("#chat-input").focus();
-			} else {
-				// has chat focus
-				if (code === 38) {
-					// chat focus history nav up
-					if (chat.history[chat.historyIndex - 1] !== undefined) {
-						var msg = chat.history[--chat.historyIndex];
-						dom.chatInput.value = msg;
-					}
-				}
-				else if (code === 40) {
-					// chat focus history nav down
-					if (chat.history.length === chat.historyIndex + 1) {
-						chat.historyIndex++;
-						chat.clear();
-					}
-					else if (chat.history[chat.historyIndex + 1] !== undefined) {
-						var msg = chat.history[++chat.historyIndex];
-						dom.chatInput.value = msg;
-					}
-				} else if (code === 13) {
-					// enter
-					chat.sendMsg();
+		} else {
+			// always works town,dungeon and combat
+			// has chat focus
+			if (code === 38) {
+				// chat focus history nav up
+				if (chat.history[chat.historyIndex - 1] !== undefined) {
+					var msg = chat.history[--chat.historyIndex];
+					dom.chatInput.value = msg;
 				}
 			}
-		} else {
-			// game
-			if (code === 9){
-				// tab
-				if (!e.shiftKey){
-					my.nextTarget(false);
-				} else {
-					my.nextTarget(true);
+			else if (code === 40) {
+				// chat focus history nav down
+				if (chat.history.length === chat.historyIndex + 1) {
+					chat.historyIndex++;
+					chat.clear();
 				}
-				e.preventDefault();
-			} else if (code === 86){
-				// v
-				if (g.view === 'game' && !g.chatOn){
-					game.toggleGameWindows(1);
+				else if (chat.history[chat.historyIndex + 1] !== undefined) {
+					var msg = chat.history[++chat.historyIndex];
+					dom.chatInput.value = msg;
+				}
+			} else if (code === 13) {
+				// enter
+				my.name && chat.sendMsg();
+			}
+
+			if (g.view === 'town') {
+				if (!chat.hasFocus) {
+					// no chat focus
+					$("#chat-input").focus();
+				} else {
+				}
+			} else {
+				// game
+				if (code === 9) {
+					// tab
+					if (!e.shiftKey) {
+						my.nextTarget(false);
+					} else {
+						my.nextTarget(true);
+					}
+					e.preventDefault();
+				} else if (code === 86) {
+					// v
+					if (g.view === 'game' && !g.chatOn) {
+						game.toggleGameWindows(1);
+					}
 				}
 			}
 		}
@@ -2185,7 +2200,7 @@ var socket = {
 			if (channel !== my.channel){
 				$.ajax({
 					type: "POST",
-					url: g.url + 'php/titleChangeChannel.php',
+					url: app.url + 'php/titleChangeChannel.php',
 					data: {
 						channel: channel
 					}
@@ -2239,30 +2254,54 @@ var socket = {
 			}
 		})();
 	},
+	lastPing: 0,
 	initWhisper: function() {
 		if (socket.enabled) {
-			var channel = 'name:' + my.name;
 			console.info("subscribing to whisper channel: ", channel);
+
+			var channel = 'name:' + my.name;
+			socket.updatePing();
+
 			socket.zmq.subscribe(channel, function(topic, data) {
 				console.info('rx ', topic, data);
 				if (data.action === 'send') {
 					// report message
 					route.town(data, data.route);
 					// callback to sender
-					data.action = 'receive';
-					socket.zmq.publish('name:' + data.name, data);
+					// data.action = 'receive';
+					//socket.zmq.publish('name:' + data.name, data);
+					// callback to sender
+					$.ajax({
+						url: app.url + 'php2/chat/send.php',
+						data: {
+							date: data.date,
+							action: 'receive',
+							msg: 'x',
+							class: 'chat-whisper',
+							category: 'name:' + data.name
+						}
+					});
 				}
+				// receive pong
 				else if (data.action === 'receive') {
 					route.town(chat.whispers[data.date], 'chat->log');
+				}
+				// receive keep alive
+				if (data.ping) {
+					socket.updatePing();
 				}
 			});
 		}
 	},
-	enabled: false,
+	updatePing: function(){
+		console.info("updatePing");
+		socket.lastPing = Date.now();
+	},
+	enabled: 0,
 	init: function(bypass){
 		// is player logged in?
 		if (bypass || !socket.enabled) {
-			socket.zmq = new ab.Session('wss://' + g.socketUrl + '/wss2/', function () {
+			socket.zmq = new ab.Session('wss://' + app.socketUrl + '/wss2/', function () {
 				// on open
 				socket.connectionSuccess();
 			}, function () {
@@ -2274,13 +2313,25 @@ var socket = {
 			});
 		}
 	},
-	initialConnection: true,
+	reinit: function(){
+		socket.zmq = null;
+		socket.enabled = 0;
+		socket.initialConnection = 0;
+		socket.init();
+	},
+	initialConnection: 1,
+	pongTimer: 0,
 	connectionSuccess: function(){
-		socket.enabled = true;
+		socket.enabled = 1;
+		/*
+		socket.zmq._websocket.onerror = function() {
+			socket.reconnect();
+		}
+		*/
 		console.info("Socket connection established with server");
 		// chat updates
 		if (socket.initialConnection){
-			socket.initialConnection = false;
+			socket.initialConnection = 0;
 			// subscribe to town-1 default channel - general chat
 			var town = 'ng2:town-1';
 			console.info("subscribing to channel: ", town);
@@ -2324,6 +2375,22 @@ var socket = {
 					setTimeout(repeat, 200);
 				}
 			})();
+			// keep alive?
+			(function repeat(){
+				socket.zmq.publish('name:' + my.name, {
+					ping: 1
+				});
+				setTimeout(repeat, 5000);
+			})();
+			// pong timer
+			clearInterval(chat.pongTimer);
+			chat.pongTimer = setInterval(function(){
+				var pong = Date.now() - socket.lastPing;
+				if (pong > 10000) {
+					socket.reinit();
+				}
+				console.info("pong: ", pong);
+			}, 5000);
 		}
 		socket.setChannel(chat.channel);
 	},
@@ -2331,7 +2398,7 @@ var socket = {
 	connectionRetryDuration: 100,
 	reconnect: function(){
 		console.warn('WebSocket connection failed. Retrying...');
-		socket.enabled = false;
+		socket.enabled = 0;
 		setTimeout(socket.init, socket.connectionRetryDuration);
 	}
 }
@@ -2387,16 +2454,12 @@ var chat = {
 		// dom
 		dom.chatLog = document.getElementById('chat-log');
 		dom.chatInput = document.getElementById('chat-input');
-		chat.count = dom.chatLog.childElementCount;
 	},
 	// report to chat-log
 	log: function(msg, route){
 		if (msg){
-			if (chat.count >= 500) {
+			while (dom.chatLog.childElementCount >= 500) {
 				dom.chatLog.removeChild(dom.chatLog.firstChild);
-			}
-			else {
-				chat.count++;
 			}
 			var z = document.createElement('div');
 			if (route){
@@ -2410,7 +2473,7 @@ var chat = {
 	parseMsg: function(msg) {
 		var arr = msg.split(" ");
 		var o = {
-			first: arr[0].trim()
+			first: arr[0].trim().toLowerCase()
 		}
 		arr.shift();
 		o.command = arr.join(' ');
@@ -2424,8 +2487,6 @@ var chat = {
 				category: my.channel
 			};
 		var parse = chat.parseMsg(msg);
-
-		console.info("getMsgObject: ", parse.first, parse.command);
 
 		// is it a command?
 		if (parse.first === '/p' || parse.first === '/party'){
@@ -2463,17 +2524,30 @@ var chat = {
 	},
 	historyIndex: 0,
 	history: [],
+	updateHistory: function(msg) {
+		chat.history.push(msg);
+		chat.historyIndex = chat.history.length;
+	},
 	help: function() {
 		var z = 'class="chat-emote"',
 			s = [
 				'<div class="chat-warning">Chat Commands:</div>',
-				'<div '+ z +'>/p : Message your party : /p hail</div>',
-				'<div '+ z +'>/g : Message your guild : /g hail</div>',
-				'<div '+ z +'>@ : Send a private message by name : @bob hi</div>',
+				'<div '+ z +'>/party /p : Message your party : /p hail</div>',
+				'<div '+ z +'>/guild /g : Message your guild : /g hail</div>',
 				'<div '+ z +'>/ooc : Send a message out of character : /ooc hail</div>',
-				'<div '+ z +'>/shout : Shout a message : /shout hail</div>',
+				'<div '+ z +'>/shout /s : Shout a message : /s hail</div>',
 				'<div '+ z +'>/me : Send an emote : /me waves</div>',
-				'<div '+ z +'>/friend : Show your friends\' online status</div>'
+				'<div '+ z +'>@ : Send a private message by name : @bob hi</div>',
+				'<div '+ z +'>/friend or /f : Show your friends\' online status</div>',
+				'<div '+ z +'>/f add : Add a friend : /f add Bob</div>',
+				'<div '+ z +'>/f remove : Remove a friend : /f remove Bob</div>',
+				'<div '+ z +'>/ignore or /i : Show your ignore list</div>',
+				'<div '+ z +'>/i add : Add someone to your ignore list</div>',
+				'<div '+ z +'>/i remove : Remove someone from your ignore list</div>',
+				'<div '+ z +'>/who : Show all players currently playing</div>',
+				'<div '+ z +'>/who class : Show current players by class : /who warrior</div>',
+				'<div '+ z +'>/clear: clear the chat log</div>',
+				'<div '+ z +'>/played: Show character creation, session duration, and total playtime</div>',
 			];
 		for (var i=0, len=s.length; i<len; i++) {
 			chat.log(s[i]);
@@ -2481,12 +2555,18 @@ var chat = {
 	},
 	// player hit ENTER
 	sendMsg: function(bypass){
-		var msg = dom.chatInput.value.trim();
+		var msg = dom.chatInput.value.trim(),
+			msgLower = msg.toLowerCase();
 		// bypass via ENTER or chat has focus
 		if (msg === '/h' || msg === '/help') {
+			chat.updateHistory(msg);
 			chat.help();
 		}
 		/*
+		/random
+		/surname
+		update /help
+		create placards!
 		allow to form parties
 			invite
 			disband
@@ -2496,22 +2576,44 @@ var chat = {
 			disband
 			leader
 		 */
-		else if (msg === '/i' || msg === '/ignore') {
+		else if (msgLower === '/played') {
+			chat.updateHistory(msgLower);
+			chat.played();
+		}
+		else if (msgLower === '/clear') {
+			chat.updateHistory(msgLower);
+			chat.clearChatLog();
+		}
+		else if (msgLower === '/who') {
+			chat.updateHistory(msgLower);
+			chat.who.all();
+		}
+		else if (msgLower.indexOf('/who ') === 0 && msgLower.length > 5) {
+			chat.updateHistory(msg);
+			chat.who.class(chat.who.parse(msg));
+		}
+		else if (msgLower === '/i' || msgLower === '/ignore') {
+			chat.updateHistory(msgLower);
 			chat.ignore.list();
 		}
-		else if (msg.indexOf('/i remove') === 0 || msg.indexOf('/ignore remove') === 0) {
+		else if (msgLower.indexOf('/i remove') === 0 || msgLower.indexOf('/ignore remove') === 0) {
+			chat.updateHistory(msg);
 			chat.ignore.remove(chat.friend.parse(msg));
 		}
-		else if (msg.indexOf('/i add') === 0 || msg.indexOf('/ignore add') === 0) {
+		else if (msgLower.indexOf('/i add') === 0 || msgLower.indexOf('/ignore add') === 0) {
+			chat.updateHistory(msg);
 			chat.ignore.add(chat.friend.parse(msg));
 		}
-		else if (msg === '/f' || msg === '/friend') {
+		else if (msgLower === '/f' || msgLower === '/friend') {
+			chat.updateHistory(msgLower);
 			chat.friend.list();
 		}
-		else if (msg.indexOf('/f remove') === 0 || msg.indexOf('/friend remove') === 0) {
+		else if (msgLower.indexOf('/f remove') === 0 || msgLower.indexOf('/friend remove') === 0) {
+			chat.updateHistory(msg);
 			chat.friend.remove(chat.friend.parse(msg));
 		}
-		else if (msg.indexOf('/f add') === 0 || msg.indexOf('/friend add') === 0) {
+		else if (msgLower.indexOf('/f add') === 0 || msgLower.indexOf('/friend add') === 0) {
+			chat.updateHistory(msg);
 			chat.friend.add(chat.friend.parse(msg));
 		}
 		else if (msg[0] === '@'){
@@ -2527,9 +2629,10 @@ var chat = {
 					msg: 'You told ' + name + ': ' + parse.command,
 					class: 'chat-whisper'
 				};
+				chat.updateHistory(msg);
 
 				$.ajax({
-					url: g.url + 'php2/chat/send.php',
+					url: app.url + 'php2/chat/send.php',
 					data: {
 						date: d,
 						action: 'send',
@@ -2545,10 +2648,9 @@ var chat = {
 				if (msg) {
 					var o = chat.getMsgObject(msg);
 					if (o.msg[0] !== '/') {
-						chat.history.push(msg);
-						chat.historyIndex = chat.history.length;
+						chat.updateHistory(msg);
 						$.ajax({
-							url: g.url + 'php2/chat/send.php',
+							url: app.url + 'php2/chat/send.php',
 							data: {
 								msg: o.msg,
 								class: o.class,
@@ -2569,6 +2671,9 @@ var chat = {
 	whispers: {},
 	clear: function() {
 		dom.chatInput.value = '';
+	},
+	clearChatLog: function(){
+		dom.chatLog.innerHTML = '';
 	},
 	changeChannel: function(msg, splitter){
 		var arr = msg.split(splitter);
@@ -2591,13 +2696,17 @@ var chat = {
 			}
 		},
 		add: function(o) {
-			g.ignore.push(o);
-			localStorage.setItem('ignore', JSON.stringify(g.ignore));
-			chat.log('You have added ' + o + ' to your ignore list.', 'chat-warning');
+			if (o !== my.name) {
+				g.ignore.push(o);
+				localStorage.setItem('ignore', JSON.stringify(g.ignore));
+				chat.log('You have added ' + o + ' to your ignore list.', 'chat-warning');
+			}
 		},
 		remove: function(o) {
-			var index = g.ignore.indexOf(o);
-			g.ignore.splice(index, 1);
+			while (g.ignore.indexOf(o) > -1) {
+				var index = g.ignore.indexOf(o);
+				g.ignore.splice(index, 1);
+			}
 			localStorage.setItem('ignore', JSON.stringify(g.ignore));
 			chat.log('You have removed ' + o + ' from your ignore list.', 'chat-warning');
 		}
@@ -2611,28 +2720,26 @@ var chat = {
 			g.friends = g.friends || [];
 			$.ajax({
 				type: 'GET',
-				url: g.url + 'php2/chat/friend-get.php',
+				url: app.url + 'php2/chat/friend-get.php',
 			}).done(function(data){
 				g.friends = data;
 			});
 		},
 		list: function() {
-			var len = g.friends.length;
 			chat.log('<div class="chat-warning">Checking friends list...</div>');
 			if (g.friends.length){
 				$.ajax({
-					url: g.url + 'php2/chat/friend-status.php',
-					data: {
-						friends: g.friends
-					}
-				}).done(function(data){
-					var p = data.players;
-					console.info(data);
-					var str = '<div>Friend List ('+ len +')</div>';
-					for (var i=0; i<len; i++){
-						var index = p.indexOf(g.friends[i]);
+					type: 'GET',
+					url: app.url + 'php2/chat/friend-status.php'
+				}).done(function(r){
+					g.friends = r.friends;
+					console.info(r);
+					var str = '<div>Friend List ('+ r.friends.length +')</div>';
+
+					g.friends.forEach(function(name, i){
+						var index = r.players.indexOf(name);
 						if (index > -1){
-							var s = data.stats[i];
+							var s = r.stats[index];
 							// online
 							str +=
 								'<div class="chat-whisper">[' +
@@ -2640,9 +2747,10 @@ var chat = {
 								')</div>';
 						} else {
 							// offline
-							str += '<div class="chat-emote">' + g.friends[i] +' [Offline]</div>';
+							str += '<div class="chat-emote">[Offline] ' + name +'</div>';
 						}
-					}
+					});
+
 					chat.log(str);
 				});
 			} else {
@@ -2651,9 +2759,9 @@ var chat = {
 			}
 		},
 		add: function(o) {
-			if (o.length > 1) {
+			if (o.length > 1 && o !== my.name) {
 				$.ajax({
-					url: g.url + 'php2/chat/friend-add.php',
+					url: app.url + 'php2/chat/friend-add.php',
 					data: {
 						friend: o
 					}
@@ -2671,7 +2779,7 @@ var chat = {
 		remove: function(o) {
 			if (o.length > 1) {
 				$.ajax({
-					url: g.url + 'php2/chat/friend-remove.php',
+					url: app.url + 'php2/chat/friend-remove.php',
 					data: {
 						friend: o
 					}
@@ -2681,102 +2789,155 @@ var chat = {
 					}
 					else {
 						chat.log('You have removed ' + o + ' from your friends list.', 'chat-warning');
-						var index = g.friends.indexOf(o);
-						g.friends.splice(index, 1);
+						while (g.friends.indexOf(o) > -1) {
+							var index = g.friends.indexOf(o);
+							g.friends.splice(index, 1);
+						}
 					}
 				});
 			}
 		}
 	},
-	listIgnore: function(){
-		var len = g.ignore.length;
-		var str = '<div>Ignore List ('+ len +')</div>';
-		for (var i=0; i<len; i++){
-			str += '<div><span class="chat-muted titlePlayerAccount">' + g.ignore[i] +'</span></div>';
+	toPlaytime: function(minLeft) {
+		var d = 0,
+			h = 0;
+
+		if (minLeft >= 1440) {
+			d = Math.floor(minLeft / 1440);
+			minLeft = (minLeft % 1440);
 		}
-		g.chat(str);
-	},
-	addIgnore: function(account){
-		account = account.trim();
-		g.chat('<div>Ignoring '+ account +'</div>');
-		if (g.ignore.indexOf(account) === -1 && account){
-			if (g.ignore.length < 20){
-				if (account !== my.account){
-					g.ignore.push(account);
-					localStorage.setItem('ignore', JSON.stringify(g.ignore));
-					g.chat('Now ignoring account: ' + account, 'chat-muted');
-				} else {
-					g.chat("<div>You can't ignore yourself!</div><img src='images/chat/random/autism.jpg'>", 'chat-muted');
-				}
-			} else {
-				g.chat('You cannot ignore more than 20 accounts!', 'chat-muted');
-			}
-		} else {
-			g.chat('Already ignoring ' + account +'!', 'chat-muted');
+		if (minLeft >= 60) {
+			h = Math.floor(minLeft / 60);
+			minLeft = (minLeft % 60);
 		}
-	},
-	removeIgnore: function(account){
-		account = account.trim();
-		g.chat('<div>Unignoring '+ account +'</div>');
-		if (g.ignore.indexOf(account) > -1 && account){
-			// found account
-			var index = g.ignore.indexOf(account);
-			g.ignore.splice(index, 1);
-			localStorage.setItem('ignore', JSON.stringify(g.ignore));
-			g.chat('Stopped ignoring account: ' + account, 'chat-muted');
-		} else {
-			g.chat(account + ' is not on your ignore list.', 'chat-muted');
+		var m = minLeft,
+			dayStr = '',
+			hourStr = '',
+			minStr = '';
+		if (d) {
+			dayStr += d + (d > 1 ? ' days' : ' day');
 		}
+		if (h) {
+			hourStr += h + (h > 1 ? ' hours' : ' hour');
+		}
+		// minutes
+		minStr = m;
+		if (m !== 1) {
+			minStr += ' minutes';
+		}
+		else {
+			minStr += ' minute';
+		}
+
+		if (d && h && m) {
+			dayStr += ', ';
+		}
+		else if (d) {
+			dayStr += ' ';
+		}
+
+		if (h) {
+			hourStr += ', ';
+		}
+
+		if (d || h) {
+			minStr = 'and ' + minStr;
+		}
+		return dayStr + hourStr + minStr;
 	},
-	who: function(msg){
-		var a = msg.split("/who ");
+	toCreateString: function(d) {
+		d = new Date(d);
+		return d.toDateString() + ' ' + d.toLocaleTimeString();
+	},
+	played: function() {
 		$.ajax({
-			url: g.url + 'php/who.php',
-			data: {
-				account: a[1]
-			}
-		}).done(function(data){
-			function getRibbonStr(){
-				var str = '';
-				if (data.ribbons !== undefined){
-					var len = data.ribbons.length;
-					if (len){
-						str += '<div class="who-ribbon-chat '+ (len >= 24 ? 'wideRack' : 'narrowRack') +'">';
-						for (var i=0, len=data.ribbons.length; i<len; i++){
-							var z = data.ribbons[i];
-							str += '<div class="pointer ribbon ribbon'+ z +'" title="'+ game.ribbonTitle[z] +'" data-ribbon="'+ z +'"></div>';
-						}
-						str += '</div>';
-					}
-				}
-				return str;
-			}
-			
-			var str = 
-			'<div class="row who-wrap">'+
-				'<div class="col-xs-8">';
-				// left col
-				str += data.str;
-				if (data.account !== my.account && g.friends.indexOf(data.account) === -1){
-					str += '<button style="pointer-events: initial" class="addFriend btn btn-xs fwBlue" data-account="'+ data.account +'">Add Friend</button>';
-				}
-			str += 
-				'</div>'+
-				'<div class="col-xs-4">';
-				// right col
-				str += 
-					'<div class="who-avatar-wrap">'+
-						data.img +
-						'<div class="who-ribbon-wrap">'+
-							getRibbonStr()+
-						'</div>'+
-					'</div>'+
-				'</div>'+
-			'</div>';
-			g.chat(str);
-		}).fail(function(){
-			g.chat('No data found.');
+			type: 'GET',
+			url: app.url + 'php2/chat/played.php'
+		}).done(function(r) {
+			var sessionLen = Date.now() - JSON.parse(sessionStorage.getItem('startTime')),
+				durationStr = chat.toPlaytime(~~(sessionLen / 100000));
+			chat.log("Character created: " + chat.toCreateString(r.created), 'chat-warning');
+			chat.log("Current session duration: " + durationStr, 'chat-whisper');
+			chat.log("Total character playtime: " + chat.toPlaytime(r.playtime), 'chat-whisper');
 		});
+	},
+	who: {
+		parse: function(msg) {
+			var a = msg.split(" "),
+				job = a[1],
+				longJob = job[0].toUpperCase() + job.substr(1);
+
+			// long name?
+			if (g.jobs.indexOf(longJob) > -1) {
+				// convert to short
+				return g.jobShort[longJob];
+			}
+			else {
+				var shortJobs = Object.keys(g.jobLong),
+					job = job.toUpperCase();
+				if (shortJobs.indexOf(job)) {
+					// is it on the short job list?
+					return job;
+				}
+				else {
+					return '';
+				}
+			}
+		},
+		all: function(){
+			$.ajax({
+				type: 'GET',
+				url: app.url + 'php2/chat/who-all.php'
+			}).done(function(r){
+				console.info('who ', r);
+				if (r.len) {
+					chat.log("There " + (r.len > 1 ? "are" : "is") +" currently "+
+						r.len + " "+ (r.len > 1 ? "players" : "players") +" in Vandamor.", "chat-warning");
+					// online
+					var str = '';
+					r.players.forEach(function(v, i){
+						str +=
+							'<div class="chat-whisper">[' +
+							v.level +' '+ g.jobLong[v.job] +'] '+ v.name + ' ('+ v.race +
+							')</div>';
+					});
+					chat.log(str, 'chat-whisper');
+				}
+				else {
+					chat.log("Nobody is currently in Vandamor.", "chat-warning");
+				}
+			});
+		},
+		class: function(job){
+			console.info('who.class ', job);
+			$.ajax({
+				url: app.url + 'php2/chat/who-class.php',
+				data: {
+					job: job
+				}
+			}).done(function(r){
+				console.info('r ', r);
+				var jobLong = g.toJobLong(job);
+				if (r.len) {
+					chat.log("There " + (r.len > 1 ? "are" : "is") +" currently "+
+						r.len + " "+ (r.len > 1 ? jobLong + 's' : jobLong) +" in Vandamor.", "chat-warning");
+					// online
+					var str = '';
+					r.players.forEach(function(v, i){
+						str +=
+							'<div class="chat-whisper">[' +
+							v.level +' '+ g.jobLong[v.job] +'] '+ v.name + ' ('+ v.race +
+							')</div>';
+					});
+					chat.log(str, 'chat-whisper');
+				}
+				else {
+					chat.log("Currently there are no " + jobLong + "s in Vandamor.", "chat-warning");
+				}
+
+
+			});
+		},
 	},
 	scrollBottom: function(){
 		if (!chat.isClicked){
@@ -2936,7 +3097,7 @@ var payment = {
             g.lock();
             g.msg("Communicating with the server...");
             $.ajax({
-                url: g.url + 'php2/payment/unlockGame.php',
+                url: app.url + 'php2/payment/unlockGame.php',
                 data: {
                     stripeToken: response.id
                 }
@@ -4605,13 +4766,13 @@ var mob = {
 		});
 	}
 }
-var p = {};
-var town = {
+var p = {}, // party info
+	town = {
 	go: function(){
 		if (create.selected) {
 			g.lock(1);
 			$.ajax({
-				url: g.url + 'php2/character/loadCharacter.php',
+				url: app.url + 'php2/character/loadCharacter.php',
 				data: {
 					row: create.selected
 				}
@@ -4625,7 +4786,7 @@ var town = {
 				g.setScene('town');
 				town.init();
 				chat.init(1);
-				chat.log("There are currently " + data.count + " players exploring Vandamor", 'chat-emote');
+				chat.log("There are currently " + data.count + " players exploring Vandamor.", 'chat-emote');
 				chat.friend.init();
 				chat.ignore.init();
 				game.heartbeat.start();
@@ -4655,11 +4816,14 @@ var town = {
 	},
 	initialized: 0,
 	init: function(){
-		if (g.view !== 'town' && !town.initialized) {
+		if (!town.initialized) {
 			town.initialized = 1;
 			document.getElementById('scene-town').innerHTML = town.html();
 			town.events();
 			$("#scene-title").remove();
+			if (!sessionStorage.getItem('startTime')) {
+				sessionStorage.setItem('startTime', JSON.stringify(Date.now()));
+			}
 		}
 	}
 };
@@ -4775,9 +4939,5 @@ var test = {
 	Array,
 	JSON,
 	Date,
-	Object,
-	g
+	Object
 );
-// remove global reference
-g = null;
-console.info('g', g);

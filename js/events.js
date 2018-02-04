@@ -1,10 +1,13 @@
-$(document).on('keydown', function(e){
+$(document).on(env.click, function(){
+	g.setIdleDate();
+}).on('keydown', function(e){
 	var code = e.keyCode,
 		key = e.key;
 
+	g.setIdleDate();
 	console.info('keydown: ', key, code);
 	// local only
-	if (g.isLocal) {
+	if (app.isLocal) {
 		if (!chat.hasFocus) {
 			// key input view router
 			if (key === 'b') {
@@ -38,48 +41,52 @@ $(document).on('keydown', function(e){
 			if (!g.isModalOpen){
 				$("#create-character-name").focus();
 			}
-		} else if (g.view === 'town'){
-			if (!chat.hasFocus) {
-				// no chat focus
-				$("#chat-input").focus();
-			} else {
-				// has chat focus
-				if (code === 38) {
-					// chat focus history nav up
-					if (chat.history[chat.historyIndex - 1] !== undefined) {
-						var msg = chat.history[--chat.historyIndex];
-						dom.chatInput.value = msg;
-					}
-				}
-				else if (code === 40) {
-					// chat focus history nav down
-					if (chat.history.length === chat.historyIndex + 1) {
-						chat.historyIndex++;
-						chat.clear();
-					}
-					else if (chat.history[chat.historyIndex + 1] !== undefined) {
-						var msg = chat.history[++chat.historyIndex];
-						dom.chatInput.value = msg;
-					}
-				} else if (code === 13) {
-					// enter
-					chat.sendMsg();
+		} else {
+			// always works town,dungeon and combat
+			// has chat focus
+			if (code === 38) {
+				// chat focus history nav up
+				if (chat.history[chat.historyIndex - 1] !== undefined) {
+					var msg = chat.history[--chat.historyIndex];
+					dom.chatInput.value = msg;
 				}
 			}
-		} else {
-			// game
-			if (code === 9){
-				// tab
-				if (!e.shiftKey){
-					my.nextTarget(false);
-				} else {
-					my.nextTarget(true);
+			else if (code === 40) {
+				// chat focus history nav down
+				if (chat.history.length === chat.historyIndex + 1) {
+					chat.historyIndex++;
+					chat.clear();
 				}
-				e.preventDefault();
-			} else if (code === 86){
-				// v
-				if (g.view === 'game' && !g.chatOn){
-					game.toggleGameWindows(1);
+				else if (chat.history[chat.historyIndex + 1] !== undefined) {
+					var msg = chat.history[++chat.historyIndex];
+					dom.chatInput.value = msg;
+				}
+			} else if (code === 13) {
+				// enter
+				my.name && chat.sendMsg();
+			}
+
+			if (g.view === 'town') {
+				if (!chat.hasFocus) {
+					// no chat focus
+					$("#chat-input").focus();
+				} else {
+				}
+			} else {
+				// game
+				if (code === 9) {
+					// tab
+					if (!e.shiftKey) {
+						my.nextTarget(false);
+					} else {
+						my.nextTarget(true);
+					}
+					e.preventDefault();
+				} else if (code === 86) {
+					// v
+					if (g.view === 'game' && !g.chatOn) {
+						game.toggleGameWindows(1);
+					}
 				}
 			}
 		}

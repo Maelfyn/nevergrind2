@@ -1,17 +1,17 @@
 // core.js
-g = Object.assign(g, {
+var g = {
 	events: function(){
 		$(window).focus(function(){
 			/*document.title = g.defaultTitle;
 			g.titleFlashing = false;*/
-			socket.init(1);
+			// my.name && socket.init(1);
 		});
 		// should be delegating no drag start
 		$("body").on('dragstart', 'img', function(e) {
 			e.preventDefault();
 		});
 		// disable stuff in app to appear more "native"
-		if (g.isApp) {
+		if (app.isApp) {
 			document.addEventListener("contextmenu", function (e) {
 				// disable default right-click menu
 				e.preventDefault();
@@ -41,6 +41,22 @@ g = Object.assign(g, {
 		}).on('load', function(){
 			env.resizeWindow();
 		});
+	},
+	idleDate: 0,
+	setIdleDate: function() {
+		g.idleDate = Date.now();
+	},
+	disconnect: function(msg) {
+		g.view = 'disconnected';
+		// turn off all events
+		$(document).add('*').off();
+		$("main > *").css('display', 'none');
+		var e = document.getElementById('scene-error');
+		e.style.display = 'block';
+		e.innerHTML = msg || 'You have been disconnected from the server';
+		setTimeout(function() {
+			location.reload();
+		}, 10000);
 	},
 	resizeTimer: 0,
 	races: [
@@ -131,8 +147,6 @@ g = Object.assign(g, {
 	view: "title",
 	resizeX: 1,
 	resizeY: 1,
-	sfxFood: false,
-	sfxCulture: false,
 	chatOn: false,
 	lockOverlay: document.getElementById("lock-overlay"),
 	startTime: Date.now(),
@@ -189,7 +203,7 @@ g = Object.assign(g, {
 				data.longitude += '';
 				g.geo = data;
 				$.ajax({
-					url: g.url + 'php/updateUserInfo.php',
+					url: app.url + 'php/updateUserInfo.php',
 					data: {
 						location: g.geo
 					}
@@ -241,7 +255,7 @@ g = Object.assign(g, {
 	keepAlive: function(){
 		$.ajax({
 			type: 'GET',
-			url: g.url + "php/keepAlive.php"
+			url: app.url + "php/keepAlive.php"
 		}).always(function() {
 			setTimeout(g.keepAlive, 120000);
 		});
@@ -306,7 +320,7 @@ g = Object.assign(g, {
 		// socket.removePlayer(my.account);
 		$.ajax({
 			type: 'GET',
-			url: g.url + 'php/deleteFromFwtitle.php'
+			url: app.url + 'php/deleteFromFwtitle.php'
 		});
 		
 		try {
@@ -328,7 +342,7 @@ g = Object.assign(g, {
 		setTimeout(function(){
 			$.ajax({
 				type: 'GET',
-				url: g.url + 'php/logout.php'
+				url: app.url + 'php/logout.php'
 			}).done(function(data) {
 				g.msg("Logout successful");
 				localStorage.removeItem('email');
@@ -379,7 +393,7 @@ g = Object.assign(g, {
 		
 		$.ajax({
 			type: 'GET',
-			url: g.url + 'php2/create/getStatMap.php'
+			url: app.url + 'php2/create/getStatMap.php'
 		}).done(function(r){
 			var r = r.statMap;
 			g.races.forEach(function(v){
@@ -397,25 +411,24 @@ g = Object.assign(g, {
 	initGame: function(){
 		$.ajax({
 			type: 'POST',
-			url: g.url + 'php2/initGame.php'
+			url: app.url + 'php2/initGame.php'
 		}).done(function(r){
 			console.info("initGame: ", r);
-			g.initialized = 1;
+			app.initialized = 1;
 			if (r.account) {
-				my.account = r.account;
+				app.account = my.account = r.account; // for global reference
 				document.getElementById('logout').textContent = 'Logout ' + r.account;
 				g.displayAllCharacters(r.characterData);
 				g.checkPlayerData();
-				var e = document.getElementById('login-modal');
-				!e && e.parentNode.removeChild(e);
+				$("#login-modal").remove();
 			}
 			else {
 				notLoggedIn();
 			}
-			document.getElementById('version').textContent = 'Version ' + g.version;
+			document.getElementById('version').textContent = 'Version ' + app.version;
 
 			var h = location.hash;
-			if (g.isLocal) {
+			if (app.isLocal) {
 				// hastag routing
 				if (h === '#town') {
 					town.go();
@@ -441,7 +454,8 @@ g = Object.assign(g, {
 		document.getElementById('ch-card-list').innerHTML = s;
 		$(".select-player-card:first").trigger(env.click);
 	}
-});
+};
+
 g.init = (function(){
 	// console.info("Initializing game...");
 	$.ajaxSetup({
@@ -450,4 +464,3 @@ g.init = (function(){
 	});
 	TweenLite.defaultEase = Quad.easeOut;
 })();
-location.search === '?create' && g.goCreateCharacter();

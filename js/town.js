@@ -1,10 +1,10 @@
-var p = {};
-var town = {
+var p = {}, // party info
+	town = {
 	go: function(){
 		if (create.selected) {
 			g.lock(1);
 			$.ajax({
-				url: g.url + 'php2/character/loadCharacter.php',
+				url: app.url + 'php2/character/loadCharacter.php',
 				data: {
 					row: create.selected
 				}
@@ -18,13 +18,12 @@ var town = {
 				g.setScene('town');
 				town.init();
 				chat.init(1);
-				chat.log("There are currently " + data.count + " players exploring Vandamor", 'chat-emote');
+				chat.log("There are currently " + data.count + " players exploring Vandamor.", 'chat-emote');
 				chat.friend.init();
 				chat.ignore.init();
 				game.heartbeat.start();
 			}).fail(function(data){
-				console.info(data);
-				g.msg(data.responseText, 1.5);
+				g.disconnect(data.responseText);
 			}).always(function(){
 				g.unlock();
 			});
@@ -48,11 +47,14 @@ var town = {
 	},
 	initialized: 0,
 	init: function(){
-		if (g.view !== 'town' && !town.initialized) {
+		if (!town.initialized) {
 			town.initialized = 1;
 			document.getElementById('scene-town').innerHTML = town.html();
 			town.events();
 			$("#scene-title").remove();
+			if (!sessionStorage.getItem('startTime')) {
+				sessionStorage.setItem('startTime', JSON.stringify(Date.now()));
+			}
 		}
 	}
 };

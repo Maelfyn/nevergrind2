@@ -30,26 +30,24 @@
 
 	<!--link rel="stylesheet" href="css/bootstrap-slider.min.css"-->
 	<script>
-		var g = {
-			version: '0.0.70',
+		var app = {
+			version: '0.0.74',
 			initialized: 0,
-			session_id: '',
-			isApp: location.protocol === 'chrome-extension:' ? 1 : 0
-		}, my = {
+			isApp: location.protocol === 'chrome-extension:' ? 1 : 0,
 			account: ''
 		};
-		g.url = g.isApp ?
+		app.url = app.isApp ?
 			'https://nevergrind.com/ng2-test-server/' : '';
-		g.loginUrl = 'https://nevergrind.com';
-		g.socketUrl = g.isApp ?
+		app.loginUrl = 'https://nevergrind.com';
+		app.socketUrl = app.isApp ?
 			'nevergrind.com' : location.hostname;
-		g.isServer = 0;
-		if (!g.isApp && location.hostname === 'nevergrind.com'){
-			g.isServer = 1;
+		app.isServer = 0;
+		if (!app.isApp && location.hostname === 'nevergrind.com'){
+			app.isServer = 1;
 		}
-		g.isLocal = location.hostname.indexOf('localhost') > -1;
-		if (g.isLocal) {
-			g.loginUrl = '';
+		app.isLocal = location.hostname.indexOf('localhost') > -1;
+		if (app.isLocal) {
+			app.loginUrl = '';
 		}
 	</script>
 	<style>
@@ -64,8 +62,8 @@
 <body id="body">
 <script>
 	(function(b){
-		e = document.createElement('link');
-		e.href = 'css/ng2' + (g.isLocal ? '.css' : '.min.css') + '?v='+ g.version;
+		var e = document.createElement('link');
+		e.href = 'css/ng2' + (app.isLocal ? '.css' : '.min.css') + '?v='+ app.version;
 		e.rel = 'stylesheet';
 		b.appendChild(e);
 	})(document.body);
@@ -598,6 +596,9 @@
 	<div id="scene-battle" class="scene none no-select">
 	</div> <!-- end scene-battle -->
 
+	<div id="scene-error" class="scene none no-select text-shadow">
+	</div> <!-- end scene-error -->
+
 	<audio id="bgmusic" autoplay loop preload="auto"></audio>
 
 
@@ -613,7 +614,7 @@
 <script>
 	// kongregate
 	/*
-	if (g.isServer) {
+	if (app.isServer) {
 		(function(d, s, id) {
 			var js, fjs = d.getElementsByTagName(s)[0];
 			js = d.createElement(s);
@@ -632,7 +633,7 @@
 	// loginModal.php
 	sessionStorage.setItem('refer', location.pathname);
 	// FB SSO
-	if (g.isServer) {
+	if (app.isServer) {
 		window.fbAsyncInit = function () {
 			FB.init({
 				appId: '737706186279455',
@@ -655,7 +656,7 @@
 		});
 	}
 	function fbLoginCallback(response){
-		if (g.isServer) {
+		if (app.isServer) {
 			if (response && response.status === 'connected') {
 				// Logged into your app and Facebook.
 				var token = response.authResponse.accessToken;
@@ -666,7 +667,7 @@
 					}, function (response) {
 						$.ajax({
 							type: 'POST',
-							url: g.loginUrl + '/php/master1.php',
+							url: app.loginUrl + '/php/master1.php',
 							data: {
 								run: 'authenticate',
 								facebookToken: token
@@ -695,7 +696,7 @@
 
 	// google SSO
 	function loginRenderButton() {
-		if (g.isServer || g.isApp) {
+		if (app.isServer || app.isApp) {
 			gapi.load('auth2', function () {
 				gapi.auth2.init();
 				gapi.signin2.render('my-signin2', {
@@ -710,7 +711,7 @@
 							loginAuthenticationLock = true;
 							$.ajax({
 								type: 'POST',
-								url: g.loginUrl + '/php/master1.php',
+								url: app.loginUrl + '/php/master1.php',
 								data: {
 									run: 'authenticate',
 									googleToken: token
@@ -779,7 +780,7 @@
 		}
 		loginMsg("Checking account status...");
 		$.ajax({
-			url: g.loginUrl + '/php/master1.php',
+			url: app.loginUrl + '/php/master1.php',
 			data: {
 				run: "forgotPassword",
 				email: email
@@ -831,7 +832,7 @@
 
 		$.ajax({
 			type: 'POST',
-			url: g.loginUrl + '/php/master1.php',
+			url: app.loginUrl + '/php/master1.php',
 			data: {
 				run: 'authenticate',
 				email: login,
@@ -849,7 +850,7 @@
 	function loginTokenAuthenticate(){
 		$.ajax({
 			type: 'POST',
-			url: g.loginUrl + '/php/master1.php',
+			url: app.loginUrl + '/php/master1.php',
 			data: {
 				run: 'authenticate',
 				email: email,
@@ -863,7 +864,7 @@
 	}
 	function loginGotoRefer(data, suppress, origin){
 		function redirect(){
-			if (g.isApp){
+			if (app.isApp){
 				location.reload();
 			}
 			else {
@@ -875,15 +876,15 @@
 				}
 			}
 		}
-		var target = g.url + (sessionStorage.getItem('refer') || '');
+		var target = app.url + (sessionStorage.getItem('refer') || '');
 		if (data === 'Create an account name!'){
 			location.replace("https://nevergrind.com/setAccount.php");
 		} else if (data === "Login successful!"){
 			if (origin === 'loginRenderButton'){
 				$("#login-modal").remove();
 				(function repeat(){
-					if (g.initialized){
-						if (!my.account) {
+					if (app.initialized){
+						if (!app.account) {
 							// not logged in - Google SSO requires this
 							redirect();
 						}
@@ -911,7 +912,7 @@
 
 	// facebook
 	(function(d, s, id) {
-		if (g.isServer) {
+		if (app.isServer) {
 			var js, fjs = d.getElementsByTagName(s)[0];
 			js = d.createElement(s);
 			js.id = id;
@@ -922,14 +923,14 @@
 </script>
 <script src="https://apis.google.com/js/platform.js?onload=loginRenderButton" async defer></script>
 <script>
-	if (g.isServer || g.isApp) {
+	if (app.isServer || app.isApp) {
 		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 			(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
 			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
 		})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 		ga('create', 'UA-35167620-1', 'auto');
 		ga('send', 'pageview');
-		if (g.isServer) {
+		if (app.isServer) {
 			document.getElementById('social-login-wrap').style.display = 'block';
 		}
 	}
@@ -940,8 +941,9 @@
 			visibility: 'visible'
 		});
 
-		if (g.isServer) {
-			/*kongregateAPI.loadAPI(function () {
+
+		/*if (app.isServer) {
+			kongregateAPI.loadAPI(function () {
 				function loginKong() {
 					loginAuthenticationLock = true;
 					var kongGames = {
@@ -959,7 +961,7 @@
 
 					$.ajax({
 						type: 'POST',
-						url: g.loginUrl + '/php/master1.php',
+						url: app.loginUrl + '/php/master1.php',
 						data: o
 					}).done(function (data) {
 						if (data === 'Create an account name!') {
@@ -985,8 +987,8 @@
 						loginKong();
 					});
 				}
-			});*/
-		}
+			});
+		}*/
 	}
 
 	(function(d, s, x){
@@ -1020,7 +1022,7 @@
 
 		for (var i=0, len=s.length; i<len; i++){
 			var e = d.createElement("script");
-			var js = "js/" + s[i] + x + "?v="+ g.version;
+			var js = "js/" + s[i] + x + "?v="+ app.version;
 			e.src = js;
 			e.async = false;
 			d.head.appendChild(e);

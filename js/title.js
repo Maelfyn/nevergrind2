@@ -7,7 +7,7 @@ var title = {
 		e.innerHTML = '';
 		g.lock();
 		$.ajax({
-			url: g.url + 'php/leaderboard.php',
+			url: app.url + 'php/leaderboard.php',
 			data: {
 				type: type
 			}
@@ -22,7 +22,7 @@ var title = {
 			title.refreshTimer = Date.now();
 			$.ajax({
 				type: 'GET',
-				url: g.url + 'php/refreshGames.php'
+				url: app.url + 'php/refreshGames.php'
 			}).done(function(data) {
 				//console.info(data);
 				var e = document.getElementById('gameTableBody');
@@ -74,7 +74,7 @@ var title = {
 				if (g.view === 'title'){
 					$.ajax({
 						type: "POST",
-						url: g.url + 'php/titleUpdate.php',
+						url: app.url + 'php/titleUpdate.php',
 						data: {
 							channel: my.channel
 						}
@@ -169,7 +169,7 @@ var title = {
 		}
 		var e = document.getElementById('titlePlayer' + account);
 		if (e !== null){
-			e.parentNode.removeChild(e);
+			//e.parentNode.removeChild(e);
 		}
 		var e = document.createElement('div');
 		e.className = "titlePlayer";
@@ -186,7 +186,7 @@ var title = {
 		delete title.players[data.account];
 		var z = document.getElementById('titlePlayer' + data.account);
 		if (z !== null){
-			z.parentNode.removeChild(z);
+			//z.parentNode.removeChild(z);
 		}
 	},
 	updateGame: function(data){
@@ -265,7 +265,7 @@ var title = {
 		delete title.games[data.id];
 		var e = document.getElementById('game_' + data.id);
 		if (e !== null){
-			e.parentNode.removeChild(e);
+			//e.parentNode.removeChild(e);
 		}
 	},
 	showBackdrop: function(e){
@@ -315,7 +315,7 @@ var title = {
 		g.teamMode = teamMode;
 		g.speed = speed;
 		$.ajax({
-			url: g.url + 'php/createGame.php',
+			url: app.url + 'php/createGame.php',
 			data: {
 				name: name,
 				pw: pw,
@@ -353,7 +353,7 @@ var title = {
 		g.lock();
 		audio.play('click');
 		$.ajax({
-			url: g.url + 'php/joinGame.php',
+			url: app.url + 'php/joinGame.php',
 			data: {
 				name: g.name,
 				password: g.password

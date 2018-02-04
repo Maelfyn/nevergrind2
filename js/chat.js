@@ -6,6 +6,7 @@ var chat = {
 		var s =
 			'<div id="chat-log">' +
 				'<div>Welcome to Vandamor.</div>' +
+				'<div class="chat-warning">Nevergrind 2 is still in development, but feel free to test it out!</div>' +
 				'<div class="chat-emote">Type /help or /h for a list of chat commands.</div>' +
 			'</div>' +
 			'<input id="chat-input" type="text" maxlength="240" autocomplete="off" spellcheck="false" />';
@@ -50,16 +51,12 @@ var chat = {
 		// dom
 		dom.chatLog = document.getElementById('chat-log');
 		dom.chatInput = document.getElementById('chat-input');
-		chat.count = dom.chatLog.childElementCount;
 	},
 	// report to chat-log
 	log: function(msg, route){
 		if (msg){
-			if (chat.count >= 500) {
+			while (dom.chatLog.childElementCount >= 500) {
 				dom.chatLog.removeChild(dom.chatLog.firstChild);
-			}
-			else {
-				chat.count++;
 			}
 			var z = document.createElement('div');
 			if (route){
@@ -73,7 +70,7 @@ var chat = {
 	parseMsg: function(msg) {
 		var arr = msg.split(" ");
 		var o = {
-			first: arr[0].trim()
+			first: arr[0].trim().toLowerCase()
 		}
 		arr.shift();
 		o.command = arr.join(' ');
@@ -87,8 +84,6 @@ var chat = {
 				category: my.channel
 			};
 		var parse = chat.parseMsg(msg);
-
-		console.info("getMsgObject: ", parse.first, parse.command);
 
 		// is it a command?
 		if (parse.first === '/p' || parse.first === '/party'){
@@ -126,17 +121,30 @@ var chat = {
 	},
 	historyIndex: 0,
 	history: [],
+	updateHistory: function(msg) {
+		chat.history.push(msg);
+		chat.historyIndex = chat.history.length;
+	},
 	help: function() {
 		var z = 'class="chat-emote"',
 			s = [
 				'<div class="chat-warning">Chat Commands:</div>',
-				'<div '+ z +'>/p : Message your party : /p hail</div>',
-				'<div '+ z +'>/g : Message your guild : /g hail</div>',
-				'<div '+ z +'>@ : Send a private message by name : @bob hi</div>',
+				'<div '+ z +'>/party /p : Message your party : /p hail</div>',
+				'<div '+ z +'>/guild /g : Message your guild : /g hail</div>',
 				'<div '+ z +'>/ooc : Send a message out of character : /ooc hail</div>',
-				'<div '+ z +'>/shout : Shout a message : /shout hail</div>',
+				'<div '+ z +'>/shout /s : Shout a message : /s hail</div>',
 				'<div '+ z +'>/me : Send an emote : /me waves</div>',
-				'<div '+ z +'>/friend : Show your friends\' online status</div>'
+				'<div '+ z +'>@ : Send a private message by name : @bob hi</div>',
+				'<div '+ z +'>/flist or /f : Show your friends\' online status</div>',
+				'<div '+ z +'>/f add : Add a friend : /f add Bob</div>',
+				'<div '+ z +'>/f remove : Remove a friend : /f remove Bob</div>',
+				'<div '+ z +'>/ignore or /i : Show your ignore list</div>',
+				'<div '+ z +'>/i add : Add someone to your ignore list</div>',
+				'<div '+ z +'>/i remove : Remove someone from your ignore list</div>',
+				'<div '+ z +'>/who : Show all players currently playing</div>',
+				'<div '+ z +'>/who class : Show current players by class : /who warrior</div>',
+				'<div '+ z +'>/clear: clear the chat log</div>',
+				'<div '+ z +'>/played: Show character creation, session duration, and total playtime</div>',
 			];
 		for (var i=0, len=s.length; i<len; i++) {
 			chat.log(s[i]);
@@ -144,12 +152,18 @@ var chat = {
 	},
 	// player hit ENTER
 	sendMsg: function(bypass){
-		var msg = dom.chatInput.value.trim();
+		var msg = dom.chatInput.value.trim(),
+			msgLower = msg.toLowerCase();
 		// bypass via ENTER or chat has focus
 		if (msg === '/h' || msg === '/help') {
+			chat.updateHistory(msg);
 			chat.help();
 		}
 		/*
+		/random
+		/surname
+		update /help
+		create placards!
 		allow to form parties
 			invite
 			disband
@@ -159,22 +173,44 @@ var chat = {
 			disband
 			leader
 		 */
-		else if (msg === '/i' || msg === '/ignore') {
+		else if (msgLower === '/played') {
+			chat.updateHistory(msgLower);
+			chat.played();
+		}
+		else if (msgLower === '/clear') {
+			chat.updateHistory(msgLower);
+			chat.clearChatLog();
+		}
+		else if (msgLower === '/who') {
+			chat.updateHistory(msgLower);
+			chat.who.all();
+		}
+		else if (msgLower.indexOf('/who ') === 0 && msgLower.length > 5) {
+			chat.updateHistory(msg);
+			chat.who.class(chat.who.parse(msg));
+		}
+		else if (msgLower === '/i' || msgLower === '/ignore') {
+			chat.updateHistory(msgLower);
 			chat.ignore.list();
 		}
-		else if (msg.indexOf('/i remove') === 0 || msg.indexOf('/ignore remove') === 0) {
+		else if (msgLower.indexOf('/i remove') === 0 || msgLower.indexOf('/ignore remove') === 0) {
+			chat.updateHistory(msg);
 			chat.ignore.remove(chat.friend.parse(msg));
 		}
-		else if (msg.indexOf('/i add') === 0 || msg.indexOf('/ignore add') === 0) {
+		else if (msgLower.indexOf('/i add') === 0 || msgLower.indexOf('/ignore add') === 0) {
+			chat.updateHistory(msg);
 			chat.ignore.add(chat.friend.parse(msg));
 		}
-		else if (msg === '/f' || msg === '/friend') {
+		else if (msgLower === '/f' || msgLower === '/friend' || msgLower === '/flist') {
+			chat.updateHistory(msgLower);
 			chat.friend.list();
 		}
-		else if (msg.indexOf('/f remove') === 0 || msg.indexOf('/friend remove') === 0) {
+		else if (msgLower.indexOf('/f remove') === 0 || msgLower.indexOf('/friend remove') === 0) {
+			chat.updateHistory(msg);
 			chat.friend.remove(chat.friend.parse(msg));
 		}
-		else if (msg.indexOf('/f add') === 0 || msg.indexOf('/friend add') === 0) {
+		else if (msgLower.indexOf('/f add') === 0 || msgLower.indexOf('/friend add') === 0) {
+			chat.updateHistory(msg);
 			chat.friend.add(chat.friend.parse(msg));
 		}
 		else if (msg[0] === '@'){
@@ -190,9 +226,10 @@ var chat = {
 					msg: 'You told ' + name + ': ' + parse.command,
 					class: 'chat-whisper'
 				};
+				chat.updateHistory(msg);
 
 				$.ajax({
-					url: g.url + 'php2/chat/send.php',
+					url: app.url + 'php2/chat/send.php',
 					data: {
 						date: d,
 						action: 'send',
@@ -208,10 +245,9 @@ var chat = {
 				if (msg) {
 					var o = chat.getMsgObject(msg);
 					if (o.msg[0] !== '/') {
-						chat.history.push(msg);
-						chat.historyIndex = chat.history.length;
+						chat.updateHistory(msg);
 						$.ajax({
-							url: g.url + 'php2/chat/send.php',
+							url: app.url + 'php2/chat/send.php',
 							data: {
 								msg: o.msg,
 								class: o.class,
@@ -232,6 +268,9 @@ var chat = {
 	whispers: {},
 	clear: function() {
 		dom.chatInput.value = '';
+	},
+	clearChatLog: function(){
+		dom.chatLog.innerHTML = '';
 	},
 	changeChannel: function(msg, splitter){
 		var arr = msg.split(splitter);
@@ -254,13 +293,17 @@ var chat = {
 			}
 		},
 		add: function(o) {
-			g.ignore.push(o);
-			localStorage.setItem('ignore', JSON.stringify(g.ignore));
-			chat.log('You have added ' + o + ' to your ignore list.', 'chat-warning');
+			if (o !== my.name) {
+				g.ignore.push(o);
+				localStorage.setItem('ignore', JSON.stringify(g.ignore));
+				chat.log('You have added ' + o + ' to your ignore list.', 'chat-warning');
+			}
 		},
 		remove: function(o) {
-			var index = g.ignore.indexOf(o);
-			g.ignore.splice(index, 1);
+			while (g.ignore.indexOf(o) > -1) {
+				var index = g.ignore.indexOf(o);
+				g.ignore.splice(index, 1);
+			}
 			localStorage.setItem('ignore', JSON.stringify(g.ignore));
 			chat.log('You have removed ' + o + ' from your ignore list.', 'chat-warning');
 		}
@@ -274,28 +317,26 @@ var chat = {
 			g.friends = g.friends || [];
 			$.ajax({
 				type: 'GET',
-				url: g.url + 'php2/chat/friend-get.php',
+				url: app.url + 'php2/chat/friend-get.php',
 			}).done(function(data){
 				g.friends = data;
 			});
 		},
 		list: function() {
-			var len = g.friends.length;
 			chat.log('<div class="chat-warning">Checking friends list...</div>');
 			if (g.friends.length){
 				$.ajax({
-					url: g.url + 'php2/chat/friend-status.php',
-					data: {
-						friends: g.friends
-					}
-				}).done(function(data){
-					var p = data.players;
-					console.info(data);
-					var str = '<div>Friend List ('+ len +')</div>';
-					for (var i=0; i<len; i++){
-						var index = p.indexOf(g.friends[i]);
+					type: 'GET',
+					url: app.url + 'php2/chat/friend-status.php'
+				}).done(function(r){
+					g.friends = r.friends;
+					console.info(r);
+					var str = '<div>Friend List ('+ r.friends.length +')</div>';
+
+					g.friends.forEach(function(name, i){
+						var index = r.players.indexOf(name);
 						if (index > -1){
-							var s = data.stats[i];
+							var s = r.stats[index];
 							// online
 							str +=
 								'<div class="chat-whisper">[' +
@@ -303,9 +344,10 @@ var chat = {
 								')</div>';
 						} else {
 							// offline
-							str += '<div class="chat-emote">' + g.friends[i] +' [Offline]</div>';
+							str += '<div class="chat-emote">[Offline] ' + name +'</div>';
 						}
-					}
+					});
+
 					chat.log(str);
 				});
 			} else {
@@ -314,9 +356,9 @@ var chat = {
 			}
 		},
 		add: function(o) {
-			if (o.length > 1) {
+			if (o.length > 1 && o !== my.name) {
 				$.ajax({
-					url: g.url + 'php2/chat/friend-add.php',
+					url: app.url + 'php2/chat/friend-add.php',
 					data: {
 						friend: o
 					}
@@ -334,7 +376,7 @@ var chat = {
 		remove: function(o) {
 			if (o.length > 1) {
 				$.ajax({
-					url: g.url + 'php2/chat/friend-remove.php',
+					url: app.url + 'php2/chat/friend-remove.php',
 					data: {
 						friend: o
 					}
@@ -344,102 +386,155 @@ var chat = {
 					}
 					else {
 						chat.log('You have removed ' + o + ' from your friends list.', 'chat-warning');
-						var index = g.friends.indexOf(o);
-						g.friends.splice(index, 1);
+						while (g.friends.indexOf(o) > -1) {
+							var index = g.friends.indexOf(o);
+							g.friends.splice(index, 1);
+						}
 					}
 				});
 			}
 		}
 	},
-	listIgnore: function(){
-		var len = g.ignore.length;
-		var str = '<div>Ignore List ('+ len +')</div>';
-		for (var i=0; i<len; i++){
-			str += '<div><span class="chat-muted titlePlayerAccount">' + g.ignore[i] +'</span></div>';
+	toPlaytime: function(minLeft) {
+		var d = 0,
+			h = 0;
+
+		if (minLeft >= 1440) {
+			d = Math.floor(minLeft / 1440);
+			minLeft = (minLeft % 1440);
 		}
-		g.chat(str);
-	},
-	addIgnore: function(account){
-		account = account.trim();
-		g.chat('<div>Ignoring '+ account +'</div>');
-		if (g.ignore.indexOf(account) === -1 && account){
-			if (g.ignore.length < 20){
-				if (account !== my.account){
-					g.ignore.push(account);
-					localStorage.setItem('ignore', JSON.stringify(g.ignore));
-					g.chat('Now ignoring account: ' + account, 'chat-muted');
-				} else {
-					g.chat("<div>You can't ignore yourself!</div><img src='images/chat/random/autism.jpg'>", 'chat-muted');
-				}
-			} else {
-				g.chat('You cannot ignore more than 20 accounts!', 'chat-muted');
-			}
-		} else {
-			g.chat('Already ignoring ' + account +'!', 'chat-muted');
+		if (minLeft >= 60) {
+			h = Math.floor(minLeft / 60);
+			minLeft = (minLeft % 60);
 		}
-	},
-	removeIgnore: function(account){
-		account = account.trim();
-		g.chat('<div>Unignoring '+ account +'</div>');
-		if (g.ignore.indexOf(account) > -1 && account){
-			// found account
-			var index = g.ignore.indexOf(account);
-			g.ignore.splice(index, 1);
-			localStorage.setItem('ignore', JSON.stringify(g.ignore));
-			g.chat('Stopped ignoring account: ' + account, 'chat-muted');
-		} else {
-			g.chat(account + ' is not on your ignore list.', 'chat-muted');
+		var m = minLeft,
+			dayStr = '',
+			hourStr = '',
+			minStr = '';
+		if (d) {
+			dayStr += d + (d > 1 ? ' days' : ' day');
 		}
+		if (h) {
+			hourStr += h + (h > 1 ? ' hours' : ' hour');
+		}
+		// minutes
+		minStr = m;
+		if (m !== 1) {
+			minStr += ' minutes';
+		}
+		else {
+			minStr += ' minute';
+		}
+
+		if (d && h && m) {
+			dayStr += ', ';
+		}
+		else if (d) {
+			dayStr += ' ';
+		}
+
+		if (h) {
+			hourStr += ', ';
+		}
+
+		if (d || h) {
+			minStr = 'and ' + minStr;
+		}
+		return dayStr + hourStr + minStr;
 	},
-	who: function(msg){
-		var a = msg.split("/who ");
+	toCreateString: function(d) {
+		d = new Date(d);
+		return d.toDateString() + ' ' + d.toLocaleTimeString();
+	},
+	played: function() {
 		$.ajax({
-			url: g.url + 'php/who.php',
-			data: {
-				account: a[1]
-			}
-		}).done(function(data){
-			function getRibbonStr(){
-				var str = '';
-				if (data.ribbons !== undefined){
-					var len = data.ribbons.length;
-					if (len){
-						str += '<div class="who-ribbon-chat '+ (len >= 24 ? 'wideRack' : 'narrowRack') +'">';
-						for (var i=0, len=data.ribbons.length; i<len; i++){
-							var z = data.ribbons[i];
-							str += '<div class="pointer ribbon ribbon'+ z +'" title="'+ game.ribbonTitle[z] +'" data-ribbon="'+ z +'"></div>';
-						}
-						str += '</div>';
-					}
-				}
-				return str;
-			}
-			
-			var str = 
-			'<div class="row who-wrap">'+
-				'<div class="col-xs-8">';
-				// left col
-				str += data.str;
-				if (data.account !== my.account && g.friends.indexOf(data.account) === -1){
-					str += '<button style="pointer-events: initial" class="addFriend btn btn-xs fwBlue" data-account="'+ data.account +'">Add Friend</button>';
-				}
-			str += 
-				'</div>'+
-				'<div class="col-xs-4">';
-				// right col
-				str += 
-					'<div class="who-avatar-wrap">'+
-						data.img +
-						'<div class="who-ribbon-wrap">'+
-							getRibbonStr()+
-						'</div>'+
-					'</div>'+
-				'</div>'+
-			'</div>';
-			g.chat(str);
-		}).fail(function(){
-			g.chat('No data found.');
+			type: 'GET',
+			url: app.url + 'php2/chat/played.php'
+		}).done(function(r) {
+			var sessionLen = Date.now() - JSON.parse(sessionStorage.getItem('startTime')),
+				durationStr = chat.toPlaytime(~~(sessionLen / 100000));
+			chat.log("Character created: " + chat.toCreateString(r.created), 'chat-warning');
+			chat.log("Current session duration: " + durationStr, 'chat-whisper');
+			chat.log("Total character playtime: " + chat.toPlaytime(r.playtime), 'chat-whisper');
 		});
+	},
+	who: {
+		parse: function(msg) {
+			var a = msg.split(" "),
+				job = a[1],
+				longJob = job[0].toUpperCase() + job.substr(1);
+
+			// long name?
+			if (g.jobs.indexOf(longJob) > -1) {
+				// convert to short
+				return g.jobShort[longJob];
+			}
+			else {
+				var shortJobs = Object.keys(g.jobLong),
+					job = job.toUpperCase();
+				if (shortJobs.indexOf(job)) {
+					// is it on the short job list?
+					return job;
+				}
+				else {
+					return '';
+				}
+			}
+		},
+		all: function(){
+			$.ajax({
+				type: 'GET',
+				url: app.url + 'php2/chat/who-all.php'
+			}).done(function(r){
+				console.info('who ', r);
+				if (r.len) {
+					chat.log("There " + (r.len > 1 ? "are" : "is") +" currently "+
+						r.len + " "+ (r.len > 1 ? "players" : "players") +" in Vandamor.", "chat-warning");
+					// online
+					var str = '';
+					r.players.forEach(function(v, i){
+						str +=
+							'<div class="chat-whisper">[' +
+							v.level +' '+ g.jobLong[v.job] +'] '+ v.name + ' ('+ v.race +
+							')</div>';
+					});
+					chat.log(str, 'chat-whisper');
+				}
+				else {
+					chat.log("Nobody is currently in Vandamor.", "chat-warning");
+				}
+			});
+		},
+		class: function(job){
+			console.info('who.class ', job);
+			$.ajax({
+				url: app.url + 'php2/chat/who-class.php',
+				data: {
+					job: job
+				}
+			}).done(function(r){
+				console.info('r ', r);
+				var jobLong = g.toJobLong(job);
+				if (r.len) {
+					chat.log("There " + (r.len > 1 ? "are" : "is") +" currently "+
+						r.len + " "+ (r.len > 1 ? jobLong + 's' : jobLong) +" in Vandamor.", "chat-warning");
+					// online
+					var str = '';
+					r.players.forEach(function(v, i){
+						str +=
+							'<div class="chat-whisper">[' +
+							v.level +' '+ g.jobLong[v.job] +'] '+ v.name + ' ('+ v.race +
+							')</div>';
+					});
+					chat.log(str, 'chat-whisper');
+				}
+				else {
+					chat.log("Currently there are no " + jobLong + "s in Vandamor.", "chat-warning");
+				}
+
+
+			});
+		},
 	},
 	scrollBottom: function(){
 		if (!chat.isClicked){

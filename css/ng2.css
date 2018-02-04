@@ -1228,13 +1228,14 @@ tbody {
 	border: 2px ridge #666;
 	background: rgba(0,0,0,.8);
 	width: 30rem;
-	height: 12rem;
+	height: 25rem;
 	z-index: 2;
 }
 #chat-log {
 	flex: 1;
 	height: 100%;
 	overflow: auto;
+	overflow-x: hidden;
 	line-height: 1.2;
 	color: #f2f2f2;
 	box-shadow: 0 0 5px 1px #025 inset;
@@ -1446,6 +1447,30 @@ tbody {
 	background-color: #248;
 	/*background-image: -webkit-linear-gradient(top, #579 0%, #bdf 50%, #579 100%);*/
 	outline: 1px solid #0f0;
+	border-radius: 22%;
+}
+#scene-error {
+	padding: 30vh 10vw 0;
+	color: gold;
+	text-align: center;
+	font: 3rem Cinzel;
+	text-shadow:
+		.6px .6px #000,
+		-.4px .6px #000,
+		-.4px 0 #000,
+		.6px 0 #000,
+		0 .6px #000,
+		0 -.6px #000,
+		0px 0px 5px #000,
+		0px 0px 2px #000,
+		1px 1px 2px #fff,
+		0 0 2px #fd0,
+		0 0 5px #fd0;
+	background: #111;
+	background: -webkit-radial-gradient(center center, farthest-corner, rgba(16, 16, 16, 1) 0, rgba(0, 0, 0, 1) 100%);
+	background: -moz-radial-gradient(center center, farthest-corner, rgba(16, 16, 16, 1) 0, rgba(0, 0, 0, 1) 100%);
+	background: -o-radial-gradient(center center, farthest-corner, rgba(16, 16, 16, 1) 0, rgba(0, 0, 0, 1) 100%);
+	background: radial-gradient(center center, farthest-corner, rgba(16, 16, 16, 1) 0, rgba(0, 0, 0, 1) 100%);
 }
 body {
 	visibility: visible;

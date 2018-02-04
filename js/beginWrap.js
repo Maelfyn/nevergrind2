@@ -31,6 +31,5 @@
 	JSON,
 	Date,
 	Object,
-	g,
 	undefined
 ){

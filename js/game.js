@@ -5,6 +5,7 @@ var game = {
 		start: function() {
 			game.heartbeat.send();
 			game.heartbeat.update();
+			game.played.start();
 		},
 		update: function() {
 			clearTimeout(game.heartbeat.timer);
@@ -17,12 +18,34 @@ var game = {
 			clearTimeout(title.keepAliveTimer);
 			$.ajax({
 				type: 'GET',
-				url: g.url + 'php2/heartbeat.php'
+				url: app.url + 'php2/heartbeat.php'
 			}).done(function(data){
 				console.info('heartbeat ', data);
 			})
 
 		}
+	},
+	played: {
+		timer: 0,
+		start: function() {
+			clearInterval(game.played.timer);
+			game.played.timer = setInterval(function(){
+				var d = Date.now() - g.idleDate;
+				console.info("idleDate", d);
+				if (d > 900000) {
+					// disconnect - idle 15 minutes
+					g.disconnect();
+				}
+				else {
+					$.ajax({
+						type: 'GET',
+						url: app.url + 'php2/update-played.php'
+					});
+					!app.isLocal && console.clear();
+				}
+			}, 60000);
+		}
+
 	},
 	name: '',
 	initialized: false,
@@ -32,7 +55,7 @@ var game = {
 		// or check that players are still online?
 		$.ajax({
 			type: 'GET',
-			url: g.url + 'php/getGameState.php'
+			url: app.url + 'php/getGameState.php'
 		}).done(function(data){
 			console.info('getGameState ', data);
 			// get tile data

@@ -38,7 +38,7 @@ var socket = {
 			if (channel !== my.channel){
 				$.ajax({
 					type: "POST",
-					url: g.url + 'php/titleChangeChannel.php',
+					url: app.url + 'php/titleChangeChannel.php',
 					data: {
 						channel: channel
 					}
@@ -92,48 +92,82 @@ var socket = {
 			}
 		})();
 	},
+	lastPing: 0,
 	initWhisper: function() {
 		if (socket.enabled) {
-			var channel = 'name:' + my.name;
 			console.info("subscribing to whisper channel: ", channel);
+
+			var channel = 'name:' + my.name;
+			socket.updatePing();
+
 			socket.zmq.subscribe(channel, function(topic, data) {
 				console.info('rx ', topic, data);
 				if (data.action === 'send') {
 					// report message
 					route.town(data, data.route);
 					// callback to sender
-					data.action = 'receive';
-					socket.zmq.publish('name:' + data.name, data);
+					// data.action = 'receive';
+					//socket.zmq.publish('name:' + data.name, data);
+					// callback to sender
+					$.ajax({
+						url: app.url + 'php2/chat/send.php',
+						data: {
+							date: data.date,
+							action: 'receive',
+							msg: 'x',
+							class: 'chat-whisper',
+							category: 'name:' + data.name
+						}
+					});
 				}
+				// receive pong
 				else if (data.action === 'receive') {
 					route.town(chat.whispers[data.date], 'chat->log');
+				}
+				// receive keep alive
+				if (data.ping) {
+					socket.updatePing();
 				}
 			});
 		}
 	},
-	enabled: false,
+	updatePing: function(){
+		socket.lastPing = Date.now();
+	},
+	enabled: 0,
+	connectionTries: 0,
+	connectionRetryDuration: 100,
 	init: function(bypass){
 		// is player logged in?
 		if (bypass || !socket.enabled) {
-			socket.zmq = new ab.Session('wss://' + g.socketUrl + '/wss2/', function () {
+			socket.zmq = new ab.Session('wss://' + app.socketUrl + '/wss2/', function () {
 				// on open
 				socket.connectionSuccess();
 			}, function () {
 				// on close/fail
-				socket.reconnect();
+				console.warn('WebSocket connection failed. Retrying...');
+				socket.enabled = 0;
+				setTimeout(socket.init, socket.connectionRetryDuration);
 			}, {
 				// options
 				'skipSubprotocolCheck': true
 			});
 		}
 	},
-	initialConnection: true,
+	reinit: function(){
+		socket.zmq = null;
+		socket.enabled = 0;
+		socket.initialConnection = 0;
+		socket.init();
+	},
+	initialConnection: 1,
+	pongTimer: 0,
 	connectionSuccess: function(){
-		socket.enabled = true;
+		socket.enabled = 1;
 		console.info("Socket connection established with server");
 		// chat updates
 		if (socket.initialConnection){
-			socket.initialConnection = false;
+			socket.initialConnection = 0;
 			// subscribe to town-1 default channel - general chat
 			var town = 'ng2:town-1';
 			console.info("subscribing to channel: ", town);
@@ -177,14 +211,25 @@ var socket = {
 					setTimeout(repeat, 200);
 				}
 			})();
+			/*
+			// keep alive?
+			(function repeat(){
+				socket.zmq.publish('name:' + my.name, {
+					ping: 1
+				});
+				setTimeout(repeat, 5000);
+			})();
+			// pong timer
+			clearInterval(chat.pongTimer);
+			chat.pongTimer = setInterval(function(){
+				var pong = Date.now() - socket.lastPing;
+				if (pong > 9000) {
+					socket.reinit();
+				}
+				console.info("pong: ", pong);
+			}, 5000);
+			*/
 		}
 		socket.setChannel(chat.channel);
-	},
-	connectionTries: 0,
-	connectionRetryDuration: 100,
-	reconnect: function(){
-		console.warn('WebSocket connection failed. Retrying...');
-		socket.enabled = false;
-		setTimeout(socket.init, socket.connectionRetryDuration);
 	}
 }

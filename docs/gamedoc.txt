@@ -8,6 +8,10 @@
 
 ///////////////
 
+- player/party panels
+- presence displayed in lobby/town
+- add right-click menu to player names for invite to party/guild/ignore/friend, etc?
+- add guild stuff!
 - add backstab, archery, shadow kick as skills. make casting spells conditionally added to separate table?
 - Finish insert items template files
 	establish low/high values from 1-50 items

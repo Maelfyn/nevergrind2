@@ -1,6 +1,6 @@
 
 // player data values
-my = Object.assign(my, {
+var my = {
 	lastReceivedWhisper: '',
 	team: 0,
 	gameName: 'Earth Alpha',
@@ -32,7 +32,7 @@ my = Object.assign(my, {
 		if (r || bypass || g.view !== 'game'){
 			g.lock(1);
 			$.ajax({
-				url: g.url + 'php/exitGame.php',
+				url: app.url + 'php/exitGame.php',
 				data: {
 					view: g.view
 				}
@@ -41,4 +41,4 @@ my = Object.assign(my, {
 			});
 		}
 	}
-});
+};
