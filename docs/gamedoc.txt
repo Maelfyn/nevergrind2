@@ -1,15 +1,9 @@
-=== image config ====
 
-1. w & h
-2. yFloor
-3. imgCy
-4. rest
-// all done - resize all images??
 
 ///////////////
 
+- presence displayed in lobby/town - sanity check needed?
 - player/party panels
-- presence displayed in lobby/town
 - add right-click menu to player names for invite to party/guild/ignore/friend, etc?
 - add guild stuff!
 - add backstab, archery, shadow kick as skills. make casting spells conditionally added to separate table?
@@ -54,6 +48,15 @@ Town
 	races, classes, gender, stats
 - experiment with a 3d hallway thing
 - Maybe upgrade autobahn?
+
+=== image config ====
+
+1. w & h
+2. yFloor
+3. imgCy
+4. rest
+// all done - resize all images??
+
 
 ITEMIZATION:
 

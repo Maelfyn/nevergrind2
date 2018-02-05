@@ -12,5 +12,12 @@ var route = {
 				console.warn("Message from " + data.name + " has been ignored.");
 			}
 		}
+		else if (r === 'chat->add') {
+			console.info('chat.inChannel', data.row, chat.inChannel);
+			chat.addPlayer(data);
+		}
+		else if (r === 'chat->remove') {
+			chat.removePlayer(data);
+		}
 	}
 };

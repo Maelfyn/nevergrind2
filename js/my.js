@@ -1,9 +1,9 @@
 
 // player data values
 var my = {
+	channel: 'town-1',
 	lastReceivedWhisper: '',
 	team: 0,
-	gameName: 'Earth Alpha',
 	slot: 1,
 	tgt: 1,
 	attackOn: false,

@@ -1219,29 +1219,59 @@ tbody {
 /* chat styles */
 #chat-wrap {
 	display: none;
-	flex-direction: column;
+	flex-direction: row;
 	font-family: Roboto Condensed, Roboto, sans-serif;
 	position: absolute;
 	top: .2rem;
 	right: .2rem;
 	font-size: 1rem;
-	border: 2px ridge #666;
+	border: 2px ridge #222;
 	background: rgba(0,0,0,.8);
-	width: 30rem;
 	height: 25rem;
 	z-index: 2;
 }
+#chat-present-wrap {
+	display: flex;
+	flex-direction: column;
+	width: 10rem;
+}
+#chat-header {
+	text-align: center;
+	color: gold;
+	border: 2px ridge #048;
+	background: -webkit-radial-gradient(top center,farthest-side,rgba(0,48,96,1) 0,rgba(0,0,0,1) 100%);
+	background: -moz-radial-gradient(top center, farthest-side,rgba(0,48,96,1) 0,rgba(0,0,0,1) 100%);
+	background: -o-radial-gradient(top center, farthest-side,rgba(0,48,96,1) 0,rgba(0,0,0,1) 100%);
+	background: radial-gradient(top center, farthest-side,rgba(0,48,96,1) 0,rgba(0,0,0,1) 100%);
+}
+#chat-room {
+	flex: 1;
+	line-height: 1.2;
+	overflow: auto;
+	overflow-x: hidden;
+}
+#chat-log-wrap {
+	display: flex;
+	flex-direction: column;
+	border-left: 2px ridge #222;
+	width: 30rem;
+}
 #chat-log {
 	flex: 1;
-	height: 100%;
 	overflow: auto;
 	overflow-x: hidden;
 	line-height: 1.2;
 	color: #f2f2f2;
-	box-shadow: 0 0 5px 1px #025 inset;
 	word-break: break-word;
 	padding: .1rem 0 0 .2rem;
 	margin-bottom: .1rem;
+	border-bottom: 2px ridge #222;
+}
+.chat-room-player {
+	cursor: pointer;
+}
+.chat-room-player:hover {
+	background: #025;
 }
 #chat-log div {
 	text-shadow: 1px 1px #000;
@@ -1254,6 +1284,7 @@ tbody {
 	border: 2px ridge #444;
 	cursor: pointer;
 	padding: .2rem .4rem;
+	margin: .1rem .2rem;
 	box-shadow: 0 0 5px 1px rgba(0, 64, 128, .3) inset;
 }
 #chat-input:focus {

@@ -1,78 +1,10 @@
 // ws.js
 var socket = {
-	removePlayer: function(account){
-		// instant update of clients
-		var o = {
-			type: 'remove',
-			account: my.account
-		}
-		// removes id
-		socket.zmq.publish('title:' + my.channel, o);
-		delete title.players[account];
-	},
-	addPlayer: function(account, flag){
-		// instant update of clients
-		var o = {
-			type: 'add',
-			account: my.account,
-			flag: my.flag,
-			rating: my.rating
-		}
-		socket.zmq.publish('title:' + my.channel, o);
-		title.players[account] = {
-			flag: flag
-		}
-	},
 	unsubscribe: function(channel){
 		try {
 			socket.zmq.unsubscribe(channel);
 		} catch(err){
 			console.info(err);
-		}
-	},
-	setChannel: function(channel){
-		// change channel on title screen
-		if (g.view === 'title'){
-			// remove from channel
-			channel = chat.channel.trim();
-			if (channel !== my.channel){
-				$.ajax({
-					type: "POST",
-					url: app.url + 'php/titleChangeChannel.php',
-					data: {
-						channel: channel
-					}
-				}).done(function(data){
-					console.info("You have changed channel to: ", data.channel);
-					// removes id
-					//socket.removePlayer(my.account);
-					// unsubs
-					my.channel && socket.unsubscribe('title:' + my.channel);
-					// set new channel data
-					my.channel = data.channel;
-					for (var key in title.players){
-						delete title.players[key];
-					}
-					data.skip = true;
-					data.message = "You have joined channel: " + data.channel;
-					data.type = "chat-warning";
-					chat.log(data);
-					socket.zmq.subscribe('title:' + data.channel, function(topic, data) {
-						console.info("title:' + data.channel ", topic, data);
-						if (g.ignore.indexOf(data.account) === -1){
-							chat.log(data);
-						}
-					});
-					// add id
-					socket.addPlayer(my.account, my.flag);
-					// update display of channel
-					if (g.view === 'title'){
-						//document.getElementById('titleChatHeaderChannel').textContent = data.channel;
-						//document.getElementById('titleChatBody').innerHTML = '';
-					}
-					//chat.updatePlayers(0);
-				});
-			}
 		}
 	},
 	joinGame: function(){
@@ -95,9 +27,9 @@ var socket = {
 	lastPing: 0,
 	initWhisper: function() {
 		if (socket.enabled) {
+			var channel = 'name:' + my.name;
 			console.info("subscribing to whisper channel: ", channel);
 
-			var channel = 'name:' + my.name;
 			socket.updatePing();
 
 			socket.zmq.subscribe(channel, function(topic, data) {
@@ -162,6 +94,10 @@ var socket = {
 	},
 	initialConnection: 1,
 	pongTimer: 0,
+	routeMainChat: function(topic, data) {
+		console.info('rx ', topic, data);
+		route.town(data, data.route);
+	},
 	connectionSuccess: function(){
 		socket.enabled = 1;
 		console.info("Socket connection established with server");
@@ -169,13 +105,11 @@ var socket = {
 		if (socket.initialConnection){
 			socket.initialConnection = 0;
 			// subscribe to town-1 default channel - general chat
-			var town = 'ng2:town-1';
+			var town = chat.getChannel();
 			console.info("subscribing to channel: ", town);
-			chat.log("You have joined channel: town-1", 'chat-warning');
-			my.channel = town;
+			chat.log("You have joined channel: " + my.channel, 'chat-warning');
 			socket.zmq.subscribe(town, function(topic, data) {
-				console.info('rx ', topic, data);
-				route.town(data, data.route);
+				socket.routeMainChat(topic, data);
 			});
 
 			// subscribe to admin broadcasts
@@ -229,7 +163,9 @@ var socket = {
 				console.info("pong: ", pong);
 			}, 5000);
 			*/
+			// let everyone know I am here
+			chat.broadcast.add();
+			chat.setHeader();
 		}
-		socket.setChannel(chat.channel);
 	}
 }

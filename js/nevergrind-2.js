@@ -632,6 +632,22 @@ var g = {
 			env.resizeWindow();
 		});
 	},
+	idleDate: 0,
+	setIdleDate: function() {
+		g.idleDate = Date.now();
+	},
+	disconnect: function(msg) {
+		g.view = 'disconnected';
+		// turn off all events
+		$(document).add('*').off();
+		$("main > *").css('display', 'none');
+		var e = document.getElementById('scene-error');
+		e.style.display = 'block';
+		e.innerHTML = msg || 'You have been disconnected from the server';
+		setTimeout(function() {
+			location.reload();
+		}, 10000);
+	},
 	resizeTimer: 0,
 	races: [
 		'Barbarian',
@@ -1146,7 +1162,7 @@ var modal = {
 		var s = '<div class="stag-blue">'+
 					modal.header(e) +
 					modal.body(e) +
-					modal.footer(e) +
+					(e.hideFooter ? '' : modal.footer(e)) +
 				'</div>';
 		modal.wrap.innerHTML = s;
 		
@@ -1200,6 +1216,7 @@ var modal = {
 	},
 	header: function(e){
 		var z = {
+			playerIdleBoot: '<div id="modal-header">Disconnected</div>',
 			deleteCharacter: '<div id="modal-header">Delete '+ create.name +'?</div>',
 			unlockGame: '<div id="modal-header">$5 to purchase Nevergrind 2?</div>',
 		}
@@ -1207,6 +1224,10 @@ var modal = {
 	},
 	body: function(e){
 		var z = {
+			playerIdleBoot:
+			'<div id="modal-body">'+
+				'<p>You have been disconnected from the server.</p>'+
+			'</div>',
 			deleteCharacter:
 			'<div id="modal-body">'+
 				'<p>Are you sure you want to delete this character?</p>'+
@@ -1513,10 +1534,19 @@ var game = {
 		start: function() {
 			clearInterval(game.played.timer);
 			game.played.timer = setInterval(function(){
-				$.ajax({
-					type: 'GET',
-					url: app.url + 'php2/update-played.php'
-				})
+				var d = Date.now() - g.idleDate;
+				console.info("idleDate", d);
+				if (d > 900000) {
+					// disconnect - idle 15 minutes
+					g.disconnect();
+				}
+				else {
+					$.ajax({
+						type: 'GET',
+						url: app.url + 'php2/update-played.php'
+					});
+					!app.isLocal && console.clear();
+				}
 			}, 60000);
 		}
 
@@ -1925,10 +1955,13 @@ var title = {
 		socket.joinGame();
 	}
 };
-$(document).on('keydown', function(e){
+$(document).on(env.click, function(){
+	g.setIdleDate();
+}).on('keydown', function(e){
 	var code = e.keyCode,
 		key = e.key;
 
+	g.setIdleDate();
 	console.info('keydown: ', key, code);
 	// local only
 	if (app.isLocal) {
@@ -2294,10 +2327,11 @@ var socket = {
 		}
 	},
 	updatePing: function(){
-		console.info("updatePing");
 		socket.lastPing = Date.now();
 	},
 	enabled: 0,
+	connectionTries: 0,
+	connectionRetryDuration: 100,
 	init: function(bypass){
 		// is player logged in?
 		if (bypass || !socket.enabled) {
@@ -2306,7 +2340,9 @@ var socket = {
 				socket.connectionSuccess();
 			}, function () {
 				// on close/fail
-				socket.reconnect();
+				console.warn('WebSocket connection failed. Retrying...');
+				socket.enabled = 0;
+				setTimeout(socket.init, socket.connectionRetryDuration);
 			}, {
 				// options
 				'skipSubprotocolCheck': true
@@ -2323,11 +2359,6 @@ var socket = {
 	pongTimer: 0,
 	connectionSuccess: function(){
 		socket.enabled = 1;
-		/*
-		socket.zmq._websocket.onerror = function() {
-			socket.reconnect();
-		}
-		*/
 		console.info("Socket connection established with server");
 		// chat updates
 		if (socket.initialConnection){
@@ -2375,6 +2406,7 @@ var socket = {
 					setTimeout(repeat, 200);
 				}
 			})();
+			/*
 			// keep alive?
 			(function repeat(){
 				socket.zmq.publish('name:' + my.name, {
@@ -2386,20 +2418,14 @@ var socket = {
 			clearInterval(chat.pongTimer);
 			chat.pongTimer = setInterval(function(){
 				var pong = Date.now() - socket.lastPing;
-				if (pong > 10000) {
+				if (pong > 9000) {
 					socket.reinit();
 				}
 				console.info("pong: ", pong);
 			}, 5000);
+			*/
 		}
 		socket.setChannel(chat.channel);
-	},
-	connectionTries: 0,
-	connectionRetryDuration: 100,
-	reconnect: function(){
-		console.warn('WebSocket connection failed. Retrying...');
-		socket.enabled = 0;
-		setTimeout(socket.init, socket.connectionRetryDuration);
 	}
 }
 // chat.js
@@ -2410,6 +2436,7 @@ var chat = {
 		var s =
 			'<div id="chat-log">' +
 				'<div>Welcome to Vandamor.</div>' +
+				'<div class="chat-warning">Nevergrind 2 is still in development, but feel free to test it out!</div>' +
 				'<div class="chat-emote">Type /help or /h for a list of chat commands.</div>' +
 			'</div>' +
 			'<input id="chat-input" type="text" maxlength="240" autocomplete="off" spellcheck="false" />';
@@ -2538,7 +2565,7 @@ var chat = {
 				'<div '+ z +'>/shout /s : Shout a message : /s hail</div>',
 				'<div '+ z +'>/me : Send an emote : /me waves</div>',
 				'<div '+ z +'>@ : Send a private message by name : @bob hi</div>',
-				'<div '+ z +'>/friend or /f : Show your friends\' online status</div>',
+				'<div '+ z +'>/flist or /f : Show your friends\' online status</div>',
 				'<div '+ z +'>/f add : Add a friend : /f add Bob</div>',
 				'<div '+ z +'>/f remove : Remove a friend : /f remove Bob</div>',
 				'<div '+ z +'>/ignore or /i : Show your ignore list</div>',
@@ -2604,7 +2631,7 @@ var chat = {
 			chat.updateHistory(msg);
 			chat.ignore.add(chat.friend.parse(msg));
 		}
-		else if (msgLower === '/f' || msgLower === '/friend') {
+		else if (msgLower === '/f' || msgLower === '/friend' || msgLower === '/flist') {
 			chat.updateHistory(msgLower);
 			chat.friend.list();
 		}
@@ -4791,8 +4818,7 @@ var p = {}, // party info
 				chat.ignore.init();
 				game.heartbeat.start();
 			}).fail(function(data){
-				console.info(data);
-				g.msg(data.responseText, 1.5);
+				g.disconnect(data.responseText);
 			}).always(function(){
 				g.unlock();
 			});

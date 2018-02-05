@@ -10,11 +10,15 @@ var p = {}, // party info
 				}
 			}).done(function(data) {
 				socket.init();
-				my.name = data.characterData.name;
-				my.race = data.characterData.race;
+				var z = data.characterData;
+				my.name = z.name;
+				my.job = z.job;
+				my.race = z.race;
+				my.level = z.level;
+				my.row = z.row;
 				my.leader = '';
-				p[my.name] = data.characterData;
-				console.info('loadCharacter: ', p[my.name]);
+				p[my.name] = z;
+				console.info('p[my.name]: ', p[my.name]);
 				g.setScene('town');
 				town.init();
 				chat.init(1);
@@ -22,6 +26,7 @@ var p = {}, // party info
 				chat.friend.init();
 				chat.ignore.init();
 				game.heartbeat.start();
+				chat.setRoom(data.players);
 			}).fail(function(data){
 				g.disconnect(data.responseText);
 			}).always(function(){

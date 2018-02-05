@@ -1,15 +1,24 @@
 // chat.js
 var chat = {
-	channel: "town",
+	prefix: 't:',
+	getChannel: function() {
+		return chat.prefix + my.channel;
+	},
 	// receives channel prop from index.php
 	html: function() {
 		var s =
-			'<div id="chat-log">' +
-				'<div>Welcome to Vandamor.</div>' +
-				'<div class="chat-warning">Nevergrind 2 is still in development, but feel free to test it out!</div>' +
-				'<div class="chat-emote">Type /help or /h for a list of chat commands.</div>' +
+			'<div id="chat-present-wrap">' +
+				'<div id="chat-header">&nbsp;</div>' +
+				'<div id="chat-room"></div>' +
 			'</div>' +
-			'<input id="chat-input" type="text" maxlength="240" autocomplete="off" spellcheck="false" />';
+			'<div id="chat-log-wrap">' +
+				'<div id="chat-log">' +
+					'<div>Welcome to Vandamor.</div>' +
+					'<div class="chat-warning">Nevergrind 2 is still in development, but feel free to test it out!</div>' +
+					'<div class="chat-emote">Type /help or /h for a list of chat commands.</div>' +
+				'</div>' +
+				'<input id="chat-input" type="text" maxlength="240" autocomplete="off" spellcheck="false" />' +
+			'</div>';
 
 		return s;
 	},
@@ -23,6 +32,7 @@ var chat = {
 		account: '',
 		msg: ''
 	},
+	dom: {},
 	init: function(z) {
 		// default initialization of chat
 		if (z && !chat.initialized) {
@@ -48,22 +58,24 @@ var chat = {
 		else {
 			// hide
 		}
-		// dom
-		dom.chatLog = document.getElementById('chat-log');
-		dom.chatInput = document.getElementById('chat-input');
+		// dom cache
+		chat.dom.chatRoom = document.getElementById('chat-room');
+		chat.dom.chatHeader = document.getElementById('chat-header');
+		chat.dom.chatLog = document.getElementById('chat-log');
+		chat.dom.chatInput = document.getElementById('chat-input');
 	},
 	// report to chat-log
 	log: function(msg, route){
 		if (msg){
-			while (dom.chatLog.childElementCount >= 500) {
-				dom.chatLog.removeChild(dom.chatLog.firstChild);
+			while (chat.dom.chatLog.childElementCount >= 500) {
+				chat.dom.chatLog.removeChild(chat.dom.chatLog.firstChild);
 			}
 			var z = document.createElement('div');
 			if (route){
 				z.className = route;
 			}
 			z.innerHTML = msg;
-			dom.chatLog.appendChild(z);
+			chat.dom.chatLog.appendChild(z);
 			chat.scrollBottom();
 		}
 	},
@@ -81,7 +93,7 @@ var chat = {
 		var o = {
 				msg: msg,
 				class: 'chat-normal',
-				category: my.channel
+				category: chat.getChannel()
 			};
 		var parse = chat.parseMsg(msg);
 
@@ -133,6 +145,7 @@ var chat = {
 				'<div '+ z +'>/guild /g : Message your guild : /g hail</div>',
 				'<div '+ z +'>/ooc : Send a message out of character : /ooc hail</div>',
 				'<div '+ z +'>/shout /s : Shout a message : /s hail</div>',
+				'<div '+ z +'>/join /j : Join a channel : /j bros</div>',
 				'<div '+ z +'>/me : Send an emote : /me waves</div>',
 				'<div '+ z +'>@ : Send a private message by name : @bob hi</div>',
 				'<div '+ z +'>/flist or /f : Show your friends\' online status</div>',
@@ -152,14 +165,18 @@ var chat = {
 	},
 	// player hit ENTER
 	sendMsg: function(bypass){
-		var msg = dom.chatInput.value.trim(),
+		var msg = chat.dom.chatInput.value.trim(),
 			msgLower = msg.toLowerCase();
+
 		// bypass via ENTER or chat has focus
 		if (msg === '/h' || msg === '/help') {
 			chat.updateHistory(msg);
 			chat.help();
 		}
 		/*
+		/chat
+		/invite
+		/disband
 		/random
 		/surname
 		update /help
@@ -176,6 +193,10 @@ var chat = {
 		else if (msgLower === '/played') {
 			chat.updateHistory(msgLower);
 			chat.played();
+		}
+		else if (msgLower.indexOf('/j') === 0 || msgLower.indexOf('/join') === 0) {
+			chat.updateHistory(msgLower);
+			chat.join.channel(chat.join.parse(msg));
 		}
 		else if (msgLower === '/clear') {
 			chat.updateHistory(msgLower);
@@ -267,14 +288,10 @@ var chat = {
 	},
 	whispers: {},
 	clear: function() {
-		dom.chatInput.value = '';
+		chat.dom.chatInput.value = '';
 	},
 	clearChatLog: function(){
-		dom.chatLog.innerHTML = '';
-	},
-	changeChannel: function(msg, splitter){
-		var arr = msg.split(splitter);
-		socket.setChannel(arr[1]);
+		chat.dom.chatLog.innerHTML = '';
 	},
 	ignore: {
 		init: function() {
@@ -538,99 +555,104 @@ var chat = {
 	},
 	scrollBottom: function(){
 		if (!chat.isClicked){
-			dom.chatLog.scrollTop = dom.chatLog.scrollHeight;
+			chat.dom.chatLog.scrollTop = chat.dom.chatLog.scrollHeight;
 		}
 	},
-	// rx routing - not used now
-	chatReceive: function(data){
-		if (g.view === 'lobby'){
-			// lobby
-			//console.info('lobby receive: ', data);
-			if (data.type === 'hostLeft'){
-				lobby.hostLeft();
-			} else if (data.type === 'lobby-set-cpu-difficulty'){
-				lobby.updateDifficulty(data);
-			} else if (data.type === 'updateGovernment'){
-				lobby.updateGovernment(data);
-			} else if (data.type === 'updatePlayerColor'){
-				lobby.updatePlayerColor(data);
-			} else if (data.type === 'updateTeamNumber'){
-				lobby.updateTeamNumber(data);
-			} else if (data.type === 'countdown'){
-				lobby.countdown(data);
-			} else if (data.type === 'updateLobbyPlayer'){
-				lobby.updatePlayer(data);
-			} else if (data.type === 'updateLobbyCPU'){
-				lobby.updateCPU(data);
-			} else {
-				if (data.msg !== undefined){
-					lobby.chat(data);
+	inChannel: [],
+	setRoom: function(data) {
+		console.info('setRoom', data);
+		var s = '';
+		chat.inChannel = [];
+		data.forEach(function(v){
+			chat.inChannel.push(v.id * 1);
+			s +=
+			'<div id="chat-room-'+ v.id +'">'+
+				'<span class="chat-room-player">['+ v.level +':<span class="chat-'+ v.job +'">'+ v.name +'</span>]</span>'+
+			'</div>';
+		});
+		if (s) {
+			chat.dom.chatRoom.innerHTML = s;
+		}
+	},
+	setHeader: function() {
+		chat.dom.chatHeader.innerHTML = my.channel + '&thinsp;(' + chat.inChannel.length + ')';
+	},
+	join: {
+		parse: function(msg) {
+			var c = msg.split(" ");
+			return c[1].toLowerCase().trim();
+		},
+		channel: function(channel) {
+			if (g.view === 'town' && channel){
+				console.info("JOINING: ", channel);
+				// remove from channel
+				if (channel !== my.channel){
+					$.ajax({
+						url: app.url + 'php2/chat/set-channel.php',
+						data: {
+							channel: channel
+						}
+					}).done(function(data){
+						chat.broadcast.remove();
+						console.info("You have changed channel to: ", data);
+						chat.setRoom(data.players);
+						// removes id
+						//socket.removePlayer(my.account);
+						// unsubs
+						my.channel && socket.unsubscribe(chat.getChannel());
+						// set new channel data
+						my.channel = data.channel;
+						chat.log('You have joined channel: ' + data.channel, 'chat-warning');
+						socket.zmq.subscribe(data.fullChannel, function(topic, data) {
+							socket.routeMainChat(topic, data);
+						});
+						// add to chat channel
+						chat.setHeader();
+						chat.broadcast.add();
+					});
 				}
 			}
-		} else {
-			// game
-			// console.info('game receive: ', data);
-			if (data.type === 'cannons'){
-				animate.cannons(data.attackerTile, data.tile, false);
-				game.updateTile(data);
-			} else if (data.type === 'missile'){
-				animate.missile(data.attacker, data.defender, true);
-			} else if (data.type === 'nuke'){
-				setTimeout(function(){
-					animate.nuke(data.tile, data.attacker);
-				}, 5000);
-			} else if (data.type === 'nukeHit'){
-				game.updateTile(data);
-				game.updateDefense(data);
-			} else if (data.type === 'gunfire'){
-				// defender tile update
-				animate.gunfire(data.attackerTile, data.tile, data.player === my.player || data.playerB === my.player);
-				animate.cannons(data.attackerTile, data.tile, false, 0, .175, 10);
-				game.updateTile(data);
-				if (data.rewardUnits){
-					animate.upgrade(data.tile, 'troops', data.rewardUnits);
-				}
-			} else if (data.type === 'updateTile'){
-				// attacker tile update
-				game.updateTile(data);
-				game.setSumValues();
-				if (data.rewardUnits){
-					animate.upgrade(data.tile, 'troops', data.rewardUnits);
-				}
-				if (data.sfx === 'sniper0'){
-					animate.upgrade(data.tile, 'culture');
-				}
-			} else if (data.type === 'food'){
-				if (data.account.indexOf(my.account) > -1){
-					audio.play('hup2');
-				}
-			} else if (data.type === 'upgrade'){
-				// fetch updated tile defense data
-				game.updateDefense(data);
-				animate.upgrade(data.tile, 'shield');
-			} else if (data.type === 'eliminated'){
-				game.eliminatePlayer(data);
-			} else if (data.type === 'endTurnCheck'){
-				game.triggerNextTurn(data);
-			} else if (data.type === 'disconnect'){
-				game.eliminatePlayer(data);
-			}
-
-			if (data.msg){
-				if (data.type === 'gunfire'){
-					// ? when I'm attacked?
-					if (data.defender === my.account){
-						// display msg?
-						game.chat(data);
-					}
-					// lost attack
-				} else {
-					game.chat(data);
-				}
-			}
-			if (data.sfx){
-				audio.play(data.sfx);
-			}
+		}
+	},
+	// players receive update from socket
+	addPlayer: function(v) {
+		console.info('chat.inChannel', v.row, chat.inChannel);
+		if (chat.inChannel.indexOf(v.row) === -1) {
+			var e = document.createElement('div');
+			e.innerHTML =
+			'<div id="chat-room-'+ v.row +'">'+
+				'<span class="chat-room-player">['+ v.level +':<span class="chat-'+ v.job +'">'+ v.name +'</span>]</span>'+
+			'</div>';
+			chat.dom.chatRoom.appendChild(e);
+			chat.inChannel.push(v.row);
+			chat.setHeader();
+		}
+	},
+	removePlayer: function(v) {
+		var e = document.getElementById('chat-room-' + v.row);
+		e !== null && e.parentNode.removeChild(e);
+		var index = chat.inChannel.indexOf(v.row);
+		chat.inChannel.splice(index, 1);
+		chat.setHeader();
+	},
+	// player broadcasts updates from client
+	broadcast: {
+		add: function() {
+			console.info('broadcast.add');
+			socket.zmq.publish(chat.getChannel(), {
+				route: 'chat->add',
+				row: my.row,
+				level: my.level,
+				job: my.job,
+				name: my.name
+			});
+		},
+		remove: function() {
+			console.info('broadcast.remove');
+			socket.zmq.publish(chat.getChannel(), {
+				route: 'chat->remove',
+				row: my.row
+			});
 		}
 	}
 };

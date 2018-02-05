@@ -1,3 +1,8 @@
+window.onbeforeunload = function(){
+	chat.broadcast.remove();
+	//return "Are you sure you want to leave the game? Use /camp to save your game!";
+}
+
 $(document).on(env.click, function(){
 	g.setIdleDate();
 }).on('keydown', function(e){
@@ -48,7 +53,7 @@ $(document).on(env.click, function(){
 				// chat focus history nav up
 				if (chat.history[chat.historyIndex - 1] !== undefined) {
 					var msg = chat.history[--chat.historyIndex];
-					dom.chatInput.value = msg;
+					chat.dom.chatInput.value = msg;
 				}
 			}
 			else if (code === 40) {
@@ -59,7 +64,7 @@ $(document).on(env.click, function(){
 				}
 				else if (chat.history[chat.historyIndex + 1] !== undefined) {
 					var msg = chat.history[++chat.historyIndex];
-					dom.chatInput.value = msg;
+					chat.dom.chatInput.value = msg;
 				}
 			} else if (code === 13) {
 				// enter
