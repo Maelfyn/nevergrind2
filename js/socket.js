@@ -68,8 +68,6 @@ var socket = {
 		socket.lastPing = Date.now();
 	},
 	enabled: 0,
-	connectionTries: 0,
-	connectionRetryDuration: 100,
 	init: function(bypass){
 		// is player logged in?
 		socket.zmq = new ab.Session('wss://' + app.socketUrl + '/wss2/', function () {
@@ -78,8 +76,7 @@ var socket = {
 		}, function () {
 			// on close/fail
 			console.warn('WebSocket connection failed. Retrying...');
-			socket.enabled = 0;
-			setTimeout(socket.init, socket.connectionRetryDuration);
+			socket.reconnect();
 		}, {
 			// options
 			'skipSubprotocolCheck': true
@@ -143,5 +140,11 @@ var socket = {
 			chat.broadcast.add();
 			chat.setHeader();
 		}
+	},
+	connectionTries: 0,
+	connectionRetryDuration: 100,
+	reconnect: function() {
+		socket.enabled = 0;
+		setTimeout(socket.init, socket.connectionRetryDuration);
 	}
 }

@@ -1509,12 +1509,18 @@ audio.init = (function(){
 // game specific data
 var game = {
 	maxPlayers: 6,
+	init: 0,
 	heartbeat: {
 		timer: 0,
 		start: function() {
-			game.heartbeat.send();
-			game.heartbeat.update();
-			game.played.start();
+			// only called once
+			if (!game.init) {
+				game.init = 1;
+				game.heartbeat.send();
+				game.heartbeat.update();
+				game.socketRefresh();
+				game.played.start();
+			}
 		},
 		update: function() {
 			clearTimeout(game.heartbeat.timer);
@@ -1573,6 +1579,11 @@ var game = {
 		}
 
 	},
+	socketRefresh: function() {
+		setInterval(function() {
+			socket.reconnect();
+		}, 600000)
+	},
 	name: '',
 	initialized: false,
 	getGameState: function(){
@@ -1590,60 +1601,64 @@ var game = {
 		});
 	},
 	getPetName:  function() {
-		var x = ~~(Math.random()*(26))+1,
-			y = ~~(Math.random()*16)+1,
-			z = ~~(Math.random()*(5))+1,
-			i = "Jo",
-			j = "bek",
-			k = "er";
-		if(x===1){ i = "Ga"; }
-		if(x===2){ i = "Ge"; }
-		if(x===3){ i = "Go"; }
-		if(x===4){ i = "Gi"; }
-		if(x===5){ i = "Ja"; }
-		if(x===6){ i = "Jo"; }
-		if(x===7){ i = "Je"; }
-		if(x===8){ i = "Ji"; }
-		if(x===9){ i = "Ka"; }
-		if(x===10){ i = "Ke"; }
-		if(x===11){ i = "Ko"; }
-		if(x===12){ i = "Ki"; }
-		if(x===13){ i = "La"; }
-		if(x===14){ i = "Le"; }
-		if(x===15){ i = "Lo"; }
-		if(x===16){ i = "Li"; }
-		if(x===17){ i = "Va"; }
-		if(x===18){ i = "Ve"; }
-		if(x===19){ i = "Vo"; }
-		if(x===20){ i = "Xa"; }
-		if(x===21){ i = "Xe"; }
-		if(x===22){ i = "Xo"; }
-		if(x===23){ i = "Za"; }
-		if(x===24){ i = "Ze"; }
-		if(x===25){ i = "Zo"; }
-		if(x===26){ i = "Bo"; }
-		if(y===1){ j = "b"; }
-		if(y===2){ j = "ban"; }
-		if(y===3){ j = "bar"; }
-		if(y===4){ j = "bek"; }
-		if(y===5){ j = "bob"; }
-		if(y===6){ j = "rek"; }
-		if(y===7){ j = "rar"; }
-		if(y===8){ j = "nar"; }
-		if(y===9){ j = "ran"; }
-		if(y===10){ j = "sar"; }
-		if(y===11){ j = "sek"; }
-		if(y===12){ j = "sob"; }
-		if(y===13){ j = "n"; }
-		if(y===14){ j = "s"; }
-		if(y===15){ j = "k"; }
-		if(y===16){ j = "n"; }
-		if(z===1){ k = "tik"; }
-		if(z===2){ k = "n"; }
-		if(z===3){ k = "er"; }
-		if(z===4){ k = "ab"; }
-		if(z===5){ k = ""; }
-		return i+j+k;
+		var s1 = [
+				"Jo",
+				"Ge",
+				"Go",
+				"Gi",
+				"Ja",
+				"Jo",
+				"Je",
+				"Ji",
+				"Ka",
+				"Ke",
+				"Ko",
+				"Ki",
+				"La",
+				"Le",
+				"Lo",
+				"Li",
+				"Va",
+				"Ve",
+				"Vo",
+				"Xa",
+				"Xe",
+				"Xo",
+				"Za",
+				"Ze",
+				"Zo",
+				"Bo"
+			],
+			s2 = [
+				"bek",
+				"ban",
+				"bar",
+				"bek",
+				"bob",
+				"rek",
+				"rar",
+				"nar",
+				"ran",
+				"sar",
+				"sek",
+				"sob",
+				"n",
+				"s",
+				"k",
+				"n"
+			],
+			s3 = [
+				"er",
+				"tik",
+				"n",
+				"er",
+				"ab",
+				""
+			];
+
+		return s1[~~(Math.random() * s1.length) - 1] +
+			s2[~~(Math.random() * s2.length) - 1]+
+			s3[~~(Math.random() * s3.length) - 1];
 	}
 };
 // title.js
@@ -1982,8 +1997,6 @@ var socket = {
 		socket.lastPing = Date.now();
 	},
 	enabled: 0,
-	connectionTries: 0,
-	connectionRetryDuration: 100,
 	init: function(bypass){
 		// is player logged in?
 		socket.zmq = new ab.Session('wss://' + app.socketUrl + '/wss2/', function () {
@@ -1992,8 +2005,7 @@ var socket = {
 		}, function () {
 			// on close/fail
 			console.warn('WebSocket connection failed. Retrying...');
-			socket.enabled = 0;
-			setTimeout(socket.init, socket.connectionRetryDuration);
+			socket.reconnect();
 		}, {
 			// options
 			'skipSubprotocolCheck': true
@@ -2057,6 +2069,12 @@ var socket = {
 			chat.broadcast.add();
 			chat.setHeader();
 		}
+	},
+	connectionTries: 0,
+	connectionRetryDuration: 100,
+	reconnect: function() {
+		socket.enabled = 0;
+		setTimeout(socket.init, socket.connectionRetryDuration);
 	}
 }
 // chat.js
