@@ -57,7 +57,8 @@ var socket = {
 					route.town(chat.whispers[data.date], 'chat->log');
 				}
 				// receive keep alive
-				if (data.ping) {
+				else if (data.action === 'ping') {
+					console.info(data);
 					socket.updatePing();
 				}
 			});
@@ -71,29 +72,20 @@ var socket = {
 	connectionRetryDuration: 100,
 	init: function(bypass){
 		// is player logged in?
-		if (bypass || !socket.enabled) {
-			socket.zmq = new ab.Session('wss://' + app.socketUrl + '/wss2/', function () {
-				// on open
-				socket.connectionSuccess();
-			}, function () {
-				// on close/fail
-				console.warn('WebSocket connection failed. Retrying...');
-				socket.enabled = 0;
-				setTimeout(socket.init, socket.connectionRetryDuration);
-			}, {
-				// options
-				'skipSubprotocolCheck': true
-			});
-		}
-	},
-	reinit: function(){
-		socket.zmq = null;
-		socket.enabled = 0;
-		socket.initialConnection = 0;
-		socket.init();
+		socket.zmq = new ab.Session('wss://' + app.socketUrl + '/wss2/', function () {
+			// on open
+			socket.connectionSuccess();
+		}, function () {
+			// on close/fail
+			console.warn('WebSocket connection failed. Retrying...');
+			socket.enabled = 0;
+			setTimeout(socket.init, socket.connectionRetryDuration);
+		}, {
+			// options
+			'skipSubprotocolCheck': true
+		});
 	},
 	initialConnection: 1,
-	pongTimer: 0,
 	routeMainChat: function(topic, data) {
 		console.info('rx ', topic, data);
 		route.town(data, data.route);
@@ -102,7 +94,7 @@ var socket = {
 		socket.enabled = 1;
 		console.info("Socket connection established with server");
 		// chat updates
-		if (socket.initialConnection){
+		if (socket.initialConnection) {
 			socket.initialConnection = 0;
 			// subscribe to town-1 default channel - general chat
 			var town = chat.getChannel();
@@ -145,24 +137,8 @@ var socket = {
 					setTimeout(repeat, 200);
 				}
 			})();
-			/*
+
 			// keep alive?
-			(function repeat(){
-				socket.zmq.publish('name:' + my.name, {
-					ping: 1
-				});
-				setTimeout(repeat, 5000);
-			})();
-			// pong timer
-			clearInterval(chat.pongTimer);
-			chat.pongTimer = setInterval(function(){
-				var pong = Date.now() - socket.lastPing;
-				if (pong > 9000) {
-					socket.reinit();
-				}
-				console.info("pong: ", pong);
-			}, 5000);
-			*/
 			// let everyone know I am here
 			chat.broadcast.add();
 			chat.setHeader();

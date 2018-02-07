@@ -27,6 +27,7 @@ var p = {}, // party info
 				chat.ignore.init();
 				game.heartbeat.start();
 				chat.setRoom(data.players);
+				bar.init();
 			}).fail(function(data){
 				g.disconnect(data.responseText);
 			}).always(function(){

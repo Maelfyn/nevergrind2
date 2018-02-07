@@ -601,10 +601,11 @@ var g = {
 			e.preventDefault();
 		});
 		// disable stuff in app to appear more "native"
-		if (app.isApp) {
+		if (!app.isLocal) {
 			document.addEventListener("contextmenu", function (e) {
 				// disable default right-click menu
 				e.preventDefault();
+				return false;
 			}, false);
 			window.addEventListener("wheel", function(e){
 				if (e.ctrlKey) {
@@ -622,6 +623,9 @@ var g = {
 			// debounce resize
 			clearTimeout(g.resizeTimer);
 			g.resizeTimer = setTimeout(function(){
+				if (chat.initialized) {
+					chat.scrollBottom();
+				}
 				if (g.view === 'battle') {
 					for (var i=0; i<mob.max; i++) {
 						mob.sizeMob(mobs[i]);
@@ -646,7 +650,7 @@ var g = {
 		e.innerHTML = msg || 'You have been disconnected from the server';
 		setTimeout(function() {
 			location.reload();
-		}, 10000);
+		}, 12000);
 	},
 	resizeTimer: 0,
 	races: [
@@ -1099,9 +1103,9 @@ env.isChrome = !!window.chrome && !env.isOpera;
 
 // player data values
 var my = {
+	channel: 'town-1',
 	lastReceivedWhisper: '',
 	team: 0,
-	gameName: 'Earth Alpha',
 	slot: 1,
 	tgt: 1,
 	attackOn: false,
@@ -1504,6 +1508,7 @@ audio.init = (function(){
 //audio.gameMusicInit();
 // game specific data
 var game = {
+	maxPlayers: 6,
 	heartbeat: {
 		timer: 0,
 		start: function() {
@@ -1523,9 +1528,14 @@ var game = {
 			$.ajax({
 				type: 'GET',
 				url: app.url + 'php2/heartbeat.php'
-			}).done(function(data){
-				console.info('heartbeat ', data);
-			})
+			}).done(function(){
+				// nothing
+			}).fail(function(){
+				clearTimeout(game.heartbeat.timer);
+				game.heartbeat.timer = setTimeout(function(){
+					game.heartbeat.update();
+				}, 1000);
+			});
 
 		}
 	},
@@ -1535,8 +1545,10 @@ var game = {
 			clearInterval(game.played.timer);
 			game.played.timer = setInterval(function(){
 				var d = Date.now() - g.idleDate;
-				console.info("idleDate", d);
-				if (d > 900000) {
+				console.info("played.timer", d);
+				//if (d > 900000 * 4) {
+				if (0) {
+					// 60 minutes now!
 					// disconnect - idle 15 minutes
 					g.disconnect();
 				}
@@ -1544,8 +1556,18 @@ var game = {
 					$.ajax({
 						type: 'GET',
 						url: app.url + 'php2/update-played.php'
+					}).done(function(){
+						!app.isLocal && console.clear();
+						setTimeout(function() {
+							socket.zmq.publish('name:' + my.name, {
+								ping: 1
+							});
+						}, 30000);
+					}).fail(function(){
+						setTimeout(function(){
+							game.played.start();
+						}, 10000);
 					});
-					!app.isLocal && console.clear();
 				}
 			}, 60000);
 		}
@@ -1566,61 +1588,66 @@ var game = {
 		}).fail(function(data){
 			console.info(data.responseText);
 		});
+	},
+	getPetName:  function() {
+		var x = ~~(Math.random()*(26))+1,
+			y = ~~(Math.random()*16)+1,
+			z = ~~(Math.random()*(5))+1,
+			i = "Jo",
+			j = "bek",
+			k = "er";
+		if(x===1){ i = "Ga"; }
+		if(x===2){ i = "Ge"; }
+		if(x===3){ i = "Go"; }
+		if(x===4){ i = "Gi"; }
+		if(x===5){ i = "Ja"; }
+		if(x===6){ i = "Jo"; }
+		if(x===7){ i = "Je"; }
+		if(x===8){ i = "Ji"; }
+		if(x===9){ i = "Ka"; }
+		if(x===10){ i = "Ke"; }
+		if(x===11){ i = "Ko"; }
+		if(x===12){ i = "Ki"; }
+		if(x===13){ i = "La"; }
+		if(x===14){ i = "Le"; }
+		if(x===15){ i = "Lo"; }
+		if(x===16){ i = "Li"; }
+		if(x===17){ i = "Va"; }
+		if(x===18){ i = "Ve"; }
+		if(x===19){ i = "Vo"; }
+		if(x===20){ i = "Xa"; }
+		if(x===21){ i = "Xe"; }
+		if(x===22){ i = "Xo"; }
+		if(x===23){ i = "Za"; }
+		if(x===24){ i = "Ze"; }
+		if(x===25){ i = "Zo"; }
+		if(x===26){ i = "Bo"; }
+		if(y===1){ j = "b"; }
+		if(y===2){ j = "ban"; }
+		if(y===3){ j = "bar"; }
+		if(y===4){ j = "bek"; }
+		if(y===5){ j = "bob"; }
+		if(y===6){ j = "rek"; }
+		if(y===7){ j = "rar"; }
+		if(y===8){ j = "nar"; }
+		if(y===9){ j = "ran"; }
+		if(y===10){ j = "sar"; }
+		if(y===11){ j = "sek"; }
+		if(y===12){ j = "sob"; }
+		if(y===13){ j = "n"; }
+		if(y===14){ j = "s"; }
+		if(y===15){ j = "k"; }
+		if(y===16){ j = "n"; }
+		if(z===1){ k = "tik"; }
+		if(z===2){ k = "n"; }
+		if(z===3){ k = "er"; }
+		if(z===4){ k = "ab"; }
+		if(z===5){ k = ""; }
+		return i+j+k;
 	}
 };
 // title.js
 var title = {
-	players: [],
-	games: [],
-	getLeaderboard: function(type){
-		var e = document.getElementById('leaderboardBody');
-		e.innerHTML = '';
-		g.lock();
-		$.ajax({
-			url: app.url + 'php/leaderboard.php',
-			data: {
-				type: type
-			}
-		}).done(function(data) {
-			e.innerHTML = data.str;
-			g.unlock();
-		});
-	},
-	refreshTimer: 0,
-	refreshGames: function(){
-		if (Date.now() - title.refreshTimer > 5000){
-			title.refreshTimer = Date.now();
-			$.ajax({
-				type: 'GET',
-				url: app.url + 'php/refreshGames.php'
-			}).done(function(data) {
-				//console.info(data);
-				var e = document.getElementById('gameTableBody');
-				if (e === null){
-					return;
-				}
-				// head
-				var str = '';
-				// body
-				for (var i=0, len=data.length; i<len; i++){
-					var d = data[i];
-					title.games[d.id] = d.players * 1;
-					str += 
-					"<tr id='game_"+ d.id +"' class='wars wars-"+ d.gameMode +" no-select' data-name='" + d.name + "'>\
-						<td class='warCells'>"+ d.name + "</td>\
-						<td class='warCells'>" + d.map + "</td>\
-						<td class='warCells'>" + d.speed + "</td>\
-						<td class='warCells'>" + d.gameMode + "</td>\
-					</tr>";
-					
-				}
-				e.innerHTML = str;
-			}).fail(function(e){
-				console.info(e.responseText);
-				//g.msg("Server error.");
-			});
-		}
-	},
 	init: (function(){
 		$(document).ready(function(){
 			// console.info("Initializing title screen...");
@@ -1636,327 +1663,19 @@ var title = {
 			audio.events();
 		});
 	})(),
-	updatePlayers: function(once){
-		title.titleUpdate = $("#titleChatPlayers").length; // player is logged in
-		if (title.titleUpdate){
-			// title chat loop
-			(function repeat(){
-				if (g.view === 'title'){
-					$.ajax({
-						type: "POST",
-						url: app.url + 'php/titleUpdate.php',
-						data: {
-							channel: my.channel
-						}
-					}).done(function(data){
-						// set title players
-						if (g.view === 'title'){
-							if (data.playerData !== undefined){
-								var p = data.playerData,
-									foundPlayers = [];
-								for (var i=0, len=p.length; i<len; i++){
-									// add new players
-									var account = p[i].account,
-										flag = p[i].flag,
-										rating = p[i].rating;
-									if (title.players[account] === undefined){
-										//console.info("ADDING PLAYER: ", p[i]);
-										title.addPlayer(account, flag, rating);
-									} else if (title.players[account].flag !== flag){
-										// replace player flag
-										var flagElement = document.getElementById("titlePlayerFlag_" + account);
-										if (flagElement !== null){
-											var flagClass = flag.split(".");
-											flagElement.className = 'flag ' + flagClass[0].replace(/ /g, "-");
-										}
-									}
-									foundPlayers.push(account);
-								}
-								// remove missing players
-								for (var key in title.players){
-									if (foundPlayers.indexOf(key) === -1){
-										var x = {
-											account: key
-										}
-										// console.info("REMOVING PLAYER: " + x.account);
-										//title.removePlayer(x);
-									}
-								}
-							}
-							document.getElementById('titleChatHeaderCount').textContent = len !== undefined ? '('+len+')' : '';
-							// game data sanity check
-							var serverGames = [];
-							if (data.gameData !== undefined){
-								var p = data.gameData;
-								for (var i=0, len=p.length; i<len; i++){
-									serverGames[p[i].id] = {
-										players: p[i].players * 1,
-										max: p[i].max * 1
-									}
-								}
-							}
-							// remove games if they're not found in server games
-							title.games.forEach(function(e, ind){
-								// console.info(serverGames[ind]);
-								if (serverGames[ind] === undefined){
-									// game timed out, not found
-									var o = {
-										id: ind
-									}
-									console.info("REMOVING: ", o);
-									title.removeGame(o);
-								} else {
-									// found game
-									if (serverGames[ind].players !== title.games[ind]){
-										// player count does not match... fixing
-										// console.info("PLAYER COUNT WRONG!");
-										var o = {
-											id: ind,
-											players: serverGames[ind].players,
-											max: serverGames[ind].max
-										}
-										title.setToGame(o);
-									}
-								}
-							});
-						}
-					}).always(function(){
-						if (!once){
-							setTimeout(repeat, 5000);
-						}
-					});
-				}
-			})();
-		} else {
-			// not logged in
-			$("#titleChat, #titleMenu").remove();
-		}
-	},
-	// adds player to chat room
-	addPlayer: function(account, flag, rating){
-		title.players[account] = {
-			flag: flag
-		}
-		var e = document.getElementById('titlePlayer' + account);
-		if (e !== null){
-			//e.parentNode.removeChild(e);
-		}
-		var e = document.createElement('div');
-		e.className = "titlePlayer";
-		e.id = "titlePlayer" + account;
-		var flagClass = flag.split(".");
-		flagClass = flagClass[0].replace(/ /g, "-");
-		e.innerHTML = '<div id="titlePlayerFlag_'+ account +'" class="flag ' + flagClass +'"></div><span class="chat-rating">['+ rating +']</span> <span class="titlePlayerAccount">'+ account +'</span>';
-		if (title.titleUpdate){
-			DOM.titleChatBody.appendChild(e);
-		}
-	},
-	removePlayer: function(data){
-		// fix this
-		delete title.players[data.account];
-		var z = document.getElementById('titlePlayer' + data.account);
-		if (z !== null){
-			//z.parentNode.removeChild(z);
-		}
-	},
-	updateGame: function(data){
-		if (data.type === 'addToGame'){
-			title.addToGame(data);
-		} else if (data.type === 'removeFromGame'){
-			title.removeFromGame(data);
-		} else if (data.type === 'addGame'){
-			title.addGame(data);
-		} else if (data.type === 'removeGame'){
-			title.removeGame(data);
-		}
-	},
-	updatePlayerText: function(id){
-		var e = document.getElementById('game_players_' + id);
-		if (e !== null){
-			e.textContent = title.games[id];
-		}
-	},
-	setToGame: function(data){
-		// refreshGames corrects player values
-		// console.info("setToGame", data);
-		var id = data.id;
-		title.games[id] = data.players;
-		// title.updatePlayerText(id);
-	},
-	addToGame: function(data){
-		// player joined or left
-		//console.info("addToGame", data);
-		var id = data.id;
-		if (title.games[id] !== undefined){
-			if (title.games[id] + 1 > data.max){
-				title.games[id] = data.max;
-			} else {
-				title.games[id]++;
-			}
-		} else {
-			title.games[id] = 1;
-		}
-		//title.updatePlayerText(id);
-	},
-	removeFromGame: function(data){
-		// player joined or left
-		//console.info("removeFromGame", data);
-		var id = data.id;
-		if (title.games[id] !== undefined){
-			if (title.games[id] - 1 < 1){
-				title.games[id] = 1;
-			} else {
-				title.games[id]--;
-			}
-		} else {
-			title.games[id] = 1;
-		}
-		//title.updatePlayerText(id);
-	},
-	addGame: function(data){
-		// created game
-		// console.info("addGame", data);
-		title.games[data.id] = 1;
-		var e = document.createElement('tr'),
-			gameMode = data.gameMode === 'Ranked' ? 'Ranked' : data.gameMode === 'Team' ? 'Team' : 'FFA';
-		e.id = 'game_' + data.id;
-		e.className = 'wars wars-'+ gameMode +' no-select';
-		e.setAttribute('data-name', data.name);
-		e.innerHTML = 
-			"<td class='warCells'>"+ data.name + "</td>\
-			<td class='warCells'>" + data.map + "</td>\
-			<td class='warCells'>" + data.speed + "</td>\
-			<td class='warCells'>" + gameMode + "</td>";
-		DOM.gameTableBody.insertBefore(e, DOM.gameTableBody.childNodes[0]);
-	},
-	removeGame: function(data){
-		// game countdown started or exited
-		// console.info("removeGame", data);
-		delete title.games[data.id];
-		var e = document.getElementById('game_' + data.id);
-		if (e !== null){
-			//e.parentNode.removeChild(e);
-		}
-	},
-	showBackdrop: function(e){
-		TweenMax.to('#title-backdrop', env.delay(.3), {
-			startAt: {
-				visibility: 'visible',
-				alpha: 0
-			},
-			alpha: 1,
-			onComplete: function(){
-				if (e !== undefined){
-					e.focus();
-				}
-			}
-		});
-		g.isModalOpen = true;
-	},
-	closeModal: function(){
-		TweenMax.set('.title-modals, #title-backdrop', {
-			alpha: 0,
-			visibility: 'hidden'
-		});
-		g.isModalOpen = false;
-	},
-	createGameFocus: false,
-	createGame: function(){
-		var name = $("#gameName").val(),
-			pw = $("#gamePassword").val(),
-			max = $("#gamePlayers").val() * 1,
-			speed = g.speed;
-			
-		if (!g.rankedMode && (name.length < 4 || name.length > 32)){
-			g.msg("Game name must be at least 4-32 characters.", 1);
-			setTimeout(function(){
-				$("#gameName").focus().select();
-			}, 100);
-		} else if (!g.rankedMode && (max < 2 || max > 8 || max % 1 !== 0)){
-			g.msg("Game must have 2-8 players.", 1);
-		} else {
-			title.createGameService(name, pw, title.mapData[g.map.key].name, max, g.rankedMode, g.teamMode, speed);
-		}
-	},
-	createGameService: function(name, pw, map, max, rankedMode, teamMode, speed){
-		g.lock(1);
-		audio.play('click');
-		g.rankedMode = rankedMode;
-		g.teamMode = teamMode;
-		g.speed = speed;
-		$.ajax({
-			url: app.url + 'php/createGame.php',
-			data: {
-				name: name,
-				pw: pw,
-				map: map,
-				max: max,
-				rating: rankedMode,
-				teamMode: teamMode,
-				speed: speed
-			}
-		}).done(function(data) {
-			//socket.removePlayer(my.account);
-			my.player = data.player;
-			my.playerColor = data.playerColor;
-			my.team = data.team;
-			game.id = data.gameId;
-			game.name = data.gameName;
-			// console.info("Creating: ", data);
-			lobby.init(data);
-			lobby.join(); // create
-			socket.joinGame();
-			lobby.styleStartGame();
-		}).fail(function(e){
-			g.msg(e.statusText);
-			g.unlock(1);
-		});
-	},
-	joinGame: function(){
-		g.name = $("#joinGame").val();
-		if (!g.name){
-			g.msg("Game name is not valid!", 1.5);
-			$("#joinGame").focus().select();
-			return;
-		}
-		g.password = $("#joinGamePassword").val();
-		g.lock();
-		audio.play('click');
-		$.ajax({
-			url: app.url + 'php/joinGame.php',
-			data: {
-				name: g.name,
-				password: g.password
-			}
-		}).done(function(data){
-			title.joinGameCallback(data);
-		}).fail(function(data){
-			console.info(data);
-			g.msg(data.statusText, 1.5);
-		}).always(function(){
-			g.unlock();
-		});
-	},
-	joinGameCallback: function(data){
-		//socket.removePlayer(my.account);
-		// console.info(data);
-		my.player = data.player;
-		my.playerColor = data.player;
-		g.teamMode = data.teamMode;
-		g.rankedMode = data.rankedMode;
-		my.team = data.team;
-		game.id = data.id;
-		game.name = data.gameName;
-		g.map = data.mapData;
-		g.speed = data.speed;
-		lobby.init(data);
-		lobby.join(); // normal join
-		//$("#titleMenu, #titleChat").remove();
-		socket.joinGame();
+	test: function() {
+		// nada
 	}
 };
-$(document).on(env.click, function(){
+window.onbeforeunload = function(){
+	chat.broadcast.remove();
+	//return "Are you sure you want to leave the game? Use /camp to save your game!";
+}
+
+$(document).on(env.click, function(e){
 	g.setIdleDate();
+	e.preventDefault();
+	return false;
 }).on('keydown', function(e){
 	var code = e.keyCode,
 		key = e.key;
@@ -2005,7 +1724,7 @@ $(document).on(env.click, function(){
 				// chat focus history nav up
 				if (chat.history[chat.historyIndex - 1] !== undefined) {
 					var msg = chat.history[--chat.historyIndex];
-					dom.chatInput.value = msg;
+					chat.dom.chatInput.value = msg;
 				}
 			}
 			else if (code === 40) {
@@ -2016,7 +1735,7 @@ $(document).on(env.click, function(){
 				}
 				else if (chat.history[chat.historyIndex + 1] !== undefined) {
 					var msg = chat.history[++chat.historyIndex];
-					dom.chatInput.value = msg;
+					chat.dom.chatInput.value = msg;
 				}
 			} else if (code === 13) {
 				// enter
@@ -2195,79 +1914,11 @@ $(document).on(env.click, function(){
 });
 // ws.js
 var socket = {
-	removePlayer: function(account){
-		// instant update of clients
-		var o = {
-			type: 'remove',
-			account: my.account
-		}
-		// removes id
-		socket.zmq.publish('title:' + my.channel, o);
-		delete title.players[account];
-	},
-	addPlayer: function(account, flag){
-		// instant update of clients
-		var o = {
-			type: 'add',
-			account: my.account,
-			flag: my.flag,
-			rating: my.rating
-		}
-		socket.zmq.publish('title:' + my.channel, o);
-		title.players[account] = {
-			flag: flag
-		}
-	},
 	unsubscribe: function(channel){
 		try {
 			socket.zmq.unsubscribe(channel);
 		} catch(err){
 			console.info(err);
-		}
-	},
-	setChannel: function(channel){
-		// change channel on title screen
-		if (g.view === 'title'){
-			// remove from channel
-			channel = chat.channel.trim();
-			if (channel !== my.channel){
-				$.ajax({
-					type: "POST",
-					url: app.url + 'php/titleChangeChannel.php',
-					data: {
-						channel: channel
-					}
-				}).done(function(data){
-					console.info("You have changed channel to: ", data.channel);
-					// removes id
-					//socket.removePlayer(my.account);
-					// unsubs
-					my.channel && socket.unsubscribe('title:' + my.channel);
-					// set new channel data
-					my.channel = data.channel;
-					for (var key in title.players){
-						delete title.players[key];
-					}
-					data.skip = true;
-					data.message = "You have joined channel: " + data.channel;
-					data.type = "chat-warning";
-					chat.log(data);
-					socket.zmq.subscribe('title:' + data.channel, function(topic, data) {
-						console.info("title:' + data.channel ", topic, data);
-						if (g.ignore.indexOf(data.account) === -1){
-							chat.log(data);
-						}
-					});
-					// add id
-					socket.addPlayer(my.account, my.flag);
-					// update display of channel
-					if (g.view === 'title'){
-						//document.getElementById('titleChatHeaderChannel').textContent = data.channel;
-						//document.getElementById('titleChatBody').innerHTML = '';
-					}
-					//chat.updatePlayers(0);
-				});
-			}
 		}
 	},
 	joinGame: function(){
@@ -2290,9 +1941,9 @@ var socket = {
 	lastPing: 0,
 	initWhisper: function() {
 		if (socket.enabled) {
+			var channel = 'name:' + my.name;
 			console.info("subscribing to whisper channel: ", channel);
 
-			var channel = 'name:' + my.name;
 			socket.updatePing();
 
 			socket.zmq.subscribe(channel, function(topic, data) {
@@ -2320,7 +1971,8 @@ var socket = {
 					route.town(chat.whispers[data.date], 'chat->log');
 				}
 				// receive keep alive
-				if (data.ping) {
+				else if (data.action === 'ping') {
+					console.info(data);
 					socket.updatePing();
 				}
 			});
@@ -2334,43 +1986,36 @@ var socket = {
 	connectionRetryDuration: 100,
 	init: function(bypass){
 		// is player logged in?
-		if (bypass || !socket.enabled) {
-			socket.zmq = new ab.Session('wss://' + app.socketUrl + '/wss2/', function () {
-				// on open
-				socket.connectionSuccess();
-			}, function () {
-				// on close/fail
-				console.warn('WebSocket connection failed. Retrying...');
-				socket.enabled = 0;
-				setTimeout(socket.init, socket.connectionRetryDuration);
-			}, {
-				// options
-				'skipSubprotocolCheck': true
-			});
-		}
-	},
-	reinit: function(){
-		socket.zmq = null;
-		socket.enabled = 0;
-		socket.initialConnection = 0;
-		socket.init();
+		socket.zmq = new ab.Session('wss://' + app.socketUrl + '/wss2/', function () {
+			// on open
+			socket.connectionSuccess();
+		}, function () {
+			// on close/fail
+			console.warn('WebSocket connection failed. Retrying...');
+			socket.enabled = 0;
+			setTimeout(socket.init, socket.connectionRetryDuration);
+		}, {
+			// options
+			'skipSubprotocolCheck': true
+		});
 	},
 	initialConnection: 1,
-	pongTimer: 0,
+	routeMainChat: function(topic, data) {
+		console.info('rx ', topic, data);
+		route.town(data, data.route);
+	},
 	connectionSuccess: function(){
 		socket.enabled = 1;
 		console.info("Socket connection established with server");
 		// chat updates
-		if (socket.initialConnection){
+		if (socket.initialConnection) {
 			socket.initialConnection = 0;
 			// subscribe to town-1 default channel - general chat
-			var town = 'ng2:town-1';
+			var town = chat.getChannel();
 			console.info("subscribing to channel: ", town);
-			chat.log("You have joined channel: town-1", 'chat-warning');
-			my.channel = town;
+			chat.log("You have joined channel: " + my.channel, 'chat-warning');
 			socket.zmq.subscribe(town, function(topic, data) {
-				console.info('rx ', topic, data);
-				route.town(data, data.route);
+				socket.routeMainChat(topic, data);
 			});
 
 			// subscribe to admin broadcasts
@@ -2406,40 +2051,35 @@ var socket = {
 					setTimeout(repeat, 200);
 				}
 			})();
-			/*
+
 			// keep alive?
-			(function repeat(){
-				socket.zmq.publish('name:' + my.name, {
-					ping: 1
-				});
-				setTimeout(repeat, 5000);
-			})();
-			// pong timer
-			clearInterval(chat.pongTimer);
-			chat.pongTimer = setInterval(function(){
-				var pong = Date.now() - socket.lastPing;
-				if (pong > 9000) {
-					socket.reinit();
-				}
-				console.info("pong: ", pong);
-			}, 5000);
-			*/
+			// let everyone know I am here
+			chat.broadcast.add();
+			chat.setHeader();
 		}
-		socket.setChannel(chat.channel);
 	}
 }
 // chat.js
 var chat = {
-	channel: "town",
+	prefix: 't:',
+	getChannel: function() {
+		return chat.prefix + my.channel;
+	},
 	// receives channel prop from index.php
 	html: function() {
 		var s =
-			'<div id="chat-log">' +
-				'<div>Welcome to Vandamor.</div>' +
-				'<div class="chat-warning">Nevergrind 2 is still in development, but feel free to test it out!</div>' +
-				'<div class="chat-emote">Type /help or /h for a list of chat commands.</div>' +
+			'<div id="chat-present-wrap">' +
+				'<div id="chat-header">&nbsp;</div>' +
+				'<div id="chat-room"></div>' +
 			'</div>' +
-			'<input id="chat-input" type="text" maxlength="240" autocomplete="off" spellcheck="false" />';
+			'<div id="chat-log-wrap">' +
+				'<div id="chat-log">' +
+					'<div>Welcome to Vandamor.</div>' +
+					'<div class="chat-warning">Nevergrind 2 is still in development, but feel free to test it out!</div>' +
+					'<div class="chat-emote">Type /help or /h for a list of chat commands.</div>' +
+				'</div>' +
+				'<input id="chat-input" type="text" maxlength="240" autocomplete="off" spellcheck="false" />' +
+			'</div>';
 
 		return s;
 	},
@@ -2453,6 +2093,7 @@ var chat = {
 		account: '',
 		msg: ''
 	},
+	dom: {},
 	init: function(z) {
 		// default initialization of chat
 		if (z && !chat.initialized) {
@@ -2478,22 +2119,24 @@ var chat = {
 		else {
 			// hide
 		}
-		// dom
-		dom.chatLog = document.getElementById('chat-log');
-		dom.chatInput = document.getElementById('chat-input');
+		// dom cache
+		chat.dom.chatRoom = document.getElementById('chat-room');
+		chat.dom.chatHeader = document.getElementById('chat-header');
+		chat.dom.chatLog = document.getElementById('chat-log');
+		chat.dom.chatInput = document.getElementById('chat-input');
 	},
 	// report to chat-log
 	log: function(msg, route){
 		if (msg){
-			while (dom.chatLog.childElementCount >= 500) {
-				dom.chatLog.removeChild(dom.chatLog.firstChild);
+			while (chat.dom.chatLog.childElementCount >= 500) {
+				chat.dom.chatLog.removeChild(chat.dom.chatLog.firstChild);
 			}
 			var z = document.createElement('div');
 			if (route){
 				z.className = route;
 			}
 			z.innerHTML = msg;
-			dom.chatLog.appendChild(z);
+			chat.dom.chatLog.appendChild(z);
 			chat.scrollBottom();
 		}
 	},
@@ -2511,7 +2154,7 @@ var chat = {
 		var o = {
 				msg: msg,
 				class: 'chat-normal',
-				category: my.channel
+				category: chat.getChannel()
 			};
 		var parse = chat.parseMsg(msg);
 
@@ -2563,6 +2206,7 @@ var chat = {
 				'<div '+ z +'>/guild /g : Message your guild : /g hail</div>',
 				'<div '+ z +'>/ooc : Send a message out of character : /ooc hail</div>',
 				'<div '+ z +'>/shout /s : Shout a message : /s hail</div>',
+				'<div '+ z +'>/join /j : Join a channel : /j bros</div>',
 				'<div '+ z +'>/me : Send an emote : /me waves</div>',
 				'<div '+ z +'>@ : Send a private message by name : @bob hi</div>',
 				'<div '+ z +'>/flist or /f : Show your friends\' online status</div>',
@@ -2582,14 +2226,18 @@ var chat = {
 	},
 	// player hit ENTER
 	sendMsg: function(bypass){
-		var msg = dom.chatInput.value.trim(),
+		var msg = chat.dom.chatInput.value.trim(),
 			msgLower = msg.toLowerCase();
+
 		// bypass via ENTER or chat has focus
 		if (msg === '/h' || msg === '/help') {
 			chat.updateHistory(msg);
 			chat.help();
 		}
 		/*
+		/chat
+		/invite
+		/disband
 		/random
 		/surname
 		update /help
@@ -2606,6 +2254,10 @@ var chat = {
 		else if (msgLower === '/played') {
 			chat.updateHistory(msgLower);
 			chat.played();
+		}
+		else if (msgLower.indexOf('/j') === 0 || msgLower.indexOf('/join') === 0) {
+			chat.updateHistory(msgLower);
+			chat.join.channel(chat.join.parse(msg));
 		}
 		else if (msgLower === '/clear') {
 			chat.updateHistory(msgLower);
@@ -2697,14 +2349,10 @@ var chat = {
 	},
 	whispers: {},
 	clear: function() {
-		dom.chatInput.value = '';
+		chat.dom.chatInput.value = '';
 	},
 	clearChatLog: function(){
-		dom.chatLog.innerHTML = '';
-	},
-	changeChannel: function(msg, splitter){
-		var arr = msg.split(splitter);
-		socket.setChannel(arr[1]);
+		chat.dom.chatLog.innerHTML = '';
 	},
 	ignore: {
 		init: function() {
@@ -2968,102 +2616,162 @@ var chat = {
 	},
 	scrollBottom: function(){
 		if (!chat.isClicked){
-			dom.chatLog.scrollTop = dom.chatLog.scrollHeight;
+			chat.dom.chatLog.scrollTop = chat.dom.chatLog.scrollHeight;
 		}
 	},
-	// rx routing - not used now
-	chatReceive: function(data){
-		if (g.view === 'lobby'){
-			// lobby
-			//console.info('lobby receive: ', data);
-			if (data.type === 'hostLeft'){
-				lobby.hostLeft();
-			} else if (data.type === 'lobby-set-cpu-difficulty'){
-				lobby.updateDifficulty(data);
-			} else if (data.type === 'updateGovernment'){
-				lobby.updateGovernment(data);
-			} else if (data.type === 'updatePlayerColor'){
-				lobby.updatePlayerColor(data);
-			} else if (data.type === 'updateTeamNumber'){
-				lobby.updateTeamNumber(data);
-			} else if (data.type === 'countdown'){
-				lobby.countdown(data);
-			} else if (data.type === 'updateLobbyPlayer'){
-				lobby.updatePlayer(data);
-			} else if (data.type === 'updateLobbyCPU'){
-				lobby.updateCPU(data);
-			} else {
-				if (data.msg !== undefined){
-					lobby.chat(data);
+	inChannel: [],
+	setRoom: function(data) {
+		console.info('setRoom', data);
+		var s = '';
+		chat.inChannel = [];
+		data.forEach(function(v){
+			chat.inChannel.push(v.id * 1);
+			s +=
+			'<div id="chat-room-'+ v.id +'">'+
+				'<span class="chat-room-player">['+ v.level +':<span class="chat-'+ v.job +'">'+ v.name +'</span>]</span>'+
+			'</div>';
+		});
+		if (s) {
+			chat.dom.chatRoom.innerHTML = s;
+		}
+	},
+	setHeader: function() {
+		chat.dom.chatHeader.innerHTML = my.channel + '&thinsp;(' + chat.inChannel.length + ')';
+	},
+	join: {
+		parse: function(msg) {
+			var c = msg.split(" ");
+			return c[1].toLowerCase().trim();
+		},
+		channel: function(channel) {
+			if (g.view === 'town' && channel){
+				console.info("JOINING: ", channel);
+				// remove from channel
+				if (channel !== my.channel){
+					$.ajax({
+						url: app.url + 'php2/chat/set-channel.php',
+						data: {
+							channel: channel
+						}
+					}).done(function(data){
+						chat.broadcast.remove();
+						console.info("You have changed channel to: ", data);
+						chat.setRoom(data.players);
+						// removes id
+						//socket.removePlayer(my.account);
+						// unsubs
+						my.channel && socket.unsubscribe(chat.getChannel());
+						// set new channel data
+						my.channel = data.channel;
+						chat.log('You have joined channel: ' + data.channel, 'chat-warning');
+						socket.zmq.subscribe(data.fullChannel, function(topic, data) {
+							socket.routeMainChat(topic, data);
+						});
+						// add to chat channel
+						chat.setHeader();
+						chat.broadcast.add();
+					});
 				}
 			}
-		} else {
-			// game
-			// console.info('game receive: ', data);
-			if (data.type === 'cannons'){
-				animate.cannons(data.attackerTile, data.tile, false);
-				game.updateTile(data);
-			} else if (data.type === 'missile'){
-				animate.missile(data.attacker, data.defender, true);
-			} else if (data.type === 'nuke'){
-				setTimeout(function(){
-					animate.nuke(data.tile, data.attacker);
-				}, 5000);
-			} else if (data.type === 'nukeHit'){
-				game.updateTile(data);
-				game.updateDefense(data);
-			} else if (data.type === 'gunfire'){
-				// defender tile update
-				animate.gunfire(data.attackerTile, data.tile, data.player === my.player || data.playerB === my.player);
-				animate.cannons(data.attackerTile, data.tile, false, 0, .175, 10);
-				game.updateTile(data);
-				if (data.rewardUnits){
-					animate.upgrade(data.tile, 'troops', data.rewardUnits);
-				}
-			} else if (data.type === 'updateTile'){
-				// attacker tile update
-				game.updateTile(data);
-				game.setSumValues();
-				if (data.rewardUnits){
-					animate.upgrade(data.tile, 'troops', data.rewardUnits);
-				}
-				if (data.sfx === 'sniper0'){
-					animate.upgrade(data.tile, 'culture');
-				}
-			} else if (data.type === 'food'){
-				if (data.account.indexOf(my.account) > -1){
-					audio.play('hup2');
-				}
-			} else if (data.type === 'upgrade'){
-				// fetch updated tile defense data
-				game.updateDefense(data);
-				animate.upgrade(data.tile, 'shield');
-			} else if (data.type === 'eliminated'){
-				game.eliminatePlayer(data);
-			} else if (data.type === 'endTurnCheck'){
-				game.triggerNextTurn(data);
-			} else if (data.type === 'disconnect'){
-				game.eliminatePlayer(data);
-			}
-
-			if (data.msg){
-				if (data.type === 'gunfire'){
-					// ? when I'm attacked?
-					if (data.defender === my.account){
-						// display msg?
-						game.chat(data);
-					}
-					// lost attack
-				} else {
-					game.chat(data);
-				}
-			}
-			if (data.sfx){
-				audio.play(data.sfx);
-			}
+		}
+	},
+	// players receive update from socket
+	addPlayer: function(v) {
+		console.info('chat.inChannel', v.row, chat.inChannel);
+		if (chat.inChannel.indexOf(v.row) === -1) {
+			var e = document.createElement('div');
+			e.innerHTML =
+			'<div id="chat-room-'+ v.row +'">'+
+				'<span class="chat-room-player">['+ v.level +':<span class="chat-'+ v.job +'">'+ v.name +'</span>]</span>'+
+			'</div>';
+			chat.dom.chatRoom.appendChild(e);
+			chat.inChannel.push(v.row);
+			chat.setHeader();
+		}
+	},
+	removePlayer: function(v) {
+		var e = document.getElementById('chat-room-' + v.row);
+		e !== null && e.parentNode.removeChild(e);
+		var index = chat.inChannel.indexOf(v.row);
+		chat.inChannel.splice(index, 1);
+		chat.setHeader();
+	},
+	// player broadcasts updates from client
+	broadcast: {
+		add: function() {
+			console.info('broadcast.add');
+			socket.zmq.publish(chat.getChannel(), {
+				route: 'chat->add',
+				row: my.row,
+				level: my.level,
+				job: my.job,
+				name: my.name
+			});
+		},
+		remove: function() {
+			console.info('broadcast.remove');
+			socket.zmq.publish(chat.getChannel(), {
+				route: 'chat->remove',
+				row: my.row
+			});
 		}
 	}
 };
+var bar = {
+	init: function() {
+		console.info("init bar.js");
+		var e = document.getElementById('bar-wrap');
+		e.innerHTML = bar.html();
+		e.style.display = 'block';
+
+		bar.dom.playerWrap = [];
+		bar.dom.name = [];
+		bar.dom.hpFg = [];
+		bar.dom.hpBg = [];
+		bar.dom.mpWrap = [];
+		bar.dom.mpFg = [];
+		for (var i=0; i<game.maxPlayers; i++) {
+			bar.dom.playerWrap = document.getElementById('bar-player-wrap-' + i);
+			bar.dom.name = document.getElementById('bar-name-' + i);
+			bar.dom.hpFg = document.getElementById('bar-hp-fg-' + i);
+			bar.dom.hpBg = document.getElementById('bar-hp-bg-' + i);
+			bar.dom.mpWrap = document.getElementById('bar-mp-wrap-' + i);
+			bar.dom.mpFg = document.getElementById('bar-mp-fg-' + i);
+		}
+	},
+	dom: {},
+	html: function() {
+		var s = '';
+		for (var i=0; i<game.maxPlayers; i++) {
+			var c = g.toJobShort(g.jobs[~~(Math.random() * 14)]);
+			s +=
+				'<div id="bar-player-wrap-'+ i +'" class="bar-player-wrap">' +
+					'<div id="bar-col-icon-'+ i +'" class="bar-col-icon player-icon-'+ c +'"></div>' +
+					'<div class="bar-col-data">' +
+						'<div id="bar-name-'+ i +'" class="bar-hp-name">'+ game.getPetName() +'</div>' +
+						'<div id="bar-hp-wrap-'+ i +'" class="bar-hp-wrap">' +
+							'<div id="bar-hp-fg-'+ i +'" class="bar-hp-fg"></div>' +
+							'<div id="bar-hp-bg-'+ i +'" class="bar-hp-bg"></div>' +
+						'</div>' +
+						'<div id="bar-mp-wrap-'+ i +'" class="bar-mp-wrap">' +
+							'<div id="bar-mp-fg-'+ i +'" class="bar-mp-fg"></div>' +
+						'</div>' +
+					'</div>' +
+				'</div>';
+		}
+
+		return s;
+	},
+	update: function() {
+
+	},
+	get: function() {
+
+	},
+	events: function() {
+
+	}
+}
 var payment = {
     init: function(){
         if (location.hostname === "localhost"){
@@ -4805,11 +4513,15 @@ var p = {}, // party info
 				}
 			}).done(function(data) {
 				socket.init();
-				my.name = data.characterData.name;
-				my.race = data.characterData.race;
+				var z = data.characterData;
+				my.name = z.name;
+				my.job = z.job;
+				my.race = z.race;
+				my.level = z.level;
+				my.row = z.row;
 				my.leader = '';
-				p[my.name] = data.characterData;
-				console.info('loadCharacter: ', p[my.name]);
+				p[my.name] = z;
+				console.info('p[my.name]: ', p[my.name]);
 				g.setScene('town');
 				town.init();
 				chat.init(1);
@@ -4817,6 +4529,8 @@ var p = {}, // party info
 				chat.friend.init();
 				chat.ignore.init();
 				game.heartbeat.start();
+				chat.setRoom(data.players);
+				bar.init();
 			}).fail(function(data){
 				g.disconnect(data.responseText);
 			}).always(function(){
@@ -4867,10 +4581,29 @@ var route = {
 				console.warn("Message from " + data.name + " has been ignored.");
 			}
 		}
+		else if (r === 'chat->add') {
+			console.info('chat.inChannel', data.row, chat.inChannel);
+			chat.addPlayer(data);
+		}
+		else if (r === 'chat->remove') {
+			chat.removePlayer(data);
+		}
 	}
 };
 // test methods
 var test = {
+	chatRoom: function(){
+		for (var i=0; i<100; i++) {
+			var c = g.toJobShort(g.jobs[~~(Math.random() * 14)]);
+			socket.zmq.publish(chat.getChannel(), {
+				route: 'chat->add',
+				row: ~~(Math.random() * 9999),
+				level: Math.ceil(Math.random() * 50),
+				job: c,
+				name: 'WWWWWWWWWWWWWWWW'
+			});
+		}
+	},
 	orcs: function(){
 		$("#title-container-wrap").css('display', 'none');
 

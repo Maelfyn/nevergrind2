@@ -11,10 +11,11 @@ var g = {
 			e.preventDefault();
 		});
 		// disable stuff in app to appear more "native"
-		if (app.isApp) {
+		if (!app.isLocal) {
 			document.addEventListener("contextmenu", function (e) {
 				// disable default right-click menu
 				e.preventDefault();
+				return false;
 			}, false);
 			window.addEventListener("wheel", function(e){
 				if (e.ctrlKey) {
@@ -32,6 +33,9 @@ var g = {
 			// debounce resize
 			clearTimeout(g.resizeTimer);
 			g.resizeTimer = setTimeout(function(){
+				if (chat.initialized) {
+					chat.scrollBottom();
+				}
 				if (g.view === 'battle') {
 					for (var i=0; i<mob.max; i++) {
 						mob.sizeMob(mobs[i]);
@@ -56,7 +60,7 @@ var g = {
 		e.innerHTML = msg || 'You have been disconnected from the server';
 		setTimeout(function() {
 			location.reload();
-		}, 10000);
+		}, 12000);
 	},
 	resizeTimer: 0,
 	races: [

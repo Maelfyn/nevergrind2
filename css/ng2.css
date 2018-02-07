@@ -1503,6 +1503,89 @@ tbody {
 	background: -o-radial-gradient(center center, farthest-corner, rgba(16, 16, 16, 1) 0, rgba(0, 0, 0, 1) 100%);
 	background: radial-gradient(center center, farthest-corner, rgba(16, 16, 16, 1) 0, rgba(0, 0, 0, 1) 100%);
 }
+/* bar wrap */
+#bar-wrap {
+	display: none;
+	position: absolute;
+	top: .1rem;
+	left: .2rem;
+	z-index: 1;
+}
+.bar-player-wrap {
+	display: flex;
+	margin-bottom: .2rem;
+}
+.bar-col-icon {
+	background: url('../img2/job-icons.png');
+	background-size: 1400% 100%;
+	width: 3.25rem;
+	height: 3.25rem;
+}
+.bar-col-data {
+	flex: 1;
+	width: 7rem;
+}
+.bar-hp-name {
+	text-transform: capitalize;
+	text-indent: .2rem;
+	color: #fff;
+	font: 1rem Roboto Slab, sans-serif;
+	line-height: 1.2;
+}
+.bar-hp-wrap,
+.bar-mp-wrap {
+	position: relative;
+	border: 1px solid #111;
+	background: #777;
+	margin: .1rem .2rem;
+	height: .5rem;
+	border-radius: 10px;
+	overflow: hidden;
+}
+.bar-hp-fg {
+	position: absolute;
+	background: #f22;
+	height: 100%;
+	width: 50%;
+	z-index: 1;
+}
+.bar-hp-bg {
+	position: absolute;
+	background: #ff0;
+	height: 100%;
+	width: 100%;
+	z-index: 0;
+}
+.bar-mp-fg {
+	background: #05b;
+	height: 100%;
+	width: 75%;
+}
+.player-icon-WAR { background-position: 0; }
+.player-icon-ROG { background-position: -100%; }
+.player-icon-MNK { background-position: -200%; }
+.player-icon-PAL { background-position: -300%; }
+.player-icon-SHD { background-position: -400%; }
+.player-icon-RNG { background-position: 900%; }
+.player-icon-BRD { background-position: 800%; }
+.player-icon-DRU { background-position: 700%; }
+.player-icon-CLR { background-position: 600%; }
+.player-icon-SHM { background-position: 500%; }
+.player-icon-NEC { background-position: 400%; }
+.player-icon-ENC { background-position: 300%; }
+.player-icon-MAG { background-position: 200%; }
+.player-icon-WIZ { background-position: 100%; }
+
+
+
+
+
+
+
+
+
+
+/* show game */
 body {
 	visibility: visible;
 }

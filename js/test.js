@@ -2,8 +2,7 @@
 var test = {
 	chatRoom: function(){
 		for (var i=0; i<100; i++) {
-			var m = ~~(Math.random() * 14);
-			var c = g.toJobShort(g.jobs[m])
+			var c = g.toJobShort(g.jobs[~~(Math.random() * 14)]);
 			socket.zmq.publish(chat.getChannel(), {
 				route: 'chat->add',
 				row: ~~(Math.random() * 9999),

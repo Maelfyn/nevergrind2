@@ -80,6 +80,7 @@ return gulp.src([
 './js/events.js',
 './js/socket.js',
 './js/chat.js',
+'./js/bar.js',
 './js/payment.js',
 './js/battle.js',
 './js/mobs.js',

@@ -2,7 +2,6 @@
 
 ///////////////
 
-- presence displayed in lobby/town - sanity check needed?
 - player/party panels
 - add right-click menu to player names for invite to party/guild/ignore/friend, etc?
 - add guild stuff!

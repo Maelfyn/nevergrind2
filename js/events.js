@@ -3,8 +3,10 @@ window.onbeforeunload = function(){
 	//return "Are you sure you want to leave the game? Use /camp to save your game!";
 }
 
-$(document).on(env.click, function(){
+$(document).on(env.click, function(e){
 	g.setIdleDate();
+	e.preventDefault();
+	return false;
 }).on('keydown', function(e){
 	var code = e.keyCode,
 		key = e.key;
