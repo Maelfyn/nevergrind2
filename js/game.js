@@ -10,7 +10,6 @@ var game = {
 				game.init = 1;
 				game.heartbeat.send();
 				game.heartbeat.update();
-				game.socketRefresh();
 				game.played.start();
 			}
 		},
@@ -42,39 +41,25 @@ var game = {
 		start: function() {
 			clearInterval(game.played.timer);
 			game.played.timer = setInterval(function(){
-				var d = Date.now() - g.idleDate;
-				console.info("played.timer", d);
-				//if (d > 900000 * 4) {
-				if (0) {
-					// 60 minutes now!
-					// disconnect - idle 15 minutes
-					g.disconnect();
-				}
-				else {
-					$.ajax({
-						type: 'GET',
-						url: app.url + 'php2/update-played.php'
-					}).done(function(){
-						!app.isLocal && console.clear();
-						setTimeout(function() {
-							socket.zmq.publish('name:' + my.name, {
-								ping: 1
-							});
-						}, 30000);
-					}).fail(function(){
-						setTimeout(function(){
-							game.played.start();
-						}, 10000);
-					});
-				}
+				socket.startHealthCheck();
+				$.ajax({
+					type: 'GET',
+					url: app.url + 'php2/update-played.php'
+				}).done(function(){
+					setTimeout(function() {
+						socket.startHealthCheck();
+						socket.zmq.publish('name:' + my.name, {
+							ping: 1
+						});
+					}, 30000);
+				}).fail(function(){
+					setTimeout(function(){
+						game.played.start();
+					}, 5000);
+				});
 			}, 60000);
 		}
 
-	},
-	socketRefresh: function() {
-		setInterval(function() {
-			socket.reconnect();
-		}, 600000)
 	},
 	name: '',
 	initialized: false,
@@ -148,8 +133,8 @@ var game = {
 				""
 			];
 
-		return s1[~~(Math.random() * s1.length) - 1] +
-			s2[~~(Math.random() * s2.length) - 1]+
-			s3[~~(Math.random() * s3.length) - 1];
+		return s1[~~(Math.random() * s1.length)] +
+			s2[~~(Math.random() * s2.length)]+
+			s3[~~(Math.random() * s3.length)];
 	}
 };

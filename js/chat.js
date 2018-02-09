@@ -202,11 +202,11 @@ var chat = {
 			chat.updateHistory(msgLower);
 			chat.clearChatLog();
 		}
-		else if (msgLower === '/who') {
+		else if (msgLower === '/w' || msgLower === '/who') {
 			chat.updateHistory(msgLower);
 			chat.who.all();
 		}
-		else if (msgLower.indexOf('/who ') === 0 && msgLower.length > 5) {
+		else if ( (msgLower.indexOf('/w ') === 0 || msgLower.indexOf('/who ') === 0) && msgLower.length > 5) {
 			chat.updateHistory(msg);
 			chat.who.class(chat.who.parse(msg));
 		}
@@ -386,6 +386,9 @@ var chat = {
 					else {
 						chat.log('You have added ' + o + ' to your friends list.', 'chat-warning');
 						g.friends.push(o);
+						socket.zmq.subscribe('friend:'+ o, function(topic, data) {
+							chat.friend.notify(topic, data);
+						});
 					}
 				});
 			}
@@ -407,8 +410,17 @@ var chat = {
 							var index = g.friends.indexOf(o);
 							g.friends.splice(index, 1);
 						}
+						socket.unsubscribe('friend:'+ o);
 					}
 				});
+			}
+		},
+		notify: function(topic, data) {
+			if (data.route === 'on') {
+				chat.log(data.name + ' has come online.', 'chat-warning');
+			}
+			else {
+				chat.log(data.name + ' has gone offline.', 'chat-warning');
 			}
 		}
 	},

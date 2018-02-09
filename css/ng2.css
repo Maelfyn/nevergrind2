@@ -1222,8 +1222,8 @@ tbody {
 	flex-direction: row;
 	font-family: Roboto Condensed, Roboto, sans-serif;
 	position: absolute;
-	top: .2rem;
-	right: .2rem;
+	top: 0;
+	right: 0;
 	font-size: 1rem;
 	border: 2px ridge #222;
 	background: rgba(0,0,0,.8);
@@ -1507,7 +1507,7 @@ tbody {
 #bar-wrap {
 	display: none;
 	position: absolute;
-	top: .1rem;
+	top: .2rem;
 	left: .2rem;
 	z-index: 1;
 }
@@ -1535,7 +1535,7 @@ tbody {
 .bar-hp-wrap,
 .bar-mp-wrap {
 	position: relative;
-	border: 1px solid #111;
+	border: 1px solid #000;
 	background: #777;
 	margin: .1rem .2rem;
 	height: .5rem;

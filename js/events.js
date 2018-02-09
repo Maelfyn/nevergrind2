@@ -1,6 +1,12 @@
-window.onbeforeunload = function(){
+onbeforeunload = function(){
 	chat.broadcast.remove();
-	//return "Are you sure you want to leave the game? Use /camp to save your game!";
+	if (socket.enabled) {
+		socket.zmq.publish('friend:' + my.name, {
+			name: my.name,
+			route: 'off'
+		});
+		socket.zmq.close();
+	}
 }
 
 $(document).on(env.click, function(e){

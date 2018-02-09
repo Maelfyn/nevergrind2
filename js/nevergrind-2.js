@@ -1518,7 +1518,7 @@ var game = {
 				game.init = 1;
 				game.heartbeat.send();
 				game.heartbeat.update();
-				game.socketRefresh();
+				//game.socketRefresh();
 				game.played.start();
 			}
 		},
@@ -1563,7 +1563,6 @@ var game = {
 						type: 'GET',
 						url: app.url + 'php2/update-played.php'
 					}).done(function(){
-						!app.isLocal && console.clear();
 						setTimeout(function() {
 							socket.zmq.publish('name:' + my.name, {
 								ping: 1
@@ -1580,9 +1579,12 @@ var game = {
 
 	},
 	socketRefresh: function() {
+		// 5 minute socket refresh
 		setInterval(function() {
+			console.info("Refreshing socket ", Date.now());
+			!app.isLocal && console.clear();
 			socket.reconnect();
-		}, 600000)
+		}, 300000);
 	},
 	name: '',
 	initialized: false,
@@ -1656,9 +1658,9 @@ var game = {
 				""
 			];
 
-		return s1[~~(Math.random() * s1.length) - 1] +
-			s2[~~(Math.random() * s2.length) - 1]+
-			s3[~~(Math.random() * s3.length) - 1];
+		return s1[~~(Math.random() * s1.length)] +
+			s2[~~(Math.random() * s2.length)]+
+			s3[~~(Math.random() * s3.length)];
 	}
 };
 // title.js
@@ -1984,12 +1986,12 @@ var socket = {
 				// receive pong
 				else if (data.action === 'receive') {
 					route.town(chat.whispers[data.date], 'chat->log');
-				}
+				}/*
 				// receive keep alive
 				else if (data.action === 'ping') {
 					console.info(data);
 					socket.updatePing();
-				}
+				}*/
 			});
 		}
 	},
@@ -2281,11 +2283,11 @@ var chat = {
 			chat.updateHistory(msgLower);
 			chat.clearChatLog();
 		}
-		else if (msgLower === '/who') {
+		else if (msgLower === '/w' || msgLower === '/who') {
 			chat.updateHistory(msgLower);
 			chat.who.all();
 		}
-		else if (msgLower.indexOf('/who ') === 0 && msgLower.length > 5) {
+		else if ( (msgLower.indexOf('/w ') === 0 || msgLower.indexOf('/who ') === 0) && msgLower.length > 5) {
 			chat.updateHistory(msg);
 			chat.who.class(chat.who.parse(msg));
 		}

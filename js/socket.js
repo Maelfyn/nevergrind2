@@ -3,8 +3,8 @@ var socket = {
 	unsubscribe: function(channel){
 		try {
 			socket.zmq.unsubscribe(channel);
-		} catch(err){
-			console.info(err);
+		} catch(err) {
+			console.warn(err);
 		}
 	},
 	joinGame: function(){
@@ -24,14 +24,11 @@ var socket = {
 			}
 		})();
 	},
-	lastPing: 0,
+	isHealthy: 0,
 	initWhisper: function() {
 		if (socket.enabled) {
 			var channel = 'name:' + my.name;
 			console.info("subscribing to whisper channel: ", channel);
-
-			socket.updatePing();
-
 			socket.zmq.subscribe(channel, function(topic, data) {
 				console.info('rx ', topic, data);
 				if (data.action === 'send') {
@@ -58,14 +55,24 @@ var socket = {
 				}
 				// receive keep alive
 				else if (data.action === 'ping') {
-					console.info(data);
-					socket.updatePing();
+					console.info("Socket is healthy! ", Date.now() - socket.healthTime);
+					socket.isHealthy = 1;
 				}
 			});
 		}
 	},
-	updatePing: function(){
-		socket.lastPing = Date.now();
+	healthTime: 0,
+	startHealthCheck: function() {
+		socket.healthTime = Date.now();
+		socket.isHealthy = 0;
+		setTimeout(function() {
+			socket.checkHealth();
+		}, 5000);
+	},
+	checkHealth: function(){
+		if (!socket.isHealthy) {
+			g.disconnect();
+		}
 	},
 	enabled: 0,
 	init: function(bypass){
@@ -73,10 +80,12 @@ var socket = {
 		socket.zmq = new ab.Session('wss://' + app.socketUrl + '/wss2/', function () {
 			// on open
 			socket.connectionSuccess();
-		}, function () {
+		}, function (code, reason) {
+			console.info('Websocket connection closed. Code: '+code+'; reason: '+reason);
 			// on close/fail
 			console.warn('WebSocket connection failed. Retrying...');
-			socket.reconnect();
+			socket.enabled = 0;
+			setTimeout(socket.init, 100);
 		}, {
 			// options
 			'skipSubprotocolCheck': true
@@ -130,6 +139,7 @@ var socket = {
 			(function repeat(){
 				if (my.name){
 					socket.initWhisper();
+					socket.initFriendAlerts();
 				} else {
 					setTimeout(repeat, 200);
 				}
@@ -139,12 +149,18 @@ var socket = {
 			// let everyone know I am here
 			chat.broadcast.add();
 			chat.setHeader();
+			// notify friends I'm online
+			socket.zmq.publish('friend:' + my.name, {
+				name: my.name,
+				route: 'on'
+			});
 		}
 	},
-	connectionTries: 0,
-	connectionRetryDuration: 100,
-	reconnect: function() {
-		socket.enabled = 0;
-		setTimeout(socket.init, socket.connectionRetryDuration);
+	initFriendAlerts: function() {
+		g.friends.forEach(function(v){
+			socket.zmq.subscribe('friend:' + v, function(topic, data) {
+				chat.friend.notify(topic, data);
+			});
+		});
 	}
 }
