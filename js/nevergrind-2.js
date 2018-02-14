@@ -590,6 +590,14 @@ var create = {
 
 // core.js
 var g = {
+	id: 0,
+	getId: function() {
+		g.id++;
+		if (g.id > 999999999) {
+			g.id = 1;
+		}
+		return g.id;
+	},
 	events: function(){
 		$(window).focus(function(){
 			/*document.title = g.defaultTitle;
@@ -1102,6 +1110,11 @@ env.isChrome = !!window.chrome && !env.isOpera;
 var my = {
 	channel: 'town-1',
 	lastReceivedWhisper: '',
+	p_id: '',
+	partyLeader: 0,
+	party: [],
+	g_id: '',
+	guild: [],
 	team: 0,
 	slot: 1,
 	tgt: 1,
@@ -1652,6 +1665,11 @@ var title = {
 	}
 };
 onbeforeunload = function(){
+	// attempt to remove player from game
+	$.ajax({
+		type: 'GET',
+		url: app.url + 'php2/chat/camp.php'
+	});
 	chat.broadcast.remove();
 	if (socket.enabled) {
 		socket.zmq.publish('friend:' + my.name, {
@@ -1852,17 +1870,18 @@ var socket = {
 					data.msg = "You whispered to " + data.name + ": " + chat.whisper.parse(data.msg);
 					route.town(data, 'chat->log');
 				}
-				// receive keep alive
-				else if (data.action === 'ping') {
-					console.info("Socket is healthy! ", Date.now() - socket.healthTime);
-					socket.isHealthy = 1;
+				// party invite
+				else if (data.action === 'party-invite') {
+					console.info("party invite received! ", data);
+					chat.prompt.add(data);
+				}
+				else if (data.action === 'party-deny') {
+					chat.log(data.name + " has denied your party invite.", 'chat-warning');
+				}
+				else if (data.action === 'party-accept') {
+					chat.log(data.name + " has joined the party.", 'chat-warning');
 				}
 
-				if (!chat.mode.command) {
-					// set chat mode if none is set
-					chat.mode.command = '@';
-					chat.mode.name = data.name;
-				}
 			});
 		}
 	},
@@ -1932,15 +1951,6 @@ var socket = {
 				route.town(data, data.route);
 			});
 
-			// subscribe to test party for now
-			var party = 'party:' + Date.now();
-			my.party = party;
-			console.info("subscribing to channel: ", party);
-			socket.zmq.subscribe(party, function(topic, data) {
-				console.info('rx ', topic, data);
-				route.town(data, data.route);
-			});
-
 			(function repeat(){
 				if (my.name){
 					socket.initWhisper();
@@ -1963,6 +1973,7 @@ var socket = {
 	},
 	initFriendAlerts: function() {
 		g.friends.forEach(function(v){
+			socket.unsubscribe('friend:' + v);
 			socket.zmq.subscribe('friend:' + v, function(topic, data) {
 				chat.friend.notify(topic, data);
 			});
@@ -1989,6 +2000,8 @@ var chat = {
 					'<div class="chat-warning">Nevergrind 2 is still in development, but feel free to test it out!</div>' +
 					'<div class="chat-emote">Type /help or /h for a list of chat commands.</div>' +
 				'</div>' +
+				'<div id="chat-prompt" class="no-select">'+
+				'</div>' +
 				'<div id="chat-input-wrap">' +
 					'<div id="chat-input-mode" class="chat-white no-select">'+
 						'<span id="chat-mode-msg" class="ellipsis">To town-1:</span>' +
@@ -2009,12 +2022,12 @@ var chat = {
 	},
 	mode: {
 		types: [
-			'/s',
-			'/p',
-			'/g',
+			'/say',
+			'/party',
+			'/gsay',
 			'/me'
 		],
-		command: '/s',
+		command: '/say',
 		name: '',
 		change: function(h){
 			// only trim leading spaces
@@ -2058,15 +2071,15 @@ var chat = {
 			}
 		},
 		set: function(mode) {
-			if (mode === '/s') {
+			if (mode === '/say') {
 				chat.dom.chatInputMode.className = 'chat-white';
 				chat.dom.chatModeMsg.textContent = 'To ' + my.channel + ':';
 			}
-			else if (mode === '/p') {
+			else if (mode === '/party') {
 				chat.dom.chatInputMode.className = 'chat-party';
 				chat.dom.chatModeMsg.textContent = 'To party:';
 			}
-			else if (mode === '/g') {
+			else if (mode === '/gsay') {
 				chat.dom.chatInputMode.className = 'chat-guild';
 				chat.dom.chatModeMsg.textContent = 'To guild:';
 			}
@@ -2102,6 +2115,14 @@ var chat = {
 			}).on('blur', function(){
 				chat.hasFocus = 0;
 			});
+
+			$("#chat-prompt").on(env.click, '.chat-prompt-yes', function(e){
+				chat.prompt.confirm($(this).data());
+			});
+
+			$("#chat-prompt").on(env.click, '.chat-prompt-no', function(e){
+				chat.prompt.deny($(this).data());
+			});
 		}
 		else {
 			// hide
@@ -2113,6 +2134,7 @@ var chat = {
 		chat.dom.chatInput = document.getElementById('chat-input');
 		chat.dom.chatInputMode = document.getElementById('chat-input-mode');
 		chat.dom.chatModeMsg = document.getElementById('chat-mode-msg');
+		chat.dom.chatPrompt = document.getElementById('chat-prompt');
 	},
 	// report to chat-log
 	log: function(msg, route){
@@ -2138,36 +2160,6 @@ var chat = {
 		o.command = arr.join(' ');
 		return o;
 	},
-	getMsgObject: function(msg){
-		var o = {
-				msg: msg,
-				class: 'chat-normal',
-				category: chat.getChannel()
-			};
-		var parse = chat.parseMsg(msg);
-
-		// is it a command?
-		if (chat.mode.command === '/p'){
-			o.category = my.party;
-			o.msg = msg;
-			o.class = 'chat-party';
-		}
-		else if (chat.mode.command === '/g'){
-			o.category = my.guild;
-			o.msg = msg;
-			o.class = 'chat-guild';
-		}
-		else if (chat.mode.command === '/me') {
-			o.msg = msg;
-			o.class = 'chat-emote';
-		}
-		else if (parse.first === '/broadcast'){
-			o.category = 'admin:broadcast';
-			o.msg = parse.command;
-			o.class = 'chat-broadcast';
-		}
-		return o;
-	},
 	historyIndex: 0,
 	history: [],
 	updateHistory: function(msg) {
@@ -2185,23 +2177,23 @@ var chat = {
 		var z = 'class="chat-emote"',
 			s = [
 				'<div class="chat-warning">Chat Commands:</div>',
-				'<div '+ z +'>/s : Say a message in town chat channel : /s hail</div>',
-				'<div '+ z +'>/p : Message your party : /p hail</div>',
-				'<div '+ z +'>/g : Message your guild : /g hail</div>',
+				'<div '+ z +'>/say : Say a message in town chat channel : /say hail</div>',
+				'<div '+ z +'>/party : Message your party : /party hail</div>',
+				'<div '+ z +'>/gsay : Message your guild : /gsay hail</div>',
 				'<div '+ z +'>@ : Send a private message by name : @bob hi</div>',
 				'<div '+ z +'>/me : Send an emote : /me waves</div>',
-				'<div '+ z +'>/j : Join the default chat channel : /j</div>',
-				'<div '+ z +'>/j channel : Join a channel : /j bros</div>',
-				'<div '+ z +'>/flist or /f : Show your friends\' online status</div>',
-				'<div '+ z +'>/f add : Add a friend : /f add Bob</div>',
-				'<div '+ z +'>/f remove : Remove a friend : /f remove Bob</div>',
-				'<div '+ z +'>/ignore or /i : Show your ignore list</div>',
-				'<div '+ z +'>/i add : Add someone to your ignore list</div>',
-				'<div '+ z +'>/i remove : Remove someone from your ignore list</div>',
+				'<div '+ z +'>/join : Join the default chat channel : /join</div>',
+				'<div '+ z +'>/join channel : Join a channel : /join bros</div>',
+				'<div '+ z +'>/friends or /friends : Show your friends\' online status</div>',
+				'<div '+ z +'>/friend add : Add a friend : /friend add Bob</div>',
+				'<div '+ z +'>/friend remove : Remove a friend : /friend remove Bob</div>',
+				'<div '+ z +'>/ignore : Show your ignore list</div>',
+				'<div '+ z +'>/ignore add : Add someone to your ignore list</div>',
+				'<div '+ z +'>/ignore remove : Remove someone from your ignore list</div>',
 				'<div '+ z +'>/who : Show all players currently playing</div>',
 				'<div '+ z +'>/who class : Show current players by class : /who warrior</div>',
 				'<div '+ z +'>/clear: clear the chat log</div>',
-				'<div '+ z +'>/time: Show character creation, session duration, and total playtime</div>',
+				'<div '+ z +'>/played: Show character creation, session duration, and total playtime</div>',
 				'<div '+ z +'>/camp: Exit the game.</div>',
 			];
 		for (var i=0, len=s.length; i<len; i++) {
@@ -2234,15 +2226,43 @@ var chat = {
 			disband
 			leader
 		 */
+		else if (msgLower === '/gmotd') {
+			chat.updateHistory(msgLower);
+			chat.invite();
+		}
+		else if (msgLower === '/gleader') {
+			chat.updateHistory(msgLower);
+			chat.invite();
+		}
+		else if (msgLower === '/gremove') {
+			chat.updateHistory(msgLower);
+			chat.invite();
+		}
+		else if (msgLower === '/ginvite') {
+			chat.updateHistory(msgLower);
+			chat.invite();
+		}
+		else if (msgLower === '/leader') {
+			chat.updateHistory(msgLower);
+			chat.invite();
+		}
+		else if (msgLower === '/disband') {
+			chat.updateHistory(msgLower);
+			chat.invite();
+		}
+		else if (msgLower.indexOf('/invite') === 0) {
+			chat.updateHistory(msgLower);
+			chat.invite(chat.party.parse(msgLower));
+		}
 		else if (msgLower === '/camp') {
 			chat.updateHistory(msgLower);
 			chat.camp();
 		}
-		else if (msgLower === '/time') {
+		else if (msgLower === '/played') {
 			chat.updateHistory(msgLower);
 			chat.played();
 		}
-		else if (msgLower.indexOf('/j') === 0) {
+		else if (msgLower.indexOf('/join') === 0) {
 			chat.updateHistory(msgLower);
 			chat.join.channel(chat.join.parse(msg));
 		}
@@ -2250,35 +2270,35 @@ var chat = {
 			chat.updateHistory(msgLower);
 			chat.clearChatLog();
 		}
-		else if (msgLower === '/w' || msgLower === '/who') {
+		else if (msgLower === '/who') {
 			chat.updateHistory(msgLower);
 			chat.who.all();
 		}
-		else if ( (msgLower.indexOf('/w ') === 0 || msgLower.indexOf('/who ') === 0) && msgLower.length > 5) {
+		else if (msgLower.indexOf('/who ') === 0 && msgLower.length > 5) {
 			chat.updateHistory(msg);
 			chat.who.class(chat.who.parse(msg));
 		}
-		else if (msgLower === '/i' || msgLower === '/ignore') {
+		else if (msgLower === '/ignore') {
 			chat.updateHistory(msgLower);
 			chat.ignore.list();
 		}
-		else if (msgLower.indexOf('/i remove') === 0 || msgLower.indexOf('/ignore remove') === 0) {
+		else if (msgLower.indexOf('/ignore remove') === 0) {
 			chat.updateHistory(msg);
 			chat.ignore.remove(chat.friend.parse(msg));
 		}
-		else if (msgLower.indexOf('/i add') === 0 || msgLower.indexOf('/ignore add') === 0) {
+		else if (msgLower.indexOf('/ignore add') === 0) {
 			chat.updateHistory(msg);
 			chat.ignore.add(chat.friend.parse(msg));
 		}
-		else if (msgLower === '/f' || msgLower === '/friend' || msgLower === '/flist') {
+		else if (msgLower === '/friends' || msgLower === '/flist') {
 			chat.updateHistory(msgLower);
 			chat.friend.list();
 		}
-		else if (msgLower.indexOf('/f remove') === 0 || msgLower.indexOf('/friend remove') === 0) {
+		else if (msgLower.indexOf('/friend remove') === 0) {
 			chat.updateHistory(msg);
 			chat.friend.remove(chat.friend.parse(msg));
 		}
-		else if (msgLower.indexOf('/f add') === 0 || msgLower.indexOf('/friend add') === 0) {
+		else if (msgLower.indexOf('/friend add') === 0) {
 			chat.updateHistory(msg);
 			chat.friend.add(chat.friend.parse(msg));
 		}
@@ -2301,6 +2321,7 @@ var chat = {
 			if (bypass || chat.hasFocus) {
 				if (msg) {
 					var o = chat.getMsgObject(msg);
+					console.info('send  ', o);
 					if (o.msg[0] !== '/') {
 						chat.updateHistory(msg);
 						$.ajax({
@@ -2316,6 +2337,36 @@ var chat = {
 			}
 		}
 		chat.clear();
+	},
+	getMsgObject: function(msg){
+		var o = {
+			msg: msg,
+			class: 'chat-normal',
+			category: chat.getChannel()
+		};
+		var parse = chat.parseMsg(msg);
+
+		// is it a command?
+		if (chat.mode.command === '/party'){
+			o.category = 'party:' + my.p_id;
+			o.msg = msg;
+			o.class = 'chat-party';
+		}
+		else if (chat.mode.command === '/gsay'){
+			o.category = 'g:' + my.g_id;
+			o.msg = msg;
+			o.class = 'chat-guild';
+		}
+		else if (chat.mode.command === '/me') {
+			o.msg = msg;
+			o.class = 'chat-emote';
+		}
+		else if (parse.first === '/broadcast'){
+			o.category = 'admin:broadcast';
+			o.msg = parse.command;
+			o.class = 'chat-broadcast';
+		}
+		return o;
 	},
 	whispers: {},
 	clear: function() {
@@ -2356,6 +2407,34 @@ var chat = {
 			chat.log('You have removed ' + o + ' from your ignore list.', 'chat-warning');
 		}
 	},
+	invite: function(p) {
+		if (my.name === p) {
+			chat.log("You can't invite yourself to a party.", "chat-warning");
+		}
+		else if (my.p_id && !my.partyLeader) {
+			chat.log("You're still in a party! Try /disband to leave your party.", "chat-warning");
+		}
+		else {
+			if (p) {
+				chat.log('Sent party invite to '+ p +'.', 'chat-warning');
+				$.ajax({
+					url: app.url + 'php2/chat/invite.php',
+					data: {
+						player: p
+					}
+				}).done(function(r){
+					console.info('invite ', r);
+					if (r.newParty) {
+						my.partyLeader = 1;
+					}
+					chat.party.subscribe(r.p_id);
+				});
+			}
+			else {
+				chat.log("Syntax: /invite [player_name]", "chat-warning");
+			}
+		}
+	},
 	camp: function() {
 		chat.log('Camping...', 'chat-warning');
 		setTimeout(function(){
@@ -2379,14 +2458,113 @@ var chat = {
 			chat.dom.chatInput.focus();
 		}
 	},
+	prompt: {
+		add: function(data) {
+			var s = '',
+				e = document.createElement('div'),
+				id = g.getId();
+
+			e.id = 'party-invite-'+ data.row;
+			e.className = 'prompt-row prompt-row-' + id + ' ' + data.css;
+			// write innerHTML
+			s +=
+				'<div class="chat-prompt-msg">'+ data.msg +'</div>' + // col 1
+				'<div class="chat-prompt-options">'+ // col 2
+					'<span data-row="'+ data.row +'" '+
+						'data-id="'+ id +'" '+
+						'data-action="'+ data.action +'" '+
+						'class="chat-prompt-btn chat-prompt-yes">'+
+						'<i class="fa fa-check chat-prompt-yes-icon"></i>&thinsp;Confirm'+
+					'</span>' +
+					'<span data-row="'+ data.row +'" '+
+						'data-id="'+ id +'" '+
+						'data-name="'+ data.name +'"'+
+						'data-action="'+ data.action +'" '+
+						'class="chat-prompt-btn chat-prompt-no">'+
+						'<i class="fa fa-times chat-prompt-no-icon"></i>&thinsp;Deny'+
+					'</span>' +
+				'</div>';
+
+			e.innerHTML = s;
+			// remove double invites?
+			$('#'+ data.action +'-' + data.row).remove();
+			chat.dom.chatPrompt.appendChild(e);
+		},
+		confirm: function(data){
+			// join party by player id?
+			$("#"+ data.action +"-"+ data.row).remove();
+			/*
+			action: "party-invite"
+			id: 2
+			row: 188
+			 */
+			// use data.row to join ng2_parties
+			// actually add me to the party and ZMQ msg on callback success
+			// and call a method to draw the whole party including hp, mp, names etc
+			// party table needs extra values... hp, mp, buffs, etc
+			console.info('Joining party: ', data.row, data);
+			chat.party.join(data);
+			/*socket.zmq.publish("party:"+ data.row, {
+				action: 'party-accept',
+				route: 'party->add',
+				name: my.name
+			});*/
+		},
+		deny: function(data){
+			console.info('deny ', data);
+			$("#"+ data.action +"-"+ data.row).remove();
+			socket.zmq.publish("name:"+ data.name, {
+				action: 'party-deny',
+				name: my.name
+			});
+		}
+	},
+	party: {
+		subscribe: function(row) {
+			// unsub to current party?
+			socket.unsubscribe('party:'+ my.p_id);
+			// sub to party
+			var party = 'party:' + row;
+			my.p_id = row;
+			console.info("subscribing to channel: ", party);
+			socket.zmq.subscribe(party, function(topic, data) {
+				console.info('party rx ', topic, data);
+				route.town(data, data.route);
+			});
+		},
+		join: function(z) {
+			// clicked CONFIRM
+			console.info('party.join: ', z);
+			$.ajax({
+				url: app.url + 'php2/chat/party-join.php',
+				data: {
+					row: z.row
+				}
+			}).done(function(data){
+				console.info("party-join.php ", data);
+				chat.log("You have joined the party.", "chat-warning");
+				chat.party.subscribe(z.row);
+				bar.getParty();
+			}).fail(function(data){
+				console.info("Oh no", data);
+				chat.log(data.responseText, 'chat-warning');
+			});
+		},
+		parse: function(msg) { // 2-part upper case
+			var a = msg.split(" ");
+			return a[1] === undefined ?
+				'' : (a[1][0].toUpperCase() + a[1].substr(1)).trim();
+		},
+
+	},
 	whisper: {
-		parse: function(msg) {
+		parse: function(msg) { // 2-part parse lower case
 			var a = msg.split("whispers: ");
 			return a[1];
 		}
 	},
 	friend: {
-		parse: function(o) {
+		parse: function(o) { // 3-part parse
 			var a = o.split(" ");
 			return a[2][0].toUpperCase() + a[2].substr(1);
 		},
@@ -2548,7 +2726,7 @@ var chat = {
 		});
 	},
 	who: {
-		parse: function(msg) {
+		parse: function(msg) { // complex parse for class names
 			var a = msg.split(" "),
 				job = a[1],
 				longJob = job[0].toUpperCase() + job.substr(1);
@@ -2647,10 +2825,11 @@ var chat = {
 		}
 	},
 	setHeader: function() {
-		chat.dom.chatHeader.innerHTML = my.channel + '&thinsp;(' + chat.inChannel.length + ')';
+		// or chat.inChannel.length ?
+		chat.dom.chatHeader.innerHTML = my.channel + '&thinsp;(' + $(".chat-player").length + ')';
 	},
 	join: {
-		parse: function(msg) {
+		parse: function(msg) { // 2 part parse lower case
 			var c = msg.split(" ");
 			return c[1] === undefined ?
 				'' : c[1].toLowerCase().trim();
@@ -2771,30 +2950,60 @@ var bar = {
 		}
 	},
 	dom: {},
-	html: function() {
-		var s = '';
-		for (var i=0; i<game.maxPlayers; i++) {
-			var c = g.toJobShort(g.jobs[~~(Math.random() * 14)]);
-			s +=
-				'<div id="bar-player-wrap-'+ i +'" class="bar-player-wrap">' +
-					'<div id="bar-col-icon-'+ i +'" class="bar-col-icon player-icon-'+ c +'"></div>' +
-					'<div class="bar-col-data">' +
-						'<div id="bar-name-'+ i +'" class="bar-hp-name">'+ game.getPetName() +'</div>' +
-						'<div id="bar-hp-wrap-'+ i +'" class="bar-hp-wrap">' +
-							'<div id="bar-hp-fg-'+ i +'" class="bar-hp-fg"></div>' +
-							'<div id="bar-hp-bg-'+ i +'" class="bar-hp-bg"></div>' +
-						'</div>' +
-						'<div id="bar-mp-wrap-'+ i +'" class="bar-mp-wrap">' +
-							'<div id="bar-mp-fg-'+ i +'" class="bar-mp-fg"></div>' +
-						'</div>' +
+	getPlayerBarHtml: function(p, i) {
+		console.info(p);
+		var s = '<div id="bar-player-wrap-'+ i +'" class="bar-player-wrap '+ (!i ? 'bar-player-wrap-me' : '') +'">' +
+			'<div id="bar-col-icon-'+ i +'" class="bar-col-icon player-icon-'+ p.job +'">' +
+				'<div id="bar-level-'+ i +'" class="bar-level-wrap">'+ p.level +'</div>' +
+			'</div>' +
+				'<div class="bar-col-data">' +
+					'<div id="bar-name-'+ i +'" class="bar-hp-name">'+ p.name +'</div>' +
+					'<div id="bar-hp-wrap-'+ i +'" class="bar-any-wrap">' +
+						'<div id="bar-hp-fg-'+ i +'" class="bar-hp-fg"></div>' +
+						'<div id="bar-hp-bg-'+ i +'" class="bar-any-bg"></div>' +
 					'</div>' +
-				'</div>';
-		}
+					'<div id="bar-mp-wrap-'+ i +'" class="bar-any-wrap">' +
+						'<div id="bar-mp-fg-'+ i +'" class="bar-mp-fg"></div>' +
+					'</div>' +
+				'</div>' +
+			'</div>';
+		return s;
 
+	},
+	html: function() {
+		var s = '',
+			i = 0;
+		// my bar
+		s += bar.getPlayerBarHtml(party[my.name], i++);
+		// party bars
+		for (var key in party) {
+			if (key !== my.name) {
+				console.info("PARTY MEMBER:", party[key]);
+				s += bar.getPlayerBarHtml(party[key], i++);
+			}
+		}
 		return s;
 	},
-	update: function() {
-
+	party: {
+		join: function(data) {
+			console.info('bar.party.join ', data);
+			chat.log(data.msg, 'chat-warning');
+			// refresh party bars
+			bar.getParty();
+		}
+	},
+	getParty: function() {
+		console.info("Drawing all bars!");
+		if (my.p_id) {
+			$.ajax({
+				type: 'GET',
+				url: app.url + 'php2/chat/party-get-all.php'
+			}).done(function(data){
+				console.info('GET ALL BARS ', data);
+				// continue here
+			});
+		}
+		// actually do it
 	},
 	get: function() {
 
@@ -4456,7 +4665,7 @@ var mob = {
 		});
 	}
 }
-var p = {}, // party info
+var party = {}, // party info
 	town = {
 	go: function(){
 		if (create.selected) {
@@ -4475,8 +4684,8 @@ var p = {}, // party info
 				my.level = z.level;
 				my.row = z.row;
 				my.leader = '';
-				p[my.name] = z;
-				console.info('p[my.name]: ', p[my.name]);
+				party[my.name] = z;
+				console.info('party[my.name]: ', party[my.name]);
 				g.setScene('town');
 				town.init();
 				chat.init(1);
@@ -4543,6 +4752,14 @@ var route = {
 		}
 		else if (r === 'chat->remove') {
 			chat.removePlayer(data);
+		}
+		else if (r === 'party->add') {
+			console.info('adding to party ', data);
+
+		}
+		else if (r === 'party->join') {
+			console.info('joining party ', data);
+			bar.party.join(data);
 		}
 	}
 };

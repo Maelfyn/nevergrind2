@@ -162,6 +162,7 @@ var socket = {
 	},
 	initFriendAlerts: function() {
 		g.friends.forEach(function(v){
+			socket.unsubscribe('friend:' + v);
 			socket.zmq.subscribe('friend:' + v, function(topic, data) {
 				chat.friend.notify(topic, data);
 			});

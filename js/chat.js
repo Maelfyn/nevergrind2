@@ -843,7 +843,8 @@ var chat = {
 		}
 	},
 	setHeader: function() {
-		chat.dom.chatHeader.innerHTML = my.channel + '&thinsp;(' + chat.inChannel.length + ')';
+		// or chat.inChannel.length ?
+		chat.dom.chatHeader.innerHTML = my.channel + '&thinsp;(' + $(".chat-player").length + ')';
 	},
 	join: {
 		parse: function(msg) { // 2 part parse lower case
