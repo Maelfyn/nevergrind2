@@ -3,6 +3,11 @@
 var my = {
 	channel: 'town-1',
 	lastReceivedWhisper: '',
+	p_id: '',
+	partyLeader: 0,
+	party: [],
+	g_id: '',
+	guild: [],
 	team: 0,
 	slot: 1,
 	tgt: 1,

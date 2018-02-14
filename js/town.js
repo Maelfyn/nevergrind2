@@ -1,4 +1,4 @@
-var p = {}, // party info
+var party = {}, // party info
 	town = {
 	go: function(){
 		if (create.selected) {
@@ -17,15 +17,15 @@ var p = {}, // party info
 				my.level = z.level;
 				my.row = z.row;
 				my.leader = '';
-				p[my.name] = z;
-				console.info('p[my.name]: ', p[my.name]);
+				party[my.name] = z;
+				console.info('party[my.name]: ', party[my.name]);
 				g.setScene('town');
 				town.init();
 				chat.init(1);
 				chat.log("There are currently " + data.count + " players exploring Vandamor.", 'chat-emote');
 				chat.friend.init();
 				chat.ignore.init();
-				game.heartbeat.start();
+				game.start();
 				chat.setRoom(data.players);
 				bar.init();
 			}).fail(function(data){

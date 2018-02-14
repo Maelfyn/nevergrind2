@@ -636,10 +636,6 @@ var g = {
 			env.resizeWindow();
 		});
 	},
-	idleDate: 0,
-	setIdleDate: function() {
-		g.idleDate = Date.now();
-	},
 	disconnect: function(msg) {
 		g.view = 'disconnected';
 		// turn off all events
@@ -742,6 +738,7 @@ var g = {
 	resizeX: 1,
 	resizeY: 1,
 	chatOn: false,
+	lastKey: 0,
 	lockOverlay: document.getElementById("lock-overlay"),
 	startTime: Date.now(),
 	locked: 0,
@@ -860,7 +857,7 @@ var g = {
 			d = 2;
 		}
 		// unlock game modal?
-        if (msg.indexOf('unlock-game') > -1){
+        /*if (msg.indexOf('unlock-game') > -1){
             modal.show({
                 key: 'unlock-game',
                 focus: 1
@@ -868,7 +865,7 @@ var g = {
             TweenMax.set('#msg', {
                 visibility: 'hidden'
             });
-        }
+        }*/
 		TweenMax.to(dom.msg, d, {
 			overwrite: 1,
 			startAt: {
@@ -1195,9 +1192,9 @@ var modal = {
 		$('#modal-wrap').on(env.click, '#delete-character-confirm', function(){
 			create.deleteCharacter();
 		});
-		if (e.key === 'unlock-game'){
+		/*if (e.key === 'unlock-game'){
             payment.init();
-		}
+		}*/
 		if (e.focus) {
             setTimeout(function () {
                 $("#modal-wrap input:first").focus();
@@ -1222,7 +1219,7 @@ var modal = {
 		var z = {
 			playerIdleBoot: '<div id="modal-header">Disconnected</div>',
 			deleteCharacter: '<div id="modal-header">Delete '+ create.name +'?</div>',
-			unlockGame: '<div id="modal-header">$5 to purchase Nevergrind 2?</div>',
+			/*unlockGame: '<div id="modal-header">$5 to purchase Nevergrind 2?</div>',*/
 		}
 		return z[e.camelKey];
 	},
@@ -1236,7 +1233,7 @@ var modal = {
 			'<div id="modal-body">'+
 				'<p>Are you sure you want to delete this character?</p>'+
 			'</div>',
-			unlockGame:
+			/*unlockGame:
 			'<div id="modal-body">'+
 				'<p>Purchasing Nevergrind 2 unlocks:</p>'+
 				'<div id="unlock-game-perks">'+
@@ -1273,7 +1270,7 @@ var modal = {
 					'</p>'+
 				'</div>'+
 				'<div id="modal-error"></div>'+
-			'</div>'
+			'</div>'*/
 		}
 		return z[e.camelKey];
 	},
@@ -1510,39 +1507,47 @@ audio.init = (function(){
 var game = {
 	maxPlayers: 6,
 	init: 0,
+	start: function() {
+		// only called once
+		if (!game.init) {
+			game.init = 1;
+			game.heartbeat.send();
+			game.heartbeat.start();
+			game.socket.start();
+			game.played.start();
+		}
+	},
 	heartbeat: {
 		timer: 0,
 		start: function() {
-			// only called once
-			if (!game.init) {
-				game.init = 1;
-				game.heartbeat.send();
-				game.heartbeat.update();
-				//game.socketRefresh();
-				game.played.start();
-			}
-		},
-		update: function() {
 			clearTimeout(game.heartbeat.timer);
-			game.heartbeat.timer = setTimeout(function(){
+			game.heartbeat.timer = setTimeout(function() {
 				game.heartbeat.send();
-				game.heartbeat.update();
 			}, 5000);
 		},
 		send: function() {
-			clearTimeout(title.keepAliveTimer);
 			$.ajax({
 				type: 'GET',
 				url: app.url + 'php2/heartbeat.php'
-			}).done(function(){
+			}).done(function () {
 				// nothing
-			}).fail(function(){
+			}).fail(function () {
 				clearTimeout(game.heartbeat.timer);
-				game.heartbeat.timer = setTimeout(function(){
-					game.heartbeat.update();
+				game.heartbeat.timer = setTimeout(function () {
+					game.heartbeat.start();
 				}, 1000);
 			});
-
+		}
+	},
+	socket: {
+		timer: 0,
+		start: function() {
+			clearInterval(game.socket.timer);
+			game.socket.timer = setInterval(function(){
+				socket.healthTime = Date.now();
+				socket.startHealthCheck();
+				socket.zmq.publish('hb:' + my.name, {});
+			}, 20000);
 		}
 	},
 	played: {
@@ -1550,57 +1555,19 @@ var game = {
 		start: function() {
 			clearInterval(game.played.timer);
 			game.played.timer = setInterval(function(){
-				var d = Date.now() - g.idleDate;
-				console.info("played.timer", d);
-				//if (d > 900000 * 4) {
-				if (0) {
-					// 60 minutes now!
-					// disconnect - idle 15 minutes
-					g.disconnect();
-				}
-				else {
-					$.ajax({
-						type: 'GET',
-						url: app.url + 'php2/update-played.php'
-					}).done(function(){
-						setTimeout(function() {
-							socket.zmq.publish('name:' + my.name, {
-								ping: 1
-							});
-						}, 30000);
-					}).fail(function(){
-						setTimeout(function(){
-							game.played.start();
-						}, 10000);
-					});
-				}
+				$.ajax({
+					type: 'GET',
+					url: app.url + 'php2/update-played.php'
+				}).done(function(){
+				}).fail(function(){
+					setTimeout(function(){
+						game.played.start();
+					}, 5000);
+				});
 			}, 60000);
 		}
-
 	},
-	socketRefresh: function() {
-		// 5 minute socket refresh
-		setInterval(function() {
-			console.info("Refreshing socket ", Date.now());
-			!app.isLocal && console.clear();
-			socket.reconnect();
-		}, 300000);
-	},
-	name: '',
-	initialized: false,
 	getGameState: function(){
-		// use as a reality check in case zmq messes up 
-		// or to init game state?
-		// or check that players are still online?
-		$.ajax({
-			type: 'GET',
-			url: app.url + 'php/getGameState.php'
-		}).done(function(data){
-			console.info('getGameState ', data);
-			// get tile data
-		}).fail(function(data){
-			console.info(data.responseText);
-		});
 	},
 	getPetName:  function() {
 		var s1 = [
@@ -1684,21 +1651,27 @@ var title = {
 		// nada
 	}
 };
-window.onbeforeunload = function(){
+onbeforeunload = function(){
 	chat.broadcast.remove();
-	//return "Are you sure you want to leave the game? Use /camp to save your game!";
+	if (socket.enabled) {
+		socket.zmq.publish('friend:' + my.name, {
+			name: my.name,
+			route: 'off'
+		});
+		socket.zmq.close();
+	}
 }
 
 $(document).on(env.click, function(e){
-	g.setIdleDate();
 	e.preventDefault();
 	return false;
 }).on('keydown', function(e){
 	var code = e.keyCode,
 		key = e.key;
 
-	g.setIdleDate();
-	console.info('keydown: ', key, code);
+	g.lastKey = key;
+
+	app.isLocal && console.info('keydown: ', key, code);
 	// local only
 	if (app.isLocal) {
 		if (!chat.hasFocus) {
@@ -1724,9 +1697,11 @@ $(document).on(env.click, function(e){
 	} else if (e.ctrlKey){
 		if (code === 82){
 			// ctrl+r refresh
+			chat.reply();
 			return false;
 		}
 		else if (!chat.hasFocus && code === 65) {
+			// no select all of webpage elements
 			e.preventDefault();
 		}
 	} else {
@@ -1736,34 +1711,42 @@ $(document).on(env.click, function(e){
 			}
 		} else {
 			// always works town,dungeon and combat
-			// has chat focus
-			if (code === 38) {
-				// chat focus history nav up
-				if (chat.history[chat.historyIndex - 1] !== undefined) {
-					var msg = chat.history[--chat.historyIndex];
-					chat.dom.chatInput.value = msg;
+			if (chat.hasFocus) {
+				// has chat focus
+				if (code === 38) {
+					// chat focus history nav up
+					if (chat.history[chat.historyIndex - 1] !== undefined) {
+						var o = chat.history[--chat.historyIndex];
+						chat.dom.chatInput.value = o.msg;
+						chat.mode.change(o);
+					}
 				}
-			}
-			else if (code === 40) {
-				// chat focus history nav down
-				if (chat.history.length === chat.historyIndex + 1) {
-					chat.historyIndex++;
-					chat.clear();
+				else if (code === 40) {
+					// chat focus history nav down
+					if (chat.history.length === chat.historyIndex + 1) {
+						chat.historyIndex++;
+						chat.clear();
+					}
+					else if (chat.history[chat.historyIndex + 1] !== undefined) {
+						var o = chat.history[++chat.historyIndex];
+						chat.dom.chatInput.value = o.msg;
+						chat.mode.change(o);
+					}
+				} else if (code === 13) {
+					// enter
+					my.name && chat.sendMsg();
 				}
-				else if (chat.history[chat.historyIndex + 1] !== undefined) {
-					var msg = chat.history[++chat.historyIndex];
-					chat.dom.chatInput.value = msg;
-				}
-			} else if (code === 13) {
-				// enter
-				my.name && chat.sendMsg();
 			}
 
 			if (g.view === 'town') {
-				if (!chat.hasFocus) {
-					// no chat focus
-					$("#chat-input").focus();
+				if (chat.hasFocus) {
+					if (chat.mode.change()) {
+						// changing chat mode - matches possible mode change
+						return false;
+					}
 				} else {
+					// no chat focus
+					chat.dom.chatInput.focus();
 				}
 			} else {
 				// game
@@ -1805,128 +1788,7 @@ $(document).on(env.click, function(e){
 			// esc
 			title.closeModal();
 		}
-	} else if (g.view === 'lobby'){
-		if (lobby.chatOn){
-			if (x === 13){
-				// enter - sends chat
-				lobby.sendMsg();
-			}
-		}
-	// game hotkeys
-	} else if (g.view === 'game'){
-		if (g.chatOn){
-			if (x === 13){
-				// enter/esc - sends chat
-				toggleChatMode(true);
-			} else if (x === 27){
-				// esc
-				toggleChatMode();
-			}
-		} else {
-			if (x === 13){
-				// enter
-				toggleChatMode();
-			}  else if (x === 27){
-				// esc
-				my.attackOn = false;
-				my.attackName = '';
-				my.clearHud();
-				env.showTarget(DOM['land' + my.tgt]); 
-				//console.clear();
-			} else if (x === 65){
-				// a
-				var o = new Target();
-				action.target(o);
-			} else if (x === 83){
-				// s
-				var o = new Target({
-					cost: 1, 
-					attackName: 'splitAttack',
-					hudMsg: 'Split Attack: Select Target',
-					splitAttack: true
-				});
-				console.info(o.cost);
-				action.target(o);
-			} else if (x === 68){
-				// d
-				if (!g.keyLock){
-					action.deploy();
-				}
-			} else if (x === 82){
-				// r
-				if (!g.keyLock){
-					if (e.ctrlKey){
-						var x = my.lastReceivedWhisper;
-						if (x){
-							if (g.view === 'title'){
-								$("#chat-input").val('/w ' + x + ' ').focus();
-							} else if (g.view === 'lobby'){
-								$("#chat-input").val('/w ' + x + ' ').focus();
-							} else {
-								if (!g.chatOn){
-									toggleChatMode();
-								}
-								$("#chat-input").val('/w ' + x + ' ').focus();
-							}
-						}
-						return false;
-					} else {
-						action.rush();
-					}
-				}
-			} else if (x === 89){
-				// y
-				research.masonry();
-			} else if (x === 79){
-				// o
-				research.construction();
-			} else if (x === 69){
-				// e
-				research.engineering();
-			} else if (x === 71){
-				// g
-				research.gunpowder();
-			} else if (x === 75){
-				// k
-				research.rocketry();
-			} else if (x === 84){
-				// t
-				research.atomicTheory();
-			} else if (x === 70){
-				// f
-				research.futureTech();
-			} else if (x === 66){
-				// b
-				action.upgradeTileDefense();
-			} else if (x === 67){
-				// c
-				var o = new Target({
-					cost: 0,
-					minimum: 0,
-					attackName: 'cannons',
-					hudMsg: 'Fire Cannons'
-				});
-				action.target(o);
-			} else if (x === 77){
-				// m
-				var o = new Target({
-					cost: 0,
-					minimum: 0,
-					attackName: 'missile',
-					hudMsg: 'Launch Missile'
-				});
-				action.target(o);
-			} else if (x === 78){
-				// n
-				var o = new Target({
-					cost: 0,
-					minimum: 0,
-					attackName: 'nuke',
-					hudMsg: 'Launch Nuclear Weapon'
-				});
-				action.target(o);
-			}
-		}
+	} else {
 	}
 });
 // ws.js
@@ -1934,8 +1796,8 @@ var socket = {
 	unsubscribe: function(channel){
 		try {
 			socket.zmq.unsubscribe(channel);
-		} catch(err){
-			console.info(err);
+		} catch(err) {
+			console.warn(err);
 		}
 	},
 	joinGame: function(){
@@ -1955,29 +1817,31 @@ var socket = {
 			}
 		})();
 	},
-	lastPing: 0,
+	isHealthy: 0,
 	initWhisper: function() {
 		if (socket.enabled) {
-			var channel = 'name:' + my.name;
+			var channel = 'hb:' + my.name;
+			// heartbeat
+			console.info("subscribing to heartbeat channel: ", channel);
+			socket.zmq.subscribe(channel, function(){
+				socket.isHealthy = 1;
+				console.info("socket heartbeat received: ", Date.now() - socket.healthTime + 'ms');
+			});
+			// whisper
+			channel = 'name:' + my.name;
 			console.info("subscribing to whisper channel: ", channel);
-
-			socket.updatePing();
-
 			socket.zmq.subscribe(channel, function(topic, data) {
-				console.info('rx ', topic, data);
 				if (data.action === 'send') {
+					console.info('Sent whisper: ', data);
 					// report message
 					route.town(data, data.route);
-					// callback to sender
-					// data.action = 'receive';
-					//socket.zmq.publish('name:' + data.name, data);
+					chat.lastWhisper.name = data.name;
 					// callback to sender
 					$.ajax({
 						url: app.url + 'php2/chat/send.php',
 						data: {
-							date: data.date,
 							action: 'receive',
-							msg: 'x',
+							msg: chat.whisper.parse(data.msg),
 							class: 'chat-whisper',
 							category: 'name:' + data.name
 						}
@@ -1985,18 +1849,35 @@ var socket = {
 				}
 				// receive pong
 				else if (data.action === 'receive') {
-					route.town(chat.whispers[data.date], 'chat->log');
-				}/*
+					data.msg = "You whispered to " + data.name + ": " + chat.whisper.parse(data.msg);
+					route.town(data, 'chat->log');
+				}
 				// receive keep alive
 				else if (data.action === 'ping') {
-					console.info(data);
-					socket.updatePing();
-				}*/
+					console.info("Socket is healthy! ", Date.now() - socket.healthTime);
+					socket.isHealthy = 1;
+				}
+
+				if (!chat.mode.command) {
+					// set chat mode if none is set
+					chat.mode.command = '@';
+					chat.mode.name = data.name;
+				}
 			});
 		}
 	},
-	updatePing: function(){
-		socket.lastPing = Date.now();
+	healthTime: 0,
+	startHealthCheck: function() {
+		socket.healthTime = Date.now();
+		socket.isHealthy = 0;
+		setTimeout(function() {
+			socket.checkHealth();
+		}, 8000);
+	},
+	checkHealth: function(){
+		if (!socket.isHealthy) {
+			g.disconnect();
+		}
 	},
 	enabled: 0,
 	init: function(bypass){
@@ -2004,10 +1885,12 @@ var socket = {
 		socket.zmq = new ab.Session('wss://' + app.socketUrl + '/wss2/', function () {
 			// on open
 			socket.connectionSuccess();
-		}, function () {
+		}, function (code, reason) {
+			console.info('Websocket connection closed. Code: '+code+'; reason: '+reason);
 			// on close/fail
 			console.warn('WebSocket connection failed. Retrying...');
-			socket.reconnect();
+			socket.enabled = 0;
+			setTimeout(socket.init, 100);
 		}, {
 			// options
 			'skipSubprotocolCheck': true
@@ -2061,6 +1944,7 @@ var socket = {
 			(function repeat(){
 				if (my.name){
 					socket.initWhisper();
+					socket.initFriendAlerts();
 				} else {
 					setTimeout(repeat, 200);
 				}
@@ -2070,18 +1954,25 @@ var socket = {
 			// let everyone know I am here
 			chat.broadcast.add();
 			chat.setHeader();
+			// notify friends I'm online
+			socket.zmq.publish('friend:' + my.name, {
+				name: my.name,
+				route: 'on'
+			});
 		}
 	},
-	connectionTries: 0,
-	connectionRetryDuration: 100,
-	reconnect: function() {
-		socket.enabled = 0;
-		setTimeout(socket.init, socket.connectionRetryDuration);
+	initFriendAlerts: function() {
+		g.friends.forEach(function(v){
+			socket.zmq.subscribe('friend:' + v, function(topic, data) {
+				chat.friend.notify(topic, data);
+			});
+		});
 	}
 }
 // chat.js
 var chat = {
 	prefix: 't:',
+	default: 'town-1',
 	getChannel: function() {
 		return chat.prefix + my.channel;
 	},
@@ -2089,7 +1980,7 @@ var chat = {
 	html: function() {
 		var s =
 			'<div id="chat-present-wrap">' +
-				'<div id="chat-header">&nbsp;</div>' +
+				'<div id="chat-header">town-1</div>' +
 				'<div id="chat-room"></div>' +
 			'</div>' +
 			'<div id="chat-log-wrap">' +
@@ -2098,7 +1989,12 @@ var chat = {
 					'<div class="chat-warning">Nevergrind 2 is still in development, but feel free to test it out!</div>' +
 					'<div class="chat-emote">Type /help or /h for a list of chat commands.</div>' +
 				'</div>' +
-				'<input id="chat-input" type="text" maxlength="240" autocomplete="off" spellcheck="false" />' +
+				'<div id="chat-input-wrap">' +
+					'<div id="chat-input-mode" class="chat-white no-select">'+
+						'<span id="chat-mode-msg" class="ellipsis">To town-1:</span>' +
+					'</div>' +
+					'<input id="chat-input" type="text" maxlength="240" autocomplete="off" spellcheck="false" />' +
+				'</div>' +
 			'</div>';
 
 		return s;
@@ -2109,9 +2005,80 @@ var chat = {
 	count: 1, // total msgs in chat; used to count messages in memory instead of by DOM
 	players: [],
 	lastWhisper: {
-		timestamp: Date.now(),
-		account: '',
-		msg: ''
+		name: ''
+	},
+	mode: {
+		types: [
+			'/s',
+			'/p',
+			'/g',
+			'/me'
+		],
+		command: '/s',
+		name: '',
+		change: function(h){
+			// only trim leading spaces
+			var mode = h === undefined ? (chat.dom.chatInput.value + g.lastKey) : h.mode,
+				mode = mode.replace(/^\s+/g, '');
+
+			// known standard mode
+			if (chat.mode.types.indexOf(mode) > -1) {
+				chat.mode.command = mode;
+				chat.mode.set(mode);
+				if (!h) {
+					chat.dom.chatInput.value = '';
+				}
+				return true;
+			}
+			// it's a whisper
+			else if ( (h && mode[0]) === '@' ||
+				(!h && mode[0] === '@' && g.lastKey === ' ') ) {
+				// history mode and mode is @
+				// or not history mode and mode is @ and just hit space!
+				if (h) {
+					name = h.name;
+				}
+				else {
+					var parse = chat.parseMsg(mode),
+						name = parse.first.substr(1);
+
+					name = name.toLowerCase();
+					name = name[0].toUpperCase() + name.substr(1);
+				}
+				chat.mode.command = '@';
+				chat.mode.name = name;
+				chat.mode.set(chat.mode.command);
+				if (!h) {
+					chat.dom.chatInput.value = '';
+				}
+				return true;
+			}
+			else {
+				return false;
+			}
+		},
+		set: function(mode) {
+			if (mode === '/s') {
+				chat.dom.chatInputMode.className = 'chat-white';
+				chat.dom.chatModeMsg.textContent = 'To ' + my.channel + ':';
+			}
+			else if (mode === '/p') {
+				chat.dom.chatInputMode.className = 'chat-party';
+				chat.dom.chatModeMsg.textContent = 'To party:';
+			}
+			else if (mode === '/g') {
+				chat.dom.chatInputMode.className = 'chat-guild';
+				chat.dom.chatModeMsg.textContent = 'To guild:';
+			}
+			else if (mode === '/me') {
+				chat.dom.chatInputMode.className = 'chat-emote';
+				chat.dom.chatModeMsg.textContent = 'Emote:';
+			}
+			else if (mode === '@') {
+				chat.dom.chatInputMode.className = 'chat-whisper';
+				chat.dom.chatModeMsg.textContent = 'To '+ chat.mode.name +':';
+			}
+		},
 	},
 	dom: {},
 	init: function(z) {
@@ -2144,6 +2111,8 @@ var chat = {
 		chat.dom.chatHeader = document.getElementById('chat-header');
 		chat.dom.chatLog = document.getElementById('chat-log');
 		chat.dom.chatInput = document.getElementById('chat-input');
+		chat.dom.chatInputMode = document.getElementById('chat-input-mode');
+		chat.dom.chatModeMsg = document.getElementById('chat-mode-msg');
 	},
 	// report to chat-log
 	log: function(msg, route){
@@ -2169,7 +2138,6 @@ var chat = {
 		o.command = arr.join(' ');
 		return o;
 	},
-	// send to server
 	getMsgObject: function(msg){
 		var o = {
 				msg: msg,
@@ -2179,30 +2147,18 @@ var chat = {
 		var parse = chat.parseMsg(msg);
 
 		// is it a command?
-		if (parse.first === '/p' || parse.first === '/party'){
+		if (chat.mode.command === '/p'){
 			o.category = my.party;
-			o.msg = parse.command;
+			o.msg = msg;
 			o.class = 'chat-party';
 		}
-		else if (parse.first === '/g' || parse.first === '/guild'){
+		else if (chat.mode.command === '/g'){
 			o.category = my.guild;
-			o.msg = parse.command;
+			o.msg = msg;
 			o.class = 'chat-guild';
 		}
-		else if (parse.first === '/ooc'){
-			o.msg = parse.command;
-			o.class = 'chat-ooc';
-		}
-		else if (parse.first === '/s' || parse.first === '/shout'){
-			o.msg = parse.command;
-			o.class = 'chat-shout';
-		}
-		else if (parse.first[0] === '`'){
-			o.msg = msg.substr(1);
-			o.class = 'chat-hidden';
-		}
-		else if (parse.first === '/me') {
-			o.msg = parse.command;
+		else if (chat.mode.command === '/me') {
+			o.msg = msg;
 			o.class = 'chat-emote';
 		}
 		else if (parse.first === '/broadcast'){
@@ -2215,20 +2171,27 @@ var chat = {
 	historyIndex: 0,
 	history: [],
 	updateHistory: function(msg) {
-		chat.history.push(msg);
+		var o = {
+			msg: msg,
+			mode: chat.mode.command
+		};
+		if (chat.mode.command === '@') {
+			o.name = chat.mode.name;
+		}
+		chat.history.push(o);
 		chat.historyIndex = chat.history.length;
 	},
 	help: function() {
 		var z = 'class="chat-emote"',
 			s = [
 				'<div class="chat-warning">Chat Commands:</div>',
-				'<div '+ z +'>/party /p : Message your party : /p hail</div>',
-				'<div '+ z +'>/guild /g : Message your guild : /g hail</div>',
-				'<div '+ z +'>/ooc : Send a message out of character : /ooc hail</div>',
-				'<div '+ z +'>/shout /s : Shout a message : /s hail</div>',
-				'<div '+ z +'>/join /j : Join a channel : /j bros</div>',
-				'<div '+ z +'>/me : Send an emote : /me waves</div>',
+				'<div '+ z +'>/s : Say a message in town chat channel : /s hail</div>',
+				'<div '+ z +'>/p : Message your party : /p hail</div>',
+				'<div '+ z +'>/g : Message your guild : /g hail</div>',
 				'<div '+ z +'>@ : Send a private message by name : @bob hi</div>',
+				'<div '+ z +'>/me : Send an emote : /me waves</div>',
+				'<div '+ z +'>/j : Join the default chat channel : /j</div>',
+				'<div '+ z +'>/j channel : Join a channel : /j bros</div>',
 				'<div '+ z +'>/flist or /f : Show your friends\' online status</div>',
 				'<div '+ z +'>/f add : Add a friend : /f add Bob</div>',
 				'<div '+ z +'>/f remove : Remove a friend : /f remove Bob</div>',
@@ -2238,7 +2201,8 @@ var chat = {
 				'<div '+ z +'>/who : Show all players currently playing</div>',
 				'<div '+ z +'>/who class : Show current players by class : /who warrior</div>',
 				'<div '+ z +'>/clear: clear the chat log</div>',
-				'<div '+ z +'>/played: Show character creation, session duration, and total playtime</div>',
+				'<div '+ z +'>/time: Show character creation, session duration, and total playtime</div>',
+				'<div '+ z +'>/camp: Exit the game.</div>',
 			];
 		for (var i=0, len=s.length; i<len; i++) {
 			chat.log(s[i]);
@@ -2255,7 +2219,6 @@ var chat = {
 			chat.help();
 		}
 		/*
-		/chat
 		/invite
 		/disband
 		/random
@@ -2271,11 +2234,15 @@ var chat = {
 			disband
 			leader
 		 */
-		else if (msgLower === '/played') {
+		else if (msgLower === '/camp') {
+			chat.updateHistory(msgLower);
+			chat.camp();
+		}
+		else if (msgLower === '/time') {
 			chat.updateHistory(msgLower);
 			chat.played();
 		}
-		else if (msgLower.indexOf('/j') === 0 || msgLower.indexOf('/join') === 0) {
+		else if (msgLower.indexOf('/j') === 0) {
 			chat.updateHistory(msgLower);
 			chat.join.channel(chat.join.parse(msg));
 		}
@@ -2315,29 +2282,17 @@ var chat = {
 			chat.updateHistory(msg);
 			chat.friend.add(chat.friend.parse(msg));
 		}
-		else if (msg[0] === '@'){
+		else if (chat.mode.command === '@'){
 			// whisper
-			var parse = chat.parseMsg(msg),
-				name = parse.first.substr(1);
-			name = name.toLowerCase();
-			name = name[0].toUpperCase() + name.substr(1);
-			if (my.name !== name) {
-				// date stamp for callback
-				var d = Date.now();
-				chat.whispers[d] = {
-					msg: 'You told ' + name + ': ' + parse.command,
-					class: 'chat-whisper'
-				};
+			if (my.name !== chat.mode.name) {
 				chat.updateHistory(msg);
-
 				$.ajax({
 					url: app.url + 'php2/chat/send.php',
 					data: {
-						date: d,
 						action: 'send',
-						msg: parse.command,
+						msg: msg,
 						class: 'chat-whisper',
-						category: 'name:' + name
+						category: 'name:' + chat.mode.name
 					}
 				});
 			}
@@ -2361,11 +2316,6 @@ var chat = {
 			}
 		}
 		chat.clear();
-	},
-	getPrefix: function() {
-		var z = p[my.name],
-			s = '[' + z.level + ':<span class="chat-' + z.job + '">' + z.name + '</span>] ';
-		return s;
 	},
 	whispers: {},
 	clear: function() {
@@ -2404,6 +2354,35 @@ var chat = {
 			}
 			localStorage.setItem('ignore', JSON.stringify(g.ignore));
 			chat.log('You have removed ' + o + ' from your ignore list.', 'chat-warning');
+		}
+	},
+	camp: function() {
+		chat.log('Camping...', 'chat-warning');
+		setTimeout(function(){
+			$.ajax({
+				type: 'GET',
+				url: app.url + 'php2/chat/camp.php'
+			}).done(function(){
+				location.reload();
+			}).fail(function(){
+				chat.log('Failed to camp successfully.', 'chat-alert');
+			});
+		}, 1000);
+	},
+	reply: function() {
+		if (chat.lastWhisper.name) {
+			var o = {
+				mode: '@',
+				name: chat.lastWhisper.name
+			}
+			chat.mode.change(o);
+			chat.dom.chatInput.focus();
+		}
+	},
+	whisper: {
+		parse: function(msg) {
+			var a = msg.split("whispers: ");
+			return a[1];
 		}
 	},
 	friend: {
@@ -2454,7 +2433,7 @@ var chat = {
 			}
 		},
 		add: function(o) {
-			if (o.length > 1 && o !== my.name) {
+			if (o.length > 1 && o !== my.name && g.friends.indexOf(o) === -1) {
 				$.ajax({
 					url: app.url + 'php2/chat/friend-add.php',
 					data: {
@@ -2467,12 +2446,15 @@ var chat = {
 					else {
 						chat.log('You have added ' + o + ' to your friends list.', 'chat-warning');
 						g.friends.push(o);
+						socket.zmq.subscribe('friend:'+ o, function(topic, data) {
+							chat.friend.notify(topic, data);
+						});
 					}
 				});
 			}
 		},
 		remove: function(o) {
-			if (o.length > 1) {
+			if (o.length > 1 && o !== my.name && g.friends.indexOf(o) > -1) {
 				$.ajax({
 					url: app.url + 'php2/chat/friend-remove.php',
 					data: {
@@ -2488,8 +2470,17 @@ var chat = {
 							var index = g.friends.indexOf(o);
 							g.friends.splice(index, 1);
 						}
+						socket.unsubscribe('friend:'+ o);
 					}
 				});
+			}
+		},
+		notify: function(topic, data) {
+			if (data.route === 'on') {
+				chat.log(data.name + ' has come online.', 'chat-warning');
+			}
+			else {
+				chat.log(data.name + ' has gone offline.', 'chat-warning');
 			}
 		}
 	},
@@ -2647,8 +2638,8 @@ var chat = {
 		data.forEach(function(v){
 			chat.inChannel.push(v.id * 1);
 			s +=
-			'<div id="chat-room-'+ v.id +'">'+
-				'<span class="chat-room-player">['+ v.level +':<span class="chat-'+ v.job +'">'+ v.name +'</span>]</span>'+
+			'<div id="chat-player-'+ v.id +'">'+
+				'<span class="chat-player">['+ v.level +':<span class="chat-'+ v.job +'">'+ v.name +'</span>]</span>'+
 			'</div>';
 		});
 		if (s) {
@@ -2661,48 +2652,68 @@ var chat = {
 	join: {
 		parse: function(msg) {
 			var c = msg.split(" ");
-			return c[1].toLowerCase().trim();
+			return c[1] === undefined ?
+				'' : c[1].toLowerCase().trim();
 		},
 		channel: function(channel) {
-			if (g.view === 'town' && channel){
-				console.info("JOINING: ", channel);
-				// remove from channel
-				if (channel !== my.channel){
-					$.ajax({
-						url: app.url + 'php2/chat/set-channel.php',
-						data: {
-							channel: channel
-						}
-					}).done(function(data){
-						chat.broadcast.remove();
-						console.info("You have changed channel to: ", data);
-						chat.setRoom(data.players);
-						// removes id
-						//socket.removePlayer(my.account);
-						// unsubs
-						my.channel && socket.unsubscribe(chat.getChannel());
-						// set new channel data
-						my.channel = data.channel;
-						chat.log('You have joined channel: ' + data.channel, 'chat-warning');
-						socket.zmq.subscribe(data.fullChannel, function(topic, data) {
-							socket.routeMainChat(topic, data);
+			if (g.view === 'town') {
+				if (channel) {
+					// remove from channel
+					if (channel !== my.channel) {
+						$.ajax({
+							url: app.url + 'php2/chat/set-channel.php',
+							data: {
+								channel: channel
+							}
+						}).done(function (data) {
+							chat.join.changeCallback(data);
 						});
-						// add to chat channel
-						chat.setHeader();
-						chat.broadcast.add();
-					});
+					}
+				}
+				else {
+					chat.join.default();
 				}
 			}
+		},
+		default: function() {
+			if (my.channel !== chat.default) {
+				$.ajax({
+					url: app.url + 'php2/chat/set-channel.php',
+					data: {
+						channel: chat.default
+					}
+				}).done(function (data) {
+					chat.join.changeCallback(data);
+				});
+			}
+		},
+		changeCallback: function(data) {
+			chat.broadcast.remove();
+			console.info("You have changed channel to: ", data);
+			chat.setRoom(data.players);
+			// removes id
+			//socket.removePlayer(my.account);
+			// unsubs
+			my.channel && socket.unsubscribe(chat.getChannel());
+			// set new channel data
+			my.channel = data.channel;
+			chat.log('You have joined channel: ' + data.channel, 'chat-warning');
+			socket.zmq.subscribe(data.fullChannel, function (topic, data) {
+				socket.routeMainChat(topic, data);
+			});
+			// add to chat channel
+			chat.setHeader();
+			chat.broadcast.add();
 		}
 	},
 	// players receive update from socket
 	addPlayer: function(v) {
-		console.info('chat.inChannel', v.row, chat.inChannel);
+		// console.info('chat.inChannel', v.row, chat.inChannel);
 		if (chat.inChannel.indexOf(v.row) === -1) {
 			var e = document.createElement('div');
 			e.innerHTML =
-			'<div id="chat-room-'+ v.row +'">'+
-				'<span class="chat-room-player">['+ v.level +':<span class="chat-'+ v.job +'">'+ v.name +'</span>]</span>'+
+			'<div id="chat-player-'+ v.row +'">'+
+				'<span class="chat-player">['+ v.level +':<span class="chat-'+ v.job +'">'+ v.name +'</span>]</span>'+
 			'</div>';
 			chat.dom.chatRoom.appendChild(e);
 			chat.inChannel.push(v.row);
@@ -2710,7 +2721,7 @@ var chat = {
 		}
 	},
 	removePlayer: function(v) {
-		var e = document.getElementById('chat-room-' + v.row);
+		var e = document.getElementById('chat-player-' + v.row);
 		e !== null && e.parentNode.removeChild(e);
 		var index = chat.inChannel.indexOf(v.row);
 		chat.inChannel.splice(index, 1);
@@ -2792,82 +2803,6 @@ var bar = {
 
 	}
 }
-var payment = {
-    init: function(){
-        if (location.hostname === "localhost"){
-            Stripe.setPublishableKey('pk_test_GtNfTRB1vYUiMv1GY2kSSRRh');
-        }
-        else {
-            Stripe.setPublishableKey('pk_live_rPSfoOYjUrmJyQYLnYJw71Zm');
-        }
-        $("#unlock-game-confirm").on(env.click, function(){
-            payment.send();
-        })
-    },
-    error: function(msg){
-        $("#modal-error").text(msg);
-        g.unlock();
-    },
-    send: function(){
-        var f = {
-            ccNum: $('#card-number').val(),
-            cvcNum: $('#card-cvc').val(),
-            expMonth: $('#card-month').val(),
-            expYear: $('#card-year').val()
-        }
-        var error = '';
-        if (!Stripe.validateCardNumber(f.ccNum)) {
-            // Validate the number:
-            error = 'The credit card number appears to be invalid.';
-        }
-        else if (!Stripe.validateCVC(f.cvcNum)) {
-            // Validate the CVC:
-            error = 'The CVC number appears to be invalid.';
-        }
-        else if (!Stripe.validateExpiry(f.expMonth, f.expYear)) {
-            // Validate the expiration:
-            error = 'The expiration date appears to be invalid.';
-        }
-        if (error) {
-            payment.error(error);
-        }
-        else {
-            payment.createToken(f);
-        }
-    },
-    createToken: function(d){
-        Stripe.createToken({
-            number: d.ccNum,
-            cvc: d.cvcNum,
-            exp_month: d.expMonth,
-            exp_year: d.expYear
-        }, payment.stripeResponseHandler);
-        payment.error('');
-    },
-    stripeResponseHandler: function(status, response){
-        if (response.error) {
-            payment.error(response.error.message);
-        } else {
-            // submit the form
-            g.lock();
-            g.msg("Communicating with the server...");
-            $.ajax({
-                url: app.url + 'php2/payment/unlockGame.php',
-                data: {
-                    stripeToken: response.id
-                }
-            }).done(function(data) {
-                g.msg("You have unlocked the full game: Nevergrind 2<br>Thanks for your support!");
-                console.info(data);
-                modal.hide();
-            }).fail(function(r) {
-                g.msg(r.responseText, 8);
-            }).always(function(){
-                g.unlock();
-            });
-        }
-    }
-};
 // battle
 var battle = {
 	go: function(){
@@ -4548,7 +4483,7 @@ var p = {}, // party info
 				chat.log("There are currently " + data.count + " players exploring Vandamor.", 'chat-emote');
 				chat.friend.init();
 				chat.ignore.init();
-				game.heartbeat.start();
+				game.start();
 				chat.setRoom(data.players);
 				bar.init();
 			}).fail(function(data){
@@ -4591,6 +4526,7 @@ var p = {}, // party info
 var route = {
 	town: function(data, r) {
 		if (r === 'chat->log') {
+			console.info("Callback whisper ", data.name);
 			if (data.name === my.name) {
 				chat.log(data.msg, data.class);
 			}
@@ -4602,7 +4538,7 @@ var route = {
 			}
 		}
 		else if (r === 'chat->add') {
-			console.info('chat.inChannel', data.row, chat.inChannel);
+			// console.info('chat.inChannel', data.row, chat.inChannel);
 			chat.addPlayer(data);
 		}
 		else if (r === 'chat->remove') {

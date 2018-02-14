@@ -2,38 +2,47 @@
 var game = {
 	maxPlayers: 6,
 	init: 0,
+	start: function() {
+		// only called once
+		if (!game.init) {
+			game.init = 1;
+			game.heartbeat.send();
+			game.heartbeat.start();
+			game.socket.start();
+			game.played.start();
+		}
+	},
 	heartbeat: {
 		timer: 0,
 		start: function() {
-			// only called once
-			if (!game.init) {
-				game.init = 1;
-				game.heartbeat.send();
-				game.heartbeat.update();
-				game.played.start();
-			}
-		},
-		update: function() {
 			clearTimeout(game.heartbeat.timer);
-			game.heartbeat.timer = setTimeout(function(){
+			game.heartbeat.timer = setTimeout(function() {
 				game.heartbeat.send();
-				game.heartbeat.update();
 			}, 5000);
 		},
 		send: function() {
-			clearTimeout(title.keepAliveTimer);
 			$.ajax({
 				type: 'GET',
 				url: app.url + 'php2/heartbeat.php'
-			}).done(function(){
+			}).done(function () {
 				// nothing
-			}).fail(function(){
+			}).fail(function () {
 				clearTimeout(game.heartbeat.timer);
-				game.heartbeat.timer = setTimeout(function(){
-					game.heartbeat.update();
+				game.heartbeat.timer = setTimeout(function () {
+					game.heartbeat.start();
 				}, 1000);
 			});
-
+		}
+	},
+	socket: {
+		timer: 0,
+		start: function() {
+			clearInterval(game.socket.timer);
+			game.socket.timer = setInterval(function(){
+				socket.healthTime = Date.now();
+				socket.startHealthCheck();
+				socket.zmq.publish('hb:' + my.name, {});
+			}, 20000);
 		}
 	},
 	played: {
@@ -41,17 +50,10 @@ var game = {
 		start: function() {
 			clearInterval(game.played.timer);
 			game.played.timer = setInterval(function(){
-				socket.startHealthCheck();
 				$.ajax({
 					type: 'GET',
 					url: app.url + 'php2/update-played.php'
 				}).done(function(){
-					setTimeout(function() {
-						socket.startHealthCheck();
-						socket.zmq.publish('name:' + my.name, {
-							ping: 1
-						});
-					}, 30000);
 				}).fail(function(){
 					setTimeout(function(){
 						game.played.start();
@@ -59,23 +61,8 @@ var game = {
 				});
 			}, 60000);
 		}
-
 	},
-	name: '',
-	initialized: false,
 	getGameState: function(){
-		// use as a reality check in case zmq messes up 
-		// or to init game state?
-		// or check that players are still online?
-		$.ajax({
-			type: 'GET',
-			url: app.url + 'php/getGameState.php'
-		}).done(function(data){
-			console.info('getGameState ', data);
-			// get tile data
-		}).fail(function(data){
-			console.info(data.responseText);
-		});
 	},
 	getPetName:  function() {
 		var s1 = [

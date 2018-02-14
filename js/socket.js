@@ -27,23 +27,28 @@ var socket = {
 	isHealthy: 0,
 	initWhisper: function() {
 		if (socket.enabled) {
-			var channel = 'name:' + my.name;
+			var channel = 'hb:' + my.name;
+			// heartbeat
+			console.info("subscribing to heartbeat channel: ", channel);
+			socket.zmq.subscribe(channel, function(){
+				socket.isHealthy = 1;
+				console.info("socket heartbeat received: ", Date.now() - socket.healthTime + 'ms');
+			});
+			// whisper
+			channel = 'name:' + my.name;
 			console.info("subscribing to whisper channel: ", channel);
 			socket.zmq.subscribe(channel, function(topic, data) {
-				console.info('rx ', topic, data);
 				if (data.action === 'send') {
+					console.info('Sent whisper: ', data);
 					// report message
 					route.town(data, data.route);
-					// callback to sender
-					// data.action = 'receive';
-					//socket.zmq.publish('name:' + data.name, data);
+					chat.lastWhisper.name = data.name;
 					// callback to sender
 					$.ajax({
 						url: app.url + 'php2/chat/send.php',
 						data: {
-							date: data.date,
 							action: 'receive',
-							msg: 'x',
+							msg: chat.whisper.parse(data.msg),
 							class: 'chat-whisper',
 							category: 'name:' + data.name
 						}
@@ -51,13 +56,21 @@ var socket = {
 				}
 				// receive pong
 				else if (data.action === 'receive') {
-					route.town(chat.whispers[data.date], 'chat->log');
+					data.msg = "You whispered to " + data.name + ": " + chat.whisper.parse(data.msg);
+					route.town(data, 'chat->log');
 				}
-				// receive keep alive
-				else if (data.action === 'ping') {
-					console.info("Socket is healthy! ", Date.now() - socket.healthTime);
-					socket.isHealthy = 1;
+				// party invite
+				else if (data.action === 'party-invite') {
+					console.info("party invite received! ", data);
+					chat.prompt.add(data);
 				}
+				else if (data.action === 'party-deny') {
+					chat.log(data.name + " has denied your party invite.", 'chat-warning');
+				}
+				else if (data.action === 'party-accept') {
+					chat.log(data.name + " has joined the party.", 'chat-warning');
+				}
+
 			});
 		}
 	},
@@ -67,7 +80,7 @@ var socket = {
 		socket.isHealthy = 0;
 		setTimeout(function() {
 			socket.checkHealth();
-		}, 5000);
+		}, 8000);
 	},
 	checkHealth: function(){
 		if (!socket.isHealthy) {
@@ -123,15 +136,6 @@ var socket = {
 			my.guild = guild;
 			console.info("subscribing to channel: ", guild);
 			socket.zmq.subscribe(guild, function(topic, data) {
-				console.info('rx ', topic, data);
-				route.town(data, data.route);
-			});
-
-			// subscribe to test party for now
-			var party = 'party:' + Date.now();
-			my.party = party;
-			console.info("subscribing to channel: ", party);
-			socket.zmq.subscribe(party, function(topic, data) {
 				console.info('rx ', topic, data);
 				route.town(data, data.route);
 			});

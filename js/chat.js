@@ -1,6 +1,7 @@
 // chat.js
 var chat = {
 	prefix: 't:',
+	default: 'town-1',
 	getChannel: function() {
 		return chat.prefix + my.channel;
 	},
@@ -8,7 +9,7 @@ var chat = {
 	html: function() {
 		var s =
 			'<div id="chat-present-wrap">' +
-				'<div id="chat-header">&nbsp;</div>' +
+				'<div id="chat-header">town-1</div>' +
 				'<div id="chat-room"></div>' +
 			'</div>' +
 			'<div id="chat-log-wrap">' +
@@ -17,7 +18,14 @@ var chat = {
 					'<div class="chat-warning">Nevergrind 2 is still in development, but feel free to test it out!</div>' +
 					'<div class="chat-emote">Type /help or /h for a list of chat commands.</div>' +
 				'</div>' +
-				'<input id="chat-input" type="text" maxlength="240" autocomplete="off" spellcheck="false" />' +
+				'<div id="chat-prompt" class="no-select">'+
+				'</div>' +
+				'<div id="chat-input-wrap">' +
+					'<div id="chat-input-mode" class="chat-white no-select">'+
+						'<span id="chat-mode-msg" class="ellipsis">To town-1:</span>' +
+					'</div>' +
+					'<input id="chat-input" type="text" maxlength="240" autocomplete="off" spellcheck="false" />' +
+				'</div>' +
 			'</div>';
 
 		return s;
@@ -28,9 +36,80 @@ var chat = {
 	count: 1, // total msgs in chat; used to count messages in memory instead of by DOM
 	players: [],
 	lastWhisper: {
-		timestamp: Date.now(),
-		account: '',
-		msg: ''
+		name: ''
+	},
+	mode: {
+		types: [
+			'/say',
+			'/party',
+			'/gsay',
+			'/me'
+		],
+		command: '/say',
+		name: '',
+		change: function(h){
+			// only trim leading spaces
+			var mode = h === undefined ? (chat.dom.chatInput.value + g.lastKey) : h.mode,
+				mode = mode.replace(/^\s+/g, '');
+
+			// known standard mode
+			if (chat.mode.types.indexOf(mode) > -1) {
+				chat.mode.command = mode;
+				chat.mode.set(mode);
+				if (!h) {
+					chat.dom.chatInput.value = '';
+				}
+				return true;
+			}
+			// it's a whisper
+			else if ( (h && mode[0]) === '@' ||
+				(!h && mode[0] === '@' && g.lastKey === ' ') ) {
+				// history mode and mode is @
+				// or not history mode and mode is @ and just hit space!
+				if (h) {
+					name = h.name;
+				}
+				else {
+					var parse = chat.parseMsg(mode),
+						name = parse.first.substr(1);
+
+					name = name.toLowerCase();
+					name = name[0].toUpperCase() + name.substr(1);
+				}
+				chat.mode.command = '@';
+				chat.mode.name = name;
+				chat.mode.set(chat.mode.command);
+				if (!h) {
+					chat.dom.chatInput.value = '';
+				}
+				return true;
+			}
+			else {
+				return false;
+			}
+		},
+		set: function(mode) {
+			if (mode === '/say') {
+				chat.dom.chatInputMode.className = 'chat-white';
+				chat.dom.chatModeMsg.textContent = 'To ' + my.channel + ':';
+			}
+			else if (mode === '/party') {
+				chat.dom.chatInputMode.className = 'chat-party';
+				chat.dom.chatModeMsg.textContent = 'To party:';
+			}
+			else if (mode === '/gsay') {
+				chat.dom.chatInputMode.className = 'chat-guild';
+				chat.dom.chatModeMsg.textContent = 'To guild:';
+			}
+			else if (mode === '/me') {
+				chat.dom.chatInputMode.className = 'chat-emote';
+				chat.dom.chatModeMsg.textContent = 'Emote:';
+			}
+			else if (mode === '@') {
+				chat.dom.chatInputMode.className = 'chat-whisper';
+				chat.dom.chatModeMsg.textContent = 'To '+ chat.mode.name +':';
+			}
+		},
 	},
 	dom: {},
 	init: function(z) {
@@ -54,6 +133,14 @@ var chat = {
 			}).on('blur', function(){
 				chat.hasFocus = 0;
 			});
+
+			$("#chat-prompt").on(env.click, '.chat-prompt-yes', function(e){
+				chat.prompt.confirm($(this).data());
+			});
+
+			$("#chat-prompt").on(env.click, '.chat-prompt-no', function(e){
+				chat.prompt.deny($(this).data());
+			});
 		}
 		else {
 			// hide
@@ -63,6 +150,9 @@ var chat = {
 		chat.dom.chatHeader = document.getElementById('chat-header');
 		chat.dom.chatLog = document.getElementById('chat-log');
 		chat.dom.chatInput = document.getElementById('chat-input');
+		chat.dom.chatInputMode = document.getElementById('chat-input-mode');
+		chat.dom.chatModeMsg = document.getElementById('chat-mode-msg');
+		chat.dom.chatPrompt = document.getElementById('chat-prompt');
 	},
 	// report to chat-log
 	log: function(msg, route){
@@ -88,76 +178,41 @@ var chat = {
 		o.command = arr.join(' ');
 		return o;
 	},
-	// send to server
-	getMsgObject: function(msg){
-		var o = {
-				msg: msg,
-				class: 'chat-normal',
-				category: chat.getChannel()
-			};
-		var parse = chat.parseMsg(msg);
-
-		// is it a command?
-		if (parse.first === '/p' || parse.first === '/party'){
-			o.category = my.party;
-			o.msg = parse.command;
-			o.class = 'chat-party';
-		}
-		else if (parse.first === '/g' || parse.first === '/guild'){
-			o.category = my.guild;
-			o.msg = parse.command;
-			o.class = 'chat-guild';
-		}
-		else if (parse.first === '/ooc'){
-			o.msg = parse.command;
-			o.class = 'chat-ooc';
-		}
-		else if (parse.first === '/s' || parse.first === '/shout'){
-			o.msg = parse.command;
-			o.class = 'chat-shout';
-		}
-		else if (parse.first[0] === '`'){
-			o.msg = msg.substr(1);
-			o.class = 'chat-hidden';
-		}
-		else if (parse.first === '/me') {
-			o.msg = parse.command;
-			o.class = 'chat-emote';
-		}
-		else if (parse.first === '/broadcast'){
-			o.category = 'admin:broadcast';
-			o.msg = parse.command;
-			o.class = 'chat-broadcast';
-		}
-		return o;
-	},
 	historyIndex: 0,
 	history: [],
 	updateHistory: function(msg) {
-		chat.history.push(msg);
+		var o = {
+			msg: msg,
+			mode: chat.mode.command
+		};
+		if (chat.mode.command === '@') {
+			o.name = chat.mode.name;
+		}
+		chat.history.push(o);
 		chat.historyIndex = chat.history.length;
 	},
 	help: function() {
 		var z = 'class="chat-emote"',
 			s = [
 				'<div class="chat-warning">Chat Commands:</div>',
-				'<div '+ z +'>/party /p : Message your party : /p hail</div>',
-				'<div '+ z +'>/guild /g : Message your guild : /g hail</div>',
-				'<div '+ z +'>/ooc : Send a message out of character : /ooc hail</div>',
-				'<div '+ z +'>/shout /s : Shout a message : /s hail</div>',
-				'<div '+ z +'>/join /j : Join a channel : /j bros</div>',
-				'<div '+ z +'>/me : Send an emote : /me waves</div>',
+				'<div '+ z +'>/say : Say a message in town chat channel : /say hail</div>',
+				'<div '+ z +'>/party : Message your party : /party hail</div>',
+				'<div '+ z +'>/gsay : Message your guild : /gsay hail</div>',
 				'<div '+ z +'>@ : Send a private message by name : @bob hi</div>',
-				'<div '+ z +'>/flist or /f : Show your friends\' online status</div>',
-				'<div '+ z +'>/f add : Add a friend : /f add Bob</div>',
-				'<div '+ z +'>/f remove : Remove a friend : /f remove Bob</div>',
-				'<div '+ z +'>/ignore or /i : Show your ignore list</div>',
-				'<div '+ z +'>/i add : Add someone to your ignore list</div>',
-				'<div '+ z +'>/i remove : Remove someone from your ignore list</div>',
+				'<div '+ z +'>/me : Send an emote : /me waves</div>',
+				'<div '+ z +'>/join : Join the default chat channel : /join</div>',
+				'<div '+ z +'>/join channel : Join a channel : /join bros</div>',
+				'<div '+ z +'>/friends or /friends : Show your friends\' online status</div>',
+				'<div '+ z +'>/friend add : Add a friend : /friend add Bob</div>',
+				'<div '+ z +'>/friend remove : Remove a friend : /friend remove Bob</div>',
+				'<div '+ z +'>/ignore : Show your ignore list</div>',
+				'<div '+ z +'>/ignore add : Add someone to your ignore list</div>',
+				'<div '+ z +'>/ignore remove : Remove someone from your ignore list</div>',
 				'<div '+ z +'>/who : Show all players currently playing</div>',
 				'<div '+ z +'>/who class : Show current players by class : /who warrior</div>',
 				'<div '+ z +'>/clear: clear the chat log</div>',
 				'<div '+ z +'>/played: Show character creation, session duration, and total playtime</div>',
+				'<div '+ z +'>/camp: Exit the game.</div>',
 			];
 		for (var i=0, len=s.length; i<len; i++) {
 			chat.log(s[i]);
@@ -174,7 +229,6 @@ var chat = {
 			chat.help();
 		}
 		/*
-		/chat
 		/invite
 		/disband
 		/random
@@ -190,11 +244,43 @@ var chat = {
 			disband
 			leader
 		 */
+		else if (msgLower === '/gmotd') {
+			chat.updateHistory(msgLower);
+			chat.invite();
+		}
+		else if (msgLower === '/gleader') {
+			chat.updateHistory(msgLower);
+			chat.invite();
+		}
+		else if (msgLower === '/gremove') {
+			chat.updateHistory(msgLower);
+			chat.invite();
+		}
+		else if (msgLower === '/ginvite') {
+			chat.updateHistory(msgLower);
+			chat.invite();
+		}
+		else if (msgLower === '/leader') {
+			chat.updateHistory(msgLower);
+			chat.invite();
+		}
+		else if (msgLower === '/disband') {
+			chat.updateHistory(msgLower);
+			chat.invite();
+		}
+		else if (msgLower.indexOf('/invite') === 0) {
+			chat.updateHistory(msgLower);
+			chat.invite(chat.party.parse(msgLower));
+		}
+		else if (msgLower === '/camp') {
+			chat.updateHistory(msgLower);
+			chat.camp();
+		}
 		else if (msgLower === '/played') {
 			chat.updateHistory(msgLower);
 			chat.played();
 		}
-		else if (msgLower.indexOf('/j') === 0 || msgLower.indexOf('/join') === 0) {
+		else if (msgLower.indexOf('/join') === 0) {
 			chat.updateHistory(msgLower);
 			chat.join.channel(chat.join.parse(msg));
 		}
@@ -202,61 +288,49 @@ var chat = {
 			chat.updateHistory(msgLower);
 			chat.clearChatLog();
 		}
-		else if (msgLower === '/w' || msgLower === '/who') {
+		else if (msgLower === '/who') {
 			chat.updateHistory(msgLower);
 			chat.who.all();
 		}
-		else if ( (msgLower.indexOf('/w ') === 0 || msgLower.indexOf('/who ') === 0) && msgLower.length > 5) {
+		else if (msgLower.indexOf('/who ') === 0 && msgLower.length > 5) {
 			chat.updateHistory(msg);
 			chat.who.class(chat.who.parse(msg));
 		}
-		else if (msgLower === '/i' || msgLower === '/ignore') {
+		else if (msgLower === '/ignore') {
 			chat.updateHistory(msgLower);
 			chat.ignore.list();
 		}
-		else if (msgLower.indexOf('/i remove') === 0 || msgLower.indexOf('/ignore remove') === 0) {
+		else if (msgLower.indexOf('/ignore remove') === 0) {
 			chat.updateHistory(msg);
 			chat.ignore.remove(chat.friend.parse(msg));
 		}
-		else if (msgLower.indexOf('/i add') === 0 || msgLower.indexOf('/ignore add') === 0) {
+		else if (msgLower.indexOf('/ignore add') === 0) {
 			chat.updateHistory(msg);
 			chat.ignore.add(chat.friend.parse(msg));
 		}
-		else if (msgLower === '/f' || msgLower === '/friend' || msgLower === '/flist') {
+		else if (msgLower === '/friends' || msgLower === '/flist') {
 			chat.updateHistory(msgLower);
 			chat.friend.list();
 		}
-		else if (msgLower.indexOf('/f remove') === 0 || msgLower.indexOf('/friend remove') === 0) {
+		else if (msgLower.indexOf('/friend remove') === 0) {
 			chat.updateHistory(msg);
 			chat.friend.remove(chat.friend.parse(msg));
 		}
-		else if (msgLower.indexOf('/f add') === 0 || msgLower.indexOf('/friend add') === 0) {
+		else if (msgLower.indexOf('/friend add') === 0) {
 			chat.updateHistory(msg);
 			chat.friend.add(chat.friend.parse(msg));
 		}
-		else if (msg[0] === '@'){
+		else if (chat.mode.command === '@'){
 			// whisper
-			var parse = chat.parseMsg(msg),
-				name = parse.first.substr(1);
-			name = name.toLowerCase();
-			name = name[0].toUpperCase() + name.substr(1);
-			if (my.name !== name) {
-				// date stamp for callback
-				var d = Date.now();
-				chat.whispers[d] = {
-					msg: 'You told ' + name + ': ' + parse.command,
-					class: 'chat-whisper'
-				};
+			if (my.name !== chat.mode.name) {
 				chat.updateHistory(msg);
-
 				$.ajax({
 					url: app.url + 'php2/chat/send.php',
 					data: {
-						date: d,
 						action: 'send',
-						msg: parse.command,
+						msg: msg,
 						class: 'chat-whisper',
-						category: 'name:' + name
+						category: 'name:' + chat.mode.name
 					}
 				});
 			}
@@ -265,6 +339,7 @@ var chat = {
 			if (bypass || chat.hasFocus) {
 				if (msg) {
 					var o = chat.getMsgObject(msg);
+					console.info('send  ', o);
 					if (o.msg[0] !== '/') {
 						chat.updateHistory(msg);
 						$.ajax({
@@ -281,10 +356,35 @@ var chat = {
 		}
 		chat.clear();
 	},
-	getPrefix: function() {
-		var z = p[my.name],
-			s = '[' + z.level + ':<span class="chat-' + z.job + '">' + z.name + '</span>] ';
-		return s;
+	getMsgObject: function(msg){
+		var o = {
+			msg: msg,
+			class: 'chat-normal',
+			category: chat.getChannel()
+		};
+		var parse = chat.parseMsg(msg);
+
+		// is it a command?
+		if (chat.mode.command === '/party'){
+			o.category = 'party:' + my.p_id;
+			o.msg = msg;
+			o.class = 'chat-party';
+		}
+		else if (chat.mode.command === '/gsay'){
+			o.category = 'g:' + my.g_id;
+			o.msg = msg;
+			o.class = 'chat-guild';
+		}
+		else if (chat.mode.command === '/me') {
+			o.msg = msg;
+			o.class = 'chat-emote';
+		}
+		else if (parse.first === '/broadcast'){
+			o.category = 'admin:broadcast';
+			o.msg = parse.command;
+			o.class = 'chat-broadcast';
+		}
+		return o;
 	},
 	whispers: {},
 	clear: function() {
@@ -325,8 +425,164 @@ var chat = {
 			chat.log('You have removed ' + o + ' from your ignore list.', 'chat-warning');
 		}
 	},
+	invite: function(p) {
+		if (my.name === p) {
+			chat.log("You can't invite yourself to a party.", "chat-warning");
+		}
+		else if (my.p_id && !my.partyLeader) {
+			chat.log("You're still in a party! Try /disband to leave your party.", "chat-warning");
+		}
+		else {
+			if (p) {
+				chat.log('Sent party invite to '+ p +'.', 'chat-warning');
+				$.ajax({
+					url: app.url + 'php2/chat/invite.php',
+					data: {
+						player: p
+					}
+				}).done(function(r){
+					console.info('invite ', r);
+					if (r.newParty) {
+						my.partyLeader = 1;
+					}
+					chat.party.subscribe(r.p_id);
+				});
+			}
+			else {
+				chat.log("Syntax: /invite [player_name]", "chat-warning");
+			}
+		}
+	},
+	camp: function() {
+		chat.log('Camping...', 'chat-warning');
+		setTimeout(function(){
+			$.ajax({
+				type: 'GET',
+				url: app.url + 'php2/chat/camp.php'
+			}).done(function(){
+				location.reload();
+			}).fail(function(){
+				chat.log('Failed to camp successfully.', 'chat-alert');
+			});
+		}, 1000);
+	},
+	reply: function() {
+		if (chat.lastWhisper.name) {
+			var o = {
+				mode: '@',
+				name: chat.lastWhisper.name
+			}
+			chat.mode.change(o);
+			chat.dom.chatInput.focus();
+		}
+	},
+	prompt: {
+		add: function(data) {
+			var s = '',
+				e = document.createElement('div'),
+				id = g.getId();
+
+			e.id = 'party-invite-'+ data.row;
+			e.className = 'prompt-row prompt-row-' + id + ' ' + data.css;
+			// write innerHTML
+			s +=
+				'<div class="chat-prompt-msg">'+ data.msg +'</div>' + // col 1
+				'<div class="chat-prompt-options">'+ // col 2
+					'<span data-row="'+ data.row +'" '+
+						'data-id="'+ id +'" '+
+						'data-action="'+ data.action +'" '+
+						'class="chat-prompt-btn chat-prompt-yes">'+
+						'<i class="fa fa-check chat-prompt-yes-icon"></i>&thinsp;Confirm'+
+					'</span>' +
+					'<span data-row="'+ data.row +'" '+
+						'data-id="'+ id +'" '+
+						'data-name="'+ data.name +'"'+
+						'data-action="'+ data.action +'" '+
+						'class="chat-prompt-btn chat-prompt-no">'+
+						'<i class="fa fa-times chat-prompt-no-icon"></i>&thinsp;Deny'+
+					'</span>' +
+				'</div>';
+
+			e.innerHTML = s;
+			// remove double invites?
+			$('#'+ data.action +'-' + data.row).remove();
+			chat.dom.chatPrompt.appendChild(e);
+		},
+		confirm: function(data){
+			// join party by player id?
+			$("#"+ data.action +"-"+ data.row).remove();
+			/*
+			action: "party-invite"
+			id: 2
+			row: 188
+			 */
+			// use data.row to join ng2_parties
+			// actually add me to the party and ZMQ msg on callback success
+			// and call a method to draw the whole party including hp, mp, names etc
+			// party table needs extra values... hp, mp, buffs, etc
+			console.info('Joining party: ', data.row, data);
+			chat.party.join(data);
+			/*socket.zmq.publish("party:"+ data.row, {
+				action: 'party-accept',
+				route: 'party->add',
+				name: my.name
+			});*/
+		},
+		deny: function(data){
+			console.info('deny ', data);
+			$("#"+ data.action +"-"+ data.row).remove();
+			socket.zmq.publish("name:"+ data.name, {
+				action: 'party-deny',
+				name: my.name
+			});
+		}
+	},
+	party: {
+		subscribe: function(row) {
+			// unsub to current party?
+			socket.unsubscribe('party:'+ my.p_id);
+			// sub to party
+			var party = 'party:' + row;
+			my.p_id = row;
+			console.info("subscribing to channel: ", party);
+			socket.zmq.subscribe(party, function(topic, data) {
+				console.info('party rx ', topic, data);
+				route.town(data, data.route);
+			});
+		},
+		join: function(z) {
+			// clicked CONFIRM
+			console.info('party.join: ', z);
+			$.ajax({
+				url: app.url + 'php2/chat/party-join.php',
+				data: {
+					row: z.row
+				}
+			}).done(function(data){
+				console.info("party-join.php ", data);
+				chat.log("You have joined the party.", "chat-warning");
+				chat.party.subscribe(z.row);
+				bar.getParty();
+			}).fail(function(data){
+				console.info("Oh no", data);
+				chat.log(data.responseText, 'chat-warning');
+			});
+		},
+		parse: function(msg) { // 2-part upper case
+			var a = msg.split(" ");
+			return a[1] === undefined ?
+				'' : (a[1][0].toUpperCase() + a[1].substr(1)).trim();
+		},
+
+	},
+	whisper: {
+		parse: function(msg) { // 2-part parse lower case
+			var a = msg.split("whispers: ");
+			return a[1];
+		}
+	},
 	friend: {
-		parse: function(o) {
+		parse: function(o) { // 3-part parse
 			var a = o.split(" ");
 			return a[2][0].toUpperCase() + a[2].substr(1);
 		},
@@ -373,7 +629,7 @@ var chat = {
 			}
 		},
 		add: function(o) {
-			if (o.length > 1 && o !== my.name) {
+			if (o.length > 1 && o !== my.name && g.friends.indexOf(o) === -1) {
 				$.ajax({
 					url: app.url + 'php2/chat/friend-add.php',
 					data: {
@@ -394,7 +650,7 @@ var chat = {
 			}
 		},
 		remove: function(o) {
-			if (o.length > 1) {
+			if (o.length > 1 && o !== my.name && g.friends.indexOf(o) > -1) {
 				$.ajax({
 					url: app.url + 'php2/chat/friend-remove.php',
 					data: {
@@ -488,7 +744,7 @@ var chat = {
 		});
 	},
 	who: {
-		parse: function(msg) {
+		parse: function(msg) { // complex parse for class names
 			var a = msg.split(" "),
 				job = a[1],
 				longJob = job[0].toUpperCase() + job.substr(1);
@@ -578,8 +834,8 @@ var chat = {
 		data.forEach(function(v){
 			chat.inChannel.push(v.id * 1);
 			s +=
-			'<div id="chat-room-'+ v.id +'">'+
-				'<span class="chat-room-player">['+ v.level +':<span class="chat-'+ v.job +'">'+ v.name +'</span>]</span>'+
+			'<div id="chat-player-'+ v.id +'">'+
+				'<span class="chat-player">['+ v.level +':<span class="chat-'+ v.job +'">'+ v.name +'</span>]</span>'+
 			'</div>';
 		});
 		if (s) {
@@ -590,50 +846,70 @@ var chat = {
 		chat.dom.chatHeader.innerHTML = my.channel + '&thinsp;(' + chat.inChannel.length + ')';
 	},
 	join: {
-		parse: function(msg) {
+		parse: function(msg) { // 2 part parse lower case
 			var c = msg.split(" ");
-			return c[1].toLowerCase().trim();
+			return c[1] === undefined ?
+				'' : c[1].toLowerCase().trim();
 		},
 		channel: function(channel) {
-			if (g.view === 'town' && channel){
-				console.info("JOINING: ", channel);
-				// remove from channel
-				if (channel !== my.channel){
-					$.ajax({
-						url: app.url + 'php2/chat/set-channel.php',
-						data: {
-							channel: channel
-						}
-					}).done(function(data){
-						chat.broadcast.remove();
-						console.info("You have changed channel to: ", data);
-						chat.setRoom(data.players);
-						// removes id
-						//socket.removePlayer(my.account);
-						// unsubs
-						my.channel && socket.unsubscribe(chat.getChannel());
-						// set new channel data
-						my.channel = data.channel;
-						chat.log('You have joined channel: ' + data.channel, 'chat-warning');
-						socket.zmq.subscribe(data.fullChannel, function(topic, data) {
-							socket.routeMainChat(topic, data);
+			if (g.view === 'town') {
+				if (channel) {
+					// remove from channel
+					if (channel !== my.channel) {
+						$.ajax({
+							url: app.url + 'php2/chat/set-channel.php',
+							data: {
+								channel: channel
+							}
+						}).done(function (data) {
+							chat.join.changeCallback(data);
 						});
-						// add to chat channel
-						chat.setHeader();
-						chat.broadcast.add();
-					});
+					}
+				}
+				else {
+					chat.join.default();
 				}
 			}
+		},
+		default: function() {
+			if (my.channel !== chat.default) {
+				$.ajax({
+					url: app.url + 'php2/chat/set-channel.php',
+					data: {
+						channel: chat.default
+					}
+				}).done(function (data) {
+					chat.join.changeCallback(data);
+				});
+			}
+		},
+		changeCallback: function(data) {
+			chat.broadcast.remove();
+			console.info("You have changed channel to: ", data);
+			chat.setRoom(data.players);
+			// removes id
+			//socket.removePlayer(my.account);
+			// unsubs
+			my.channel && socket.unsubscribe(chat.getChannel());
+			// set new channel data
+			my.channel = data.channel;
+			chat.log('You have joined channel: ' + data.channel, 'chat-warning');
+			socket.zmq.subscribe(data.fullChannel, function (topic, data) {
+				socket.routeMainChat(topic, data);
+			});
+			// add to chat channel
+			chat.setHeader();
+			chat.broadcast.add();
 		}
 	},
 	// players receive update from socket
 	addPlayer: function(v) {
-		console.info('chat.inChannel', v.row, chat.inChannel);
+		// console.info('chat.inChannel', v.row, chat.inChannel);
 		if (chat.inChannel.indexOf(v.row) === -1) {
 			var e = document.createElement('div');
 			e.innerHTML =
-			'<div id="chat-room-'+ v.row +'">'+
-				'<span class="chat-room-player">['+ v.level +':<span class="chat-'+ v.job +'">'+ v.name +'</span>]</span>'+
+			'<div id="chat-player-'+ v.row +'">'+
+				'<span class="chat-player">['+ v.level +':<span class="chat-'+ v.job +'">'+ v.name +'</span>]</span>'+
 			'</div>';
 			chat.dom.chatRoom.appendChild(e);
 			chat.inChannel.push(v.row);
@@ -641,7 +917,7 @@ var chat = {
 		}
 	},
 	removePlayer: function(v) {
-		var e = document.getElementById('chat-room-' + v.row);
+		var e = document.getElementById('chat-player-' + v.row);
 		e !== null && e.parentNode.removeChild(e);
 		var index = chat.inChannel.indexOf(v.row);
 		chat.inChannel.splice(index, 1);

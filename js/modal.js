@@ -38,9 +38,9 @@ var modal = {
 		$('#modal-wrap').on(env.click, '#delete-character-confirm', function(){
 			create.deleteCharacter();
 		});
-		if (e.key === 'unlock-game'){
+		/*if (e.key === 'unlock-game'){
             payment.init();
-		}
+		}*/
 		if (e.focus) {
             setTimeout(function () {
                 $("#modal-wrap input:first").focus();
@@ -65,7 +65,7 @@ var modal = {
 		var z = {
 			playerIdleBoot: '<div id="modal-header">Disconnected</div>',
 			deleteCharacter: '<div id="modal-header">Delete '+ create.name +'?</div>',
-			unlockGame: '<div id="modal-header">$5 to purchase Nevergrind 2?</div>',
+			/*unlockGame: '<div id="modal-header">$5 to purchase Nevergrind 2?</div>',*/
 		}
 		return z[e.camelKey];
 	},
@@ -79,7 +79,7 @@ var modal = {
 			'<div id="modal-body">'+
 				'<p>Are you sure you want to delete this character?</p>'+
 			'</div>',
-			unlockGame:
+			/*unlockGame:
 			'<div id="modal-body">'+
 				'<p>Purchasing Nevergrind 2 unlocks:</p>'+
 				'<div id="unlock-game-perks">'+
@@ -116,7 +116,7 @@ var modal = {
 					'</p>'+
 				'</div>'+
 				'<div id="modal-error"></div>'+
-			'</div>'
+			'</div>'*/
 		}
 		return z[e.camelKey];
 	},

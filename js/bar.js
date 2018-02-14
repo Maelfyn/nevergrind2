@@ -21,30 +21,60 @@ var bar = {
 		}
 	},
 	dom: {},
-	html: function() {
-		var s = '';
-		for (var i=0; i<game.maxPlayers; i++) {
-			var c = g.toJobShort(g.jobs[~~(Math.random() * 14)]);
-			s +=
-				'<div id="bar-player-wrap-'+ i +'" class="bar-player-wrap">' +
-					'<div id="bar-col-icon-'+ i +'" class="bar-col-icon player-icon-'+ c +'"></div>' +
-					'<div class="bar-col-data">' +
-						'<div id="bar-name-'+ i +'" class="bar-hp-name">'+ game.getPetName() +'</div>' +
-						'<div id="bar-hp-wrap-'+ i +'" class="bar-hp-wrap">' +
-							'<div id="bar-hp-fg-'+ i +'" class="bar-hp-fg"></div>' +
-							'<div id="bar-hp-bg-'+ i +'" class="bar-hp-bg"></div>' +
-						'</div>' +
-						'<div id="bar-mp-wrap-'+ i +'" class="bar-mp-wrap">' +
-							'<div id="bar-mp-fg-'+ i +'" class="bar-mp-fg"></div>' +
-						'</div>' +
+	getPlayerBarHtml: function(p, i) {
+		console.info(p);
+		var s = '<div id="bar-player-wrap-'+ i +'" class="bar-player-wrap '+ (!i ? 'bar-player-wrap-me' : '') +'">' +
+			'<div id="bar-col-icon-'+ i +'" class="bar-col-icon player-icon-'+ p.job +'">' +
+				'<div id="bar-level-'+ i +'" class="bar-level-wrap">'+ p.level +'</div>' +
+			'</div>' +
+				'<div class="bar-col-data">' +
+					'<div id="bar-name-'+ i +'" class="bar-hp-name">'+ p.name +'</div>' +
+					'<div id="bar-hp-wrap-'+ i +'" class="bar-any-wrap">' +
+						'<div id="bar-hp-fg-'+ i +'" class="bar-hp-fg"></div>' +
+						'<div id="bar-hp-bg-'+ i +'" class="bar-any-bg"></div>' +
 					'</div>' +
-				'</div>';
-		}
+					'<div id="bar-mp-wrap-'+ i +'" class="bar-any-wrap">' +
+						'<div id="bar-mp-fg-'+ i +'" class="bar-mp-fg"></div>' +
+					'</div>' +
+				'</div>' +
+			'</div>';
+		return s;
 
+	},
+	html: function() {
+		var s = '',
+			i = 0;
+		// my bar
+		s += bar.getPlayerBarHtml(party[my.name], i++);
+		// party bars
+		for (var key in party) {
+			if (key !== my.name) {
+				console.info("PARTY MEMBER:", party[key]);
+				s += bar.getPlayerBarHtml(party[key], i++);
+			}
+		}
 		return s;
 	},
-	update: function() {
-
+	party: {
+		join: function(data) {
+			console.info('bar.party.join ', data);
+			chat.log(data.msg, 'chat-warning');
+			// refresh party bars
+			bar.getParty();
+		}
+	},
+	getParty: function() {
+		console.info("Drawing all bars!");
+		if (my.p_id) {
+			$.ajax({
+				type: 'GET',
+				url: app.url + 'php2/chat/party-get-all.php'
+			}).done(function(data){
+				console.info('GET ALL BARS ', data);
+				// continue here
+			});
+		}
+		// actually do it
 	},
 	get: function() {
 

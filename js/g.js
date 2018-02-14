@@ -1,5 +1,13 @@
 // core.js
 var g = {
+	id: 0,
+	getId: function() {
+		g.id++;
+		if (g.id > 999999999) {
+			g.id = 1;
+		}
+		return g.id;
+	},
 	events: function(){
 		$(window).focus(function(){
 			/*document.title = g.defaultTitle;
@@ -45,10 +53,6 @@ var g = {
 		}).on('load', function(){
 			env.resizeWindow();
 		});
-	},
-	idleDate: 0,
-	setIdleDate: function() {
-		g.idleDate = Date.now();
 	},
 	disconnect: function(msg) {
 		g.view = 'disconnected';
@@ -152,6 +156,7 @@ var g = {
 	resizeX: 1,
 	resizeY: 1,
 	chatOn: false,
+	lastKey: 0,
 	lockOverlay: document.getElementById("lock-overlay"),
 	startTime: Date.now(),
 	locked: 0,
@@ -270,7 +275,7 @@ var g = {
 			d = 2;
 		}
 		// unlock game modal?
-        if (msg.indexOf('unlock-game') > -1){
+        /*if (msg.indexOf('unlock-game') > -1){
             modal.show({
                 key: 'unlock-game',
                 focus: 1
@@ -278,7 +283,7 @@ var g = {
             TweenMax.set('#msg', {
                 visibility: 'hidden'
             });
-        }
+        }*/
 		TweenMax.to(dom.msg, d, {
 			overwrite: 1,
 			startAt: {

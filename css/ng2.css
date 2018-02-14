@@ -1225,7 +1225,7 @@ tbody {
 	top: 0;
 	right: 0;
 	font-size: 1rem;
-	border: 2px ridge #222;
+	border: 2px groove #013;
 	background: rgba(0,0,0,.8);
 	height: 25rem;
 	z-index: 2;
@@ -1238,7 +1238,8 @@ tbody {
 #chat-header {
 	text-align: center;
 	color: gold;
-	border: 2px ridge #048;
+	border: .1rem groove #048;
+	margin: 1px;
 	background: -webkit-radial-gradient(top center,farthest-side,rgba(0,48,96,1) 0,rgba(0,0,0,1) 100%);
 	background: -moz-radial-gradient(top center, farthest-side,rgba(0,48,96,1) 0,rgba(0,0,0,1) 100%);
 	background: -o-radial-gradient(top center, farthest-side,rgba(0,48,96,1) 0,rgba(0,0,0,1) 100%);
@@ -1249,11 +1250,12 @@ tbody {
 	line-height: 1.2;
 	overflow: auto;
 	overflow-x: hidden;
+	border: .1rem groove #025;
+	margin: 1px;
 }
 #chat-log-wrap {
 	display: flex;
 	flex-direction: column;
-	border-left: 2px ridge #222;
 	width: 30rem;
 }
 #chat-log {
@@ -1264,35 +1266,102 @@ tbody {
 	color: #f2f2f2;
 	word-break: break-word;
 	padding: .1rem 0 0 .2rem;
-	margin-bottom: .1rem;
-	border-bottom: 2px ridge #222;
+	margin: .1rem;
+	border: .1rem groove #025;
 }
-.chat-room-player {
+#chat-prompt {
+	flex-direction: column;
+	padding: 0;
+	margin: 0 .2rem;
+	max-height: 6rem;
+	overflow: auto;
+}
+.prompt-row {
+	display: flex;
+}
+.chat-prompt-msg {
+	flex: 1;
+	padding: .2rem;
+	background: #013;
+}
+.prompt-row {
+	border: 1px solid #048;
+}
+.chat-prompt-options {
+	display: flex;
+	flex-direction: row;
+	padding: 0;
+	font-size: .875rem;
+	background: #013;
+	font-family: Cinzel, Roboto Slab, serif;
+	border-left: 1px solid #048;
+}
+.chat-prompt-btn {
+	cursor: pointer;
+	padding: 0 .5rem;
+	border: 1px solid #aef;
+	border-radius: 4px;
+	background: #468;
+	margin: 0 .1rem;
+	text-align: center;
+	align-self: center;
+}
+.chat-prompt-btn:hover {
+	background: #68a;
+	-webkit-transition: background ease .3s;
+	-moz-transition: background ease .3s;
+	-o-transition: background ease .3s;
+	transition: background ease .3s;
+}
+.chat-prompt-yes-icon {
+	color: #0f0;
+}
+.chat-prompt-no-icon {
+	cursor: pointer;
+	color: #f22;
+}
+.chat-player {
 	cursor: pointer;
 }
-.chat-room-player:hover {
+.chat-player:hover {
 	background: #025;
 }
 #chat-log div {
 	text-shadow: 1px 1px #000;
 }
-#chat-input {
-	flex: 0;
+#chat-input-wrap {
+	display: flex;
+	flex-direction: row;
 	font-size: 1rem;
-	color: #fff;
 	background: transparent;
-	border: 2px ridge #444;
+	margin: .1rem;
+	border: .1rem groove #025;
+}
+#chat-input-mode {
+	display: flex;
+	flex: 0;
+	background: #025;
+	padding: 0 .4rem;
+	max-width: 8rem;
+	border: .1rem groove #025;
+}
+#chat-mode-msg {
+	align-self: center;
+}
+#chat-input {
+	background: transparent;
+	flex: 1;
+	color: #fff;
 	cursor: pointer;
 	padding: .2rem .4rem;
-	margin: .1rem .2rem;
-	box-shadow: 0 0 5px 1px rgba(0, 64, 128, .3) inset;
+	border: 1px groove #013;
+	-webkit-transition : border 300ms ease-out;
+	-moz-transition : border 300ms ease-out;
+	-o-transition : border 300ms ease-out;
+	transition : border 300ms ease-out;
 }
 #chat-input:focus {
-	border: 2px ridge #555;
-	box-shadow:
-		0 0 3px #fff  rgba(255, 255, 255, .5),
-		0 0 5px 1px rgba(0, 64, 128, .6) inset;
-	background: rgba(12,12,12,.3);
+	border: 1px groove #048;
 }
 
 .chat-white {
@@ -1307,9 +1376,6 @@ tbody {
 .chat-party {
 	color: #8ef;
 }
-.chat-shout {
-	color: #dd1a1a;
-}
 .chat-ooc {
 	color: #090;
 }
@@ -1318,6 +1384,9 @@ tbody {
 }
 .chat-warning {
 	color: #ffff1a;
+}
+.chat-alert {
+	color: #f22;
 }
 .chat-broadcast {
 	text-transform: uppercase;
@@ -1454,6 +1523,11 @@ tbody {
 	text-shadow:inherit;
 }
 /* webkit scrollbar */
+/*
+track & thumb:
+border-left: 6px solid transparent;
+background-clip: content-box;
+ */
 ::-webkit-scrollbar {
 	/* addresses the background of the bar itself. It is usually covered by the other elements */
 	width: .5rem;
@@ -1515,11 +1589,30 @@ tbody {
 	display: flex;
 	margin-bottom: .2rem;
 }
+.bar-player-wrap-me .bar-col-icon{
+	width: 4.0625rem;
+	height: 4.0625rem;
+}
+.bar-player-wrap-me .bar-hp-name{
+	font-size: 1.25rem;
+}
+.bar-player-wrap-me .bar-any-wrap{
+	margin: .125rem .25rem;
+	height: .5rem;
+}
+.bar-player-wrap-me .bar-level-wrap {
+	font-size: 1.125rem;
+}
 .bar-col-icon {
 	background: url('../img2/job-icons.png');
 	background-size: 1400% 100%;
 	width: 3.25rem;
 	height: 3.25rem;
+}
+.bar-level-wrap {
+	font-size: .9rem;
+	line-height: .8;
+	color: gold;
 }
 .bar-col-data {
 	flex: 1;
@@ -1532,13 +1625,12 @@ tbody {
 	font: 1rem Roboto Slab, sans-serif;
 	line-height: 1.2;
 }
-.bar-hp-wrap,
-.bar-mp-wrap {
+.bar-any-wrap {
 	position: relative;
 	border: 1px solid #000;
 	background: #777;
 	margin: .1rem .2rem;
-	height: .5rem;
+	height: .4rem;
 	border-radius: 10px;
 	overflow: hidden;
 }
@@ -1546,10 +1638,10 @@ tbody {
 	position: absolute;
 	background: #f22;
 	height: 100%;
-	width: 50%;
+	width: 100%;
 	z-index: 1;
 }
-.bar-hp-bg {
+.bar-any-bg {
 	position: absolute;
 	background: #ff0;
 	height: 100%;
