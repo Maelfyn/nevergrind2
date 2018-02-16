@@ -1,5 +1,4 @@
-var party = {}, // party info
-	town = {
+var town = {
 	go: function(){
 		if (create.selected) {
 			g.lock(1);
@@ -16,9 +15,12 @@ var party = {}, // party info
 				my.race = z.race;
 				my.level = z.level;
 				my.row = z.row;
-				my.leader = '';
-				party[my.name] = z;
-				console.info('party[my.name]: ', party[my.name]);
+				my.party[my.index] = z;
+				// init party member values
+				for (var i=1; i<game.maxPlayers; i++) {
+					my.party[i] = my.partyDefault();
+				}
+				console.info('my.party[my.index]: ', my.party[my.index]);
 				g.setScene('town');
 				town.init();
 				chat.init(1);

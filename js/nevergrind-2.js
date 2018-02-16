@@ -1110,11 +1110,21 @@ env.isChrome = !!window.chrome && !env.isOpera;
 var my = {
 	channel: 'town-1',
 	lastReceivedWhisper: '',
-	p_id: '',
-	partyLeader: 0,
+	p_id: 0,
+	g_id: 0,
+	index: 0,
+	leader: '',
+	isLeader: 0,
 	party: [],
-	g_id: '',
 	guild: [],
+	partyDefault: function() {
+		return {
+			name: '&nbsp;',
+			isLeader: 0,
+			job: '',
+			level: 0
+		}
+	},
 	team: 0,
 	slot: 1,
 	tgt: 1,
@@ -1520,35 +1530,43 @@ audio.init = (function(){
 var game = {
 	maxPlayers: 6,
 	init: 0,
+	ping: {
+		start: 0,
+		oneWay: function() {
+			return ~~((Date.now() - game.ping.start) / 2);
+		},
+		roundTrip: function() {
+			return Date.now() - game.ping.start;
+		}
+	},
 	start: function() {
 		// only called once
 		if (!game.init) {
 			game.init = 1;
 			game.heartbeat.send();
-			game.heartbeat.start();
 			game.socket.start();
 			game.played.start();
 		}
 	},
 	heartbeat: {
 		timer: 0,
-		start: function() {
-			clearTimeout(game.heartbeat.timer);
-			game.heartbeat.timer = setTimeout(function() {
-				game.heartbeat.send();
-			}, 5000);
-		},
 		send: function() {
+			game.ping.start = Date.now();
 			$.ajax({
 				type: 'GET',
 				url: app.url + 'php2/heartbeat.php'
 			}).done(function () {
-				// nothing
+				console.info("Ping: ", game.ping.oneWay());
 			}).fail(function () {
 				clearTimeout(game.heartbeat.timer);
 				game.heartbeat.timer = setTimeout(function () {
 					game.heartbeat.start();
 				}, 1000);
+			}).always(function(){
+				clearTimeout(game.heartbeat.timer);
+				game.heartbeat.timer = setTimeout(function() {
+					game.heartbeat.send();
+				}, 5000);
 			});
 		}
 	},
@@ -1676,6 +1694,12 @@ onbeforeunload = function(){
 			name: my.name,
 			route: 'off'
 		});
+		if (my.p_id) {
+			socket.zmq.publish('party:' + my.p_id, {
+				name: my.name,
+				route: 'party->disband'
+			});
+		}
 		socket.zmq.close();
 	}
 }
@@ -1843,7 +1867,7 @@ var socket = {
 			console.info("subscribing to heartbeat channel: ", channel);
 			socket.zmq.subscribe(channel, function(){
 				socket.isHealthy = 1;
-				console.info("socket heartbeat received: ", Date.now() - socket.healthTime + 'ms');
+				// console.info("socket heartbeat received: ", Date.now() - socket.healthTime + 'ms');
 			});
 			// whisper
 			channel = 'name:' + my.name;
@@ -1880,6 +1904,9 @@ var socket = {
 				}
 				else if (data.action === 'party-accept') {
 					chat.log(data.name + " has joined the party.", 'chat-warning');
+				}
+				else if (data.route === 'friend>addedMe') {
+					chat.log(data.name + " has added you to their friend list.", 'chat-warning');
 				}
 
 			});
@@ -2024,8 +2051,7 @@ var chat = {
 		types: [
 			'/say',
 			'/party',
-			'/gsay',
-			'/me'
+			'/gsay'
 		],
 		command: '/say',
 		name: '',
@@ -2082,10 +2108,6 @@ var chat = {
 			else if (mode === '/gsay') {
 				chat.dom.chatInputMode.className = 'chat-guild';
 				chat.dom.chatModeMsg.textContent = 'To guild:';
-			}
-			else if (mode === '/me') {
-				chat.dom.chatInputMode.className = 'chat-emote';
-				chat.dom.chatModeMsg.textContent = 'Emote:';
 			}
 			else if (mode === '@') {
 				chat.dom.chatInputMode.className = 'chat-whisper';
@@ -2321,7 +2343,6 @@ var chat = {
 			if (bypass || chat.hasFocus) {
 				if (msg) {
 					var o = chat.getMsgObject(msg);
-					console.info('send  ', o);
 					if (o.msg[0] !== '/') {
 						chat.updateHistory(msg);
 						$.ajax({
@@ -2357,8 +2378,8 @@ var chat = {
 			o.msg = msg;
 			o.class = 'chat-guild';
 		}
-		else if (chat.mode.command === '/me') {
-			o.msg = msg;
+		else if (parse.first === '/me') {
+			o.msg = parse.command;
 			o.class = 'chat-emote';
 		}
 		else if (parse.first === '/broadcast'){
@@ -2411,7 +2432,7 @@ var chat = {
 		if (my.name === p) {
 			chat.log("You can't invite yourself to a party.", "chat-warning");
 		}
-		else if (my.p_id && !my.partyLeader) {
+		else if (my.p_id && !my.party[my.index].isLeader) {
 			chat.log("You're still in a party! Try /disband to leave your party.", "chat-warning");
 		}
 		else {
@@ -2425,7 +2446,8 @@ var chat = {
 				}).done(function(r){
 					console.info('invite ', r);
 					if (r.newParty) {
-						my.partyLeader = 1;
+						my.party[my.index].isLeader = 1;
+						bar.updatePlayerBar(my.index);
 					}
 					chat.party.subscribe(r.p_id);
 				});
@@ -2489,6 +2511,9 @@ var chat = {
 			// remove double invites?
 			$('#'+ data.action +'-' + data.row).remove();
 			chat.dom.chatPrompt.appendChild(e);
+			setTimeout(function() {
+				$("#" + e.id).remove();
+			}, 30000);
 		},
 		confirm: function(data){
 			// join party by player id?
@@ -2524,10 +2549,10 @@ var chat = {
 			// unsub to current party?
 			socket.unsubscribe('party:'+ my.p_id);
 			// sub to party
-			var party = 'party:' + row;
+			var p = 'party:' + row;
 			my.p_id = row;
-			console.info("subscribing to channel: ", party);
-			socket.zmq.subscribe(party, function(topic, data) {
+			console.info("subscribing to channel: ", p);
+			socket.zmq.subscribe(p, function(topic, data) {
 				console.info('party rx ', topic, data);
 				route.town(data, data.route);
 			});
@@ -2622,11 +2647,19 @@ var chat = {
 						chat.log(data.error, 'chat-warning');
 					}
 					else {
-						chat.log('You have added ' + o + ' to your friends list.', 'chat-warning');
-						g.friends.push(o);
+						chat.log('You have added ' + o + ' to your friend list.', 'chat-warning');
 						socket.zmq.subscribe('friend:'+ o, function(topic, data) {
 							chat.friend.notify(topic, data);
 						});
+
+						if (!~g.friends.indexOf(o)) {
+							socket.zmq.publish('name:' + o, {
+								name: my.name,
+								route: "friend>addedMe"
+							});
+						}
+
+						g.friends.push(o);
 					}
 				});
 			}
@@ -2643,7 +2676,7 @@ var chat = {
 						chat.log(data.error, 'chat-warning');
 					}
 					else {
-						chat.log('You have removed ' + o + ' from your friends list.', 'chat-warning');
+						chat.log('You have removed ' + o + ' from your friend list.', 'chat-warning');
 						while (g.friends.indexOf(o) > -1) {
 							var index = g.friends.indexOf(o);
 							g.friends.splice(index, 1);
@@ -2950,39 +2983,55 @@ var bar = {
 		}
 	},
 	dom: {},
-	getPlayerBarHtml: function(p, i) {
-		console.info(p);
-		var s = '<div id="bar-player-wrap-'+ i +'" class="bar-player-wrap '+ (!i ? 'bar-player-wrap-me' : '') +'">' +
-			'<div id="bar-col-icon-'+ i +'" class="bar-col-icon player-icon-'+ p.job +'">' +
-				'<div id="bar-level-'+ i +'" class="bar-level-wrap">'+ p.level +'</div>' +
-			'</div>' +
-				'<div class="bar-col-data">' +
-					'<div id="bar-name-'+ i +'" class="bar-hp-name">'+ p.name +'</div>' +
-					'<div id="bar-hp-wrap-'+ i +'" class="bar-any-wrap">' +
-						'<div id="bar-hp-fg-'+ i +'" class="bar-hp-fg"></div>' +
-						'<div id="bar-hp-bg-'+ i +'" class="bar-any-bg"></div>' +
-					'</div>' +
-					'<div id="bar-mp-wrap-'+ i +'" class="bar-any-wrap">' +
-						'<div id="bar-mp-fg-'+ i +'" class="bar-mp-fg"></div>' +
-					'</div>' +
-				'</div>' +
-			'</div>';
-		return s;
+	getPlayerHtml: function(p, i, ignoreWrap) {
+		// get bar for one player
+		var s = '';
+		if (!ignoreWrap) {
+			s += '<div id="bar-player-wrap-' + i + '" '+
+			'class="bar-player-wrap' + (!i ? ' bar-player-wrap-me' : '') + '" ' +
+				'style="display: '+ (i === 0 ? 'flex' : 'none') +'">';
 
+		}
+			s += bar.getPlayerInnerHtml(p, i);
+
+		if (!ignoreWrap) {
+			s += '</div>';
+		}
+		return s;
+	},
+	getPlayerInnerHtml: function(p, i) {
+		var s =
+		'<div id="bar-col-icon-'+ i +'" class="bar-col-icon player-icon-'+ p.job +'">' +
+			'<div id="bar-level-'+ i +'" class="bar-level">'+ p.level +'</div>' +
+			'<div id="bar-is-leader-'+ i +'" class="bar-is-leader '+ (p.isLeader ? 'block' : 'none') +'"></div>' +
+		'</div>' +
+		'<div class="bar-col-data">' +
+			'<div id="bar-name-'+ i +'" class="bar-hp-name">'+ p.name +'</div>' +
+			'<div id="bar-hp-wrap-'+ i +'" class="bar-any-wrap">' +
+				'<div id="bar-hp-fg-'+ i +'" class="bar-hp-fg"></div>' +
+				'<div id="bar-hp-bg-'+ i +'" class="bar-any-bg"></div>' +
+			'</div>' +
+			'<div id="bar-mp-wrap-'+ i +'" class="bar-any-wrap">' +
+				'<div id="bar-mp-fg-'+ i +'" class="bar-mp-fg"></div>' +
+			'</div>' +
+		'</div>';
+		return s;
 	},
 	html: function() {
-		var s = '',
-			i = 0;
 		// my bar
-		s += bar.getPlayerBarHtml(party[my.name], i++);
+		var s = bar.getPlayerHtml(my.party[my.index], my.index);
 		// party bars
-		for (var key in party) {
-			if (key !== my.name) {
-				console.info("PARTY MEMBER:", party[key]);
-				s += bar.getPlayerBarHtml(party[key], i++);
+		for (var i=0; i<game.maxPlayers; i++) {
+			if (my.party[i].name !== my.name) {
+				s += bar.getPlayerHtml(my.party[i], i);
 			}
 		}
 		return s;
+	},
+	updatePlayerBar: function(index) {
+		var e = document.getElementById('bar-player-wrap-' + index);
+		e.style.display = 'flex';
+		e.innerHTML = bar.getPlayerInnerHtml(my.party[index], index);
 	},
 	party: {
 		join: function(data) {
@@ -2998,12 +3047,28 @@ var bar = {
 			$.ajax({
 				type: 'GET',
 				url: app.url + 'php2/chat/party-get-all.php'
-			}).done(function(data){
-				console.info('GET ALL BARS ', data);
+			}).done(function (data) {
+				console.info('getParty ', data.party);
+				var npIndex = 1;
+				data.party.forEach(function(v, i){
+					console.info('SET BARS ', i, v);
+					if (v.name === my.name) {
+						my.party[0] = v;
+						bar.updatePlayerBar(0);
+					}
+					else {
+						my.party[npIndex] = v;
+						bar.updatePlayerBar(npIndex++);
+					}
+				});
 				// continue here
+				// TODO: /disband remove bar when person leaves party
+				// TODO: leader leaves? New leader logic
+				// TODO: add/remove people from party
+				// TODO: /promote leader
+
 			});
 		}
-		// actually do it
 	},
 	get: function() {
 
@@ -4665,8 +4730,7 @@ var mob = {
 		});
 	}
 }
-var party = {}, // party info
-	town = {
+var town = {
 	go: function(){
 		if (create.selected) {
 			g.lock(1);
@@ -4683,9 +4747,12 @@ var party = {}, // party info
 				my.race = z.race;
 				my.level = z.level;
 				my.row = z.row;
-				my.leader = '';
-				party[my.name] = z;
-				console.info('party[my.name]: ', party[my.name]);
+				my.party[my.index] = z;
+				// init party member values
+				for (var i=1; i<game.maxPlayers; i++) {
+					my.party[i] = my.partyDefault();
+				}
+				console.info('my.party[my.index]: ', my.party[my.index]);
 				g.setScene('town');
 				town.init();
 				chat.init(1);
@@ -4760,6 +4827,10 @@ var route = {
 		else if (r === 'party->join') {
 			console.info('joining party ', data);
 			bar.party.join(data);
+		}
+		else if (r === 'party->disband') {
+			console.info('disband ', data);
+			chat.log(data.name + " has left the party.", 'chat-warning');
 		}
 	}
 };

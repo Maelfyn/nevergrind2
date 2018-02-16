@@ -10,6 +10,12 @@ onbeforeunload = function(){
 			name: my.name,
 			route: 'off'
 		});
+		if (my.p_id) {
+			socket.zmq.publish('party:' + my.p_id, {
+				name: my.name,
+				route: 'party->disband'
+			});
+		}
 		socket.zmq.close();
 	}
 }

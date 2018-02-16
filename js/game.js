@@ -2,35 +2,43 @@
 var game = {
 	maxPlayers: 6,
 	init: 0,
+	ping: {
+		start: 0,
+		oneWay: function() {
+			return ~~((Date.now() - game.ping.start) / 2);
+		},
+		roundTrip: function() {
+			return Date.now() - game.ping.start;
+		}
+	},
 	start: function() {
 		// only called once
 		if (!game.init) {
 			game.init = 1;
 			game.heartbeat.send();
-			game.heartbeat.start();
 			game.socket.start();
 			game.played.start();
 		}
 	},
 	heartbeat: {
 		timer: 0,
-		start: function() {
-			clearTimeout(game.heartbeat.timer);
-			game.heartbeat.timer = setTimeout(function() {
-				game.heartbeat.send();
-			}, 5000);
-		},
 		send: function() {
+			game.ping.start = Date.now();
 			$.ajax({
 				type: 'GET',
 				url: app.url + 'php2/heartbeat.php'
 			}).done(function () {
-				// nothing
+				console.info("Ping: ", game.ping.oneWay());
 			}).fail(function () {
 				clearTimeout(game.heartbeat.timer);
 				game.heartbeat.timer = setTimeout(function () {
 					game.heartbeat.start();
 				}, 1000);
+			}).always(function(){
+				clearTimeout(game.heartbeat.timer);
+				game.heartbeat.timer = setTimeout(function() {
+					game.heartbeat.send();
+				}, 5000);
 			});
 		}
 	},

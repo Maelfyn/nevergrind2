@@ -42,8 +42,7 @@ var chat = {
 		types: [
 			'/say',
 			'/party',
-			'/gsay',
-			'/me'
+			'/gsay'
 		],
 		command: '/say',
 		name: '',
@@ -100,10 +99,6 @@ var chat = {
 			else if (mode === '/gsay') {
 				chat.dom.chatInputMode.className = 'chat-guild';
 				chat.dom.chatModeMsg.textContent = 'To guild:';
-			}
-			else if (mode === '/me') {
-				chat.dom.chatInputMode.className = 'chat-emote';
-				chat.dom.chatModeMsg.textContent = 'Emote:';
 			}
 			else if (mode === '@') {
 				chat.dom.chatInputMode.className = 'chat-whisper';
@@ -339,7 +334,6 @@ var chat = {
 			if (bypass || chat.hasFocus) {
 				if (msg) {
 					var o = chat.getMsgObject(msg);
-					console.info('send  ', o);
 					if (o.msg[0] !== '/') {
 						chat.updateHistory(msg);
 						$.ajax({
@@ -375,8 +369,8 @@ var chat = {
 			o.msg = msg;
 			o.class = 'chat-guild';
 		}
-		else if (chat.mode.command === '/me') {
-			o.msg = msg;
+		else if (parse.first === '/me') {
+			o.msg = parse.command;
 			o.class = 'chat-emote';
 		}
 		else if (parse.first === '/broadcast'){
@@ -429,7 +423,7 @@ var chat = {
 		if (my.name === p) {
 			chat.log("You can't invite yourself to a party.", "chat-warning");
 		}
-		else if (my.p_id && !my.partyLeader) {
+		else if (my.p_id && !my.party[my.index].isLeader) {
 			chat.log("You're still in a party! Try /disband to leave your party.", "chat-warning");
 		}
 		else {
@@ -443,7 +437,8 @@ var chat = {
 				}).done(function(r){
 					console.info('invite ', r);
 					if (r.newParty) {
-						my.partyLeader = 1;
+						my.party[my.index].isLeader = 1;
+						bar.updatePlayerBar(my.index);
 					}
 					chat.party.subscribe(r.p_id);
 				});
@@ -507,6 +502,9 @@ var chat = {
 			// remove double invites?
 			$('#'+ data.action +'-' + data.row).remove();
 			chat.dom.chatPrompt.appendChild(e);
+			setTimeout(function() {
+				$("#" + e.id).remove();
+			}, 30000);
 		},
 		confirm: function(data){
 			// join party by player id?
@@ -542,10 +540,10 @@ var chat = {
 			// unsub to current party?
 			socket.unsubscribe('party:'+ my.p_id);
 			// sub to party
-			var party = 'party:' + row;
+			var p = 'party:' + row;
 			my.p_id = row;
-			console.info("subscribing to channel: ", party);
-			socket.zmq.subscribe(party, function(topic, data) {
+			console.info("subscribing to channel: ", p);
+			socket.zmq.subscribe(p, function(topic, data) {
 				console.info('party rx ', topic, data);
 				route.town(data, data.route);
 			});
@@ -640,11 +638,19 @@ var chat = {
 						chat.log(data.error, 'chat-warning');
 					}
 					else {
-						chat.log('You have added ' + o + ' to your friends list.', 'chat-warning');
-						g.friends.push(o);
+						chat.log('You have added ' + o + ' to your friend list.', 'chat-warning');
 						socket.zmq.subscribe('friend:'+ o, function(topic, data) {
 							chat.friend.notify(topic, data);
 						});
+
+						if (!~g.friends.indexOf(o)) {
+							socket.zmq.publish('name:' + o, {
+								name: my.name,
+								route: "friend>addedMe"
+							});
+						}
+
+						g.friends.push(o);
 					}
 				});
 			}
@@ -661,7 +667,7 @@ var chat = {
 						chat.log(data.error, 'chat-warning');
 					}
 					else {
-						chat.log('You have removed ' + o + ' from your friends list.', 'chat-warning');
+						chat.log('You have removed ' + o + ' from your friend list.', 'chat-warning');
 						while (g.friends.indexOf(o) > -1) {
 							var index = g.friends.indexOf(o);
 							g.friends.splice(index, 1);

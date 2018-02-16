@@ -32,7 +32,7 @@ var socket = {
 			console.info("subscribing to heartbeat channel: ", channel);
 			socket.zmq.subscribe(channel, function(){
 				socket.isHealthy = 1;
-				console.info("socket heartbeat received: ", Date.now() - socket.healthTime + 'ms');
+				// console.info("socket heartbeat received: ", Date.now() - socket.healthTime + 'ms');
 			});
 			// whisper
 			channel = 'name:' + my.name;
@@ -69,6 +69,9 @@ var socket = {
 				}
 				else if (data.action === 'party-accept') {
 					chat.log(data.name + " has joined the party.", 'chat-warning');
+				}
+				else if (data.route === 'friend>addedMe') {
+					chat.log(data.name + " has added you to their friend list.", 'chat-warning');
 				}
 
 			});

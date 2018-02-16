@@ -28,5 +28,9 @@ var route = {
 			console.info('joining party ', data);
 			bar.party.join(data);
 		}
+		else if (r === 'party->disband') {
+			console.info('disband ', data);
+			chat.log(data.name + " has left the party.", 'chat-warning');
+		}
 	}
 };

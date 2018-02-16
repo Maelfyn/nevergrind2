@@ -1590,8 +1590,8 @@ background-clip: content-box;
 	margin-bottom: .2rem;
 }
 .bar-player-wrap-me .bar-col-icon{
-	width: 4.0625rem;
-	height: 4.0625rem;
+	width: 3.2rem;
+	height: 3.2rem;
 }
 .bar-player-wrap-me .bar-hp-name{
 	font-size: 1.25rem;
@@ -1603,16 +1603,30 @@ background-clip: content-box;
 .bar-player-wrap-me .bar-level-wrap {
 	font-size: 1.125rem;
 }
+.bar-player-wrap-me .bar-is-leader {
+	width: 1rem;
+	height: 1rem;
+}
 .bar-col-icon {
+	position: relative;
 	background: url('../img2/job-icons.png');
 	background-size: 1400% 100%;
-	width: 3.25rem;
-	height: 3.25rem;
+	width: 2.56rem;
+	height: 2.56rem;
 }
-.bar-level-wrap {
+.bar-level {
 	font-size: .9rem;
 	line-height: .8;
 	color: gold;
+}
+.bar-is-leader {
+	position: absolute;
+	top: -.25rem;
+	right: 0;
+	width: .8rem;
+	height: .8rem;
+	background: url('../img2/is-leader-20-2.png');
+	background-size: 100%;
 }
 .bar-col-data {
 	flex: 1;
@@ -1623,6 +1637,7 @@ background-clip: content-box;
 	text-indent: .2rem;
 	color: #fff;
 	font: 1rem Roboto Slab, sans-serif;
+	font-size: 1rem;
 	line-height: 1.2;
 }
 .bar-any-wrap {
