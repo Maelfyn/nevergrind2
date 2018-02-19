@@ -19,6 +19,14 @@ var bar = {
 			bar.dom.mpWrap = document.getElementById('bar-mp-wrap-' + i);
 			bar.dom.mpFg = document.getElementById('bar-mp-fg-' + i);
 		}
+		// bar events
+		$("#bar-wrap").on(env.click, '.bar-col-icon', function(e){
+			var id = $(this).attr('id'),
+				arr = id.split("-"),
+				playerId = arr[3] * 1;
+
+			console.info(id, playerId);
+		});
 	},
 	dom: {},
 	getPlayerHtml: function(p, i, ignoreWrap) {
@@ -40,8 +48,8 @@ var bar = {
 	getPlayerInnerHtml: function(p, i) {
 		var s =
 		'<div id="bar-col-icon-'+ i +'" class="bar-col-icon player-icon-'+ p.job +'">' +
-			'<div id="bar-level-'+ i +'" class="bar-level">'+ p.level +'</div>' +
-			'<div id="bar-is-leader-'+ i +'" class="bar-is-leader '+ (p.isLeader ? 'block' : 'none') +'"></div>' +
+			'<div id="bar-level-'+ i +'" class="bar-level no-pointer">'+ p.level +'</div>' +
+			'<div id="bar-is-leader-'+ i +'" class="bar-is-leader '+ (p.isLeader ? 'block' : 'none') +' no-pointer"></div>' +
 		'</div>' +
 		'<div class="bar-col-data">' +
 			'<div id="bar-name-'+ i +'" class="bar-hp-name">'+ p.name +'</div>' +
@@ -77,6 +85,36 @@ var bar = {
 			chat.log(data.msg, 'chat-warning');
 			// refresh party bars
 			bar.getParty();
+		},
+		disband: function(data) {
+			var index = 0,
+				name = '',
+				electNewLeader = 0;
+			my.party.forEach(function(v, i) {
+				if (data.row === v.id) {
+					index = i;
+					name = v.name;
+					if (v.isLeader) {
+						electNewLeader = 1;
+					}
+				}
+			});
+
+			if (index) {
+				my.party[index] = my.partyDefault();
+				document.getElementById('bar-player-wrap-' + index).style.display = 'none';
+				chat.log(name + " has disbanded the party.", 'chat-warning');
+
+				if (electNewLeader && my.isLowestPartyIdMine()) {
+					chat.promote(my.getNewLeaderName(), 1);
+				}
+			}
+		},
+		promote: function(data) {
+			console.info('bar.party.promote ', data);
+			chat.log(data.name + " has been promoted to party leader.", 'chat-warning');
+			// refresh party bars
+			bar.getParty();
 		}
 	},
 	getParty: function() {
@@ -89,7 +127,7 @@ var bar = {
 				console.info('getParty ', data.party);
 				var npIndex = 1;
 				data.party.forEach(function(v, i){
-					console.info('SET BARS ', i, v);
+					// console.info('SET BARS ', i, v);
 					if (v.name === my.name) {
 						my.party[0] = v;
 						bar.updatePlayerBar(0);
@@ -99,6 +137,11 @@ var bar = {
 						bar.updatePlayerBar(npIndex++);
 					}
 				});
+				// hide empty rows
+				var len = data.party.length;
+				for (var i=len; i<game.maxPlayers; i++) {
+					document.getElementById('bar-player-wrap-' + i).style.display = 'none';
+				}
 				// continue here
 				// TODO: /disband remove bar when person leaves party
 				// TODO: leader leaves? New leader logic
@@ -107,6 +150,27 @@ var bar = {
 
 			});
 		}
+	},
+	disband: function() {
+		my.party.forEach(function(v, i){
+			if (i) {
+				// set client value
+				v = my.partyDefault();
+			}
+		});
+		bar.hideParty();
+		// update server
+		socket.unsubscribe('party:'+ my.p_id);
+		my.p_id = 0;
+		my.isLeader = 0;
+		document.getElementById('bar-is-leader-0').style.display = 'none';
+	},
+	hideParty: function() {
+		my.party.forEach(function(v, i){
+			if (i) {
+				document.getElementById('bar-player-wrap-' + i).style.display = 'none';
+			}
+		});
 	},
 	get: function() {
 

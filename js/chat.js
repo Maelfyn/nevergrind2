@@ -148,6 +148,21 @@ var chat = {
 		chat.dom.chatInputMode = document.getElementById('chat-input-mode');
 		chat.dom.chatModeMsg = document.getElementById('chat-mode-msg');
 		chat.dom.chatPrompt = document.getElementById('chat-prompt');
+
+		$("#chat-room").on(env.click, '.chat-player', function() {
+			var id = $(this).parent().attr('id'),
+				arr = id.split("-"),
+				playerId = arr[2] * 1,
+				text = $(this).text(),
+				a2 = text.split(":"),
+				name = a2[1].replace(/\]/g, '').trim();
+
+			console.info('id name ', playerId, name);
+			context.getChatMenu(name);
+		});
+
+		console.info('bar-wrap ', $("#bar-wrap"));
+
 	},
 	// report to chat-log
 	log: function(msg, route){
@@ -188,16 +203,18 @@ var chat = {
 	},
 	help: function() {
 		var z = 'class="chat-emote"',
+			h = 'class="chat-help-header"'
 			s = [
-				'<div class="chat-warning">Chat Commands:</div>',
-				'<div '+ z +'>/say : Say a message in town chat channel : /say hail</div>',
+				'<div '+ h +'>Main Chat Channels:</div>',
+				'<div '+ z +'>/say : Say a message in your current chat channel : /say hail</div>',
 				'<div '+ z +'>/party : Message your party : /party hail</div>',
 				'<div '+ z +'>/gsay : Message your guild : /gsay hail</div>',
 				'<div '+ z +'>@ : Send a private message by name : @bob hi</div>',
-				'<div '+ z +'>/me : Send an emote : /me waves</div>',
+				'<div '+ h +'>Change Channels:</div>',
 				'<div '+ z +'>/join : Join the default chat channel : /join</div>',
 				'<div '+ z +'>/join channel : Join a channel : /join bros</div>',
-				'<div '+ z +'>/friends or /friends : Show your friends\' online status</div>',
+				'<div '+ h +'>Social Commands:</div>',
+				'<div '+ z +'>/flist or /friends : Show your friends\' online status</div>',
 				'<div '+ z +'>/friend add : Add a friend : /friend add Bob</div>',
 				'<div '+ z +'>/friend remove : Remove a friend : /friend remove Bob</div>',
 				'<div '+ z +'>/ignore : Show your ignore list</div>',
@@ -205,8 +222,14 @@ var chat = {
 				'<div '+ z +'>/ignore remove : Remove someone from your ignore list</div>',
 				'<div '+ z +'>/who : Show all players currently playing</div>',
 				'<div '+ z +'>/who class : Show current players by class : /who warrior</div>',
+				'<div '+ h +'>Party Commands</div>',
+				'<div '+ z +'>/invite: Invite a player to your party : /invite Bob</div>',
+				'<div '+ z +'>/disband: Leave your party</div>',
+				'<div '+ z +'>/promote: Promote a player in your party to leader : /promote Bob</div>',
+				'<div '+ h +'>Miscellaneous Commands:</div>',
 				'<div '+ z +'>/clear: clear the chat log</div>',
 				'<div '+ z +'>/played: Show character creation, session duration, and total playtime</div>',
+				'<div '+ z +'>/me : Send an emote to your current chat channel : /me waves</div>',
 				'<div '+ z +'>/camp: Exit the game.</div>',
 			];
 		for (var i=0, len=s.length; i<len; i++) {
@@ -224,8 +247,6 @@ var chat = {
 			chat.help();
 		}
 		/*
-		/invite
-		/disband
 		/random
 		/surname
 		update /help
@@ -255,13 +276,13 @@ var chat = {
 			chat.updateHistory(msgLower);
 			chat.invite();
 		}
-		else if (msgLower === '/leader') {
+		else if (msgLower.indexOf('/promote') === 0) {
 			chat.updateHistory(msgLower);
-			chat.invite();
+			chat.promote(chat.party.parse(msgLower));
 		}
 		else if (msgLower === '/disband') {
 			chat.updateHistory(msgLower);
-			chat.invite();
+			chat.disband();
 		}
 		else if (msgLower.indexOf('/invite') === 0) {
 			chat.updateHistory(msgLower);
@@ -419,6 +440,37 @@ var chat = {
 			chat.log('You have removed ' + o + ' from your ignore list.', 'chat-warning');
 		}
 	},
+	promote: function(name, bypass) {
+		console.info('/promote ', name, bypass);
+		// must be leader or bypass by auto-election when leader leaves
+		var id = my.getPartyMemberIdByName(name);
+		if ((my.party[0].isLeader || bypass) && my.p_id && id) {
+			$.ajax({
+				url: app.url + 'php2/chat/promote.php',
+				data: {
+					name: name,
+					leaderId: id
+				}
+			}).done(function (data) {
+				// console.info('promote ', data);
+			}).fail(function (r) {
+				chat.log(r.responseText, 'chat-warning');
+			});
+		}
+	},
+	disband: function() {
+		if (my.p_id) {
+			$.ajax({
+				type: 'GET',
+				url: app.url + 'php2/chat/disband.php'
+			}).done(function(r){
+				console.info('disband ', r);
+				bar.disband();
+			}).fail(function(r) {
+				chat.log(r.responseText, 'chat-warning');
+			});
+		}
+	},
 	invite: function(p) {
 		if (my.name === p) {
 			chat.log("You can't invite yourself to a party.", "chat-warning");
@@ -441,6 +493,8 @@ var chat = {
 						bar.updatePlayerBar(my.index);
 					}
 					chat.party.subscribe(r.p_id);
+				}).fail(function(r){
+					chat.log(r.responseText, 'chat-warning');
 				});
 			}
 			else {
@@ -520,11 +574,6 @@ var chat = {
 			// party table needs extra values... hp, mp, buffs, etc
 			console.info('Joining party: ', data.row, data);
 			chat.party.join(data);
-			/*socket.zmq.publish("party:"+ data.row, {
-				action: 'party-accept',
-				route: 'party->add',
-				name: my.name
-			});*/
 		},
 		deny: function(data){
 			console.info('deny ', data);
@@ -540,12 +589,17 @@ var chat = {
 			// unsub to current party?
 			socket.unsubscribe('party:'+ my.p_id);
 			// sub to party
-			var p = 'party:' + row;
+			var party = 'party:' + row;
 			my.p_id = row;
-			console.info("subscribing to channel: ", p);
-			socket.zmq.subscribe(p, function(topic, data) {
+			console.info("subscribing to channel: ", party);
+			socket.zmq.subscribe(party, function(topic, data) {
 				console.info('party rx ', topic, data);
-				route.town(data, data.route);
+				if (data.route === 'chat->log') {
+					route.town(data, data.route);
+				}
+				else {
+					route.party(data, data.route);
+				}
 			});
 		},
 		join: function(z) {

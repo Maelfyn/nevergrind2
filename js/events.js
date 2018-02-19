@@ -10,17 +10,17 @@ onbeforeunload = function(){
 			name: my.name,
 			route: 'off'
 		});
-		if (my.p_id) {
-			socket.zmq.publish('party:' + my.p_id, {
-				name: my.name,
-				route: 'party->disband'
-			});
-		}
+		chat.disband();
 		socket.zmq.close();
 	}
 }
 
 $(document).on(env.click, function(e){
+	if (context.isOpen) {
+		if (Date.now() - context.openDate > 100 && !context.isInside) {
+			context.hide();
+		}
+	}
 	e.preventDefault();
 	return false;
 }).on('keydown', function(e){
@@ -148,4 +148,10 @@ $(document).on(env.click, function(e){
 		}
 	} else {
 	}
+});
+
+
+$(window).on("mousemove", function(e){
+	my.mouse.x = e.clientX;
+	my.mouse.y = e.clientY;
 });

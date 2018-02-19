@@ -87,6 +87,7 @@ return gulp.src([
 './js/mob.js',
 './js/town.js',
 './js/route.js',
+'./js/context.js',
 './js/test.js',
 './js/endWrap.js'
 ])

@@ -1,6 +1,10 @@
 
 // player data values
 var my = {
+	mouse: {
+		x: 0,
+		y: 0
+	},
 	channel: 'town-1',
 	lastReceivedWhisper: '',
 	p_id: 0,
@@ -10,12 +14,45 @@ var my = {
 	isLeader: 0,
 	party: [],
 	guild: [],
+	isLowestPartyIdMine: function() {
+		var lowestId = my.party[0].id;
+		my.party.forEach(function(v) {
+			if (v.id < lowestId) {
+				lowestId = v.id;
+			}
+		});
+		return lowestId === my.party[0].id;
+	},
+	getNewLeaderName: function() {
+		var lowestId = my.party[0].id,
+			name = my.party[0].name;
+		my.party.forEach(function(v) {
+			if (v.id < lowestId) {
+				name = v.name;
+			}
+		});
+		return name;
+	},
+	getPartyMemberIdByName: function(name) {
+		var id = 0;
+		my.party.forEach(function(v) {
+			if (v.name === name) {
+				id = v.id;
+			}
+		});
+		return id;
+	},
 	partyDefault: function() {
 		return {
+			row: 0,
 			name: '&nbsp;',
 			isLeader: 0,
 			job: '',
-			level: 0
+			level: 0,
+			hp: 0,
+			maxHp: 0,
+			mp: 0,
+			maxMp: 0
 		}
 	},
 	team: 0,

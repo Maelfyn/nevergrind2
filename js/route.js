@@ -2,7 +2,6 @@
 var route = {
 	town: function(data, r) {
 		if (r === 'chat->log') {
-			console.info("Callback whisper ", data.name);
 			if (data.name === my.name) {
 				chat.log(data.msg, data.class);
 			}
@@ -20,17 +19,17 @@ var route = {
 		else if (r === 'chat->remove') {
 			chat.removePlayer(data);
 		}
-		else if (r === 'party->add') {
-			console.info('adding to party ', data);
-
-		}
-		else if (r === 'party->join') {
+	},
+	party: function(data, r) {
+		if (r === 'party->join') {
 			console.info('joining party ', data);
 			bar.party.join(data);
 		}
 		else if (r === 'party->disband') {
-			console.info('disband ', data);
-			chat.log(data.name + " has left the party.", 'chat-warning');
+			bar.party.disband(data);
+		}
+		else if (r === 'party->promote') {
+			bar.party.promote(data);
 		}
 	}
 };
