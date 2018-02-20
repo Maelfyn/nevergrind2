@@ -28,7 +28,7 @@ var game = {
 				type: 'GET',
 				url: app.url + 'php2/heartbeat.php'
 			}).done(function () {
-				console.info("Ping: ", game.ping.oneWay());
+				console.info("%c Ping: ", 'background: #0f0', game.ping.oneWay());
 			}).fail(function () {
 				clearTimeout(game.heartbeat.timer);
 				game.heartbeat.timer = setTimeout(function () {

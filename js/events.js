@@ -16,11 +16,7 @@ onbeforeunload = function(){
 }
 
 $(document).on(env.click, function(e){
-	if (context.isOpen) {
-		if (Date.now() - context.openDate > 100 && !context.isInside) {
-			context.hide();
-		}
-	}
+	context.hideCheck();
 	e.preventDefault();
 	return false;
 }).on('keydown', function(e){

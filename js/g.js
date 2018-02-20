@@ -20,8 +20,9 @@ var g = {
 		});
 		// disable stuff in app to appear more "native"
 		if (!app.isLocal) {
-			document.addEventListener("contextmenu", function (e) {
+			document.addEventListener('contextmenu', function (e) {
 				// disable default right-click menu
+				context.hideCheck();
 				e.preventDefault();
 				return false;
 			}, false);

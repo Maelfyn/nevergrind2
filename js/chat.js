@@ -149,7 +149,7 @@ var chat = {
 		chat.dom.chatModeMsg = document.getElementById('chat-mode-msg');
 		chat.dom.chatPrompt = document.getElementById('chat-prompt');
 
-		$("#chat-room").on(env.click, '.chat-player', function() {
+		$("#chat-room").on(env.context, '.chat-player', function() {
 			var id = $(this).parent().attr('id'),
 				arr = id.split("-"),
 				playerId = arr[2] * 1,

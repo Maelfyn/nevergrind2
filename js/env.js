@@ -4,6 +4,7 @@ var env = {
 	setMobile: function(){
 	},
 	click: init.isMobile ? 'mousedown' : 'click',
+	context: init.isMobile ? 'mousedown' : 'click contextmenu',
 	resizeWindow: function() {
 		// currently doing nothing
 	},
