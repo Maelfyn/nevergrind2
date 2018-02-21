@@ -5,7 +5,7 @@ var modal = {
 	wrap: document.getElementById('modal-wrap'),
 	show: function(e){
 		modal.isOpen = 1;
-		e.camelKey = g.camel(e.key);
+		e.camelKey = ng.camel(e.key);
 		var s = '<div class="stag-blue">'+
 					modal.header(e) +
 					modal.body(e) +
@@ -53,7 +53,7 @@ var modal = {
 			alpha: 0,
 			onComplete: function(){
 				modal.isOpen = 0;
-				g.unlock();
+				ng.unlock();
 				TweenMax.set(this.target, {
 					visibility: 'hidden'
 				});

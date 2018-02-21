@@ -50,7 +50,7 @@ var game = {
 				socket.healthTime = Date.now();
 				socket.startHealthCheck();
 				socket.zmq.publish('hb:' + my.name, {});
-			}, 20000);
+			}, 60000);
 		}
 	},
 	played: {
@@ -62,12 +62,35 @@ var game = {
 					type: 'GET',
 					url: app.url + 'php2/update-played.php'
 				}).done(function(){
+					// nada
 				}).fail(function(){
 					setTimeout(function(){
 						game.played.start();
 					}, 5000);
+				}).always(function(){
+					!app.isLocal && console.clear();
 				});
 			}, 60000);
+		}
+	},
+	exit: function() {
+		// from town
+		if (socket.enabled) {
+			chat.broadcast.remove();
+			if (my.p_id) {
+				// boot from party
+				socket.zmq.publish('party:' + my.p_id, {
+					id: my.row,
+					name: my.name,
+					route: 'party->bootme'
+				});
+			}
+			// notify friends
+			socket.zmq.publish('friend:' + my.name, {
+				name: my.name,
+				route: 'off'
+			});
+			socket.zmq.close();
 		}
 	},
 	getGameState: function(){

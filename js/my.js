@@ -17,7 +17,7 @@ var my = {
 	isLowestPartyIdMine: function() {
 		var lowestId = my.party[0].id;
 		my.party.forEach(function(v) {
-			if (v.id < lowestId) {
+			if (v.id && v.id < lowestId) {
 				lowestId = v.id;
 			}
 		});
@@ -42,10 +42,28 @@ var my = {
 		});
 		return id;
 	},
-	partyDefault: function() {
+	getPartySlotByRow: function(id) {
+		var slot = 0;
+		my.party.forEach(function(v, i) {
+			if (v.id === id) {
+				slot = i;
+			}
+		});
+		return slot;
+	},
+	partyCount: function() {
+		var count = 0;
+		my.party.forEach(function(v, i) {
+			if (v.name) {
+				count++;
+			}
+		});
+		return count;
+	},
+	Party: function() {
 		return {
 			row: 0,
-			name: '&nbsp;',
+			name: '',
 			isLeader: 0,
 			job: '',
 			level: 0,
@@ -59,7 +77,7 @@ var my = {
 	slot: 1,
 	tgt: 1,
 	attackOn: false,
-	hudTimer: g.TDC(),
+	hudTimer: ng.TDC(),
 	hud: function(msg, d){
 		my.hudTimer.kill();
 		DOM.hud.style.visibility = 'visible';
@@ -78,15 +96,15 @@ var my = {
 	},
 	nextTarget: function(backwards){},
 	exitGame: function(bypass){
-		if (g.view === 'game'){
+		if (ng.view === 'game'){
 			var r = confirm("Are you sure you want to surrender?");
 		}
-		if (r || bypass || g.view !== 'game'){
-			g.lock(1);
+		if (r || bypass || ng.view !== 'game'){
+			ng.lock(1);
 			$.ajax({
 				url: app.url + 'php/exitGame.php',
 				data: {
-					view: g.view
+					view: ng.view
 				}
 			}).always(function(){
 				location.reload();

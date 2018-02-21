@@ -48,7 +48,7 @@ var chat = {
 		name: '',
 		change: function(h){
 			// only trim leading spaces
-			var mode = h === undefined ? (chat.dom.chatInput.value + g.lastKey) : h.mode,
+			var mode = h === undefined ? (chat.dom.chatInput.value + ng.lastKey) : h.mode,
 				mode = mode.replace(/^\s+/g, '');
 
 			// known standard mode
@@ -62,7 +62,7 @@ var chat = {
 			}
 			// it's a whisper
 			else if ( (h && mode[0]) === '@' ||
-				(!h && mode[0] === '@' && g.lastKey === ' ') ) {
+				(!h && mode[0] === '@' && ng.lastKey === ' ') ) {
 				// history mode and mode is @
 				// or not history mode and mode is @ and just hit space!
 				if (h) {
@@ -180,7 +180,7 @@ var chat = {
 		}
 	},
 	parseMsg: function(msg) {
-		var arr = msg.split(" ");
+		var arr = msg.replace(/ +/g, " ").split(" ");
 		var o = {
 			first: arr[0].trim().toLowerCase()
 		}
@@ -226,6 +226,7 @@ var chat = {
 				'<div '+ z +'>/invite: Invite a player to your party : /invite Bob</div>',
 				'<div '+ z +'>/disband: Leave your party</div>',
 				'<div '+ z +'>/promote: Promote a player in your party to leader : /promote Bob</div>',
+				'<div '+ z +'>/boot: Boot a player from the party: /boot Bob</div>',
 				'<div '+ h +'>Miscellaneous Commands:</div>',
 				'<div '+ z +'>/clear: clear the chat log</div>',
 				'<div '+ z +'>/played: Show character creation, session duration, and total playtime</div>',
@@ -249,16 +250,16 @@ var chat = {
 		/*
 		/random
 		/surname
-		update /help
-		create placards!
 		allow to form parties
 			invite
 			disband
 			leader
+			boot
 		allow to form guilds
 			invite
 			disband
 			leader
+			boot
 		 */
 		else if (msgLower === '/gmotd') {
 			chat.updateHistory(msgLower);
@@ -279,6 +280,10 @@ var chat = {
 		else if (msgLower.indexOf('/promote') === 0) {
 			chat.updateHistory(msgLower);
 			chat.promote(chat.party.parse(msgLower));
+		}
+		else if (msgLower.indexOf('/boot') === 0) {
+			chat.updateHistory(msgLower);
+			chat.boot(chat.party.parse(msgLower));
 		}
 		else if (msgLower === '/disband') {
 			chat.updateHistory(msgLower);
@@ -410,12 +415,12 @@ var chat = {
 	},
 	ignore: {
 		init: function() {
-			g.ignore = JSON.parse(localStorage.getItem('ignore')) || g.ignore;
+			ng.ignore = JSON.parse(localStorage.getItem('ignore')) || ng.ignore;
 		},
 		list: function() {
-			if (g.ignore.length) {
+			if (ng.ignore.length) {
 				var s = '<div class="chat-warning">Checking ignore list...</div>';
-				g.ignore.forEach(function(v) {
+				ng.ignore.forEach(function(v) {
 					s += '<div class="chat-emote">' + v + '</div>';
 				});
 				chat.log(s);
@@ -426,17 +431,17 @@ var chat = {
 		},
 		add: function(o) {
 			if (o !== my.name) {
-				g.ignore.push(o);
-				localStorage.setItem('ignore', JSON.stringify(g.ignore));
+				ng.ignore.push(o);
+				localStorage.setItem('ignore', JSON.stringify(ng.ignore));
 				chat.log('You have added ' + o + ' to your ignore list.', 'chat-warning');
 			}
 		},
 		remove: function(o) {
-			while (g.ignore.indexOf(o) > -1) {
-				var index = g.ignore.indexOf(o);
-				g.ignore.splice(index, 1);
+			while (ng.ignore.indexOf(o) > -1) {
+				var index = ng.ignore.indexOf(o);
+				ng.ignore.splice(index, 1);
 			}
-			localStorage.setItem('ignore', JSON.stringify(g.ignore));
+			localStorage.setItem('ignore', JSON.stringify(ng.ignore));
 			chat.log('You have removed ' + o + ' from your ignore list.', 'chat-warning');
 		}
 	},
@@ -467,6 +472,24 @@ var chat = {
 				console.info('disband ', r);
 				bar.disband();
 			}).fail(function(r) {
+				chat.log(r.responseText, 'chat-warning');
+			});
+		}
+	},
+	boot: function(name, bypass) {
+		console.info('/promote ', name, bypass);
+		// must be leader or bypass by auto-election when leader leaves
+		var id = my.getPartyMemberIdByName(name);
+		if ((my.party[0].isLeader || bypass) && my.p_id && id) {
+			$.ajax({
+				url: app.url + 'php2/chat/boot.php',
+				data: {
+					name: name,
+					id: id
+				}
+			}).done(function (data) {
+				console.info('boot ', data);
+			}).fail(function (r) {
 				chat.log(r.responseText, 'chat-warning');
 			});
 		}
@@ -504,6 +527,7 @@ var chat = {
 	},
 	camp: function() {
 		chat.log('Camping...', 'chat-warning');
+		game.exit();
 		setTimeout(function(){
 			$.ajax({
 				type: 'GET',
@@ -529,7 +553,7 @@ var chat = {
 		add: function(data) {
 			var s = '',
 				e = document.createElement('div'),
-				id = g.getId();
+				id = ng.getId();
 
 			e.id = 'party-invite-'+ data.row;
 			e.className = 'prompt-row prompt-row-' + id + ' ' + data.css;
@@ -559,6 +583,8 @@ var chat = {
 			setTimeout(function() {
 				$("#" + e.id).remove();
 			}, 30000);
+
+			chat.log(data.msg, 'chat-warning');
 		},
 		confirm: function(data){
 			// join party by player id?
@@ -621,7 +647,7 @@ var chat = {
 			});
 		},
 		parse: function(msg) { // 2-part upper case
-			var a = msg.split(" ");
+			var a = msg.replace(/ +/g, " ").split(" ");
 			return a[1] === undefined ?
 				'' : (a[1][0].toUpperCase() + a[1].substr(1)).trim();
 		},
@@ -635,37 +661,37 @@ var chat = {
 	},
 	friend: {
 		parse: function(o) { // 3-part parse
-			var a = o.split(" ");
+			var a = o.replace(/ +/g, " ").split(" ");
 			return a[2][0].toUpperCase() + a[2].substr(1);
 		},
 		init: function() {
-			g.friends = g.friends || [];
+			ng.friends = ng.friends || [];
 			$.ajax({
 				type: 'GET',
 				url: app.url + 'php2/chat/friend-get.php',
 			}).done(function(data){
-				g.friends = data;
+				ng.friends = data;
 			});
 		},
 		list: function() {
 			chat.log('<div class="chat-warning">Checking friends list...</div>');
-			if (g.friends.length){
+			if (ng.friends.length){
 				$.ajax({
 					type: 'GET',
 					url: app.url + 'php2/chat/friend-status.php'
 				}).done(function(r){
-					g.friends = r.friends;
+					ng.friends = r.friends;
 					console.info(r);
 					var str = '<div>Friend List ('+ r.friends.length +')</div>';
 
-					g.friends.forEach(function(name, i){
+					ng.friends.forEach(function(name, i){
 						var index = r.players.indexOf(name);
 						if (index > -1){
 							var s = r.stats[index];
 							// online
 							str +=
 								'<div class="chat-whisper">[' +
-								s.level +' '+ g.jobLong[s.job] +'] '+ g.friends[i] + ' ('+ s.race +
+								s.level +' '+ ng.jobLong[s.job] +'] '+ ng.friends[i] + ' ('+ s.race +
 								')</div>';
 						} else {
 							// offline
@@ -681,7 +707,7 @@ var chat = {
 			}
 		},
 		add: function(o) {
-			if (o.length > 1 && o !== my.name && g.friends.indexOf(o) === -1) {
+			if (o.length > 1 && o !== my.name && ng.friends.indexOf(o) === -1) {
 				$.ajax({
 					url: app.url + 'php2/chat/friend-add.php',
 					data: {
@@ -697,20 +723,20 @@ var chat = {
 							chat.friend.notify(topic, data);
 						});
 
-						if (!~g.friends.indexOf(o)) {
+						if (!~ng.friends.indexOf(o)) {
 							socket.zmq.publish('name:' + o, {
 								name: my.name,
 								route: "friend>addedMe"
 							});
 						}
 
-						g.friends.push(o);
+						ng.friends.push(o);
 					}
 				});
 			}
 		},
 		remove: function(o) {
-			if (o.length > 1 && o !== my.name && g.friends.indexOf(o) > -1) {
+			if (o.length > 1 && o !== my.name && ng.friends.indexOf(o) > -1) {
 				$.ajax({
 					url: app.url + 'php2/chat/friend-remove.php',
 					data: {
@@ -722,9 +748,9 @@ var chat = {
 					}
 					else {
 						chat.log('You have removed ' + o + ' from your friend list.', 'chat-warning');
-						while (g.friends.indexOf(o) > -1) {
-							var index = g.friends.indexOf(o);
-							g.friends.splice(index, 1);
+						while (ng.friends.indexOf(o) > -1) {
+							var index = ng.friends.indexOf(o);
+							ng.friends.splice(index, 1);
 						}
 						socket.unsubscribe('friend:'+ o);
 					}
@@ -805,17 +831,17 @@ var chat = {
 	},
 	who: {
 		parse: function(msg) { // complex parse for class names
-			var a = msg.split(" "),
+			var a = msg.replace(/ +/g, " ").split(" "),
 				job = a[1],
 				longJob = job[0].toUpperCase() + job.substr(1);
 
 			// long name?
-			if (g.jobs.indexOf(longJob) > -1) {
+			if (ng.jobs.indexOf(longJob) > -1) {
 				// convert to short
-				return g.jobShort[longJob];
+				return ng.jobShort[longJob];
 			}
 			else {
-				var shortJobs = Object.keys(g.jobLong),
+				var shortJobs = Object.keys(ng.jobLong),
 					job = job.toUpperCase();
 				if (shortJobs.indexOf(job)) {
 					// is it on the short job list?
@@ -840,7 +866,7 @@ var chat = {
 					r.players.forEach(function(v, i){
 						str +=
 							'<div class="chat-whisper">[' +
-							v.level +' '+ g.jobLong[v.job] +'] '+ v.name + ' ('+ v.race +
+							v.level +' '+ ng.jobLong[v.job] +'] '+ v.name + ' ('+ v.race +
 							')</div>';
 					});
 					chat.log(str, 'chat-whisper');
@@ -859,7 +885,7 @@ var chat = {
 				}
 			}).done(function(r){
 				console.info('r ', r);
-				var jobLong = g.toJobLong(job);
+				var jobLong = ng.toJobLong(job);
 				if (r.len) {
 					chat.log("There " + (r.len > 1 ? "are" : "is") +" currently "+
 						r.len + " "+ (r.len > 1 ? jobLong + 's' : jobLong) +" in Vandamor.", "chat-warning");
@@ -868,7 +894,7 @@ var chat = {
 					r.players.forEach(function(v, i){
 						str +=
 							'<div class="chat-whisper">[' +
-							v.level +' '+ g.jobLong[v.job] +'] '+ v.name + ' ('+ v.race +
+							v.level +' '+ ng.jobLong[v.job] +'] '+ v.name + ' ('+ v.race +
 							')</div>';
 					});
 					chat.log(str, 'chat-whisper');
@@ -908,12 +934,12 @@ var chat = {
 	},
 	join: {
 		parse: function(msg) { // 2 part parse lower case
-			var c = msg.split(" ");
+			var c = msg.replace(/ +/g, " ").split(" ");
 			return c[1] === undefined ?
 				'' : c[1].toLowerCase().trim();
 		},
 		channel: function(channel) {
-			if (g.view === 'town') {
+			if (ng.view === 'town') {
 				if (channel) {
 					// remove from channel
 					if (channel !== my.channel) {

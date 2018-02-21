@@ -2,7 +2,7 @@
 var battle = {
 	go: function(){
 		mob.init();
-		g.setScene('battle');
+		ng.setScene('battle');
 	},
 	html: function(){
 		var s = '<img id="battle-bg" class="img-bg" src="img2/bg/fw2.jpg">';
@@ -36,7 +36,7 @@ var battle = {
 	},
 	initialized: 0,
 	show: function(){
-		g.setScene('battle');
+		ng.setScene('battle');
 		if (battle.initialized) {
 			document.getElementById('scene-battle').style.display = 'block';
 		}

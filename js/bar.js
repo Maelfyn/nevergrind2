@@ -90,6 +90,7 @@ var bar = {
 			var index = 0,
 				name = '',
 				electNewLeader = 0;
+			// did the leader disband or somehow get booted?
 			my.party.forEach(function(v, i) {
 				if (data.row === v.id) {
 					index = i;
@@ -99,21 +100,28 @@ var bar = {
 					}
 				}
 			});
-
+			// disbanded player found
 			if (index) {
-				my.party[index] = my.partyDefault();
+				// reset client data to default
+				my.party[index] = my.Party();
 				document.getElementById('bar-player-wrap-' + index).style.display = 'none';
 				chat.log(name + " has disbanded the party.", 'chat-warning');
-
+				// elect new leader if client's id is lowest
 				if (electNewLeader && my.isLowestPartyIdMine()) {
 					chat.promote(my.getNewLeaderName(), 1);
 				}
 			}
 		},
 		promote: function(data) {
-			console.info('bar.party.promote ', data);
 			chat.log(data.name + " has been promoted to party leader.", 'chat-warning');
 			// refresh party bars
+			bar.getParty();
+		},
+		boot: function(data) {
+			console.info('bar.party.boot ', data);
+			chat.log(data.name + " has been booted from the party.", 'chat-warning');
+			// refresh party bars
+			bar.party.disband(data);
 			bar.getParty();
 		}
 	},
@@ -155,7 +163,7 @@ var bar = {
 		my.party.forEach(function(v, i){
 			if (i) {
 				// set client value
-				v = my.partyDefault();
+				v = my.Party();
 			}
 		});
 		bar.hideParty();

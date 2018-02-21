@@ -5,7 +5,7 @@ var route = {
 			if (data.name === my.name) {
 				chat.log(data.msg, data.class);
 			}
-			else if (g.ignore.indexOf(data.name) === -1) {
+			else if (ng.ignore.indexOf(data.name) === -1) {
 				chat.log(data.msg, data.class);
 			}
 			else {
@@ -22,7 +22,6 @@ var route = {
 	},
 	party: function(data, r) {
 		if (r === 'party->join') {
-			console.info('joining party ', data);
 			bar.party.join(data);
 		}
 		else if (r === 'party->disband') {
@@ -30,6 +29,38 @@ var route = {
 		}
 		else if (r === 'party->promote') {
 			bar.party.promote(data);
+		}
+		else if (r === 'party->boot') {
+			bar.party.boot(data);
+		}
+		else if (r === 'party->bootme') {
+			// remove booted player
+			var slot = my.getPartySlotByRow(data.id * 1),
+				promote = 0;
+			if (my.party[slot].isLeader) {
+				// we must promote a new leader
+				promote = 1;
+			}
+			my.party[slot] = my.Party();
+			console.info("%c party->bootme", "background: #ff0", promote);
+			// only boot if I'm the lowest id!
+			if (my.isLowestPartyIdMine()) {
+				console.info('isLowestPartyIdMine ! YES PROMOTE! ', ng.copy(my.party));
+				chat.boot(data.name, 1);
+				if (my.partyCount() === 1) {
+					// disband if one-man party
+					console.info('partyCount === 1 ');
+					chat.disband();
+				}
+				else if (promote) {
+					// otherwise promote this player to leader
+					console.info('PROMOTING: ', my.name);
+					chat.promote(my.name, 1);
+				}
+				setTimeout(function(){
+					bar.getParty();
+				}, 1000);
+			}
 		}
 	}
 };

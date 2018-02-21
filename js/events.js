@@ -1,18 +1,6 @@
 onbeforeunload = function(){
 	// attempt to remove player from game
-	$.ajax({
-		type: 'GET',
-		url: app.url + 'php2/chat/camp.php'
-	});
-	chat.broadcast.remove();
-	if (socket.enabled) {
-		socket.zmq.publish('friend:' + my.name, {
-			name: my.name,
-			route: 'off'
-		});
-		chat.disband();
-		socket.zmq.close();
-	}
+	game.exit();
 }
 
 $(document).on(env.click, function(e){
@@ -23,7 +11,7 @@ $(document).on(env.click, function(e){
 	var code = e.keyCode,
 		key = e.key;
 
-	g.lastKey = key;
+	ng.lastKey = key;
 
 	app.isLocal && console.info('keydown: ', key, code);
 	// local only
@@ -59,8 +47,8 @@ $(document).on(env.click, function(e){
 			e.preventDefault();
 		}
 	} else {
-		if (g.view === 'title'){
-			if (!g.isModalOpen){
+		if (ng.view === 'title'){
+			if (!ng.isModalOpen){
 				$("#create-character-name").focus();
 			}
 		} else {
@@ -92,7 +80,7 @@ $(document).on(env.click, function(e){
 				}
 			}
 
-			if (g.view === 'town') {
+			if (ng.view === 'town') {
 				if (chat.hasFocus) {
 					if (chat.mode.change()) {
 						// changing chat mode - matches possible mode change
@@ -114,7 +102,7 @@ $(document).on(env.click, function(e){
 					e.preventDefault();
 				} else if (code === 86) {
 					// v
-					if (g.view === 'game' && !g.chatOn) {
+					if (ng.view === 'game' && !ng.chatOn) {
 						game.toggleGameWindows(1);
 					}
 				}
@@ -124,11 +112,11 @@ $(document).on(env.click, function(e){
 }).on('keyup', function(e) {
 	var x = e.keyCode;
 	//console.info(x);
-	if (g.view === 'title'){
+	if (ng.view === 'title'){
 		if (x === 13){
-			if (g.focusUpdateNationName){
+			if (ng.focusUpdateNationName){
 				title.submitNationName();
-			} else if (g.focusGameName){
+			} else if (ng.focusGameName){
 				title.createGame();
 			} else if (title.chatOn){
 				if (x === 13){
@@ -147,7 +135,12 @@ $(document).on(env.click, function(e){
 });
 
 
-$(window).on("mousemove", function(e){
+$(window).on('mousemove', function(e){
 	my.mouse.x = e.clientX;
 	my.mouse.y = e.clientY;
+}).on('resize', function(){
+	context.hide();
+	clearTimeout(context.resizeTimer);
+	context.resizeTimer = setTimeout(function(){
+	}, 100);
 });

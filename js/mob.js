@@ -173,7 +173,7 @@ var mob = {
 	attack: function(m, force){
 		if (m.animationActive) return;
 		m.animationActive = 1;
-		var tl = g.TM(),
+		var tl = ng.TM(),
 			foo = force === 1 || force === 2 ?
 				force : !Math.round(Math.random()) ? 1 : 2;
 		if (!m.enableSecondary) {
@@ -227,7 +227,7 @@ var mob = {
 				endFrame = 75.9,
 				diff = endFrame - startFrame;
 
-			var tl = g.TM();
+			var tl = ng.TM();
 			tl.to(m, m.speed * diff, {
 				startAt: {
 					frame: startFrame
@@ -257,7 +257,7 @@ var mob = {
 		m.hp = 0;
 		mob.setClickBox(m);
 		m.animationActive = 1;
-		var tl = g.TM(),
+		var tl = ng.TM(),
 			startFrame = 76,
 			endFrame = 105.9,
 			diff = endFrame - startFrame,

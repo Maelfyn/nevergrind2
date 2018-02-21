@@ -15,7 +15,7 @@ var socket = {
 				// game updates
 				console.info("Subscribing to game:" + game.id);
 				socket.zmq.subscribe('game:' + game.id, function(topic, data) {
-					if (g.ignore.indexOf(data.account) === -1){
+					if (ng.ignore.indexOf(data.account) === -1){
 						title.chatReceive(data);
 					}
 				});
@@ -87,7 +87,7 @@ var socket = {
 	},
 	checkHealth: function(){
 		if (!socket.isHealthy) {
-			g.disconnect();
+			ng.disconnect();
 		}
 	},
 	enabled: 0,
@@ -164,7 +164,7 @@ var socket = {
 		}
 	},
 	initFriendAlerts: function() {
-		g.friends.forEach(function(v){
+		ng.friends.forEach(function(v){
 			socket.unsubscribe('friend:' + v);
 			socket.zmq.subscribe('friend:' + v, function(topic, data) {
 				chat.friend.notify(topic, data);

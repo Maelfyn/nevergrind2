@@ -1,17 +1,17 @@
 // core.js
-var g = {
+var ng = {
 	id: 0,
 	getId: function() {
-		g.id++;
-		if (g.id > 999999999) {
-			g.id = 1;
+		ng.id++;
+		if (ng.id > 999999999) {
+			ng.id = 1;
 		}
-		return g.id;
+		return ng.id;
 	},
 	events: function(){
 		$(window).focus(function(){
 			/*document.title = g.defaultTitle;
-			g.titleFlashing = false;*/
+			ng.titleFlashing = false;*/
 			// my.name && socket.init(1);
 		});
 		// should be delegating no drag start
@@ -40,12 +40,12 @@ var g = {
 		$(window).on('resize orientationchange focus', function() {
 			// env.resizeWindow();
 			// debounce resize
-			clearTimeout(g.resizeTimer);
-			g.resizeTimer = setTimeout(function(){
+			clearTimeout(ng.resizeTimer);
+			ng.resizeTimer = setTimeout(function(){
 				if (chat.initialized) {
 					chat.scrollBottom();
 				}
-				if (g.view === 'battle') {
+				if (ng.view === 'battle') {
 					for (var i=0; i<mob.max; i++) {
 						mob.sizeMob(mobs[i]);
 					}
@@ -56,7 +56,7 @@ var g = {
 		});
 	},
 	disconnect: function(msg) {
-		g.view = 'disconnected';
+		ng.view = 'disconnected';
 		// turn off all events
 		$(document).add('*').off();
 		$("main > *").css('display', 'none');
@@ -115,7 +115,7 @@ var g = {
 		Wizard: 'WIZ'
 	},
 	toJobShort: function(key){
-		return g.jobShort[key];
+		return ng.jobShort[key];
 	},
 	jobLong: {
 		BRD: 'Bard',
@@ -134,7 +134,7 @@ var g = {
 		WIZ: 'Wizard'
 	},
 	toJobLong: function(key){
-		return g.jobLong[key];
+		return ng.jobLong[key];
 	},
 	copy: function(o){
 		return JSON.parse(JSON.stringify(o));
@@ -168,7 +168,7 @@ var g = {
 		$(".scene").removeClass('none')
 			.css('display', 'none');
 		document.getElementById('scene-' + scene).style.display = 'block';
-		g.view = scene;
+		ng.view = scene;
 	},
 	camel: function(str){
 		str = str.split("-");
@@ -178,26 +178,26 @@ var g = {
 		return str.join("");
 	},
 	lock: function(hide){
-		g.lockOverlay.style.display = "block";
-		g.lockOverlay.style.opacity = hide ? 0 : 1;
-		g.locked = 1;
+		ng.lockOverlay.style.display = "block";
+		ng.lockOverlay.style.opacity = hide ? 0 : 1;
+		ng.locked = 1;
 	},
 	unlock: function(){
-		g.lockOverlay.style.display = "none";
-		g.locked = 0;
+		ng.lockOverlay.style.display = "none";
+		ng.locked = 0;
 	},
 	unlockFade: function(d){
 		if (!d){
 			d = 1;
 		}
-		TweenMax.to(g.lockOverlay, d, {
+		TweenMax.to(ng.lockOverlay, d, {
 			startAt: {
 				opacity: 1,
 			},
 			ease: Power3.easeIn,
 			opacity: 0,
 			onComplete: function(){
-				g.lockOverlay.style.display = 'none';
+				ng.lockOverlay.style.display = 'none';
 			}
 		});
 	},
@@ -211,18 +211,18 @@ var g = {
 			}).done(function(data){
 				data.latitude += '';
 				data.longitude += '';
-				g.geo = data;
+				ng.geo = data;
 				$.ajax({
 					url: app.url + 'php/updateUserInfo.php',
 					data: {
-						location: g.geo
+						location: ng.geo
 					}
 				}).done(function(){
-					localStorage.setItem('geo', JSON.stringify(g.geo));
+					localStorage.setItem('geo', JSON.stringify(ng.geo));
 					localStorage.setItem('geoSeason', 1);
 					localStorage.setItem('geoTime', Date.now());
 				});
-				//console.info('loc: ', g.geo);
+				//console.info('loc: ', ng.geo);
 			});
 		}
 	},
@@ -234,15 +234,15 @@ var g = {
 		if (geoTime !== null || geoSeason === null){
 			// longer than 90 days?
 			if ((Date.now() - geoTime) > 7776000 || geoSeason === null){
-				g.updateUserInfo();
+				ng.updateUserInfo();
 			}
 		} else if (geo === null){
-			g.updateUserInfo();
+			ng.updateUserInfo();
 		}
 		// ignore list
 		var ignore = localStorage.getItem('ignore');
 		if (ignore !== null){
-			g.ignore = JSON.parse(ignore);
+			ng.ignore = JSON.parse(ignore);
 		} else {
 			var foo = []; 
 			localStorage.setItem('ignore', JSON.stringify(foo));
@@ -267,7 +267,7 @@ var g = {
 			type: 'GET',
 			url: app.url + "php/keepAlive.php"
 		}).always(function() {
-			setTimeout(g.keepAlive, 120000);
+			setTimeout(ng.keepAlive, 120000);
 		});
 	},
 	msg: function(msg, d){
@@ -326,7 +326,7 @@ var g = {
 		}
 	},
 	logout: function(){
-		g.lock();
+		ng.lock();
 		// socket.removePlayer(my.account);
 		$.ajax({
 			type: 'GET',
@@ -354,22 +354,22 @@ var g = {
 				type: 'GET',
 				url: app.url + 'php/logout.php'
 			}).done(function(data) {
-				g.msg("Logout successful");
+				ng.msg("Logout successful");
 				localStorage.removeItem('email');
 				localStorage.removeItem('token');
 				location.reload();
 			}).fail(function() {
-				g.msg("Logout failed.");
+				ng.msg("Logout failed.");
 			});
 		}, 1000);
 	},
 	goCreateCharacter: function(){
-		g.lock(1);
+		ng.lock(1);
 		var z = '#scene-title-select-character',
 			prom = 0,
 			allDone = function(){
 				if (++prom === 2){
-					g.unlock();
+					ng.unlock();
 					// init create screen and show
 					TweenMax.set(z, {
 						display: 'none',
@@ -387,7 +387,7 @@ var g = {
 						opacity: 1,
 						onComplete: function(){
                             $("#create-character-name").focus();
-							g.unlock();
+							ng.unlock();
 						}
 					});
 				}
@@ -406,12 +406,12 @@ var g = {
 			url: app.url + 'php2/create/getStatMap.php'
 		}).done(function(r){
 			var r = r.statMap;
-			g.races.forEach(function(v){
+			ng.races.forEach(function(v){
 				create.raceAttrs[v] = r[v].attrs;
 				create.possibleJobs[v] = r[v].jobs;
 			});
 			// job stats
-			g.jobs.forEach(function(v){
+			ng.jobs.forEach(function(v){
 				create.jobAttrs[v] = r.jobs[v];
 			});
             $("#create-character-name").val('');
@@ -428,8 +428,8 @@ var g = {
 			if (r.account) {
 				app.account = my.account = r.account; // for global reference
 				document.getElementById('logout').textContent = 'Logout ' + r.account;
-				g.displayAllCharacters(r.characterData);
-				g.checkPlayerData();
+				ng.displayAllCharacters(r.characterData);
+				ng.checkPlayerData();
 				$("#login-modal").remove();
 			}
 			else {
@@ -458,7 +458,7 @@ var g = {
 				'data-name="'+ d.name +'" '+
 				'class="btn btn-lg ch-card center select-player-card">'+
 				'<div class="ch-card-name">'+ d.name +'</div>'+
-				'<div class="ch-card-details">'+ d.level +' '+ d.race +' '+ g.toJobLong(d.job) +'</div>'+
+				'<div class="ch-card-details">'+ d.level +' '+ d.race +' '+ ng.toJobLong(d.job) +'</div>'+
 				'</div>';
 		});
 		document.getElementById('ch-card-list').innerHTML = s;
@@ -466,7 +466,7 @@ var g = {
 	}
 };
 
-g.init = (function(){
+ng.init = (function(){
 	// console.info("Initializing game...");
 	$.ajaxSetup({
 		type: 'POST',

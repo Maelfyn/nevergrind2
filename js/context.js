@@ -53,8 +53,20 @@ var context = {
 		halfWidth: ~~($("#tooltip-social-wrap").width() / 2),
 		x: function() {
 			if (my.mouse.x < context.position.halfWidth) {
-				// 50 - 100 width = 100 - 50 ... 50+ 10 padding
-				// 25 - 100 width = 100 - 25 ... 75
+				// too small
+				my.mouse.x += context.position.halfWidth / 2;
+				if (my.mouse.x < 80) {
+					my.mouse.x = 80;
+				}
+			}
+			else if (my.mouse.x > window.innerWidth - context.position.halfWidth) {
+				// too big
+				my.mouse.x -= context.position.halfWidth / 2;
+				var z = window.innerWidth - 80;
+				if (my.mouse.x > z) {
+					my.mouse.x = z;
+				}
+
 			}
 			return my.mouse.x;
 		},

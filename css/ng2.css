@@ -346,12 +346,6 @@ body {
 	overflow: hidden;
 	overflow-y: auto
 }
-main {
-	display: flex;
-	flex-direction: row;
-	flex: 1;
-	justify-content: center
-}
 input {
 	cursor: text;
 	background: #059
@@ -1227,7 +1221,7 @@ tbody {
 	font-size: 1rem;
 	border: 2px groove #013;
 	background: rgba(0,0,0,.8);
-	height: 45rem;
+	height: 50vh;
 	z-index: 2;
 }
 #chat-present-wrap {
@@ -1455,76 +1449,6 @@ tbody {
 }
 .chat-WIZ {
 	color:#f22;
-}
-.Warrior{
-	background:#3a220a;
-	background:url('/classic/images1/classPlate.png') 0 0;
-	text-shadow:inherit;
-}
-.Rogue{
-	background:#3d353d;
-	background:url('/classic/images1/classPlate.png') 0 -100%;
-	text-shadow:inherit;
-}
-.Monk{
-	background:#44441a;
-	background:url('/classic/images1/classPlate.png') 0 -200%;
-	text-shadow:inherit;
-}
-.Paladin{
-	background:#620582;
-	background:url('/classic/images1/classPlate.png') 0 -300%;
-	text-shadow:inherit;
-}
-.ShadowKnight{
-	background:#48043a;
-	background:url('/classic/images1/classPlate.png') 0 -400%;
-	text-shadow:inherit;
-}
-.Ranger{
-	background:#0a2b00;
-	background:url('/classic/images1/classPlate.png') 0 -500%;
-	text-shadow:inherit;
-}
-.Bard{
-	background:#1a006a;
-	background:url('/classic/images1/classPlate.png') 0 -600%;
-	text-shadow:inherit;
-}
-.Druid{
-	background:#1a5b0a;
-	background:url('/classic/images1/classPlate.png') 0 -700%;
-	text-shadow:inherit;
-}
-.Cleric{
-	background:#77770a;
-	background:url('/classic/images1/classPlate.png') 0 -800%;
-	text-shadow:inherit;
-}
-.Shaman{
-	background:#001a7a;
-	background:url('/classic/images1/classPlate.png') 0 -900%;
-	text-shadow:inherit;
-}
-.Necromancer{
-	background:#482a5a;
-	background:url('/classic/images1/classPlate.png') 0 -1000%;
-	text-shadow:inherit;
-}
-.Enchanter{
-	background:#123a6a;
-	background:url('/classic/images1/classPlate.png') 0 -1100%;
-	text-shadow:inherit;
-}
-.Magician{
-	background:#7a4a12;
-	background:url('/classic/images1/classPlate.png') 0 -1200%;
-	text-shadow:inherit;
-}
-.Wizard{
-	background:#5a0111;
-	background:url('/classic/images1/classPlate.png') 0 -1300%;
-	text-shadow:inherit;
 }
 /* webkit scrollbar */
 /*

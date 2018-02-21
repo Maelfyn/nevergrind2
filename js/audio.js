@@ -27,16 +27,16 @@ var audio = {
 		if (foo) {
 			if (bg){
 				// music
-				if (g.config.audio.musicVolume){
+				if (ng.config.audio.musicVolume){
 					dom.bgmusic.pause();
 					dom.bgmusic.src = "music/" + foo + ".mp3";
-					dom.bgmusic.volume = g.config.audio.musicVolume / 100;
+					dom.bgmusic.volume = ng.config.audio.musicVolume / 100;
 				}
 			} else {
 				// sfx
-				if (g.config.audio.soundVolume){
+				if (ng.config.audio.soundVolume){
 					var sfx = new Audio("sound/" + foo + ".mp3");
-					sfx.volume = g.config.audio.soundVolume / 100;
+					sfx.volume = ng.config.audio.soundVolume / 100;
 					sfx.play();
 				}
 			}
@@ -44,11 +44,11 @@ var audio = {
 	},
 	save: function(){
 		// save to storage
-		var foo = JSON.stringify(g.config); 
+		var foo = JSON.stringify(ng.config);
 		localStorage.setItem('config', foo);
 	},
 	setMusicVolume: function(val){
-		if (g.config.audio.musicVolume){
+		if (ng.config.audio.musicVolume){
 			if (!val){
 				audio.pause();
 			}
@@ -57,18 +57,18 @@ var audio = {
 			audio.musicStart();
 		}
 		dom.bgmusic.volume = val / 100;
-		g.config.audio.musicVolume = val;
+		ng.config.audio.musicVolume = val;
 		audio.save();
 	},
 	setSoundVolume: function(val){
-		g.config.audio.soundVolume = val;
+		ng.config.audio.soundVolume = val;
 		audio.save();
 	},
 	pause: function(){
 		dom.bgmusic.pause();
 	},
 	gameMusicInit: function(){
-		if (g.config.audio.musicVolume){
+		if (ng.config.audio.musicVolume){
 			audio.pause();
 			dom.bgmusic.loop = false;
 			audio.gameMusicPlayNext();
@@ -94,7 +94,7 @@ var audio = {
 		var nowPlaying = audio.tracks[++audio.trackIndex % audio.totalTracks];
 		dom.bgmusic.pause();
 		dom.bgmusic.src = "music/" + nowPlaying +".mp3";
-		dom.bgmusic.volume = g.config.audio.musicVolume / 100;
+		dom.bgmusic.volume = ng.config.audio.musicVolume / 100;
 		dom.bgmusic.onended = function(){
 			audio.gameMusicPlayNext();
 		}
@@ -102,7 +102,7 @@ var audio = {
 	},
 	fade: function(){
 		var x = {
-			vol: g.config.audio.musicVolume / 100
+			vol: ng.config.audio.musicVolume / 100
 		}
 		TweenMax.to(x, 2.5, {
 			vol: 0,
@@ -134,7 +134,7 @@ var audio = {
 		}
 	},
 	musicStart: function(){
-		if (g.view !== 'game'){
+		if (ng.view !== 'game'){
 			// audio.play("ArcLight", 1);
 			// audio.play("WaitingBetweenWorlds", 1);
 		} else {
@@ -150,13 +150,13 @@ audio.init = (function(){
 		audio.save();
 	} else {
 		var foo = JSON.parse(config);
-		if (g.config.audio.musicOn === undefined){
-			g.config.audio = foo.audio;
+		if (ng.config.audio.musicOn === undefined){
+			ng.config.audio = foo.audio;
 		}
 	}
 	// console.info("Initializing audio...", g.config.audio);
 	audio.load.title();
-	if (!g.config.audio.musicVolume){
+	if (!ng.config.audio.musicVolume){
 		audio.pause();
 	} else {
 		audio.musicStart();
@@ -167,35 +167,35 @@ audio.init = (function(){
 		e.slider({
 			min  : 0, 
 			max  : 100, 
-			value: g.config.audio.musicVolume, 
+			value: ng.config.audio.musicVolume,
 			formatter: function(value) {
 				if (initComplete){
 					audio.setMusicVolume(value);
 					return value;
 				} else {
-					return g.config.audio.musicVolume;
+					return ng.config.audio.musicVolume;
 				}
 			}
-		}).slider('setValue', g.config.audio.musicVolume);
+		}).slider('setValue', ng.config.audio.musicVolume);
 	}
 	var e = $("#musicSlider");
 	if (e.length){
 		$("#soundSlider").slider({
 			min  : 0, 
 			max  : 100, 
-			value: g.config.audio.soundVolume, 
+			value: ng.config.audio.soundVolume,
 			tooltip_position: 'bottom',
 			formatter: function(value) {
 				if (initComplete){
 					audio.setSoundVolume(value);
 					return value;
 				} else {
-					return g.config.audio.soundVolume
+					return ng.config.audio.soundVolume
 				}
 			}
 		}).on('slideStop', function(val){
 			audio.play('machine0');
-		}).slider('setValue', g.config.audio.soundVolume);
+		}).slider('setValue', ng.config.audio.soundVolume);
 	}
 	initComplete = true;
 })();

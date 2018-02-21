@@ -45,7 +45,7 @@ var create = {
 	},
 	events: function(x){
 		$("#logout").on(x, function() {
-			g.logout();
+			ng.logout();
 		});
 		$("#ch-card-base").on(x, '.ch-card', function(){
 			$('.ch-card').removeClass('ch-card-active');
@@ -54,7 +54,7 @@ var create = {
 		$('.ch-card:first').trigger(x);
 		// create character
 		$("#go-create-character").on(x, function(){
-			g.goCreateCharacter();
+			ng.goCreateCharacter();
 		});
 		$("#delete-character").on(x, function(){
 			modal.show({
@@ -101,8 +101,8 @@ var create = {
 			}
 		});
 		$("#create-character-back").on(x, function(){
-			g.lock(1);
-			g.initGame();
+			ng.lock(1);
+			ng.initGame();
 			var z = document.getElementById('scene-title-create-character');
 			TweenMax.to(z, .6, {
 				y: 20,
@@ -121,7 +121,7 @@ var create = {
 						y: 0,
 						opacity: 1,
 						onComplete: function(){
-							g.unlock();
+							ng.unlock();
 						}
 					});
 				}
@@ -129,9 +129,9 @@ var create = {
 		});
 		$("#create-character-btn").on(x, function(){
 			//client-side validation
-			if (!g.locked){
+			if (!ng.locked){
 				
-			g.lock(1);
+			ng.lock(1);
 			var f = create.form,
 				err = '';
 			if (!f.name){
@@ -145,11 +145,11 @@ var create = {
 				err = 'You must spend all of your ability points!';
 			}
 			if (err){
-				g.msg(err);
-				g.unlock();
+				ng.msg(err);
+				ng.unlock();
 			} else {
 				// final adds
-				f.shortJob = g.toJobShort(f.job);
+				f.shortJob = ng.toJobShort(f.job);
 				// send to server
 				$.ajax({
 					url: app.url + 'php2/create/create-character.php',
@@ -158,11 +158,11 @@ var create = {
 					}
 				}).done(function(r){
 					console.info('Created character: ', r);
-					g.msg(r.hero.name + ' has been created!');
+					ng.msg(r.hero.name + ' has been created!');
 					$("#create-character-back").trigger(x);
 				}).fail(function(r){
-					g.msg(r.responseText, 8);
-					g.unlock();
+					ng.msg(r.responseText, 8);
+					ng.unlock();
 				});
 			}
 			
@@ -176,8 +176,8 @@ var create = {
 	},
 	deleteCharacter: function(){
 		// send to server
-		if (!g.locked){
-			g.lock();
+		if (!ng.locked){
+			ng.lock();
 			$.ajax({
 				url: app.url + 'php2/create/delete-character.php',
 				data: {
@@ -185,12 +185,12 @@ var create = {
 				}
 			}).done(function(r){
 				console.info('Deleted character: ', r);
-				g.msg(create.name + ' has been deleted!');
+				ng.msg(create.name + ' has been deleted!');
 				modal.hide();
-				g.initGame();
+				ng.initGame();
 			}).fail(function(r){
-				g.msg(r.responseText, 8);
-				g.unlock();
+				ng.msg(r.responseText, 8);
+				ng.unlock();
 			});
 		}
 	},
@@ -245,28 +245,28 @@ var create = {
 	set: function(key, val){
 		document.getElementById(key + '-value').innerHTML = create.form[key] = val;
 		// details
-		g.split('create-details', create.msg(key, val));
+		ng.split('create-details', create.msg(key, val));
 		if (key === 'job'){
 			document.getElementById('type-value').innerHTML = create.types[val];
 		}
 		// resists
-		g.resists.forEach(function(v, i){
+		ng.resists.forEach(function(v, i){
 			document.getElementById(v + '-value').innerHTML = create.getResist(v);
 		});
 		// dungeon
-		g.dungeon.forEach(function(v, i){
+		ng.dungeon.forEach(function(v, i){
 			document.getElementById(v + '-value').innerHTML = create.getDungeon(v);
 		});
 		// reset attr
 		if (key !== 'gender' && create.form.race){
-			var raceAttr = g.copy(create.getRaceAttrs(create.form.race)),
-				jobAttr = g.copy(create.getJobAttrs(create.form.job));
+			var raceAttr = ng.copy(create.getRaceAttrs(create.form.race)),
+				jobAttr = ng.copy(create.getJobAttrs(create.form.job));
 			jobAttr.forEach(function(v, i){
 				raceAttr[i] += v;
 			});
 			// set initial attr values
 			$(".create-attr-value").removeClass('active');
-			g.attrs.forEach(function(v, i){
+			ng.attrs.forEach(function(v, i){
 				var e = document.getElementById('create-points-' + v);
 				e.innerHTML = create.form[v] = create.base[v] = raceAttr[i];
 				if (jobAttr[i]){

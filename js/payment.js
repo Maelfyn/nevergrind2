@@ -12,7 +12,7 @@ var payment = {
     },
     error: function(msg){
         $("#modal-error").text(msg);
-        g.unlock();
+        ng.unlock();
     },
     send: function(){
         var f = {
@@ -55,21 +55,21 @@ var payment = {
             payment.error(response.error.message);
         } else {
             // submit the form
-            g.lock();
-            g.msg("Communicating with the server...");
+            ng.lock();
+            ng.msg("Communicating with the server...");
             $.ajax({
                 url: app.url + 'php2/payment/unlockGame.php',
                 data: {
                     stripeToken: response.id
                 }
             }).done(function(data) {
-                g.msg("You have unlocked the full game: Nevergrind 2<br>Thanks for your support!");
+                ng.msg("You have unlocked the full game: Nevergrind 2<br>Thanks for your support!");
                 console.info(data);
                 modal.hide();
             }).fail(function(r) {
-                g.msg(r.responseText, 8);
+                ng.msg(r.responseText, 8);
             }).always(function(){
-                g.unlock();
+                ng.unlock();
             });
         }
     }

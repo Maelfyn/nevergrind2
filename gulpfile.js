@@ -68,7 +68,7 @@ return gulp.src([
 './js/beginWrap.js',
 './js/init.js',
 './js/create.js',
-'./js/g.js',
+'./js/ng.js',
 './js/env.js',
 './js/my.js',
 './js/dom.js',
@@ -77,6 +77,7 @@ return gulp.src([
 './js/audio.js',
 './js/game.js',
 './js/title.js',
+'./js/context.js',
 './js/events.js',
 './js/socket.js',
 './js/chat.js',
@@ -87,7 +88,6 @@ return gulp.src([
 './js/mob.js',
 './js/town.js',
 './js/route.js',
-'./js/context.js',
 './js/test.js',
 './js/endWrap.js'
 ])

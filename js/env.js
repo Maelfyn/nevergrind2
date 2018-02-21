@@ -5,8 +5,13 @@ var env = {
 	},
 	click: init.isMobile ? 'mousedown' : 'click',
 	context: init.isMobile ? 'mousedown' : 'click contextmenu',
+	resizeTimer: 0,
 	resizeWindow: function() {
 		// currently doing nothing
+		if (context.isOpen) {
+			context.hide();
+		}
+
 	},
 	isXbox: /Xbox/i.test(navigator.userAgent),
     isPlaystation: navigator.userAgent.toLowerCase().indexOf("playstation") >= 0,
