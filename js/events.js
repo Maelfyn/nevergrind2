@@ -109,29 +109,6 @@ $(document).on(env.click, function(e){
 			}
 		}
 	}
-}).on('keyup', function(e) {
-	var x = e.keyCode;
-	//console.info(x);
-	if (ng.view === 'title'){
-		if (x === 13){
-			if (ng.focusUpdateNationName){
-				title.submitNationName();
-			} else if (ng.focusGameName){
-				title.createGame();
-			} else if (title.chatOn){
-				if (x === 13){
-					// enter - sends chat
-					title.sendMsg();
-				}
-			} else if (title.createGameFocus){
-				title.createGame();
-			}
-		} else if (x === 27){
-			// esc
-			title.closeModal();
-		}
-	} else {
-	}
 });
 
 

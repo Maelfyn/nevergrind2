@@ -23,31 +23,107 @@ var context = {
 	})(),
 	click: function(id) {
 		console.info("click!", id, context.player);
+		context.action[ng.camel(id)]();
+		context.hide();
+	},
+	action: {
+		contextWhisper: function() {
+			chat.dom.chatInput.value = '';
+			chat.mode.change({
+				msg: '',
+				mode: '@',
+				name: context.player
+			});
+			chat.dom.chatInput.focus();
+		},
+		contextInvite: function() {
+			chat.sendMsg('/invite ' + context.player);
+		},
+		contextRemoveFriend: function() {
+			chat.sendMsg('/friend remove ' + context.player);
+		},
+		contextAddFriend: function() {
+			chat.sendMsg('/friend add ' + context.player);
+		},
+		contextRemoveIgnore: function() {
+			chat.sendMsg('/ignore remove ' + context.player);
+		},
+		contextAddIgnore: function() {
+			chat.sendMsg('/ignore add ' + context.player);
+		},
+		contextDisband: function() {
+			chat.sendMsg('/disband');
+		},
+		contextPromote: function() {
+			chat.sendMsg('/promote ' + context.player);
+		},
+		contextBoot: function() {
+			chat.sendMsg('/boot ' + context.player);
+		}
 	},
 	player: '',
-	getPartyMenu: function(name) {
-		context.player = name;
-		console.info('getPartyMenu', name);
-	},
-	setChatMenuHtml: function() {
+	setPartyMenuHtml: function() {
 		if (!context.player) return;
+		console.info('setPartyMenuHtml', context.player);
 
 		var z = ' class="context-items"',
-			s =
-			'<div id="context-invite" '+ z +'>Invite</div>'+
-			'<div id="context-whisper" '+ z +'>Whisper</div>'+
-			'<div id="context-friend" '+ z +'>Friend</div>'+
-			'<div id="context-ignore" '+ z +'>Ignore</div>';
+			s = '';
 
-		var e = document.getElementById('tooltip-social-wrap');
-		e.innerHTML = s;
-		e.style.top = context.position.y() + 'px';
-		e.style.left = context.position.x() + 'px';
-		e.style.visibility = 'visible';
-		context.isOpen = 1;
-		context.openDate = Date.now();
+		if (context.player === my.name) {
+			// commands only for me
+			// disband
+			s += '<div id="context-disband" '+ z +'>Disband</div>';
+		} else {
+			// promote
+			if (my.party[0].isLeader) {
+				s += '<div id="context-boot" '+ z +'>Boot</div>';
+				s += '<div id="context-promote" '+ z +'>Promote</div>';
+			}
+			// whisper
+			s += '<div id="context-whisper" '+ z +'>Whisper</div>';
+			// friend list
+			if (~ng.friends.indexOf(context.player)) {
+				s += '<div id="context-remove-friend" '+ z +'>Unfriend</div>';
+			}
+			else {
+				s += '<div id="context-add-friend" '+ z +'>Friend</div>';
+			}
+			// ignore list
+			if (~ng.ignore.indexOf(context.player)) {
+				s += '<div id="context-remove-ignore" '+ z +'>Unignore</div>';
+			}
+			else {
+				s += '<div id="context-add-ignore" '+ z +'>Ignore</div>';
+			}
+		}
+		context.show(s);
 	},
+	setChatMenuHtml: function() {
+		if (!context.player || context.player === my.name) return;
 
+		var z = ' class="context-items"',
+			s = '';
+		// is this guy in my party?
+		if (!~my.getPartyNames().indexOf(context.player)) {
+			s += '<div id="context-invite" '+ z +'>Invite</div>';
+		}
+		s += '<div id="context-whisper" '+ z +'>Whisper</div>';
+		// friend list
+		if (~ng.friends.indexOf(context.player)) {
+			s += '<div id="context-remove-friend" '+ z +'>Unfriend</div>';
+		}
+		else {
+			s += '<div id="context-add-friend" '+ z +'>Friend</div>';
+		}
+		// ignore list
+		if (~ng.ignore.indexOf(context.player)) {
+			s += '<div id="context-remove-ignore" '+ z +'>Unignore</div>';
+		}
+		else {
+			s += '<div id="context-add-ignore" '+ z +'>Ignore</div>';
+		}
+		context.show(s);
+	},
 	position: {
 		padding: 10,
 		halfWidth: ~~($("#tooltip-social-wrap").width() / 2),
@@ -77,9 +153,15 @@ var context = {
 			return my.mouse.y + yAdjust;
 		}
 	},
-	show: function() {
-		document.getElementById('tooltip-social-wrap').style.visibility  = 'visible';
+	show: function(s) {
+		if (!s) return;
+		var e = document.getElementById('tooltip-social-wrap');
+		e.innerHTML = s;
+		e.style.top = context.position.y() + 'px';
+		e.style.left = context.position.x() + 'px';
+		e.style.visibility = 'visible';
 		context.isOpen = 1;
+		context.openDate = Date.now();
 	},
 	hide: function() {
 		document.getElementById('tooltip-social-wrap').style.visibility  = 'hidden';
@@ -94,8 +176,10 @@ var context = {
 	},
 	getChatMenu: function(name) {
 		context.player = name;
-		console.info('getChatMenu', name, my.mouse.x, my.mouse.y);
-
 		context.setChatMenuHtml();
+	},
+	getPartyMenu: function(name) {
+		context.player = name;
+		context.setPartyMenuHtml();
 	}
 }

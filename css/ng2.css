@@ -1477,10 +1477,8 @@ background-clip: content-box;
 }
 ::-webkit-scrollbar-thumb {
 	/* draggable thing */
-	background-color: #248;
+	background-color: #58a;
 	/*background-image: -webkit-linear-gradient(top, #579 0%, #bdf 50%, #579 100%);*/
-	outline: 1px solid #0f0;
-	border-radius: 22%;
 }
 #scene-error {
 	padding: 30vh 10vw 0;
@@ -1615,7 +1613,7 @@ background-clip: content-box;
 	position: absolute;
 	visibility: hidden;
 	width: 8rem;
-	font: 1rem/1.5 Cinzel, Palatino Linotype, serif;
+	font: .9rem/1.5 Cinzel, Palatino Linotype, serif;
 	border: 2px ridge gold;
 	z-index: 2;
 	transform: translate(-50%, 0%);
@@ -1627,7 +1625,8 @@ background-clip: content-box;
 }
 .context-items {
 	cursor: pointer;
-	padding: .2rem .5rem;
+	white-space: nowrap;
+	padding: .1rem .5rem;
 	border-bottom: 1px solid #048;
 	-webkit-transition : background 100ms ease-out;
 	-moz-transition : background 100ms ease-out;

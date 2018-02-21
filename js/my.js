@@ -13,6 +13,13 @@ var my = {
 	leader: '',
 	isLeader: 0,
 	party: [],
+	getPartyNames: function(){
+		var a = [];
+		my.party.forEach(function(v){
+			v.name && a.push(v.name);
+		});
+		return a;
+	},
 	guild: [],
 	isLowestPartyIdMine: function() {
 		var lowestId = my.party[0].id;
@@ -62,7 +69,8 @@ var my = {
 	},
 	Party: function() {
 		return {
-			row: 0,
+			row: 0, // not updated from server - failing at life
+			id: 0, // when updated
 			name: '',
 			isLeader: 0,
 			job: '',

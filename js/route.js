@@ -42,10 +42,10 @@ var route = {
 				promote = 1;
 			}
 			my.party[slot] = my.Party();
-			console.info("%c party->bootme", "background: #ff0", promote);
+			//console.info("%c party->bootme", "background: #ff0", promote);
 			// only boot if I'm the lowest id!
 			if (my.isLowestPartyIdMine()) {
-				console.info('isLowestPartyIdMine ! YES PROMOTE! ', ng.copy(my.party));
+				//console.info('isLowestPartyIdMine ! YES PROMOTE! ', ng.copy(my.party));
 				chat.boot(data.name, 1);
 				if (my.partyCount() === 1) {
 					// disband if one-man party
@@ -54,13 +54,13 @@ var route = {
 				}
 				else if (promote) {
 					// otherwise promote this player to leader
-					console.info('PROMOTING: ', my.name);
+					//console.info('PROMOTING: ', my.name);
 					chat.promote(my.name, 1);
 				}
-				setTimeout(function(){
-					bar.getParty();
-				}, 1000);
 			}
+			setTimeout(function(){
+				bar.getParty();
+			}, 1000);
 		}
 	}
 };

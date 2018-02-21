@@ -157,7 +157,7 @@ var chat = {
 				a2 = text.split(":"),
 				name = a2[1].replace(/\]/g, '').trim();
 
-			console.info('id name ', playerId, name);
+			// console.info('id name ', playerId, name);
 			context.getChatMenu(name);
 		});
 
@@ -238,8 +238,8 @@ var chat = {
 		}
 	},
 	// player hit ENTER
-	sendMsg: function(bypass){
-		var msg = chat.dom.chatInput.value.trim(),
+	sendMsg: function(input){
+		var msg = input || chat.dom.chatInput.value.trim(),
 			msgLower = msg.toLowerCase();
 
 		// bypass via ENTER or chat has focus
@@ -345,6 +345,9 @@ var chat = {
 			// whisper
 			if (my.name !== chat.mode.name) {
 				chat.updateHistory(msg);
+				if (~ng.ignore.indexOf(chat.mode.name)) {
+					chat.log('You sent ' + chat.mode.name + ' a whisper, but you are currently ignoring him.', 'chat-warning');
+				}
 				$.ajax({
 					url: app.url + 'php2/chat/send.php',
 					data: {
@@ -357,7 +360,7 @@ var chat = {
 			}
 		}
 		else {
-			if (bypass || chat.hasFocus) {
+			if (chat.hasFocus) {
 				if (msg) {
 					var o = chat.getMsgObject(msg);
 					if (o.msg[0] !== '/') {
@@ -898,6 +901,9 @@ var chat = {
 							')</div>';
 					});
 					chat.log(str, 'chat-whisper');
+				}
+				else if (!jobLong) {
+					chat.log("No results found. Try searching by a class name /who cleric.", "chat-warning");
 				}
 				else {
 					chat.log("Currently there are no " + jobLong + "s in Vandamor.", "chat-warning");

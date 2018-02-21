@@ -1,15 +1,22 @@
 // test methods
 var test = {
-	chatRoom: function(){
-		for (var i=0; i<100; i++) {
-			var c = ng.toJobShort(ng.jobs[~~(Math.random() * 14)]);
-			socket.zmq.publish(chat.getChannel(), {
-				route: 'chat->add',
-				row: ~~(Math.random() * 9999),
-				level: Math.ceil(Math.random() * 50),
-				job: c,
-				name: 'WWWWWWWWWWWWWWWW'
-			});
+	chat: {
+		room: function(){
+			for (var i=0; i<100; i++) {
+				var c = ng.toJobShort(ng.jobs[~~(Math.random() * 14)]);
+				socket.zmq.publish(chat.getChannel(), {
+					route: 'chat->add',
+					row: ~~(Math.random() * 9999),
+					level: Math.ceil(Math.random() * 50),
+					job: c,
+					name: 'WWWWWWWWWWWWWWWW'
+				});
+			}
+		},
+		log: function() {
+			for (var i=0; i<10; i++) {
+				chat.sendMsg('/flist');
+			}
 		}
 	},
 	orcs: function(){

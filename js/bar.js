@@ -23,9 +23,10 @@ var bar = {
 		$("#bar-wrap").on(env.click, '.bar-col-icon', function(e){
 			var id = $(this).attr('id'),
 				arr = id.split("-"),
-				playerId = arr[3] * 1;
+				slot = arr[3] * 1;
 
-			console.info(id, playerId);
+			console.info(id, slot, my.party[slot].name);
+			context.getPartyMenu(my.party[slot].name);
 		});
 	},
 	dom: {},
@@ -111,6 +112,10 @@ var bar = {
 					chat.promote(my.getNewLeaderName(), 1);
 				}
 			}
+			// disband if it's me
+			// console.info('disband: ', data.row, my.id);
+			data.row === my.row && chat.sendMsg('/disband');
+
 		},
 		promote: function(data) {
 			chat.log(data.name + " has been promoted to party leader.", 'chat-warning');
@@ -121,6 +126,7 @@ var bar = {
 			console.info('bar.party.boot ', data);
 			chat.log(data.name + " has been booted from the party.", 'chat-warning');
 			// refresh party bars
+			data.row *= 1;
 			bar.party.disband(data);
 			bar.getParty();
 		}
@@ -135,7 +141,7 @@ var bar = {
 				console.info('getParty ', data.party);
 				var npIndex = 1;
 				data.party.forEach(function(v, i){
-					// console.info('SET BARS ', i, v);
+					console.info('SET BARS ', i, v);
 					if (v.name === my.name) {
 						my.party[0] = v;
 						bar.updatePlayerBar(0);
@@ -149,6 +155,7 @@ var bar = {
 				var len = data.party.length;
 				for (var i=len; i<game.maxPlayers; i++) {
 					document.getElementById('bar-player-wrap-' + i).style.display = 'none';
+					my.party[i] = my.Party();
 				}
 				// continue here
 				// TODO: /disband remove bar when person leaves party
