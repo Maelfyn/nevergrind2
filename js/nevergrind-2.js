@@ -91,7 +91,7 @@ var create = {
 	},
 	events: function(x){
 		$("#logout").on(x, function() {
-			g.logout();
+			ng.logout();
 		});
 		$("#ch-card-base").on(x, '.ch-card', function(){
 			$('.ch-card').removeClass('ch-card-active');
@@ -100,7 +100,7 @@ var create = {
 		$('.ch-card:first').trigger(x);
 		// create character
 		$("#go-create-character").on(x, function(){
-			g.goCreateCharacter();
+			ng.goCreateCharacter();
 		});
 		$("#delete-character").on(x, function(){
 			modal.show({
@@ -147,8 +147,8 @@ var create = {
 			}
 		});
 		$("#create-character-back").on(x, function(){
-			g.lock(1);
-			g.initGame();
+			ng.lock(1);
+			ng.initGame();
 			var z = document.getElementById('scene-title-create-character');
 			TweenMax.to(z, .6, {
 				y: 20,
@@ -167,7 +167,7 @@ var create = {
 						y: 0,
 						opacity: 1,
 						onComplete: function(){
-							g.unlock();
+							ng.unlock();
 						}
 					});
 				}
@@ -175,9 +175,9 @@ var create = {
 		});
 		$("#create-character-btn").on(x, function(){
 			//client-side validation
-			if (!g.locked){
+			if (!ng.locked){
 				
-			g.lock(1);
+			ng.lock(1);
 			var f = create.form,
 				err = '';
 			if (!f.name){
@@ -191,11 +191,11 @@ var create = {
 				err = 'You must spend all of your ability points!';
 			}
 			if (err){
-				g.msg(err);
-				g.unlock();
+				ng.msg(err);
+				ng.unlock();
 			} else {
 				// final adds
-				f.shortJob = g.toJobShort(f.job);
+				f.shortJob = ng.toJobShort(f.job);
 				// send to server
 				$.ajax({
 					url: app.url + 'php2/create/create-character.php',
@@ -204,11 +204,11 @@ var create = {
 					}
 				}).done(function(r){
 					console.info('Created character: ', r);
-					g.msg(r.hero.name + ' has been created!');
+					ng.msg(r.hero.name + ' has been created!');
 					$("#create-character-back").trigger(x);
 				}).fail(function(r){
-					g.msg(r.responseText, 8);
-					g.unlock();
+					ng.msg(r.responseText, 8);
+					ng.unlock();
 				});
 			}
 			
@@ -222,8 +222,8 @@ var create = {
 	},
 	deleteCharacter: function(){
 		// send to server
-		if (!g.locked){
-			g.lock();
+		if (!ng.locked){
+			ng.lock();
 			$.ajax({
 				url: app.url + 'php2/create/delete-character.php',
 				data: {
@@ -231,12 +231,12 @@ var create = {
 				}
 			}).done(function(r){
 				console.info('Deleted character: ', r);
-				g.msg(create.name + ' has been deleted!');
+				ng.msg(create.name + ' has been deleted!');
 				modal.hide();
-				g.initGame();
+				ng.initGame();
 			}).fail(function(r){
-				g.msg(r.responseText, 8);
-				g.unlock();
+				ng.msg(r.responseText, 8);
+				ng.unlock();
 			});
 		}
 	},
@@ -291,28 +291,28 @@ var create = {
 	set: function(key, val){
 		document.getElementById(key + '-value').innerHTML = create.form[key] = val;
 		// details
-		g.split('create-details', create.msg(key, val));
+		ng.split('create-details', create.msg(key, val));
 		if (key === 'job'){
 			document.getElementById('type-value').innerHTML = create.types[val];
 		}
 		// resists
-		g.resists.forEach(function(v, i){
+		ng.resists.forEach(function(v, i){
 			document.getElementById(v + '-value').innerHTML = create.getResist(v);
 		});
 		// dungeon
-		g.dungeon.forEach(function(v, i){
+		ng.dungeon.forEach(function(v, i){
 			document.getElementById(v + '-value').innerHTML = create.getDungeon(v);
 		});
 		// reset attr
 		if (key !== 'gender' && create.form.race){
-			var raceAttr = g.copy(create.getRaceAttrs(create.form.race)),
-				jobAttr = g.copy(create.getJobAttrs(create.form.job));
+			var raceAttr = ng.copy(create.getRaceAttrs(create.form.race)),
+				jobAttr = ng.copy(create.getJobAttrs(create.form.job));
 			jobAttr.forEach(function(v, i){
 				raceAttr[i] += v;
 			});
 			// set initial attr values
 			$(".create-attr-value").removeClass('active');
-			g.attrs.forEach(function(v, i){
+			ng.attrs.forEach(function(v, i){
 				var e = document.getElementById('create-points-' + v);
 				e.innerHTML = create.form[v] = create.base[v] = raceAttr[i];
 				if (jobAttr[i]){
@@ -589,19 +589,19 @@ var create = {
 
 
 // core.js
-var g = {
+var ng = {
 	id: 0,
 	getId: function() {
-		g.id++;
-		if (g.id > 999999999) {
-			g.id = 1;
+		ng.id++;
+		if (ng.id > 999999999) {
+			ng.id = 1;
 		}
-		return g.id;
+		return ng.id;
 	},
 	events: function(){
 		$(window).focus(function(){
 			/*document.title = g.defaultTitle;
-			g.titleFlashing = false;*/
+			ng.titleFlashing = false;*/
 			// my.name && socket.init(1);
 		});
 		// should be delegating no drag start
@@ -630,12 +630,12 @@ var g = {
 		$(window).on('resize orientationchange focus', function() {
 			// env.resizeWindow();
 			// debounce resize
-			clearTimeout(g.resizeTimer);
-			g.resizeTimer = setTimeout(function(){
+			clearTimeout(ng.resizeTimer);
+			ng.resizeTimer = setTimeout(function(){
 				if (chat.initialized) {
 					chat.scrollBottom();
 				}
-				if (g.view === 'battle') {
+				if (ng.view === 'battle') {
 					for (var i=0; i<mob.max; i++) {
 						mob.sizeMob(mobs[i]);
 					}
@@ -646,7 +646,7 @@ var g = {
 		});
 	},
 	disconnect: function(msg) {
-		g.view = 'disconnected';
+		ng.view = 'disconnected';
 		// turn off all events
 		$(document).add('*').off();
 		$("main > *").css('display', 'none');
@@ -705,7 +705,7 @@ var g = {
 		Wizard: 'WIZ'
 	},
 	toJobShort: function(key){
-		return g.jobShort[key];
+		return ng.jobShort[key];
 	},
 	jobLong: {
 		BRD: 'Bard',
@@ -724,7 +724,7 @@ var g = {
 		WIZ: 'Wizard'
 	},
 	toJobLong: function(key){
-		return g.jobLong[key];
+		return ng.jobLong[key];
 	},
 	copy: function(o){
 		return JSON.parse(JSON.stringify(o));
@@ -758,7 +758,7 @@ var g = {
 		$(".scene").removeClass('none')
 			.css('display', 'none');
 		document.getElementById('scene-' + scene).style.display = 'block';
-		g.view = scene;
+		ng.view = scene;
 	},
 	camel: function(str){
 		str = str.split("-");
@@ -768,26 +768,26 @@ var g = {
 		return str.join("");
 	},
 	lock: function(hide){
-		g.lockOverlay.style.display = "block";
-		g.lockOverlay.style.opacity = hide ? 0 : 1;
-		g.locked = 1;
+		ng.lockOverlay.style.display = "block";
+		ng.lockOverlay.style.opacity = hide ? 0 : 1;
+		ng.locked = 1;
 	},
 	unlock: function(){
-		g.lockOverlay.style.display = "none";
-		g.locked = 0;
+		ng.lockOverlay.style.display = "none";
+		ng.locked = 0;
 	},
 	unlockFade: function(d){
 		if (!d){
 			d = 1;
 		}
-		TweenMax.to(g.lockOverlay, d, {
+		TweenMax.to(ng.lockOverlay, d, {
 			startAt: {
 				opacity: 1,
 			},
 			ease: Power3.easeIn,
 			opacity: 0,
 			onComplete: function(){
-				g.lockOverlay.style.display = 'none';
+				ng.lockOverlay.style.display = 'none';
 			}
 		});
 	},
@@ -801,18 +801,18 @@ var g = {
 			}).done(function(data){
 				data.latitude += '';
 				data.longitude += '';
-				g.geo = data;
+				ng.geo = data;
 				$.ajax({
 					url: app.url + 'php/updateUserInfo.php',
 					data: {
-						location: g.geo
+						location: ng.geo
 					}
 				}).done(function(){
-					localStorage.setItem('geo', JSON.stringify(g.geo));
+					localStorage.setItem('geo', JSON.stringify(ng.geo));
 					localStorage.setItem('geoSeason', 1);
 					localStorage.setItem('geoTime', Date.now());
 				});
-				//console.info('loc: ', g.geo);
+				//console.info('loc: ', ng.geo);
 			});
 		}
 	},
@@ -824,15 +824,15 @@ var g = {
 		if (geoTime !== null || geoSeason === null){
 			// longer than 90 days?
 			if ((Date.now() - geoTime) > 7776000 || geoSeason === null){
-				g.updateUserInfo();
+				ng.updateUserInfo();
 			}
 		} else if (geo === null){
-			g.updateUserInfo();
+			ng.updateUserInfo();
 		}
 		// ignore list
 		var ignore = localStorage.getItem('ignore');
 		if (ignore !== null){
-			g.ignore = JSON.parse(ignore);
+			ng.ignore = JSON.parse(ignore);
 		} else {
 			var foo = []; 
 			localStorage.setItem('ignore', JSON.stringify(foo));
@@ -857,7 +857,7 @@ var g = {
 			type: 'GET',
 			url: app.url + "php/keepAlive.php"
 		}).always(function() {
-			setTimeout(g.keepAlive, 120000);
+			setTimeout(ng.keepAlive, 120000);
 		});
 	},
 	msg: function(msg, d){
@@ -916,7 +916,7 @@ var g = {
 		}
 	},
 	logout: function(){
-		g.lock();
+		ng.lock();
 		// socket.removePlayer(my.account);
 		$.ajax({
 			type: 'GET',
@@ -944,22 +944,22 @@ var g = {
 				type: 'GET',
 				url: app.url + 'php/logout.php'
 			}).done(function(data) {
-				g.msg("Logout successful");
+				ng.msg("Logout successful");
 				localStorage.removeItem('email');
 				localStorage.removeItem('token');
 				location.reload();
 			}).fail(function() {
-				g.msg("Logout failed.");
+				ng.msg("Logout failed.");
 			});
 		}, 1000);
 	},
 	goCreateCharacter: function(){
-		g.lock(1);
+		ng.lock(1);
 		var z = '#scene-title-select-character',
 			prom = 0,
 			allDone = function(){
 				if (++prom === 2){
-					g.unlock();
+					ng.unlock();
 					// init create screen and show
 					TweenMax.set(z, {
 						display: 'none',
@@ -977,7 +977,7 @@ var g = {
 						opacity: 1,
 						onComplete: function(){
                             $("#create-character-name").focus();
-							g.unlock();
+							ng.unlock();
 						}
 					});
 				}
@@ -996,12 +996,12 @@ var g = {
 			url: app.url + 'php2/create/getStatMap.php'
 		}).done(function(r){
 			var r = r.statMap;
-			g.races.forEach(function(v){
+			ng.races.forEach(function(v){
 				create.raceAttrs[v] = r[v].attrs;
 				create.possibleJobs[v] = r[v].jobs;
 			});
 			// job stats
-			g.jobs.forEach(function(v){
+			ng.jobs.forEach(function(v){
 				create.jobAttrs[v] = r.jobs[v];
 			});
             $("#create-character-name").val('');
@@ -1018,8 +1018,8 @@ var g = {
 			if (r.account) {
 				app.account = my.account = r.account; // for global reference
 				document.getElementById('logout').textContent = 'Logout ' + r.account;
-				g.displayAllCharacters(r.characterData);
-				g.checkPlayerData();
+				ng.displayAllCharacters(r.characterData);
+				ng.checkPlayerData();
 				$("#login-modal").remove();
 			}
 			else {
@@ -1048,7 +1048,7 @@ var g = {
 				'data-name="'+ d.name +'" '+
 				'class="btn btn-lg ch-card center select-player-card">'+
 				'<div class="ch-card-name">'+ d.name +'</div>'+
-				'<div class="ch-card-details">'+ d.level +' '+ d.race +' '+ g.toJobLong(d.job) +'</div>'+
+				'<div class="ch-card-details">'+ d.level +' '+ d.race +' '+ ng.toJobLong(d.job) +'</div>'+
 				'</div>';
 		});
 		document.getElementById('ch-card-list').innerHTML = s;
@@ -1056,7 +1056,7 @@ var g = {
 	}
 };
 
-g.init = (function(){
+ng.init = (function(){
 	// console.info("Initializing game...");
 	$.ajaxSetup({
 		type: 'POST',
@@ -1071,8 +1071,13 @@ var env = {
 	},
 	click: init.isMobile ? 'mousedown' : 'click',
 	context: init.isMobile ? 'mousedown' : 'click contextmenu',
+	resizeTimer: 0,
 	resizeWindow: function() {
 		// currently doing nothing
+		if (context.isOpen) {
+			context.hide();
+		}
+
 	},
 	isXbox: /Xbox/i.test(navigator.userAgent),
     isPlaystation: navigator.userAgent.toLowerCase().indexOf("playstation") >= 0,
@@ -1122,11 +1127,18 @@ var my = {
 	leader: '',
 	isLeader: 0,
 	party: [],
+	getPartyNames: function(){
+		var a = [];
+		my.party.forEach(function(v){
+			v.name && a.push(v.name);
+		});
+		return a;
+	},
 	guild: [],
 	isLowestPartyIdMine: function() {
 		var lowestId = my.party[0].id;
 		my.party.forEach(function(v) {
-			if (v.id < lowestId) {
+			if (v.id && v.id < lowestId) {
 				lowestId = v.id;
 			}
 		});
@@ -1151,10 +1163,29 @@ var my = {
 		});
 		return id;
 	},
-	partyDefault: function() {
+	getPartySlotByRow: function(id) {
+		var slot = 0;
+		my.party.forEach(function(v, i) {
+			if (v.id === id) {
+				slot = i;
+			}
+		});
+		return slot;
+	},
+	partyCount: function() {
+		var count = 0;
+		my.party.forEach(function(v, i) {
+			if (v.name) {
+				count++;
+			}
+		});
+		return count;
+	},
+	Party: function() {
 		return {
-			row: 0,
-			name: '&nbsp;',
+			row: 0, // not updated from server - failing at life
+			id: 0, // when updated
+			name: '',
 			isLeader: 0,
 			job: '',
 			level: 0,
@@ -1168,7 +1199,7 @@ var my = {
 	slot: 1,
 	tgt: 1,
 	attackOn: false,
-	hudTimer: g.TDC(),
+	hudTimer: ng.TDC(),
 	hud: function(msg, d){
 		my.hudTimer.kill();
 		DOM.hud.style.visibility = 'visible';
@@ -1187,15 +1218,15 @@ var my = {
 	},
 	nextTarget: function(backwards){},
 	exitGame: function(bypass){
-		if (g.view === 'game'){
+		if (ng.view === 'game'){
 			var r = confirm("Are you sure you want to surrender?");
 		}
-		if (r || bypass || g.view !== 'game'){
-			g.lock(1);
+		if (r || bypass || ng.view !== 'game'){
+			ng.lock(1);
 			$.ajax({
 				url: app.url + 'php/exitGame.php',
 				data: {
-					view: g.view
+					view: ng.view
 				}
 			}).always(function(){
 				location.reload();
@@ -1221,7 +1252,7 @@ var modal = {
 	wrap: document.getElementById('modal-wrap'),
 	show: function(e){
 		modal.isOpen = 1;
-		e.camelKey = g.camel(e.key);
+		e.camelKey = ng.camel(e.key);
 		var s = '<div class="stag-blue">'+
 					modal.header(e) +
 					modal.body(e) +
@@ -1269,7 +1300,7 @@ var modal = {
 			alpha: 0,
 			onComplete: function(){
 				modal.isOpen = 0;
-				g.unlock();
+				ng.unlock();
 				TweenMax.set(this.target, {
 					visibility: 'hidden'
 				});
@@ -1392,16 +1423,16 @@ var audio = {
 		if (foo) {
 			if (bg){
 				// music
-				if (g.config.audio.musicVolume){
+				if (ng.config.audio.musicVolume){
 					dom.bgmusic.pause();
 					dom.bgmusic.src = "music/" + foo + ".mp3";
-					dom.bgmusic.volume = g.config.audio.musicVolume / 100;
+					dom.bgmusic.volume = ng.config.audio.musicVolume / 100;
 				}
 			} else {
 				// sfx
-				if (g.config.audio.soundVolume){
+				if (ng.config.audio.soundVolume){
 					var sfx = new Audio("sound/" + foo + ".mp3");
-					sfx.volume = g.config.audio.soundVolume / 100;
+					sfx.volume = ng.config.audio.soundVolume / 100;
 					sfx.play();
 				}
 			}
@@ -1409,11 +1440,11 @@ var audio = {
 	},
 	save: function(){
 		// save to storage
-		var foo = JSON.stringify(g.config); 
+		var foo = JSON.stringify(ng.config);
 		localStorage.setItem('config', foo);
 	},
 	setMusicVolume: function(val){
-		if (g.config.audio.musicVolume){
+		if (ng.config.audio.musicVolume){
 			if (!val){
 				audio.pause();
 			}
@@ -1422,18 +1453,18 @@ var audio = {
 			audio.musicStart();
 		}
 		dom.bgmusic.volume = val / 100;
-		g.config.audio.musicVolume = val;
+		ng.config.audio.musicVolume = val;
 		audio.save();
 	},
 	setSoundVolume: function(val){
-		g.config.audio.soundVolume = val;
+		ng.config.audio.soundVolume = val;
 		audio.save();
 	},
 	pause: function(){
 		dom.bgmusic.pause();
 	},
 	gameMusicInit: function(){
-		if (g.config.audio.musicVolume){
+		if (ng.config.audio.musicVolume){
 			audio.pause();
 			dom.bgmusic.loop = false;
 			audio.gameMusicPlayNext();
@@ -1459,7 +1490,7 @@ var audio = {
 		var nowPlaying = audio.tracks[++audio.trackIndex % audio.totalTracks];
 		dom.bgmusic.pause();
 		dom.bgmusic.src = "music/" + nowPlaying +".mp3";
-		dom.bgmusic.volume = g.config.audio.musicVolume / 100;
+		dom.bgmusic.volume = ng.config.audio.musicVolume / 100;
 		dom.bgmusic.onended = function(){
 			audio.gameMusicPlayNext();
 		}
@@ -1467,7 +1498,7 @@ var audio = {
 	},
 	fade: function(){
 		var x = {
-			vol: g.config.audio.musicVolume / 100
+			vol: ng.config.audio.musicVolume / 100
 		}
 		TweenMax.to(x, 2.5, {
 			vol: 0,
@@ -1499,7 +1530,7 @@ var audio = {
 		}
 	},
 	musicStart: function(){
-		if (g.view !== 'game'){
+		if (ng.view !== 'game'){
 			// audio.play("ArcLight", 1);
 			// audio.play("WaitingBetweenWorlds", 1);
 		} else {
@@ -1515,13 +1546,13 @@ audio.init = (function(){
 		audio.save();
 	} else {
 		var foo = JSON.parse(config);
-		if (g.config.audio.musicOn === undefined){
-			g.config.audio = foo.audio;
+		if (ng.config.audio.musicOn === undefined){
+			ng.config.audio = foo.audio;
 		}
 	}
 	// console.info("Initializing audio...", g.config.audio);
 	audio.load.title();
-	if (!g.config.audio.musicVolume){
+	if (!ng.config.audio.musicVolume){
 		audio.pause();
 	} else {
 		audio.musicStart();
@@ -1532,35 +1563,35 @@ audio.init = (function(){
 		e.slider({
 			min  : 0, 
 			max  : 100, 
-			value: g.config.audio.musicVolume, 
+			value: ng.config.audio.musicVolume,
 			formatter: function(value) {
 				if (initComplete){
 					audio.setMusicVolume(value);
 					return value;
 				} else {
-					return g.config.audio.musicVolume;
+					return ng.config.audio.musicVolume;
 				}
 			}
-		}).slider('setValue', g.config.audio.musicVolume);
+		}).slider('setValue', ng.config.audio.musicVolume);
 	}
 	var e = $("#musicSlider");
 	if (e.length){
 		$("#soundSlider").slider({
 			min  : 0, 
 			max  : 100, 
-			value: g.config.audio.soundVolume, 
+			value: ng.config.audio.soundVolume,
 			tooltip_position: 'bottom',
 			formatter: function(value) {
 				if (initComplete){
 					audio.setSoundVolume(value);
 					return value;
 				} else {
-					return g.config.audio.soundVolume
+					return ng.config.audio.soundVolume
 				}
 			}
 		}).on('slideStop', function(val){
 			audio.play('machine0');
-		}).slider('setValue', g.config.audio.soundVolume);
+		}).slider('setValue', ng.config.audio.soundVolume);
 	}
 	initComplete = true;
 })();
@@ -1617,7 +1648,7 @@ var game = {
 				socket.healthTime = Date.now();
 				socket.startHealthCheck();
 				socket.zmq.publish('hb:' + my.name, {});
-			}, 20000);
+			}, 60000);
 		}
 	},
 	played: {
@@ -1629,12 +1660,35 @@ var game = {
 					type: 'GET',
 					url: app.url + 'php2/update-played.php'
 				}).done(function(){
+					// nada
 				}).fail(function(){
 					setTimeout(function(){
 						game.played.start();
 					}, 5000);
+				}).always(function(){
+					!app.isLocal && console.clear();
 				});
 			}, 60000);
+		}
+	},
+	exit: function() {
+		// from town
+		if (socket.enabled) {
+			chat.broadcast.remove();
+			if (my.p_id) {
+				// boot from party
+				socket.zmq.publish('party:' + my.p_id, {
+					id: my.row,
+					name: my.name,
+					route: 'party->bootme'
+				});
+			}
+			// notify friends
+			socket.zmq.publish('friend:' + my.name, {
+				name: my.name,
+				route: 'off'
+			});
+			socket.zmq.close();
 		}
 	},
 	getGameState: function(){
@@ -1705,37 +1759,213 @@ var title = {
 	init: (function(){
 		$(document).ready(function(){
 			// console.info("Initializing title screen...");
-			g.initGame();
-			clearTimeout(game.heartbeat.timer);
-			game.heartbeat.timer = setTimeout(function(){
-				g.keepAlive();
-			}, 180000);
-			// init events
-			var x = env.click;
-			g.events(x);
-			create.events(x);
-			audio.events();
+			setTimeout(function() {
+				ng.initGame();
+				clearTimeout(game.heartbeat.timer);
+				game.heartbeat.timer = setTimeout(function(){
+					ng.keepAlive();
+				}, 180000);
+				// init events
+				var x = env.click;
+				ng.events(x);
+				create.events(x);
+				audio.events();
+			}, 100);
 		});
 	})(),
 	test: function() {
 		// nada
 	}
 };
+var context = {
+	timer: 0,
+	openDate: 0,
+	isInside: 0,
+	isOpen: 0,
+	init: (function(){
+		var e = $("#tooltip-social-wrap");
+		e.on(env.click, '.context-items', function(e){
+			console.info('context-items clicked: ', $(this).attr('id'));
+			context.click($(this).attr('id'));
+		});
+
+		e.on('mouseenter', function() {
+			context.isInside = 1;
+		}).on('mouseleave', function() {
+			context.isInside = 0;
+			clearTimeout(context.timer);
+			setTimeout(function() {
+				if (!context.isInside) {
+				}
+			}, 1000);
+		});
+	})(),
+	click: function(id) {
+		console.info("click!", id, context.player);
+		context.action[ng.camel(id)]();
+		context.hide();
+	},
+	action: {
+		contextWhisper: function() {
+			chat.dom.chatInput.value = '';
+			chat.mode.change({
+				msg: '',
+				mode: '@',
+				name: context.player
+			});
+			chat.dom.chatInput.focus();
+		},
+		contextInvite: function() {
+			chat.sendMsg('/invite ' + context.player);
+		},
+		contextRemoveFriend: function() {
+			chat.sendMsg('/friend remove ' + context.player);
+		},
+		contextAddFriend: function() {
+			chat.sendMsg('/friend add ' + context.player);
+		},
+		contextRemoveIgnore: function() {
+			chat.sendMsg('/ignore remove ' + context.player);
+		},
+		contextAddIgnore: function() {
+			chat.sendMsg('/ignore add ' + context.player);
+		},
+		contextDisband: function() {
+			chat.sendMsg('/disband');
+		},
+		contextPromote: function() {
+			chat.sendMsg('/promote ' + context.player);
+		},
+		contextBoot: function() {
+			chat.sendMsg('/boot ' + context.player);
+		}
+	},
+	player: '',
+	setPartyMenuHtml: function() {
+		if (!context.player) return;
+		console.info('setPartyMenuHtml', context.player);
+
+		var z = ' class="context-items"',
+			s = '';
+
+		if (context.player === my.name) {
+			// commands only for me
+			// disband
+			s += '<div id="context-disband" '+ z +'>Disband</div>';
+		} else {
+			// promote
+			if (my.party[0].isLeader) {
+				s += '<div id="context-boot" '+ z +'>Boot</div>';
+				s += '<div id="context-promote" '+ z +'>Promote</div>';
+			}
+			// whisper
+			s += '<div id="context-whisper" '+ z +'>Whisper</div>';
+			// friend list
+			if (~ng.friends.indexOf(context.player)) {
+				s += '<div id="context-remove-friend" '+ z +'>Unfriend</div>';
+			}
+			else {
+				s += '<div id="context-add-friend" '+ z +'>Friend</div>';
+			}
+			// ignore list
+			if (~ng.ignore.indexOf(context.player)) {
+				s += '<div id="context-remove-ignore" '+ z +'>Unignore</div>';
+			}
+			else {
+				s += '<div id="context-add-ignore" '+ z +'>Ignore</div>';
+			}
+		}
+		context.show(s);
+	},
+	setChatMenuHtml: function() {
+		if (!context.player || context.player === my.name) return;
+
+		var z = ' class="context-items"',
+			s = '';
+		// is this guy in my party?
+		if (!~my.getPartyNames().indexOf(context.player)) {
+			s += '<div id="context-invite" '+ z +'>Invite</div>';
+		}
+		s += '<div id="context-whisper" '+ z +'>Whisper</div>';
+		// friend list
+		if (~ng.friends.indexOf(context.player)) {
+			s += '<div id="context-remove-friend" '+ z +'>Unfriend</div>';
+		}
+		else {
+			s += '<div id="context-add-friend" '+ z +'>Friend</div>';
+		}
+		// ignore list
+		if (~ng.ignore.indexOf(context.player)) {
+			s += '<div id="context-remove-ignore" '+ z +'>Unignore</div>';
+		}
+		else {
+			s += '<div id="context-add-ignore" '+ z +'>Ignore</div>';
+		}
+		context.show(s);
+	},
+	position: {
+		padding: 10,
+		halfWidth: ~~($("#tooltip-social-wrap").width() / 2),
+		x: function() {
+			if (my.mouse.x < context.position.halfWidth) {
+				// too small
+				my.mouse.x += context.position.halfWidth / 2;
+				if (my.mouse.x < 80) {
+					my.mouse.x = 80;
+				}
+			}
+			else if (my.mouse.x > window.innerWidth - context.position.halfWidth) {
+				// too big
+				my.mouse.x -= context.position.halfWidth / 2;
+				var z = window.innerWidth - 80;
+				if (my.mouse.x > z) {
+					my.mouse.x = z;
+				}
+
+			}
+			return my.mouse.x;
+		},
+		y: function() {
+			// determine Y adjustment
+			var isMenuAbove = my.mouse.y < window.innerHeight/2,
+				yAdjust = isMenuAbove ? 15 : (~~$("#tooltip-social-wrap").height() + 15) * -1;
+			return my.mouse.y + yAdjust;
+		}
+	},
+	show: function(s) {
+		if (!s) return;
+		var e = document.getElementById('tooltip-social-wrap');
+		e.innerHTML = s;
+		e.style.top = context.position.y() + 'px';
+		e.style.left = context.position.x() + 'px';
+		e.style.visibility = 'visible';
+		context.isOpen = 1;
+		context.openDate = Date.now();
+	},
+	hide: function() {
+		document.getElementById('tooltip-social-wrap').style.visibility  = 'hidden';
+		context.isOpen = 0;
+	},
+	hideCheck: function() {
+		if (context.isOpen) {
+			if (Date.now() - context.openDate > 100 && !context.isInside) {
+				context.hide();
+			}
+		}
+	},
+	getChatMenu: function(name) {
+		context.player = name;
+		context.setChatMenuHtml();
+	},
+	getPartyMenu: function(name) {
+		context.player = name;
+		context.setPartyMenuHtml();
+	}
+}
+
 onbeforeunload = function(){
 	// attempt to remove player from game
-	$.ajax({
-		type: 'GET',
-		url: app.url + 'php2/chat/camp.php'
-	});
-	chat.broadcast.remove();
-	if (socket.enabled) {
-		socket.zmq.publish('friend:' + my.name, {
-			name: my.name,
-			route: 'off'
-		});
-		chat.disband();
-		socket.zmq.close();
-	}
+	game.exit();
 }
 
 $(document).on(env.click, function(e){
@@ -1746,7 +1976,7 @@ $(document).on(env.click, function(e){
 	var code = e.keyCode,
 		key = e.key;
 
-	g.lastKey = key;
+	ng.lastKey = key;
 
 	app.isLocal && console.info('keydown: ', key, code);
 	// local only
@@ -1782,8 +2012,8 @@ $(document).on(env.click, function(e){
 			e.preventDefault();
 		}
 	} else {
-		if (g.view === 'title'){
-			if (!g.isModalOpen){
+		if (ng.view === 'title'){
+			if (!ng.isModalOpen){
 				$("#create-character-name").focus();
 			}
 		} else {
@@ -1815,7 +2045,7 @@ $(document).on(env.click, function(e){
 				}
 			}
 
-			if (g.view === 'town') {
+			if (ng.view === 'town') {
 				if (chat.hasFocus) {
 					if (chat.mode.change()) {
 						// changing chat mode - matches possible mode change
@@ -1837,42 +2067,24 @@ $(document).on(env.click, function(e){
 					e.preventDefault();
 				} else if (code === 86) {
 					// v
-					if (g.view === 'game' && !g.chatOn) {
+					if (ng.view === 'game' && !ng.chatOn) {
 						game.toggleGameWindows(1);
 					}
 				}
 			}
 		}
 	}
-}).on('keyup', function(e) {
-	var x = e.keyCode;
-	//console.info(x);
-	if (g.view === 'title'){
-		if (x === 13){
-			if (g.focusUpdateNationName){
-				title.submitNationName();
-			} else if (g.focusGameName){
-				title.createGame();
-			} else if (title.chatOn){
-				if (x === 13){
-					// enter - sends chat
-					title.sendMsg();
-				}
-			} else if (title.createGameFocus){
-				title.createGame();
-			}
-		} else if (x === 27){
-			// esc
-			title.closeModal();
-		}
-	} else {
-	}
 });
 
 
-$(window).on("mousemove", function(e){
+$(window).on('mousemove', function(e){
 	my.mouse.x = e.clientX;
 	my.mouse.y = e.clientY;
+}).on('resize', function(){
+	context.hide();
+	clearTimeout(context.resizeTimer);
+	context.resizeTimer = setTimeout(function(){
+	}, 100);
 });
 // ws.js
 var socket = {
@@ -1891,7 +2103,7 @@ var socket = {
 				// game updates
 				console.info("Subscribing to game:" + game.id);
 				socket.zmq.subscribe('game:' + game.id, function(topic, data) {
-					if (g.ignore.indexOf(data.account) === -1){
+					if (ng.ignore.indexOf(data.account) === -1){
 						title.chatReceive(data);
 					}
 				});
@@ -1963,7 +2175,7 @@ var socket = {
 	},
 	checkHealth: function(){
 		if (!socket.isHealthy) {
-			g.disconnect();
+			ng.disconnect();
 		}
 	},
 	enabled: 0,
@@ -2040,7 +2252,7 @@ var socket = {
 		}
 	},
 	initFriendAlerts: function() {
-		g.friends.forEach(function(v){
+		ng.friends.forEach(function(v){
 			socket.unsubscribe('friend:' + v);
 			socket.zmq.subscribe('friend:' + v, function(topic, data) {
 				chat.friend.notify(topic, data);
@@ -2098,7 +2310,7 @@ var chat = {
 		name: '',
 		change: function(h){
 			// only trim leading spaces
-			var mode = h === undefined ? (chat.dom.chatInput.value + g.lastKey) : h.mode,
+			var mode = h === undefined ? (chat.dom.chatInput.value + ng.lastKey) : h.mode,
 				mode = mode.replace(/^\s+/g, '');
 
 			// known standard mode
@@ -2112,7 +2324,7 @@ var chat = {
 			}
 			// it's a whisper
 			else if ( (h && mode[0]) === '@' ||
-				(!h && mode[0] === '@' && g.lastKey === ' ') ) {
+				(!h && mode[0] === '@' && ng.lastKey === ' ') ) {
 				// history mode and mode is @
 				// or not history mode and mode is @ and just hit space!
 				if (h) {
@@ -2207,7 +2419,7 @@ var chat = {
 				a2 = text.split(":"),
 				name = a2[1].replace(/\]/g, '').trim();
 
-			console.info('id name ', playerId, name);
+			// console.info('id name ', playerId, name);
 			context.getChatMenu(name);
 		});
 
@@ -2230,7 +2442,7 @@ var chat = {
 		}
 	},
 	parseMsg: function(msg) {
-		var arr = msg.split(" ");
+		var arr = msg.replace(/ +/g, " ").split(" ");
 		var o = {
 			first: arr[0].trim().toLowerCase()
 		}
@@ -2276,6 +2488,7 @@ var chat = {
 				'<div '+ z +'>/invite: Invite a player to your party : /invite Bob</div>',
 				'<div '+ z +'>/disband: Leave your party</div>',
 				'<div '+ z +'>/promote: Promote a player in your party to leader : /promote Bob</div>',
+				'<div '+ z +'>/boot: Boot a player from the party: /boot Bob</div>',
 				'<div '+ h +'>Miscellaneous Commands:</div>',
 				'<div '+ z +'>/clear: clear the chat log</div>',
 				'<div '+ z +'>/played: Show character creation, session duration, and total playtime</div>',
@@ -2287,8 +2500,8 @@ var chat = {
 		}
 	},
 	// player hit ENTER
-	sendMsg: function(bypass){
-		var msg = chat.dom.chatInput.value.trim(),
+	sendMsg: function(input){
+		var msg = input || chat.dom.chatInput.value.trim(),
 			msgLower = msg.toLowerCase();
 
 		// bypass via ENTER or chat has focus
@@ -2299,16 +2512,16 @@ var chat = {
 		/*
 		/random
 		/surname
-		update /help
-		create placards!
 		allow to form parties
 			invite
 			disband
 			leader
+			boot
 		allow to form guilds
 			invite
 			disband
 			leader
+			boot
 		 */
 		else if (msgLower === '/gmotd') {
 			chat.updateHistory(msgLower);
@@ -2329,6 +2542,10 @@ var chat = {
 		else if (msgLower.indexOf('/promote') === 0) {
 			chat.updateHistory(msgLower);
 			chat.promote(chat.party.parse(msgLower));
+		}
+		else if (msgLower.indexOf('/boot') === 0) {
+			chat.updateHistory(msgLower);
+			chat.boot(chat.party.parse(msgLower));
 		}
 		else if (msgLower === '/disband') {
 			chat.updateHistory(msgLower);
@@ -2390,6 +2607,9 @@ var chat = {
 			// whisper
 			if (my.name !== chat.mode.name) {
 				chat.updateHistory(msg);
+				if (~ng.ignore.indexOf(chat.mode.name)) {
+					chat.log('You sent ' + chat.mode.name + ' a whisper, but you are currently ignoring him.', 'chat-warning');
+				}
 				$.ajax({
 					url: app.url + 'php2/chat/send.php',
 					data: {
@@ -2402,7 +2622,7 @@ var chat = {
 			}
 		}
 		else {
-			if (bypass || chat.hasFocus) {
+			if (chat.hasFocus) {
 				if (msg) {
 					var o = chat.getMsgObject(msg);
 					if (o.msg[0] !== '/') {
@@ -2460,12 +2680,12 @@ var chat = {
 	},
 	ignore: {
 		init: function() {
-			g.ignore = JSON.parse(localStorage.getItem('ignore')) || g.ignore;
+			ng.ignore = JSON.parse(localStorage.getItem('ignore')) || ng.ignore;
 		},
 		list: function() {
-			if (g.ignore.length) {
+			if (ng.ignore.length) {
 				var s = '<div class="chat-warning">Checking ignore list...</div>';
-				g.ignore.forEach(function(v) {
+				ng.ignore.forEach(function(v) {
 					s += '<div class="chat-emote">' + v + '</div>';
 				});
 				chat.log(s);
@@ -2476,17 +2696,17 @@ var chat = {
 		},
 		add: function(o) {
 			if (o !== my.name) {
-				g.ignore.push(o);
-				localStorage.setItem('ignore', JSON.stringify(g.ignore));
+				ng.ignore.push(o);
+				localStorage.setItem('ignore', JSON.stringify(ng.ignore));
 				chat.log('You have added ' + o + ' to your ignore list.', 'chat-warning');
 			}
 		},
 		remove: function(o) {
-			while (g.ignore.indexOf(o) > -1) {
-				var index = g.ignore.indexOf(o);
-				g.ignore.splice(index, 1);
+			while (ng.ignore.indexOf(o) > -1) {
+				var index = ng.ignore.indexOf(o);
+				ng.ignore.splice(index, 1);
 			}
-			localStorage.setItem('ignore', JSON.stringify(g.ignore));
+			localStorage.setItem('ignore', JSON.stringify(ng.ignore));
 			chat.log('You have removed ' + o + ' from your ignore list.', 'chat-warning');
 		}
 	},
@@ -2517,6 +2737,24 @@ var chat = {
 				console.info('disband ', r);
 				bar.disband();
 			}).fail(function(r) {
+				chat.log(r.responseText, 'chat-warning');
+			});
+		}
+	},
+	boot: function(name, bypass) {
+		console.info('/promote ', name, bypass);
+		// must be leader or bypass by auto-election when leader leaves
+		var id = my.getPartyMemberIdByName(name);
+		if ((my.party[0].isLeader || bypass) && my.p_id && id) {
+			$.ajax({
+				url: app.url + 'php2/chat/boot.php',
+				data: {
+					name: name,
+					id: id
+				}
+			}).done(function (data) {
+				console.info('boot ', data);
+			}).fail(function (r) {
 				chat.log(r.responseText, 'chat-warning');
 			});
 		}
@@ -2554,6 +2792,7 @@ var chat = {
 	},
 	camp: function() {
 		chat.log('Camping...', 'chat-warning');
+		game.exit();
 		setTimeout(function(){
 			$.ajax({
 				type: 'GET',
@@ -2579,7 +2818,7 @@ var chat = {
 		add: function(data) {
 			var s = '',
 				e = document.createElement('div'),
-				id = g.getId();
+				id = ng.getId();
 
 			e.id = 'party-invite-'+ data.row;
 			e.className = 'prompt-row prompt-row-' + id + ' ' + data.css;
@@ -2609,6 +2848,8 @@ var chat = {
 			setTimeout(function() {
 				$("#" + e.id).remove();
 			}, 30000);
+
+			chat.log(data.msg, 'chat-warning');
 		},
 		confirm: function(data){
 			// join party by player id?
@@ -2671,7 +2912,7 @@ var chat = {
 			});
 		},
 		parse: function(msg) { // 2-part upper case
-			var a = msg.split(" ");
+			var a = msg.replace(/ +/g, " ").split(" ");
 			return a[1] === undefined ?
 				'' : (a[1][0].toUpperCase() + a[1].substr(1)).trim();
 		},
@@ -2685,37 +2926,37 @@ var chat = {
 	},
 	friend: {
 		parse: function(o) { // 3-part parse
-			var a = o.split(" ");
+			var a = o.replace(/ +/g, " ").split(" ");
 			return a[2][0].toUpperCase() + a[2].substr(1);
 		},
 		init: function() {
-			g.friends = g.friends || [];
+			ng.friends = ng.friends || [];
 			$.ajax({
 				type: 'GET',
 				url: app.url + 'php2/chat/friend-get.php',
 			}).done(function(data){
-				g.friends = data;
+				ng.friends = data;
 			});
 		},
 		list: function() {
 			chat.log('<div class="chat-warning">Checking friends list...</div>');
-			if (g.friends.length){
+			if (ng.friends.length){
 				$.ajax({
 					type: 'GET',
 					url: app.url + 'php2/chat/friend-status.php'
 				}).done(function(r){
-					g.friends = r.friends;
+					ng.friends = r.friends;
 					console.info(r);
 					var str = '<div>Friend List ('+ r.friends.length +')</div>';
 
-					g.friends.forEach(function(name, i){
+					ng.friends.forEach(function(name, i){
 						var index = r.players.indexOf(name);
 						if (index > -1){
 							var s = r.stats[index];
 							// online
 							str +=
 								'<div class="chat-whisper">[' +
-								s.level +' '+ g.jobLong[s.job] +'] '+ g.friends[i] + ' ('+ s.race +
+								s.level +' '+ ng.jobLong[s.job] +'] '+ ng.friends[i] + ' ('+ s.race +
 								')</div>';
 						} else {
 							// offline
@@ -2731,7 +2972,7 @@ var chat = {
 			}
 		},
 		add: function(o) {
-			if (o.length > 1 && o !== my.name && g.friends.indexOf(o) === -1) {
+			if (o.length > 1 && o !== my.name && ng.friends.indexOf(o) === -1) {
 				$.ajax({
 					url: app.url + 'php2/chat/friend-add.php',
 					data: {
@@ -2747,20 +2988,20 @@ var chat = {
 							chat.friend.notify(topic, data);
 						});
 
-						if (!~g.friends.indexOf(o)) {
+						if (!~ng.friends.indexOf(o)) {
 							socket.zmq.publish('name:' + o, {
 								name: my.name,
 								route: "friend>addedMe"
 							});
 						}
 
-						g.friends.push(o);
+						ng.friends.push(o);
 					}
 				});
 			}
 		},
 		remove: function(o) {
-			if (o.length > 1 && o !== my.name && g.friends.indexOf(o) > -1) {
+			if (o.length > 1 && o !== my.name && ng.friends.indexOf(o) > -1) {
 				$.ajax({
 					url: app.url + 'php2/chat/friend-remove.php',
 					data: {
@@ -2772,9 +3013,9 @@ var chat = {
 					}
 					else {
 						chat.log('You have removed ' + o + ' from your friend list.', 'chat-warning');
-						while (g.friends.indexOf(o) > -1) {
-							var index = g.friends.indexOf(o);
-							g.friends.splice(index, 1);
+						while (ng.friends.indexOf(o) > -1) {
+							var index = ng.friends.indexOf(o);
+							ng.friends.splice(index, 1);
 						}
 						socket.unsubscribe('friend:'+ o);
 					}
@@ -2855,17 +3096,17 @@ var chat = {
 	},
 	who: {
 		parse: function(msg) { // complex parse for class names
-			var a = msg.split(" "),
+			var a = msg.replace(/ +/g, " ").split(" "),
 				job = a[1],
 				longJob = job[0].toUpperCase() + job.substr(1);
 
 			// long name?
-			if (g.jobs.indexOf(longJob) > -1) {
+			if (ng.jobs.indexOf(longJob) > -1) {
 				// convert to short
-				return g.jobShort[longJob];
+				return ng.jobShort[longJob];
 			}
 			else {
-				var shortJobs = Object.keys(g.jobLong),
+				var shortJobs = Object.keys(ng.jobLong),
 					job = job.toUpperCase();
 				if (shortJobs.indexOf(job)) {
 					// is it on the short job list?
@@ -2890,7 +3131,7 @@ var chat = {
 					r.players.forEach(function(v, i){
 						str +=
 							'<div class="chat-whisper">[' +
-							v.level +' '+ g.jobLong[v.job] +'] '+ v.name + ' ('+ v.race +
+							v.level +' '+ ng.jobLong[v.job] +'] '+ v.name + ' ('+ v.race +
 							')</div>';
 					});
 					chat.log(str, 'chat-whisper');
@@ -2909,7 +3150,7 @@ var chat = {
 				}
 			}).done(function(r){
 				console.info('r ', r);
-				var jobLong = g.toJobLong(job);
+				var jobLong = ng.toJobLong(job);
 				if (r.len) {
 					chat.log("There " + (r.len > 1 ? "are" : "is") +" currently "+
 						r.len + " "+ (r.len > 1 ? jobLong + 's' : jobLong) +" in Vandamor.", "chat-warning");
@@ -2918,10 +3159,13 @@ var chat = {
 					r.players.forEach(function(v, i){
 						str +=
 							'<div class="chat-whisper">[' +
-							v.level +' '+ g.jobLong[v.job] +'] '+ v.name + ' ('+ v.race +
+							v.level +' '+ ng.jobLong[v.job] +'] '+ v.name + ' ('+ v.race +
 							')</div>';
 					});
 					chat.log(str, 'chat-whisper');
+				}
+				else if (!jobLong) {
+					chat.log("No results found. Try searching by a class name /who cleric.", "chat-warning");
 				}
 				else {
 					chat.log("Currently there are no " + jobLong + "s in Vandamor.", "chat-warning");
@@ -2958,12 +3202,12 @@ var chat = {
 	},
 	join: {
 		parse: function(msg) { // 2 part parse lower case
-			var c = msg.split(" ");
+			var c = msg.replace(/ +/g, " ").split(" ");
 			return c[1] === undefined ?
 				'' : c[1].toLowerCase().trim();
 		},
 		channel: function(channel) {
-			if (g.view === 'town') {
+			if (ng.view === 'town') {
 				if (channel) {
 					// remove from channel
 					if (channel !== my.channel) {
@@ -3080,9 +3324,10 @@ var bar = {
 		$("#bar-wrap").on(env.click, '.bar-col-icon', function(e){
 			var id = $(this).attr('id'),
 				arr = id.split("-"),
-				playerId = arr[3] * 1;
+				slot = arr[3] * 1;
 
-			console.info(id, playerId);
+			console.info(id, slot, my.party[slot].name);
+			context.getPartyMenu(my.party[slot].name);
 		});
 	},
 	dom: {},
@@ -3147,6 +3392,7 @@ var bar = {
 			var index = 0,
 				name = '',
 				electNewLeader = 0;
+			// did the leader disband or somehow get booted?
 			my.party.forEach(function(v, i) {
 				if (data.row === v.id) {
 					index = i;
@@ -3156,21 +3402,33 @@ var bar = {
 					}
 				}
 			});
-
+			// disbanded player found
 			if (index) {
-				my.party[index] = my.partyDefault();
+				// reset client data to default
+				my.party[index] = my.Party();
 				document.getElementById('bar-player-wrap-' + index).style.display = 'none';
 				chat.log(name + " has disbanded the party.", 'chat-warning');
-
+				// elect new leader if client's id is lowest
 				if (electNewLeader && my.isLowestPartyIdMine()) {
 					chat.promote(my.getNewLeaderName(), 1);
 				}
 			}
+			// disband if it's me
+			// console.info('disband: ', data.row, my.id);
+			data.row === my.row && chat.sendMsg('/disband');
+
 		},
 		promote: function(data) {
-			console.info('bar.party.promote ', data);
 			chat.log(data.name + " has been promoted to party leader.", 'chat-warning');
 			// refresh party bars
+			bar.getParty();
+		},
+		boot: function(data) {
+			console.info('bar.party.boot ', data);
+			chat.log(data.name + " has been booted from the party.", 'chat-warning');
+			// refresh party bars
+			data.row *= 1;
+			bar.party.disband(data);
 			bar.getParty();
 		}
 	},
@@ -3184,7 +3442,7 @@ var bar = {
 				console.info('getParty ', data.party);
 				var npIndex = 1;
 				data.party.forEach(function(v, i){
-					// console.info('SET BARS ', i, v);
+					console.info('SET BARS ', i, v);
 					if (v.name === my.name) {
 						my.party[0] = v;
 						bar.updatePlayerBar(0);
@@ -3198,6 +3456,7 @@ var bar = {
 				var len = data.party.length;
 				for (var i=len; i<game.maxPlayers; i++) {
 					document.getElementById('bar-player-wrap-' + i).style.display = 'none';
+					my.party[i] = my.Party();
 				}
 				// continue here
 				// TODO: /disband remove bar when person leaves party
@@ -3212,7 +3471,7 @@ var bar = {
 		my.party.forEach(function(v, i){
 			if (i) {
 				// set client value
-				v = my.partyDefault();
+				v = my.Party();
 			}
 		});
 		bar.hideParty();
@@ -3240,7 +3499,7 @@ var bar = {
 var battle = {
 	go: function(){
 		mob.init();
-		g.setScene('battle');
+		ng.setScene('battle');
 	},
 	html: function(){
 		var s = '<img id="battle-bg" class="img-bg" src="img2/bg/fw2.jpg">';
@@ -3274,7 +3533,7 @@ var battle = {
 	},
 	initialized: 0,
 	show: function(){
-		g.setScene('battle');
+		ng.setScene('battle');
 		if (battle.initialized) {
 			document.getElementById('scene-battle').style.display = 'block';
 		}
@@ -4640,7 +4899,7 @@ var mob = {
 	attack: function(m, force){
 		if (m.animationActive) return;
 		m.animationActive = 1;
-		var tl = g.TM(),
+		var tl = ng.TM(),
 			foo = force === 1 || force === 2 ?
 				force : !Math.round(Math.random()) ? 1 : 2;
 		if (!m.enableSecondary) {
@@ -4694,7 +4953,7 @@ var mob = {
 				endFrame = 75.9,
 				diff = endFrame - startFrame;
 
-			var tl = g.TM();
+			var tl = ng.TM();
 			tl.to(m, m.speed * diff, {
 				startAt: {
 					frame: startFrame
@@ -4724,7 +4983,7 @@ var mob = {
 		m.hp = 0;
 		mob.setClickBox(m);
 		m.animationActive = 1;
-		var tl = g.TM(),
+		var tl = ng.TM(),
 			startFrame = 76,
 			endFrame = 105.9,
 			diff = endFrame - startFrame,
@@ -4892,7 +5151,7 @@ var mob = {
 var town = {
 	go: function(){
 		if (create.selected) {
-			g.lock(1);
+			ng.lock(1);
 			$.ajax({
 				url: app.url + 'php2/character/loadCharacter.php',
 				data: {
@@ -4909,10 +5168,10 @@ var town = {
 				my.party[my.index] = z;
 				// init party member values
 				for (var i=1; i<game.maxPlayers; i++) {
-					my.party[i] = my.partyDefault();
+					my.party[i] = my.Party();
 				}
 				console.info('my.party[my.index]: ', my.party[my.index]);
-				g.setScene('town');
+				ng.setScene('town');
 				town.init();
 				chat.init(1);
 				chat.log("There are currently " + data.count + " players exploring Vandamor.", 'chat-emote');
@@ -4922,15 +5181,15 @@ var town = {
 				chat.setRoom(data.players);
 				bar.init();
 			}).fail(function(data){
-				g.disconnect(data.responseText);
+				ng.disconnect(data.responseText);
 			}).always(function(){
-				g.unlock();
+				ng.unlock();
 			});
 		}
 	},
 	html: function(){
 		var s =
-			'<img id="town-bg" class="img-bg" src="img2/town.jpg">'+
+			'<img id="town-bg" class="img-bg" src="img2/town2.jpg">'+
 			'<div id="town-footer" class="text-shadow2">' +
 				'<hr id="town-footer-hr1" class="footer-hr">' +
 				'<div id="town-footer-flex">' +
@@ -4964,7 +5223,7 @@ var route = {
 			if (data.name === my.name) {
 				chat.log(data.msg, data.class);
 			}
-			else if (g.ignore.indexOf(data.name) === -1) {
+			else if (ng.ignore.indexOf(data.name) === -1) {
 				chat.log(data.msg, data.class);
 			}
 			else {
@@ -4981,7 +5240,6 @@ var route = {
 	},
 	party: function(data, r) {
 		if (r === 'party->join') {
-			console.info('joining party ', data);
 			bar.party.join(data);
 		}
 		else if (r === 'party->disband') {
@@ -4990,110 +5248,59 @@ var route = {
 		else if (r === 'party->promote') {
 			bar.party.promote(data);
 		}
+		else if (r === 'party->boot') {
+			bar.party.boot(data);
+		}
+		else if (r === 'party->bootme') {
+			// remove booted player
+			var slot = my.getPartySlotByRow(data.id * 1),
+				promote = 0;
+			if (my.party[slot].isLeader) {
+				// we must promote a new leader
+				promote = 1;
+			}
+			my.party[slot] = my.Party();
+			//console.info("%c party->bootme", "background: #ff0", promote);
+			// only boot if I'm the lowest id!
+			if (my.isLowestPartyIdMine()) {
+				//console.info('isLowestPartyIdMine ! YES PROMOTE! ', ng.copy(my.party));
+				chat.boot(data.name, 1);
+				if (my.partyCount() === 1) {
+					// disband if one-man party
+					console.info('partyCount === 1 ');
+					chat.disband();
+				}
+				else if (promote) {
+					// otherwise promote this player to leader
+					//console.info('PROMOTING: ', my.name);
+					chat.promote(my.name, 1);
+				}
+			}
+			setTimeout(function(){
+				bar.getParty();
+			}, 1000);
+		}
 	}
 };
-var context = {
-	timer: 0,
-	openDate: 0,
-	isInside: 0,
-	isOpen: 0,
-	init: (function(){
-		var e = $("#tooltip-social-wrap");
-		e.on(env.click, '.context-items', function(e){
-			console.info('context-items clicked: ', $(this).attr('id'));
-			context.click($(this).attr('id'));
-		});
-
-		e.on('mouseenter', function() {
-			context.isInside = 1;
-		}).on('mouseleave', function() {
-			context.isInside = 0;
-			clearTimeout(context.timer);
-			setTimeout(function() {
-				if (!context.isInside) {
-				}
-			}, 1000);
-		});
-	})(),
-	click: function(id) {
-		console.info("click!", id, context.player);
-	},
-	player: '',
-	getPartyMenu: function(name) {
-		context.player = name;
-		console.info('getPartyMenu', name);
-	},
-	setChatMenuHtml: function() {
-		if (!context.player) return;
-
-		var z = ' class="context-items"',
-			s =
-			'<div id="context-invite" '+ z +'>Invite</div>'+
-			'<div id="context-whisper" '+ z +'>Whisper</div>'+
-			'<div id="context-friend" '+ z +'>Friend</div>'+
-			'<div id="context-ignore" '+ z +'>Ignore</div>';
-
-		var e = document.getElementById('tooltip-social-wrap');
-		e.innerHTML = s;
-		e.style.top = context.position.y() + 'px';
-		e.style.left = context.position.x() + 'px';
-		e.style.visibility = 'visible';
-		context.isOpen = 1;
-		context.openDate = Date.now();
-	},
-
-	position: {
-		padding: 10,
-		halfWidth: ~~($("#tooltip-social-wrap").width() / 2),
-		x: function() {
-			if (my.mouse.x < context.position.halfWidth) {
-				// 50 - 100 width = 100 - 50 ... 50+ 10 padding
-				// 25 - 100 width = 100 - 25 ... 75
-			}
-			return my.mouse.x;
-		},
-		y: function() {
-			// determine Y adjustment
-			var isMenuAbove = my.mouse.y < window.innerHeight/2,
-				yAdjust = isMenuAbove ? 15 : (~~$("#tooltip-social-wrap").height() + 15) * -1;
-			return my.mouse.y + yAdjust;
-		}
-	},
-	show: function() {
-		document.getElementById('tooltip-social-wrap').style.visibility  = 'visible';
-		context.isOpen = 1;
-	},
-	hide: function() {
-		document.getElementById('tooltip-social-wrap').style.visibility  = 'hidden';
-		context.isOpen = 0;
-	},
-	hideCheck: function() {
-		if (context.isOpen) {
-			if (Date.now() - context.openDate > 100 && !context.isInside) {
-				context.hide();
-			}
-		}
-	},
-	getChatMenu: function(name) {
-		context.player = name;
-		console.info('getChatMenu', name, my.mouse.x, my.mouse.y);
-
-		context.setChatMenuHtml();
-	}
-}
-
 // test methods
 var test = {
-	chatRoom: function(){
-		for (var i=0; i<100; i++) {
-			var c = g.toJobShort(g.jobs[~~(Math.random() * 14)]);
-			socket.zmq.publish(chat.getChannel(), {
-				route: 'chat->add',
-				row: ~~(Math.random() * 9999),
-				level: Math.ceil(Math.random() * 50),
-				job: c,
-				name: 'WWWWWWWWWWWWWWWW'
-			});
+	chat: {
+		room: function(){
+			for (var i=0; i<100; i++) {
+				var c = ng.toJobShort(ng.jobs[~~(Math.random() * 14)]);
+				socket.zmq.publish(chat.getChannel(), {
+					route: 'chat->add',
+					row: ~~(Math.random() * 9999),
+					level: Math.ceil(Math.random() * 50),
+					job: c,
+					name: 'WWWWWWWWWWWWWWWW'
+				});
+			}
+		},
+		log: function() {
+			for (var i=0; i<10; i++) {
+				chat.sendMsg('/flist');
+			}
 		}
 	},
 	orcs: function(){
