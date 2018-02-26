@@ -8,6 +8,7 @@ var town = {
 					row: create.selected
 				}
 			}).done(function(data) {
+				console.info('loadCharacter: ', data);
 				socket.init();
 				var z = data.characterData;
 				my.name = z.name;
@@ -16,6 +17,7 @@ var town = {
 				my.level = z.level;
 				my.row = z.row;
 				my.party[0] = z;
+				my.guildData = z.guild;
 				// init party member values
 				for (var i=1; i<game.maxPlayers; i++) {
 					my.party[i] = my.Party();
@@ -61,45 +63,65 @@ var town = {
 	aside: {
 		selected: '',
 		html: {
-			'town-merchant':
+			close: '<i class="close-aside fa fa-times text-danger"></i>',
+			sleeve: '<div class="stag-blue sleeve"></div>',
+			'town-merchant': function() {
+				var s =
 				'<img class="aside-bg" src="img2/town/halas.jpg">' +
-				'<img class="aside-npc" src="img2/town/rendo-surefoot.png?v1">' +
+				'<img class="aside-npc" src="img2/town/rendo-surefoot.png">' +
 				'<div class="aside-text">' +
-					'<div class="aside-title-wrap">' +
+					'<div class="aside-title-wrap stag-blue">' +
 						'<div class="aside-title">Merchant</div>' +
-						'<i class="close-aside fa fa-times text-danger"></i>' +
+						town.aside.html.close +
 					'</div>' +
-				'</div>',
-			'town-trainer':
+				'</div>';
+				return s;
+			},
+			'town-trainer': function() {
+				var s =
 				'<img class="aside-bg" src="img2/town/surefall.jpg">' +
-				'<img class="aside-npc" src="img2/town/arwen-reinhardt.png?v1">' +
+				'<img class="aside-npc" src="img2/town/arwen-reinhardt.png">' +
 				'<div class="aside-text">' +
-					'<div class="aside-title-wrap">' +
+					'<div class="aside-title-wrap stag-blue">' +
 						'<div class="aside-title">Skill Trainer</div>' +
-						'<i class="close-aside fa fa-times text-danger"></i>' +
+						town.aside.html.close +
 					'</div>' +
-				'</div>',
-			'town-guild':
+				'</div>';
+				return s;
+			},
+			'town-guild': function() {
+				var s =
 				'<img class="aside-bg" src="img2/town/poh.jpg">' +
-				'<img class="aside-npc" src="img2/town/valeska-windcrest.png?v1">' +
+				'<img class="aside-npc" src="img2/town/valeska-windcrest.png">' +
 				'<div class="aside-text">' +
-					'<div class="aside-title-wrap">' +
+					'<div class="aside-title-wrap stag-blue">' +
 						'<div class="aside-title">Guild Hall</div>' +
-						'<i class="close-aside fa fa-times text-danger"></i>' +
+						town.aside.html.close +
 					'</div>' +
-				'</div>',
-			'town-mission':
+					'<div class="aside-menu">' +
+						'<div>Guild: '+ (my.guild ? my.guild : 'N/A') +'</div> ' +
+						'<div class="ng-btn">Test</div> ' +
+						'<div class="ng-btn">Test</div> ' +
+						'<div class="ng-btn">Test</div> ' +
+					'</div>' +
+				'</div>';
+				return s;
+			},
+			'town-mission': function() {
+				var s =
 				'<img class="aside-bg" src="img2/town/neriak.jpg">' +
-				'<img class="aside-npc" src="img2/town/miranda-crossheart.png?v1">' +
+				'<img class="aside-npc" src="img2/town/miranda-crossheart.png">' +
 				'<div class="aside-text">' +
-					'<div class="aside-title-wrap">' +
+					'<div class="aside-title-wrap stag-blue">' +
 						'<div class="aside-title">Mission Counter</div>' +
-						'<i class="close-aside fa fa-times text-danger"></i>' +
+						town.aside.html.close +
 					'</div>' +
-				'</div>'
+				'</div>';
+				return s;
+			}
 		},
 		getHtml: function(id) {
-			return town.aside.html[id];
+			return town.aside.html[id]();
 		},
 	},
 	events: function(){
@@ -174,9 +196,9 @@ var town = {
 				setTimeout(function () {
 					TweenMax.to('.aside-bg', 1, {
 						startAt: {
-							scale: 1.2
+							left: '60%'
 						},
-						scale: 1
+						left: '50%'
 					}, 100);
 				});
 				TweenMax.to('.aside-npc', 1, {

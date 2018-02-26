@@ -8,10 +8,17 @@ var my = {
 	channel: 'town',
 	lastReceivedWhisper: '',
 	p_id: 0,
-	g_id: 0,
 	leader: '',
 	isLeader: 0,
 	party: [],
+	guild: {
+		id: 0,
+		rank: '',
+		name: ''
+	},
+	guildChannel: function() {
+		return 'guild:' + my.guild.id;
+	},
 	getPartyNames: function(){
 		var a = [];
 		my.party.forEach(function(v){
@@ -19,7 +26,6 @@ var my = {
 		});
 		return a;
 	},
-	guild: [],
 	isLowestPartyIdMine: function() {
 		var lowestId = my.party[0].id;
 		my.party.forEach(function(v) {

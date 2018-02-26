@@ -2255,7 +2255,7 @@ var socket = {
 	},
 	initFriendAlerts: function() {
 		ng.friends.forEach(function(v){
-			// socket.unsubscribe('friend:' + v);
+			socket.unsubscribe('friend:' + v);
 			socket.zmq.subscribe('friend:' + v, function(topic, data) {
 				chat.friend.notify(topic, data);
 			});
@@ -5263,7 +5263,6 @@ var town = {
 	},
 	events: function(){
 		$("#scene-town").on(env.click, '.close-aside', function(){
-			console.info("CLICK");
 			// close town asides
 			town.aside.selected = '';
 			var e = $(".town-aside");
@@ -5357,11 +5356,67 @@ var town = {
 			if (!sessionStorage.getItem('startTime')) {
 				sessionStorage.setItem('startTime', JSON.stringify(Date.now()));
 			}
+			town.preload();
 		}
-	}
+	},
+	preload: function() {
+		var p = 'img2/town/';
+		cache.preload.images([
+			p + 'arwen-reinhardt.png',
+			p + 'halas.jpg',
+			p + 'miranda-crossheart.png',
+			p + 'neriak.jpg',
+			p + 'poh.jpg',
+			p + 'rendo-surefoot.png',
+			p + 'surefall.jpg',
+			p + 'valeska-windcrest.png',
+		])
+	},
 };
 var guild = {
 
+}
+var cache = {
+	images: [],
+	imageStrings: [],
+	audio: [],
+	audioStrings: [],
+	preload: {
+		images: function(a) {
+			a.forEach(function(v){
+				if (!~cache.imageStrings.indexOf(v)) {
+					var e = new Image();
+					e.src = v;
+					cache.images.push(e);
+					cache.imageStrings.push(v);
+				}
+			});
+		},
+		audio: function(a){
+			a.forEach(function(v){
+				if (!~cache.audioStrings.indexOf(v)) {
+					var e = new Audio();
+					e.src = v;
+					cache.audio.push(e);
+					cache.audioStrings.push(v);
+				}
+			});
+		}
+	},
+	clear: {
+		all: function() {
+			cache.clear.images();
+			cache.clear.audio();
+		},
+		images: function() {
+			cache.images = [];
+			cache.imageStrings = [];
+		},
+		audio: function() {
+			cache.audio = [];
+			cache.audioStrings = [];
+		}
+	}
 }
 // route.js
 var route = {

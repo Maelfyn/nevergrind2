@@ -1697,7 +1697,6 @@ background-clip: content-box;
 	display: flex;
 	position: relative;
 	font: 2rem/2 Cinzel, Palatino Linotype, serif;
-	background: rgba(0,0,0,.7);
 	padding: 0 .5rem;
 	border: 6px double #a96;
 }
@@ -1725,7 +1724,11 @@ background-clip: content-box;
 	bottom: -15%;
 	left: -40%;
 }
-
+.aside-menu {
+	display: flex;
+	flex-direction: column;
+	margin-left: 50%;
+}
 
 
 

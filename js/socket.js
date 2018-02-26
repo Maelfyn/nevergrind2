@@ -135,19 +135,11 @@ var socket = {
 				route.town(data, data.route);
 			});
 
-			// subscribe to test guild for now
-			var guild = 'guild:' + Date.now();
-			my.guild = guild;
-			console.info("subscribing to channel: ", guild);
-			socket.zmq.subscribe(guild, function(topic, data) {
-				console.info('rx ', topic, data);
-				route.town(data, data.route);
-			});
-
 			(function repeat(){
 				if (my.name){
 					socket.initWhisper();
 					socket.initFriendAlerts();
+					socket.initGuild();
 				} else {
 					setTimeout(repeat, 200);
 				}
@@ -166,10 +158,37 @@ var socket = {
 	},
 	initFriendAlerts: function() {
 		ng.friends.forEach(function(v){
-			// socket.unsubscribe('friend:' + v);
+			socket.unsubscribe('friend:' + v);
 			socket.zmq.subscribe('friend:' + v, function(topic, data) {
 				chat.friend.notify(topic, data);
 			});
 		});
+	},
+	initParty: function(row) {
+		// unsub to current party?
+		socket.unsubscribe('party:'+ my.p_id);
+		// sub to party
+		var party = 'party:' + row;
+		my.p_id = row;
+		console.info("subscribing to channel: ", party);
+		socket.zmq.subscribe(party, function(topic, data) {
+			console.info('party rx ', topic, data);
+			if (data.route === 'chat->log') {
+				route.town(data, data.route);
+			}
+			else {
+				route.party(data, data.route);
+			}
+		});
+	},
+	initGuild: function() {
+		// subscribe to test guild for now
+		if (my.guild.id) {
+			console.info("subscribing to channel: ", my.guildChannel());
+			socket.zmq.subscribe(my.guildChannel(), function(topic, data) {
+				console.info('rx ', topic, data);
+				route.town(data, data.route);
+			});
+		}
 	}
 }

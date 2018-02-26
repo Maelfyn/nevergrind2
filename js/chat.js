@@ -1,6 +1,6 @@
 // chat.js
 var chat = {
-	prefix: 't:',
+	prefix: 'ng2:',
 	default: 'town',
 	getChannel: function() {
 		return chat.prefix + my.channel;
@@ -200,7 +200,6 @@ var chat = {
 				'<div '+ z +'>/gsay : Message your guild : /gsay hail</div>',
 				'<div '+ z +'>@ : Send a private message by name : @bob hi</div>',
 				'<div '+ h +'>Change Channels:</div>',
-				'<div '+ z +'>/join : Join the default chat channel : /join</div>',
 				'<div '+ z +'>/join channel : Join a channel : /join bros</div>',
 				'<div '+ h +'>Social Commands:</div>',
 				'<div '+ z +'>/flist or /friends : Show your friends\' online status</div>',
@@ -386,12 +385,12 @@ var chat = {
 			o.class = 'chat-party';
 		}
 		else if (parse.first === '/g') {
-			o.category = 'guild:' + my.g_id;
+			o.category = 'guild:' + my.guild.id;
 			o.msg = shortCommandMsg;
 			o.class = 'chat-guild';
 		}
 		else if (chat.mode.command === '/gsay'){
-			o.category = 'guild:' + my.g_id;
+			o.category = 'guild:' + my.guild.id;
 			o.msg = msg;
 			o.class = 'chat-guild';
 		}
@@ -623,21 +622,7 @@ var chat = {
 	},
 	party: {
 		subscribe: function(row) {
-			// unsub to current party?
-			socket.unsubscribe('party:'+ my.p_id);
-			// sub to party
-			var party = 'party:' + row;
-			my.p_id = row;
-			console.info("subscribing to channel: ", party);
-			socket.zmq.subscribe(party, function(topic, data) {
-				console.info('party rx ', topic, data);
-				if (data.route === 'chat->log') {
-					route.town(data, data.route);
-				}
-				else {
-					route.party(data, data.route);
-				}
-			});
+			socket.initParty(row);
 		},
 		join: function(z) {
 			// clicked CONFIRM
