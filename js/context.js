@@ -72,7 +72,9 @@ var context = {
 		if (context.player === my.name) {
 			// commands only for me
 			// disband
-			s += '<div id="context-disband" '+ z +'>Disband</div>';
+			if (my.p_id) {
+				s += '<div id="context-disband" '+ z +'>Disband</div>';
+			}
 		} else {
 			// promote
 			if (my.party[0].isLeader) {
@@ -96,7 +98,7 @@ var context = {
 				s += '<div id="context-add-ignore" '+ z +'>Ignore</div>';
 			}
 		}
-		context.show(s);
+		s && context.show(s);
 	},
 	setChatMenuHtml: function() {
 		if (!context.player || context.player === my.name) return;

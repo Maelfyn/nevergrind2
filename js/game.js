@@ -50,7 +50,7 @@ var game = {
 				socket.healthTime = Date.now();
 				socket.startHealthCheck();
 				socket.zmq.publish('hb:' + my.name, {});
-			}, 60000);
+			}, 20000);
 		}
 	},
 	played: {

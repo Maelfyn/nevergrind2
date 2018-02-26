@@ -1,26 +1,21 @@
 var bar = {
 	init: function() {
-		console.info("init bar.js");
 		var e = document.getElementById('bar-wrap');
 		e.innerHTML = bar.html();
 		e.style.display = 'block';
 
-		bar.dom.playerWrap = [];
-		bar.dom.name = [];
-		bar.dom.hpFg = [];
-		bar.dom.hpBg = [];
-		bar.dom.mpWrap = [];
-		bar.dom.mpFg = [];
 		for (var i=0; i<game.maxPlayers; i++) {
-			bar.dom.playerWrap = document.getElementById('bar-player-wrap-' + i);
-			bar.dom.name = document.getElementById('bar-name-' + i);
-			bar.dom.hpFg = document.getElementById('bar-hp-fg-' + i);
-			bar.dom.hpBg = document.getElementById('bar-hp-bg-' + i);
-			bar.dom.mpWrap = document.getElementById('bar-mp-wrap-' + i);
-			bar.dom.mpFg = document.getElementById('bar-mp-fg-' + i);
+			bar.dom[i] = {
+				playerWrap: document.getElementById('bar-player-wrap-' + i),
+				name: document.getElementById('bar-name-' + i),
+				hpFg: document.getElementById('bar-hp-fg-' + i),
+				hpBg: document.getElementById('bar-hp-bg-' + i),
+				mpWrap: document.getElementById('bar-mp-wrap-' + i),
+				mpFg: document.getElementById('bar-mp-fg-' + i),
+			}
 		}
 		// bar events
-		$("#bar-wrap").on(env.click, '.bar-col-icon', function(e){
+		$("#bar-wrap").on(env.context, '.bar-col-icon', function(e){
 			var id = $(this).attr('id'),
 				arr = id.split("-"),
 				slot = arr[3] * 1;
@@ -37,10 +32,8 @@ var bar = {
 			s += '<div id="bar-player-wrap-' + i + '" '+
 			'class="bar-player-wrap' + (!i ? ' bar-player-wrap-me' : '') + '" ' +
 				'style="display: '+ (i === 0 ? 'flex' : 'none') +'">';
-
 		}
-			s += bar.getPlayerInnerHtml(p, i);
-
+		s += bar.getPlayerInnerHtml(p, i);
 		if (!ignoreWrap) {
 			s += '</div>';
 		}
@@ -66,7 +59,7 @@ var bar = {
 	},
 	html: function() {
 		// my bar
-		var s = bar.getPlayerHtml(my.party[my.index], my.index);
+		var s = bar.getPlayerHtml(my.party[0], 0);
 		// party bars
 		for (var i=0; i<game.maxPlayers; i++) {
 			if (my.party[i].name !== my.name) {

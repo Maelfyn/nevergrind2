@@ -78,7 +78,7 @@ fieldset {
 }
 #forgotPassword{
 	color: #aef;
-	cursor: pointer;
+	cursor: url('cursor/pointer.cur'), pointer;
 }
 
 
@@ -135,14 +135,14 @@ label{
 	position: relative;
 	display: inline-block;
 	vertical-align: middle;
-	cursor: pointer!important;
+	cursor: url('cursor/pointer.cur'), pointer!important;
 }
 #twitter-wrap:hover {
 	text-decoration: none;
 }
 #twitter-icon-wrap {
 	color: #337ab7;
-	cursor: pointer;
+	cursor: url('cursor/pointer.cur'), pointer;
 	background: #ddd;
 	padding: 6px 9px;
 	display: inline-block;
@@ -161,7 +161,7 @@ label{
 	text-shadow: none;
 	height:20px;
 	display:inline-block;
-	cursor: pointer!important;
+	cursor: url('cursor/pointer.cur'), pointer!important;
 }
 #twitter-text {
 	color: #fff;
@@ -174,7 +174,7 @@ label{
 	vertical-align: middle;
 	border: 1px solid transparent;
 	border-radius: 4px;
-	cursor: pointer!important;
+	cursor: url('cursor/pointer.cur'), pointer!important;
 }
 #createAccount{
 	color: #aef;
@@ -245,7 +245,7 @@ label{
 	color: #fff;
 	background: #337ab7;
 	padding: 6px 12px;
-	cursor: pointer;
+	cursor: url('cursor/pointer.cur'), pointer;
 }
 /* main styles */
 
@@ -262,8 +262,24 @@ label{
 	src: url(../fonts/RobotoCondensed-Regular.ttf)
 }
 @font-face {
-	font-family: Roboto Slab;
+	font-family: Quatro, Roboto Slab;
 	src: url(../fonts/RobotoSlab-Regular.ttf)
+}
+@font-face {
+	font-family: Play;
+	src: url(../fonts/Play.ttf)
+}
+@font-face {
+	font-family: Imfell;
+	src: url(../fonts/IM-Fell-English-SC.ttf)
+}
+@font-face {
+	font-family: Quatro;
+	src: url(../fonts/Quattrocento.ttf)
+}
+@font-face {
+	font-family: Tinos;
+	src: url(../fonts/tinos.ttf)
 }
 * {
 	_noFocusLine: expression(this.hideFocus=true);
@@ -334,7 +350,7 @@ body {
 	flex-direction: column;
 	margin: 0 auto;
 	position: relative;
-	font-family: Roboto, Arial, sans-serif;
+	font-family: Play, Roboto, Arial, sans-serif;
 	background: #000;
 	color: #fff;
 	width: 100%;
@@ -360,7 +376,7 @@ input {
 }
 a {
 	color: #aef;
-	cursor: pointer
+	cursor: url('cursor/pointer.cur'), pointer
 }
 h1,
 h2 {
@@ -415,7 +431,7 @@ tbody {
 	box-shadow: none!important
 }
 .btn-primary {
-	font-family: Roboto, Roboto Slab, serif!important;
+	font-family: Roboto, Quatro, Roboto Slab, serif!important;
 	background-color: #05b;
 	border-color: #039!important
 }
@@ -583,7 +599,7 @@ tbody {
 	margin: 0!important
 }
 .pointer {
-	cursor: pointer
+	cursor: url('cursor/pointer.cur'), pointer
 }
 .no-pointer {
 	pointer-events: none
@@ -719,18 +735,17 @@ tbody {
 }
 #create-attr-remaining {
 	justify-content: space-evenly;
-	font-family: Roboto Slab, serif;
 	line-height: 1
 }
 #create-points-label {
-	font: 1.3rem/1 Georgia, Roboto Slab, serif;
+	font: 1.3rem/1 Georgia, Quatro, Roboto Slab, serif;
 	font-weight: 700;
 	text-align: center;
 	color: #8bf;
 	text-shadow: 1px 1px #000, -1px -1px #000, 1px -1px #000, -1px 1px #000, 2px 2px #048, -2px -2px #048, 2px -2px #048, -2px 2px #048
 }
 .create-attr-type {
-	font-family: Georgia, Roboto Slab, serif;
+	font-family: Georgia, Quatro, Roboto Slab, serif;
 	text-align: center;
 	font-size: 2rem;
 	font-weight: 700;
@@ -801,9 +816,11 @@ tbody {
 	margin: 0;
 	flex: 1
 }
-.title-ch-btn {
+.title-btn-margin {
+	margin: .3rem .2rem
+}
+.ng-btn {
 	color: #fff;
-	margin: .3rem .2rem;
 	padding: .2rem 1rem;
 	font: 1.1rem/1 Cinzel;
 	font-weight: 700;
@@ -811,11 +828,14 @@ tbody {
 	outline-offset: .1rem;
 	border: .1rem outset #eed;
 	border-radius: 0;
-	cursor: pointer;
+	cursor: url('cursor/pointer.cur'), pointer;
 	letter-spacing: 2px;
 	background: #bba
 }
-.title-ch-btn:active {
+.ng-btn:hover {
+	background: #ccb
+}
+.ng-btn:active {
 	outline: 1px solid #579!important;
 	border: .1rem inset #eed;
 	background: #998
@@ -824,15 +844,13 @@ tbody {
 	background: #27a;
 	background: rgba(255, 255, 255, .3);
 	border: .1rem outset #013;
-	outline: 1px solid #048
-}
-.ch-card {
-	font: 1rem Roboto Slab, serif;
+	outline: 1px solid #048;
+	font: 1rem Quatro, Roboto Slab, serif;
 	margin: 6px auto;
 	width: 90%;
 	display: block;
 	border-radius: 0;
-	cursor: pointer
+	cursor: url('cursor/pointer.cur'), pointer
 }
 .ch-card:active {
 	background: #048;
@@ -848,11 +866,11 @@ tbody {
 }
 .select-class,
 .select-race {
-	font-family: Roboto Slab, serif;
+	font-family: Quatro, Roboto Slab, serif;
 	background: #bba;
 	border: .1rem outset #eed;
 	text-align: center;
-	cursor: pointer;
+	cursor: url('cursor/pointer.cur'), pointer;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis
@@ -873,7 +891,7 @@ tbody {
 }
 #gender-wrap {
 	margin-top: 1rem;
-	font: 1.25rem Roboto Slab;
+	font: 1.25rem Quatro, Roboto Slab;
 	line-height: 1;
 	text-transform: uppercase
 }
@@ -887,14 +905,14 @@ tbody {
 	background: #bba;
 	box-shadow: 1px 1px #579 inset, -1px -1px #579 inset, 1px -1px 2px #000 inset, -3px 3px 6px 2px #fff inset;
 	border: .1rem groove #579;
-	cursor: pointer
+	cursor: url('cursor/pointer.cur'), pointer
 }
 .select-radial.active {
 	background: #776;
 	box-shadow: 1px 1px #000 inset, -1px -1px #000 inset, 0 0 5px #000 inset
 }
 .character-info-header {
-	font: 1rem Roboto Slab, serif;
+	font: 1rem Quatro, Roboto Slab, serif;
 	text-align: center;
 	border: .1rem ridge #05b;
 	background: #025;
@@ -1086,7 +1104,7 @@ tbody {
 	position: absolute;
 	left: -100px;
 	width: 200px;
-	cursor: pointer;
+	cursor: url('cursor/pointer.cur'), pointer;
 }
 .mob-name {
 	font: 28px Roboto Condensed;
@@ -1142,7 +1160,7 @@ tbody {
 	width: 1px;
 	height: 1px;
 	z-index: 5;
-	cursor: pointer;
+	cursor: url('cursor/pointer.cur'), pointer;
 }
 .mob-dead {
 	position: absolute;
@@ -1153,7 +1171,7 @@ tbody {
 	width: 1px;
 	height: 1px;
 	z-index: 5;
-	cursor: pointer;
+	cursor: url('cursor/pointer.cur'), pointer;
 	display: none;
 }
 .test {
@@ -1193,7 +1211,7 @@ tbody {
 	background-image: -moz-radial-gradient(center center, cover, #025 0%, #013 100%);
 	background-image: -ms-radial-gradient(center center, cover, #025 0%, #013 100%);
 	background-image: -o-radial-gradient(center center, cover, #025 0%, #013 100%);
-	cursor: pointer;
+	cursor: url('cursor/pointer.cur'), pointer;
 }
 .footer-hr {
 	border: 0;
@@ -1214,20 +1232,25 @@ tbody {
 #chat-wrap {
 	display: none;
 	flex-direction: row;
-	font-family: Roboto Condensed, Roboto, sans-serif;
+	font-family: Play, Roboto Condensed, Roboto, sans-serif;
 	position: absolute;
 	top: 0;
 	right: 0;
 	font-size: 1rem;
 	border: 2px groove #013;
 	background: rgba(0,0,0,.8);
-	height: 50vh;
 	z-index: 2;
 }
 #chat-present-wrap {
 	display: flex;
 	flex-direction: column;
-	width: 10rem;
+	width: 12vw;
+}
+#chat-log-wrap {
+	display: flex;
+	flex-direction: column;
+	width: 38vw;
+	height: 50vh;
 }
 #chat-header {
 	text-align: center;
@@ -1247,16 +1270,11 @@ tbody {
 	border: .1rem groove #025;
 	margin: 1px;
 }
-#chat-log-wrap {
-	display: flex;
-	flex-direction: column;
-	width: 30rem;
-}
 #chat-log {
 	flex: 1;
 	overflow: auto;
 	overflow-x: hidden;
-	line-height: 1.2;
+	line-height: 1.25;
 	color: #f2f2f2;
 	word-break: break-word;
 	padding: .1rem 0 0 .2rem;
@@ -1287,11 +1305,11 @@ tbody {
 	padding: 0;
 	font-size: .875rem;
 	background: #013;
-	font-family: Cinzel, Roboto Slab, serif;
+	font-family: Cinzel, Quatro, Roboto Slab, serif;
 	border-left: 1px solid #048;
 }
 .chat-prompt-btn {
-	cursor: pointer;
+	cursor: url('cursor/pointer.cur'), pointer;
 	padding: 0 .5rem;
 	border: 1px solid #aef;
 	border-radius: 4px;
@@ -1311,11 +1329,11 @@ tbody {
 	color: #0f0;
 }
 .chat-prompt-no-icon {
-	cursor: pointer;
+	cursor: url('cursor/pointer.cur'), pointer;
 	color: #f22;
 }
 .chat-player {
-	cursor: pointer;
+	cursor: url('cursor/pointer.cur'), pointer;
 }
 .chat-player:hover {
 	background: #025;
@@ -1346,7 +1364,7 @@ tbody {
 	background: transparent;
 	flex: 1;
 	color: #fff;
-	cursor: pointer;
+	cursor: url('cursor/pointer.cur'), pointer;
 	padding: .2rem .4rem;
 	border: 1px groove #013;
 	-webkit-transition : border 300ms ease-out;
@@ -1395,7 +1413,7 @@ tbody {
 	color: gold;
 }
 .chat-join {
-	cursor: pointer
+	cursor: url('cursor/pointer.cur'), pointer
 }
 .chat-hidden {
 	color: #000;
@@ -1480,6 +1498,12 @@ background-clip: content-box;
 	background-color: #58a;
 	/*background-image: -webkit-linear-gradient(top, #579 0%, #bdf 50%, #579 100%);*/
 }
+::selection {
+	background: #999;
+}
+::-moz-selection {
+	background: #999;
+}
 #scene-error {
 	padding: 30vh 10vw 0;
 	color: gold;
@@ -1506,6 +1530,7 @@ background-clip: content-box;
 /* bar wrap */
 #bar-wrap {
 	display: none;
+	font-family: Quatro, Roboto Condensed, Roboto, sans-serif;
 	position: absolute;
 	top: .2rem;
 	left: .2rem;
@@ -1562,7 +1587,6 @@ background-clip: content-box;
 	text-transform: capitalize;
 	text-indent: .2rem;
 	color: #fff;
-	font: 1rem Roboto Slab, sans-serif;
 	font-size: 1rem;
 	line-height: 1.2;
 }
@@ -1624,7 +1648,7 @@ background-clip: content-box;
 	background: radial-gradient(top left, farthest-corner, rgba(16, 32, 80, 1) 0, rgba(0, 0, 0, 1) 100%);
 }
 .context-items {
-	cursor: pointer;
+	cursor: url('cursor/pointer.cur'), pointer;
 	white-space: nowrap;
 	padding: .1rem .5rem;
 	border-bottom: 1px solid #048;
@@ -1642,7 +1666,26 @@ background-clip: content-box;
 .context-items:active {
 	background: #994;
 }
-
+/* town menu */
+#town-menu {
+	text-align: center;
+	border: .1rem groove #025;
+	box-shadow: 0 0 0 1px #aef;
+	position: absolute;
+	z-index: 1;
+	bottom: 4rem;
+	left: 1rem;
+	padding: .2rem .1rem 0;
+	background: #579;
+	background: -webkit-radial-gradient(top left, farthest-corner, rgba(80, 116, 132, 1) 0, rgba(0, 0, 0, 1) 100%);
+	background: -moz-radial-gradient(top left, farthest-corner, rgba(80, 116, 132, 1) 0, rgba(0, 0, 0, 1) 100%);
+	background: -o-radial-gradient(top left, farthest-corner, rgba(80, 116, 132, 1) 0, rgba(0, 0, 0, 1) 100%);
+	background: radial-gradient(top left, farthest-corner, rgba(80, 116, 132, 1) 0, rgba(0, 0, 0, 1) 100%);
+}
+#town-menu > * {
+	box-shadow: 0 0 0 1px #000;
+	margin-bottom: .2rem;
+}
 
 
 
@@ -1652,4 +1695,6 @@ background-clip: content-box;
 /* show game */
 body {
 	visibility: visible;
+	cursor: url('cursor/normal.cur'), auto;
 }
+/* mouse cursors */

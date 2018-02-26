@@ -1,15 +1,15 @@
 // chat.js
 var chat = {
 	prefix: 't:',
-	default: 'town-1',
+	default: 'town',
 	getChannel: function() {
 		return chat.prefix + my.channel;
 	},
 	// receives channel prop from index.php
 	html: function() {
 		var s =
-			'<div id="chat-present-wrap">' +
-				'<div id="chat-header">town-1</div>' +
+			'<div id="chat-present-wrap" class="no-select">' +
+				'<div id="chat-header">town</div>' +
 				'<div id="chat-room"></div>' +
 			'</div>' +
 			'<div id="chat-log-wrap">' +
@@ -22,7 +22,7 @@ var chat = {
 				'</div>' +
 				'<div id="chat-input-wrap">' +
 					'<div id="chat-input-mode" class="chat-white no-select">'+
-						'<span id="chat-mode-msg" class="ellipsis">To town-1:</span>' +
+						'<span id="chat-mode-msg" class="ellipsis">To town:</span>' +
 					'</div>' +
 					'<input id="chat-input" type="text" maxlength="240" autocomplete="off" spellcheck="false" />' +
 				'</div>' +
@@ -107,12 +107,12 @@ var chat = {
 		},
 	},
 	dom: {},
-	init: function(z) {
+	init: function() {
 		// default initialization of chat
-		if (z && !chat.initialized) {
+		if (!chat.initialized) {
 			var e = document.getElementById('chat-wrap');
 			e.innerHTML = '';
-			e.style.display = z ? 'flex' : 'none';
+			e.style.display = 'flex';
 			e.innerHTML = chat.html();
 
 			chat.initialized = 1;
@@ -136,6 +136,18 @@ var chat = {
 			$("#chat-prompt").on(env.click, '.chat-prompt-no', function(e){
 				chat.prompt.deny($(this).data());
 			});
+
+			$("#chat-room").on(env.context, '.chat-player', function() {
+				var id = $(this).parent().attr('id'),
+					arr = id.split("-"),
+					playerId = arr[2] * 1,
+					text = $(this).text(),
+					a2 = text.split(":"),
+					name = a2[1].replace(/\]/g, '').trim();
+
+				// console.info('id name ', playerId, name);
+				context.getChatMenu(name);
+			});
 		}
 		else {
 			// hide
@@ -148,20 +160,6 @@ var chat = {
 		chat.dom.chatInputMode = document.getElementById('chat-input-mode');
 		chat.dom.chatModeMsg = document.getElementById('chat-mode-msg');
 		chat.dom.chatPrompt = document.getElementById('chat-prompt');
-
-		$("#chat-room").on(env.context, '.chat-player', function() {
-			var id = $(this).parent().attr('id'),
-				arr = id.split("-"),
-				playerId = arr[2] * 1,
-				text = $(this).text(),
-				a2 = text.split(":"),
-				name = a2[1].replace(/\]/g, '').trim();
-
-			// console.info('id name ', playerId, name);
-			context.getChatMenu(name);
-		});
-
-		console.info('bar-wrap ', $("#bar-wrap"));
 
 	},
 	// report to chat-log
@@ -179,15 +177,6 @@ var chat = {
 			chat.scrollBottom();
 		}
 	},
-	parseMsg: function(msg) {
-		var arr = msg.replace(/ +/g, " ").split(" ");
-		var o = {
-			first: arr[0].trim().toLowerCase()
-		}
-		arr.shift();
-		o.command = arr.join(' ');
-		return o;
-	},
 	historyIndex: 0,
 	history: [],
 	updateHistory: function(msg) {
@@ -203,7 +192,7 @@ var chat = {
 	},
 	help: function() {
 		var z = 'class="chat-emote"',
-			h = 'class="chat-help-header"'
+			h = 'class="chat-help-header"',
 			s = [
 				'<div '+ h +'>Main Chat Channels:</div>',
 				'<div '+ z +'>/say : Say a message in your current chat channel : /say hail</div>',
@@ -243,7 +232,7 @@ var chat = {
 			msgLower = msg.toLowerCase();
 
 		// bypass via ENTER or chat has focus
-		if (msg === '/h' || msg === '/help') {
+		if (msg === '?' || msg === '/h' || msg === '/help') {
 			chat.updateHistory(msg);
 			chat.help();
 		}
@@ -262,89 +251,71 @@ var chat = {
 			boot
 		 */
 		else if (msgLower === '/gmotd') {
-			chat.updateHistory(msgLower);
 			chat.invite();
 		}
 		else if (msgLower === '/gleader') {
-			chat.updateHistory(msgLower);
 			chat.invite();
 		}
 		else if (msgLower === '/gremove') {
-			chat.updateHistory(msgLower);
 			chat.invite();
 		}
 		else if (msgLower === '/ginvite') {
-			chat.updateHistory(msgLower);
 			chat.invite();
 		}
 		else if (msgLower.indexOf('/promote') === 0) {
-			chat.updateHistory(msgLower);
-			chat.promote(chat.party.parse(msgLower));
+			chat.promote(chat.party.parse(msg));
 		}
 		else if (msgLower.indexOf('/boot') === 0) {
-			chat.updateHistory(msgLower);
-			chat.boot(chat.party.parse(msgLower));
+			chat.boot(chat.party.parse(msg));
 		}
 		else if (msgLower === '/disband') {
-			chat.updateHistory(msgLower);
 			chat.disband();
 		}
 		else if (msgLower.indexOf('/invite') === 0) {
-			chat.updateHistory(msgLower);
-			chat.invite(chat.party.parse(msgLower));
+			chat.invite(chat.party.parse(msg));
 		}
 		else if (msgLower === '/camp') {
-			chat.updateHistory(msgLower);
 			chat.camp();
 		}
 		else if (msgLower === '/played') {
-			chat.updateHistory(msgLower);
 			chat.played();
 		}
 		else if (msgLower.indexOf('/join') === 0) {
-			chat.updateHistory(msgLower);
 			chat.join.channel(chat.join.parse(msg));
 		}
 		else if (msgLower === '/clear') {
-			chat.updateHistory(msgLower);
 			chat.clearChatLog();
 		}
 		else if (msgLower === '/who') {
-			chat.updateHistory(msgLower);
 			chat.who.all();
 		}
 		else if (msgLower.indexOf('/who ') === 0 && msgLower.length > 5) {
-			chat.updateHistory(msg);
 			chat.who.class(chat.who.parse(msg));
 		}
 		else if (msgLower === '/ignore') {
-			chat.updateHistory(msgLower);
 			chat.ignore.list();
 		}
 		else if (msgLower.indexOf('/ignore remove') === 0) {
-			chat.updateHistory(msg);
 			chat.ignore.remove(chat.friend.parse(msg));
 		}
 		else if (msgLower.indexOf('/ignore add') === 0) {
-			chat.updateHistory(msg);
 			chat.ignore.add(chat.friend.parse(msg));
 		}
 		else if (msgLower === '/friends' || msgLower === '/flist') {
-			chat.updateHistory(msgLower);
 			chat.friend.list();
 		}
 		else if (msgLower.indexOf('/friend remove') === 0) {
-			chat.updateHistory(msg);
 			chat.friend.remove(chat.friend.parse(msg));
 		}
 		else if (msgLower.indexOf('/friend add') === 0) {
-			chat.updateHistory(msg);
 			chat.friend.add(chat.friend.parse(msg));
+		}
+		else if (msgLower.indexOf('/me') === 0 || msgLower.indexOf('/em') === 0) {
+			chat.emote(msg);
 		}
 		else if (chat.mode.command === '@'){
 			// whisper
 			if (my.name !== chat.mode.name) {
-				chat.updateHistory(msg);
 				if (~ng.ignore.indexOf(chat.mode.name)) {
 					chat.log('You sent ' + chat.mode.name + ' a whisper, but you are currently ignoring him.', 'chat-warning');
 				}
@@ -360,47 +331,71 @@ var chat = {
 			}
 		}
 		else {
-			if (chat.hasFocus) {
-				if (msg) {
-					var o = chat.getMsgObject(msg);
-					if (o.msg[0] !== '/') {
-						chat.updateHistory(msg);
-						$.ajax({
-							url: app.url + 'php2/chat/send.php',
-							data: {
-								msg: o.msg,
-								class: o.class,
-								category: o.category
-							}
-						});
-					}
+			if (msg) {
+				console.info("%c This workin? ", "background: #080", msg);
+				var o = chat.getMsgObject(msg);
+				console.info("%c obj? ", "background: #080", o);
+				if (o.msg[0] !== '/') {
+					$.ajax({
+						url: app.url + 'php2/chat/send.php',
+						data: {
+							msg: o.msg,
+							class: o.class,
+							category: o.category
+						}
+					});
 				}
 			}
 		}
+		chat.updateHistory(msg);
 		chat.clear();
+	},
+	parseMsg: function(msg) {
+		var arr = msg.replace(/ +/g, " ").split(" ");
+		var o = {
+			first: arr[0].trim().toLowerCase()
+		}
+		arr.shift();
+		o.command = arr.join(' ');
+		return o;
 	},
 	getMsgObject: function(msg){
 		var o = {
+			category: chat.getChannel(),
 			msg: msg,
-			class: 'chat-normal',
-			category: chat.getChannel()
-		};
-		var parse = chat.parseMsg(msg);
+			class: 'chat-normal'
+		},
+			parse = chat.parseMsg(msg),
+			a = msg.split(" ");
+
+		a.shift();
+		var shortCommandMsg = a.join(" ");
 
 		// is it a command?
-		if (chat.mode.command === '/party'){
+		if (parse.first === '/s') {
+			o.category = chat.getChannel();
+			o.msg = shortCommandMsg;
+			o.class = 'chat-normal';
+		}
+		else if (parse.first === '/p') {
+			o.category = 'party:' + my.p_id;
+			o.msg = shortCommandMsg;
+			o.class = 'chat-party';
+		}
+		else if (chat.mode.command === '/party'){
 			o.category = 'party:' + my.p_id;
 			o.msg = msg;
 			o.class = 'chat-party';
 		}
-		else if (chat.mode.command === '/gsay'){
-			o.category = 'g:' + my.g_id;
-			o.msg = msg;
+		else if (parse.first === '/g') {
+			o.category = 'guild:' + my.g_id;
+			o.msg = shortCommandMsg;
 			o.class = 'chat-guild';
 		}
-		else if (parse.first === '/me') {
-			o.msg = parse.command;
-			o.class = 'chat-emote';
+		else if (chat.mode.command === '/gsay'){
+			o.category = 'guild:' + my.g_id;
+			o.msg = msg;
+			o.class = 'chat-guild';
 		}
 		else if (parse.first === '/broadcast'){
 			o.category = 'admin:broadcast';
@@ -415,6 +410,21 @@ var chat = {
 	},
 	clearChatLog: function(){
 		chat.dom.chatLog.innerHTML = '';
+	},
+	emote: function(msg) {
+		var a = msg.split(" ");
+		a.shift();
+		msg = a.join(" ");
+		if (msg[0] !== '/') {
+			$.ajax({
+				url: app.url + 'php2/chat/send.php',
+				data: {
+					msg: msg,
+					class: 'chat-emote',
+					category: chat.getChannel()
+				}
+			});
+		}
 	},
 	ignore: {
 		init: function() {
@@ -501,7 +511,7 @@ var chat = {
 		if (my.name === p) {
 			chat.log("You can't invite yourself to a party.", "chat-warning");
 		}
-		else if (my.p_id && !my.party[my.index].isLeader) {
+		else if (my.p_id && !my.party[0].isLeader) {
 			chat.log("You're still in a party! Try /disband to leave your party.", "chat-warning");
 		}
 		else {
@@ -515,8 +525,8 @@ var chat = {
 				}).done(function(r){
 					console.info('invite ', r);
 					if (r.newParty) {
-						my.party[my.index].isLeader = 1;
-						bar.updatePlayerBar(my.index);
+						my.party[0].isLeader = 1;
+						bar.updatePlayerBar(0);
 					}
 					chat.party.subscribe(r.p_id);
 				}).fail(function(r){
@@ -652,7 +662,7 @@ var chat = {
 		parse: function(msg) { // 2-part upper case
 			var a = msg.replace(/ +/g, " ").split(" ");
 			return a[1] === undefined ?
-				'' : (a[1][0].toUpperCase() + a[1].substr(1)).trim();
+				'' : (a[1][0].toUpperCase() + a[1].substr(1).toLowerCase()).trim();
 		},
 
 	},
@@ -660,6 +670,9 @@ var chat = {
 		parse: function(msg) { // 2-part parse lower case
 			var a = msg.split("whispers: ");
 			return a[1];
+		},
+		prefix: function() {
+			return '[' + my.level +':<span class="chat-'+ my.job +'">'+ my.name + '</span>]';
 		}
 	},
 	friend: {

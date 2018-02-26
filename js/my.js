@@ -5,11 +5,10 @@ var my = {
 		x: 0,
 		y: 0
 	},
-	channel: 'town-1',
+	channel: 'town',
 	lastReceivedWhisper: '',
 	p_id: 0,
 	g_id: 0,
-	index: 0,
 	leader: '',
 	isLeader: 0,
 	party: [],

@@ -31,7 +31,7 @@
 	<!--link rel="stylesheet" href="css/bootstrap-slider.min.css"-->
 	<script>
 		var app = {
-			version: '0.0.90',
+			version: '0.0.92',
 			initialized: 0,
 			isApp: location.protocol === 'chrome-extension:' ? 1 : 0,
 			account: ''
@@ -236,9 +236,9 @@
 						<!-- well top -->
 						<div id="title-well-top" class="title-ch-well ng-blue text-center">
 							<a id="delete-character"
-							   class="btn btn-lg title-ch-btn">Delete</a>
+							   class="btn btn-lg ng-btn title-btn-margin">Delete</a>
 							<a id="go-create-character"
-							   class="btn btn-lg title-ch-btn">Create</a>
+							   class="btn btn-lg ng-btn title-btn-margin">Create</a>
 						</div>
 						<!-- char cards -->
 						<div id="ch-card-base" class="stag-blue">
@@ -247,7 +247,7 @@
 						<!-- well bottom -->
 						<div id="title-well-bottom" class="title-ch-well ng-blue text-center">
 							<a id="enter-world"
-							   class="btn btn-sm title-ch-btn">
+							   class="btn btn-sm ng-btn title-btn-margin">
 								Enter World
 							</a>
 						</div>
@@ -571,9 +571,9 @@
 						<div id="create-attr-btn-wrap" class="snug text-center">
 							<div class="flex-row">
 								<button id="create-character-back"
-										class="col btn pointer text-shadow title-ch-btn">Back</button>
+										class="col btn pointer text-shadow ng-btn title-btn-margin">Back</button>
 								<button id="create-character-btn"
-										class="col btn pointer text-shadow title-ch-btn">Create</button>
+										class="col btn pointer text-shadow ng-btn title-btn-margin">Create</button>
 							</div>
 						</div>
 					</div>
@@ -1021,6 +1021,7 @@
 				"mobs",
 				"mob",
 				"town",
+				"guild",
 				"route",
 				"test"
 			]

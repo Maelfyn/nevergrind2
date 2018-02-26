@@ -56,7 +56,8 @@ var socket = {
 				}
 				// receive pong
 				else if (data.action === 'receive') {
-					data.msg = "You whispered to " + data.name + ": " + chat.whisper.parse(data.msg);
+					console.info('receive, ', data);
+					data.msg = chat.whisper.prefix() + " whispers: " + chat.whisper.parse(data.msg);
 					route.town(data, 'chat->log');
 				}
 				// party invite
