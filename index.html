@@ -79,34 +79,11 @@
 			  onSubmit="return loginAuthenticate(this);">
 			<fieldset>
 				<p>
-					Login with your Neverworks Account or <a id="createAccount" href="/createAccount.php" class="strongShadow">Create an Account</a>
+					<div><a id="createAccount" class="login-actions strongShadow">Create an Account</a></div>
+					<div>or</div>
+					<div><a id="gotoAccount" class="login-actions strongShadow">Login with your Neverworks Account</a></div>
 				</p>
-				<label class="textLeft" for="loginEmail">Account or Email Address
-					<input name="username" type="text" id="loginEmail" class="loginInputs" maxlength="255" placeholder="Account or Email Address" required="required" />
-				</label>
-
-				<label class="textLeft" for="password">Password
-					<input name="password"
-						   type="password"
-						   id="password"
-						   class="loginInputs"
-						   maxlength="20"
-						   autocomplete="current-password"
-						   placeholder="Password"
-						   required="required" />
-				</label>
-
-				<label for="rememberMe">
-					<input type="checkbox" id="rememberMe" name="rememberMe" checked> Remember Me
-				</label>
-
-				<input id="login-btn" type="submit" value="Login" class="btn btn-primary strongShadow" />
-
-				<div class="error-msg text-shadow"></div>
-
-				<div id="forgotPasswordWrap">
-					<a title="Neverworks Games will send you an email. Click the link to reset your password." id="forgotPassword">Forgot Password?</a>
-				</div>
+				<div id="login-form-contents"></div>
 
 				<div id="social-login-wrap">
 					<hr class="fancy-hr">
@@ -144,7 +121,7 @@
 			</fieldset>
 		</form>
 	</div>
-</div>
+</div> <!-- end login -->
 
 <div id="scene-title" class="scene no-select">
 	<div id="ng2-logo-wrap" class="scene">
@@ -157,7 +134,7 @@
 
 		<header id="title-header" class="text-primary text-shadow">
 			<div class="title-column">
-				<a id="logout" class="btn btn-primary btn-sm pointer">Loading...</a>
+				<a id="logout" class="ng-btn pointer">Loading...</a>
 			</div>
 
 			<div id="social-icons" class="text-primary title-column">
@@ -629,7 +606,153 @@
 <!--script src="https://js.stripe.com/v2/"></script-->
 
 <script>
+	var login = {
+		lock: 0,
+		init: function() {
+			setTimeout(function(){
+				document.getElementById('login-form-contents').innerHTML = login.getLoginHtml();
+				$("#loginWrap").attr('onSubmit', 'return loginAuthenticate(this)');
+			});
+			$("#gotoAccount").on('click', function(){
+				document.getElementById('login-form-contents').innerHTML = login.getLoginHtml();
+				$("#loginWrap").attr('onSubmit', 'return loginAuthenticate(this)');
+			});
+			$("#createAccount").on('click', function(){
+				document.getElementById('login-form-contents').innerHTML = login.getCreateHtml();
+				$("#loginWrap").attr('onSubmit', 'return login.createAccount(this)');
+			});
+		},
+		getLoginHtml: function(){
+			var s =
+				'<label class="textLeft" for="loginEmail">Account or Email Address' +
+				'<input name="username"' +
+					'type="text"' +
+					'id="loginEmail"' +
+					'class="loginInputs"' +
+					'maxlength="255"' +
+					'placeholder="Account or Email Address"' +
+					'required="required"' +
+					'spellcheck="false"/>' +
+				'</label>' +
+				'<label class="textLeft" for="password">Password' +
+					'<input name="password"' +
+						'type="password"' +
+						'id="password"' +
+						'class="loginInputs"' +
+						'maxlength="20"' +
+						'autocomplete="current-password"' +
+						'placeholder="Password"' +
+						'required="required" />' +
+				'</label>' +
+				'<label for="rememberMe">' +
+					'<input type="checkbox" id="rememberMe" name="rememberMe" checked> Remember Me' +
+				'</label>' +
+				'<input id="login-btn" type="submit" value="Login" class="ng-btn strongShadow" />' +
+				'<div class="error-msg text-shadow"></div>' +
+				'<div id="forgotPasswordWrap">' +
+					'<a title="Neverworks Games will send you an email. Click the link to reset your password." ' +
+						'id="forgotPassword">Forgot Password?</a>' +
+				'</div>';
+			return s;
+		},
+		getCreateHtml: function() {
+			var s =
+				'<label class="textLeft" for="loginEmail">Email Address' +
+					'<input name="username" ' +
+					'type="text" ' +
+					'id="loginEmail" ' +
+					'class="loginInputs" ' +
+					'maxlength="255" ' +
+					'placeholder="Account or Email Address" ' +
+					'required="required" ' +
+					'spellcheck="false"/></label>' +
+				'<label class="textLeft" ' +
+					'for="password">Password' +
+					'<input name="password" ' +
+					'type="password" ' +
+					'id="password" ' +
+					'class="loginInputs" ' +
+					'maxlength="20" ' +
+					'placeholder="Password" required="required" /></label>' +
+				'<label class="textLeft create-account signupHeader" ' +
+					'for="loginAccount">Account Name' +
+					'<input name="account" ' +
+					'type="text" ' +
+					'name="account" ' +
+					'id="loginAccount" ' +
+					'class="loginInputs create-account" ' +
+					'maxlength="16" ' +
+					'placeholder="Account Name" ' +
+					'required="required" /></label>' +
+				'<div id="tosWrap" class="create-account">' +
+					'<span id="tos" class="aqua">' +
+					'<a target="_blank" href="//nevergrind.com/blog/terms-of-service/">Terms of Service</a> | <a target="_blank" href="//nevergrind.com/blog/privacy-policy/">Privacy Policy</a></span>' +
+				'</div>' +
+				'<input id="create-account" type="submit" value="Create" class="ng-btn strongShadow" />' +
+				'<div class="error-msg text-shadow"></div>';
+			return s;
+		},
+		createAccount: function() {
+			if (login.lock) {
+				return false;
+			}
+			var pw = $("#password").val(),
+				acc = $("#loginAccount").val();
 
+			if (acc.length < 2) {
+				loginMsg("Your account name must be more than two characters long.");
+				return false;
+			}
+			if (acc.length > 16) {
+				loginMsg("Your account name must be less than 16 characters long.");
+				return false;
+			}
+			var tempAcc = acc.replace('_', '');
+			if (tempAcc.match(/[a-z0-9]/gi, '').length < tempAcc.length) {
+				loginMsg("Your account name should only contain letters, numbers, and underscores.");
+				return false;
+			}
+			if (pw.length < 6) {
+				loginMsg("Your password must be at least six characters long.");
+				return false;
+			}
+			loginMsg("Connecting to server...");
+			login.lock = 1;
+			/*,
+				referral: $("#referFriend").val().toLowerCase()
+			*/
+			var email = $("#loginEmail").val().toLowerCase(),
+				account = acc.toLowerCase();
+			$.ajax({
+				type: 'POST',
+				url: app.loginUrl + '/php/master1.php',
+				data: {
+					run: "createAccount",
+					email: email,
+					account: account,
+					password: pw,
+					promo: ''
+				}
+			}).done(function(data) {
+				if (data.indexOf("Account Created") === -1){
+					// something went wrong
+					loginMsg(data);
+				} else {
+					loginMsg("Account Created! Reloading!");
+					setTimeout(function(){
+						location.reload();
+					}, 100);
+				}
+			}).fail(function() {
+				loginMsg("There was a problem communicating with the server.");
+			}).always(function() {
+				login.lock = 0;
+				alert('ok');
+			});
+			return false; // prevent form submission
+		}
+	}
+	login.init();
 	// loginModal.php
 	sessionStorage.setItem('refer', location.pathname);
 	// FB SSO
@@ -746,10 +869,15 @@
 		loginFadeTimer.kill();
 		loginFadeTimer = TweenMax.to('.error-msg', 0, {
 			opacity: 1,
+			height: 'auto',
 			display: 'block',
 			onComplete: function(){
 				TweenMax.to('.error-msg', 1, {
 					delay: 8,
+					transformOrigin: '50% 0',
+					transformPerspective: 500,
+					rotationX: -90,
+					height: 0,
 					opacity: 0,
 					onComplete: function(){
 						$(".error-msg").html('');
@@ -759,14 +887,19 @@
 		});
 	}
 	function loginMsg(msg){
-		var str = "<p>" + msg + "</p>";
+		var str = "<div>" + msg + "</div>";
 		$(".error-msg").html(str);
 		fadeOut();
+		TweenMax.set('.error-msg', {
+			transformOrigin: '50% 0',
+			transformPerspective: 500,
+			rotationX: 0
+		})
 	}
 	$('#login').on('click', function() {
 		loginAuthenticate();
 	});
-	$("#forgotPassword").on('click', function() {
+	$("#login-form-contents").on('click', '#forgotPassword', function() {
 		if (this.textContent === "Checking...") {
 			return;
 		}
@@ -799,10 +932,12 @@
 	}).on('blur', function() {
 		loginFocusInput = false;
 	});
-
-	$("#login-btn").on('click', function(){
+	// delegate login events
+	$("#login-form-contents").on('click', '#login-btn', function(){
 		loginAuthenticate();
-	})
+	}).on('click', '#create-account', function(){
+		login.createAccount();
+	});
 
 	$('.loginInputs').on('keydown', function(e){
 		// hit enter
@@ -822,10 +957,10 @@
 			loginMsg("Passwords must be at least six characters long.");
 			return false;
 		}
-		var login = $("#loginEmail").val().toLowerCase();
+		var loginEmail = $("#loginEmail").val().toLowerCase();
 		var setToken = false;
 		if ($("#rememberMe").prop('checked')){
-			localStorage.setItem('email', login);
+			localStorage.setItem('email', loginEmail);
 			localStorage.setItem('token', token);
 			setToken = true;
 		} else {
@@ -839,7 +974,7 @@
 			url: app.loginUrl + '/php/master1.php',
 			data: {
 				run: 'authenticate',
-				email: login,
+				email: loginEmail,
 				password: $("#password").val()
 			}
 		}).done(function(data){
@@ -944,6 +1079,7 @@
 		$("#login-modal").css({
 			visibility: 'visible'
 		});
+		$("#logout").remove();
 
 
 		/*if (app.isServer) {

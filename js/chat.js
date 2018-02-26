@@ -332,9 +332,7 @@ var chat = {
 		}
 		else {
 			if (msg) {
-				console.info("%c This workin? ", "background: #080", msg);
 				var o = chat.getMsgObject(msg);
-				console.info("%c obj? ", "background: #080", o);
 				if (o.msg[0] !== '/') {
 					$.ajax({
 						url: app.url + 'php2/chat/send.php',
@@ -723,7 +721,10 @@ var chat = {
 			}
 		},
 		add: function(o) {
-			if (o.length > 1 && o !== my.name && ng.friends.indexOf(o) === -1) {
+			if (~ng.friends.indexOf(o)) {
+				chat.log(o + " is already your friend.", 'chat-warning');
+			}
+			else if (o.length > 1 && o !== my.name) {
 				$.ajax({
 					url: app.url + 'php2/chat/friend-add.php',
 					data: {

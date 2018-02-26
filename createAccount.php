@@ -117,7 +117,14 @@
 				<hr class="fancy-hr">
 			
 				<label class="textLeft" for="loginEmail">Email Address
-					<input name="username" type="text" id="loginEmail" class="loginInputs" maxlength="255" placeholder="Account or Email Address" required="required" />
+					<input name="username" 
+						type="text" 
+						id="loginEmail" 
+						class="loginInputs" 
+						maxlength="255" 
+						placeholder="Account or Email Address" 
+						required="required"
+						spellcheck="false"/>
 				</label>
 				
 				<label class="textLeft" for="password">Password

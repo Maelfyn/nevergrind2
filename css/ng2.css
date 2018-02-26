@@ -34,17 +34,17 @@ fieldset {
 	text-align:left;
 	text-indent:15px;
 }
-#login-btn, #resetPW{
-	position:relative;
-	font-size:16px;
-	width:180px;
-	margin:0 auto;
-	margin-top:10px;
-	left:0;
-	right:0;
-	border:2px groove #642;
+#create-account, #login-btn, #resetPW{
+	position: relative;
+	font: 1rem/2;
+	width: 12rem;
+	margin: 0 auto;
+	margin-top: .5rem;
+	left: 0;
+	right: 0;
+	outline: none;
 }
-#login-btn:hover, #resetPW:hover{
+#create-account:hover, #login-btn:hover, #resetPW:hover{
 	box-shadow:0 0 2px rgba(80, 110, 240, 1),
 	0 0 5px rgba(80, 110, 240, 1);
 }
@@ -73,8 +73,11 @@ fieldset {
 	background-image: -ms-radial-gradient(80px 0px, farthest-corner, #5488da 0%, #132239 100%);
 	background-image: -o-radial-gradient(80px 0px, farthest-corner, #5488da 0%, #132239 100%);
 }
+#tosWrap {
+	margin: .5rem;
+}
 #forgotPasswordWrap{
-	margin-top:15px;
+	margin-top: 0;
 }
 #forgotPassword{
 	color: #aef;
@@ -105,8 +108,9 @@ body{
 	margin: 8px 0
 }
 .error-msg {
-	color: #ff1611;
-	margin: 10px 0;
+	padding: .5rem;
+	margin: 0;
+	color: #ff0;
 }
 #currencyIndicator{
 	width: 100%
@@ -120,11 +124,6 @@ label{
 	font-weight: normal;
 	display: block;
 	margin: .1em 0
-}
-#login-btn{
-	border: 1px solid #000;
-	width: 240px;
-	border-radius: 5px;
 }
 #twitter-wrap {
 	margin:0 0 5px 0;
@@ -176,12 +175,12 @@ label{
 	border-radius: 4px;
 	cursor: url('cursor/pointer.cur'), pointer!important;
 }
-#createAccount{
+#loginWrap .login-actions {
 	color: #aef;
-	font: 14px;
+	font-size: .75rem;
 }
-#createAccount:hover{
-	color: #fff
+#loginWrap .login-actions:hover {
+	color: #fff;
 }
 .textLeft, .signupHeader{
 	margin-top: .375em
@@ -694,6 +693,7 @@ tbody {
 	align-self: center
 }
 #logout {
+	font-size: .875rem;
 	color: #fff
 }
 .flex-row {
@@ -1197,20 +1197,8 @@ tbody {
 	justify-content: center;
 	align-items: center;
 }
-#town-mission-counter {
-	padding: 0 10px;
-	border: 2px ridge #468;
-	outline: 1px solid #000;
-	box-shadow:
-		-1px -1px #05b inset,
-		1px 1px #05b inset,
-		-1px 1px #05b inset,
-		1px -1px #05b inset;
-	background: #025;
-	background-image: -webkit-radial-gradient(center center, cover, #025 0%, #013 100%);
-	background-image: -moz-radial-gradient(center center, cover, #025 0%, #013 100%);
-	background-image: -ms-radial-gradient(center center, cover, #025 0%, #013 100%);
-	background-image: -o-radial-gradient(center center, cover, #025 0%, #013 100%);
+#town-mission {
+	font-size: 1.25rem;
 	cursor: url('cursor/pointer.cur'), pointer;
 }
 .footer-hr {
@@ -1277,7 +1265,7 @@ tbody {
 	line-height: 1.25;
 	color: #f2f2f2;
 	word-break: break-word;
-	padding: .1rem 0 0 .2rem;
+	padding: .1rem .2rem 0 .2rem;
 	margin: .1rem;
 	border: .1rem groove #025;
 }
@@ -1336,7 +1324,7 @@ tbody {
 	cursor: url('cursor/pointer.cur'), pointer;
 }
 .chat-player:hover {
-	background: #025;
+	background: #048;
 }
 #chat-log div {
 	text-shadow: 1px 1px #000;
@@ -1668,13 +1656,13 @@ background-clip: content-box;
 }
 /* town menu */
 #town-menu {
+	position: absolute;
 	text-align: center;
 	border: .1rem groove #025;
 	box-shadow: 0 0 0 1px #aef;
-	position: absolute;
 	z-index: 1;
-	bottom: 4rem;
-	left: 1rem;
+	bottom: 3rem;
+	right: .5rem;
 	padding: .2rem .1rem 0;
 	background: #579;
 	background: -webkit-radial-gradient(top left, farthest-corner, rgba(80, 116, 132, 1) 0, rgba(0, 0, 0, 1) 100%);
@@ -1682,9 +1670,60 @@ background-clip: content-box;
 	background: -o-radial-gradient(top left, farthest-corner, rgba(80, 116, 132, 1) 0, rgba(0, 0, 0, 1) 100%);
 	background: radial-gradient(top left, farthest-corner, rgba(80, 116, 132, 1) 0, rgba(0, 0, 0, 1) 100%);
 }
+.town-aside {
+	position: absolute;
+	display: none;
+	top: 2vh;
+	left: 2vw;
+	height: 92vh;
+	padding: 1rem 1.5rem;
+	font-size: 1.5rem;
+	width: 46vw;
+	border: 6px double #103860;
+	overflow: hidden;
+	z-index: 1;
+}
+.aside-bg {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+}
+.aside-text {
+	position: relative;
+	z-index: 1;
+}
+.aside-title-wrap {
+	display: flex;
+	position: relative;
+	font: 2rem/2 Cinzel, Palatino Linotype, serif;
+	background: rgba(0,0,0,.7);
+	padding: 0 .5rem;
+	border: 6px double #a96;
+}
+.aside-title {
+	flex: 1;
+}
+.close-aside {
+	flex: 0;
+	align-self: center;
+	-webkit-transition: color ease .3s;
+	-moz-transition: color ease .3s;
+	-o-transition: color ease .3s;
+	transition: color ease .3s;
+}
+.close-aside:hover {
+	cursor: url('cursor/pointer.cur'), pointer;
+	color: #f00 !important;
+}
 #town-menu > * {
 	box-shadow: 0 0 0 1px #000;
 	margin-bottom: .2rem;
+}
+.aside-npc {
+	position: absolute;
+	bottom: -15%;
+	left: -40%;
 }
 
 

@@ -338,7 +338,7 @@ var ng = {
 				ret.authResponse && FB.logout(function(response) {});
 			});
 		} catch (err){
-			console.info('Facebook error: ', err);
+			console.info('Facebook OAuth error: ', err);
 		}
 		
 		try {
@@ -346,7 +346,7 @@ var ng = {
 			auth2.signOut().then(function(){
 			});
 		} catch (err){
-			console.info('Google error: ', err);
+			console.info('Google OAuth error: ', err);
 		}
 		
 		setTimeout(function(){
