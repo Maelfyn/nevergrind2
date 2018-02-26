@@ -104,7 +104,6 @@ var town = {
 	},
 	events: function(){
 		$("#scene-town").on(env.click, '.close-aside', function(){
-			console.info("CLICK");
 			// close town asides
 			town.aside.selected = '';
 			var e = $(".town-aside");
@@ -198,6 +197,20 @@ var town = {
 			if (!sessionStorage.getItem('startTime')) {
 				sessionStorage.setItem('startTime', JSON.stringify(Date.now()));
 			}
+			town.preload();
 		}
-	}
+	},
+	preload: function() {
+		var p = 'img2/town/';
+		cache.preload.images([
+			p + 'arwen-reinhardt.png',
+			p + 'halas.jpg',
+			p + 'miranda-crossheart.png',
+			p + 'neriak.jpg',
+			p + 'poh.jpg',
+			p + 'rendo-surefoot.png',
+			p + 'surefall.jpg',
+			p + 'valeska-windcrest.png',
+		])
+	},
 };
