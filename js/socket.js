@@ -56,8 +56,12 @@ var socket = {
 				}
 				// receive pong
 				else if (data.action === 'receive') {
-					console.info('receive, ', data);
-					data.msg = chat.whisper.prefix() + " whispers: " + chat.whisper.parse(data.msg);
+					if (!chat.lastWhisper.name) {
+						chat.lastWhisper = {
+							name: data.name
+						}
+					}
+					data.msg = chat.whisper.to(data) + chat.whisper.parse(data.msg);
 					route.town(data, 'chat->log');
 				}
 				// party invite
@@ -110,7 +114,7 @@ var socket = {
 	},
 	initialConnection: 1,
 	routeMainChat: function(topic, data) {
-		console.info('rx ', topic, data);
+		// console.info('rx ', topic, data);
 		route.town(data, data.route);
 	},
 	connectionSuccess: function(){
@@ -184,7 +188,7 @@ var socket = {
 	initGuild: function() {
 		// subscribe to test guild for now
 		if (my.guild.id) {
-			console.info("subscribing to channel: ", my.guildChannel());
+			console.info("subscribing to guild channel: ", my.guildChannel());
 			socket.zmq.subscribe(my.guildChannel(), function(topic, data) {
 				console.info('rx ', topic, data);
 				route.town(data, data.route);

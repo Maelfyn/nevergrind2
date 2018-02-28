@@ -21,7 +21,13 @@ var route = {
 		}
 	},
 	party: function(data, r) {
-		if (r === 'party->join') {
+		if (r === 'party->hb') {
+			bar.heartbeat.receive(data);
+		}
+		else if (r === 'party->linkdead') {
+			bar.heartbeat.linkdead(data);
+		}
+		else if (r === 'party->join') {
 			bar.party.join(data);
 		}
 		else if (r === 'party->disband') {

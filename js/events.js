@@ -42,13 +42,13 @@ $(document).on(env.click, function(e){
 			chat.reply();
 			return false;
 		}
-		else if (!chat.hasFocus && code === 65) {
+		else if (!chat.hasFocus && !guild.hasFocus && code === 65) {
 			// no select all of webpage elements
 			e.preventDefault();
 		}
 	} else {
 		if (ng.view === 'title'){
-			if (!ng.isModalOpen){
+			if (!ng.isModalOpen && !init.isMobile){
 				$("#create-character-name").focus();
 			}
 		} else {
@@ -87,8 +87,13 @@ $(document).on(env.click, function(e){
 						return false;
 					}
 				} else {
-					// no chat focus
-					chat.dom.chatInput.focus();
+					// no aside && no chat focus
+					!town.aside.selected && chat.dom.chatInput.focus();
+					if (guild.hasFocus) {
+						if (code === 13) {
+							guild.create();
+						}
+					}
 				}
 			} else {
 				// game

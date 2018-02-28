@@ -137,10 +137,12 @@ var bar = {
 					console.info('SET BARS ', i, v);
 					if (v.name === my.name) {
 						my.party[0] = v;
+						my.resetClientPartyValues(0);
 						bar.updatePlayerBar(0);
 					}
 					else {
 						my.party[npIndex] = v;
+						my.resetClientPartyValues(npIndex);
 						bar.updatePlayerBar(npIndex++);
 					}
 				});
@@ -179,6 +181,23 @@ var bar = {
 				document.getElementById('bar-player-wrap-' + i).style.display = 'none';
 			}
 		});
+	},
+	heartbeat: {
+		receive: function(data) {
+			console.info('heartbeat.receive', data);
+			var index = 0;
+			for (var i=1; i<6; i++) {
+				if (data.id === my.party[i].id) {
+					index = i;
+				}
+			}
+			if (index) {
+				my.resetClientPartyValues(index);
+			}
+		},
+		linkdead: function(data) {
+			chat.log(data.name + ' has gone linkdead.', 'chat-warning');
+		}
 	},
 	get: function() {
 

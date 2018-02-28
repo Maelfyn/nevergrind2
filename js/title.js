@@ -5,8 +5,7 @@ var title = {
 			// console.info("Initializing title screen...");
 			setTimeout(function() {
 				ng.initGame();
-				clearTimeout(game.heartbeat.timer);
-				game.heartbeat.timer = setTimeout(function(){
+				game.session.timer = setTimeout(function(){
 					ng.keepAlive();
 				}, 180000);
 				// init events

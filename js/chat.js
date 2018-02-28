@@ -550,6 +550,7 @@ var chat = {
 		}, 1000);
 	},
 	reply: function() {
+		console.info('chat.lastWhisper.name', chat.lastWhisper.name);
 		if (chat.lastWhisper.name) {
 			var o = {
 				mode: '@',
@@ -656,6 +657,9 @@ var chat = {
 		},
 		prefix: function() {
 			return '[' + my.level +':<span class="chat-'+ my.job +'">'+ my.name + '</span>]';
+		},
+		to: function(data) {
+			return 'You whispered to ' + data.name + ': ';
 		}
 	},
 	friend: {
@@ -996,7 +1000,6 @@ var chat = {
 	},
 	// players receive update from socket
 	addPlayer: function(v) {
-		// console.info('chat.inChannel', v.row, chat.inChannel);
 		if (chat.inChannel.indexOf(v.row) === -1) {
 			var e = document.createElement('div');
 			e.innerHTML =

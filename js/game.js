@@ -2,6 +2,9 @@
 var game = {
 	maxPlayers: 6,
 	init: 0,
+	session: {
+		timer: 0
+	},
 	ping: {
 		start: 0,
 		oneWay: function() {
@@ -15,13 +18,21 @@ var game = {
 		// only called once
 		if (!game.init) {
 			game.init = 1;
-			game.heartbeat.send();
+			clearTimeout(game.session.timer);
+			game.heartbeat.start();
 			game.socket.start();
 			game.played.start();
+			game.sanity.party.start();
+			game.sanity.chat.start();
 		}
 	},
 	heartbeat: {
 		timer: 0,
+		start: function() {
+			game.heartbeat.send();
+			clearInterval(game.heartbeat.timer);
+			game.heartbeat.timer = setInterval(game.heartbeat.send, 5000);
+		},
 		send: function() {
 			game.ping.start = Date.now();
 			$.ajax({
@@ -29,16 +40,6 @@ var game = {
 				url: app.url + 'php2/heartbeat.php'
 			}).done(function () {
 				console.info("%c Ping: ", 'background: #0f0', game.ping.oneWay());
-			}).fail(function () {
-				clearTimeout(game.heartbeat.timer);
-				game.heartbeat.timer = setTimeout(function () {
-					game.heartbeat.start();
-				}, 1000);
-			}).always(function(){
-				clearTimeout(game.heartbeat.timer);
-				game.heartbeat.timer = setTimeout(function() {
-					game.heartbeat.send();
-				}, 5000);
 			});
 		}
 	},
@@ -46,31 +47,123 @@ var game = {
 		timer: 0,
 		start: function() {
 			clearInterval(game.socket.timer);
-			game.socket.timer = setInterval(function(){
-				socket.healthTime = Date.now();
-				socket.startHealthCheck();
-				socket.zmq.publish('hb:' + my.name, {});
-			}, 20000);
+			game.socket.timer = setInterval(game.socket.send, 20000);
+		},
+		send: function() {
+			socket.healthTime = Date.now();
+			socket.startHealthCheck();
+			socket.zmq.publish('hb:' + my.name, {});
 		}
 	},
 	played: {
 		timer: 0,
 		start: function() {
 			clearInterval(game.played.timer);
-			game.played.timer = setInterval(function(){
-				$.ajax({
-					type: 'GET',
-					url: app.url + 'php2/update-played.php'
-				}).done(function(){
-					// nada
-				}).fail(function(){
-					setTimeout(function(){
-						game.played.start();
-					}, 5000);
-				}).always(function(){
-					!app.isLocal && console.clear();
+			game.played.timer = setInterval(game.played.send, 60000);
+		},
+		send: function() {
+			$.ajax({
+				type: 'GET',
+				url: app.url + 'php2/update-played.php'
+			}).always(function(){
+				!app.isLocal && console.clear();
+			});
+		}
+	},
+	sanity: {
+		party: {
+			timer: 0,
+			start: function() {
+				clearInterval(game.sanity.party.timer);
+				game.sanity.party.timer = setInterval(function(){
+					if (my.p_id) {
+						game.sanity.party.send();
+						game.sanity.party.check();
+					}
+				}, 5000);
+			},
+			send: function() {
+				console.info("Sending party heartbeats....");
+				socket.zmq.publish('party:' + my.p_id, {
+					id: my.row,
+					route: 'party->hb'
 				});
-			}, 60000);
+
+				/*$.ajax({
+					type: 'GET',
+					url: app.url + 'php2/chat/sanity-party.php'
+				}).done(function (data) {
+					for (var i = 0, len = data.players.length; i < len; i++) {
+						data.players[i] *= 1;
+					}
+					var newChatArray = [];
+					chat.inChannel.forEach(function (v) {
+						if (!~data.players.indexOf(v)) {
+							$("#chat-player-" + v).remove();
+						}
+						else {
+							newChatArray.push(v);
+						}
+					});
+					if (newChatArray.length) {
+						chat.inChannel = newChatArray;
+						chat.setHeader();
+
+					}
+				});*/
+			},
+			check: function() {
+				var now = Date.now(),
+					linkdead = [];
+				for (var i=1; i<6; i++) {
+					console.info("Checking: ", my.party[i].id, now - my.party[i].heartbeat > 15000)
+					if (my.party[i].id &&
+						!my.party[i].linkdead &&
+						(now - my.party[i].heartbeat > 15000)) {
+						linkdead.push(my.party[i].name);
+						my.party[i].linkdead = 1;
+					}
+				}
+				linkdead.forEach(function(name){
+					socket.zmq.publish('party:' + my.p_id, {
+						name: name,
+						route: 'party->linkdead'
+					});
+				});
+			}
+		},
+		chat: {
+			timer: 0,
+			start: function() {
+				clearInterval(game.sanity.chat.timer);
+				game.sanity.chat.timer = setInterval(game.sanity.chat.send, 60000);
+			},
+			send: function() {
+				if (ng.view === 'town') {
+					$.ajax({
+						type: 'GET',
+						url: app.url + 'php2/chat/sanity-chat.php'
+					}).done(function (data) {
+						for (var i = 0, len = data.players.length; i < len; i++) {
+							data.players[i] *= 1;
+						}
+						var newChatArray = [];
+						chat.inChannel.forEach(function (v) {
+							if (!~data.players.indexOf(v)) {
+								$("#chat-player-" + v).remove();
+							}
+							else {
+								newChatArray.push(v);
+							}
+						});
+						if (newChatArray.length) {
+							chat.inChannel = newChatArray;
+							chat.setHeader();
+
+						}
+					});
+				}
+			}
 		}
 	},
 	exit: function() {

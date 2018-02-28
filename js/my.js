@@ -83,8 +83,13 @@ var my = {
 			hp: 0,
 			maxHp: 0,
 			mp: 0,
-			maxMp: 0
+			maxMp: 0,
+			heartbeat: Date.now()
 		}
+	},
+	resetClientPartyValues: function(o) {
+		o.heartbeat = Date.now();
+		o.linkdead = 0;
 	},
 	team: 0,
 	slot: 1,
