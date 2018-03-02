@@ -64,13 +64,21 @@ var socket = {
 					data.msg = chat.whisper.to(data) + chat.whisper.parse(data.msg);
 					route.town(data, 'chat->log');
 				}
+				// guild invite
+				else if (data.action === 'guild-invite') {
+					console.info("guild invite received! ", data);
+					chat.prompt.add(data);
+				}
 				// party invite
 				else if (data.action === 'party-invite') {
 					console.info("party invite received! ", data);
 					chat.prompt.add(data);
 				}
-				else if (data.action === 'party-deny') {
+				else if (data.action === 'party-invite-deny') {
 					chat.log(data.name + " has denied your party invite.", 'chat-warning');
+				}
+				else if (data.action === 'guild-invite-deny') {
+					chat.log(data.name + " has denied your guild invite.", 'chat-warning');
 				}
 				else if (data.action === 'party-accept') {
 					chat.log(data.name + " has joined the party.", 'chat-warning');
@@ -189,9 +197,15 @@ var socket = {
 		// subscribe to test guild for now
 		if (my.guild.id) {
 			console.info("subscribing to guild channel: ", my.guildChannel());
+			my.guild.motd && chat.log('Guild Message of the day: ' + my.guild.motd, 'chat-guild');
 			socket.zmq.subscribe(my.guildChannel(), function(topic, data) {
 				console.info('rx ', topic, data);
-				route.town(data, data.route);
+				if (data.route === 'chat->log') {
+					route.town(data, data.route);
+				}
+				else {
+					route.guild(data, data.route);
+				}
 			});
 		}
 	}

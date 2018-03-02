@@ -42,7 +42,7 @@ var chat = {
 		types: [
 			'/say',
 			'/party',
-			'/gsay'
+			'/guild'
 		],
 		command: '/say',
 		name: '',
@@ -96,7 +96,7 @@ var chat = {
 				chat.dom.chatInputMode.className = 'chat-party';
 				chat.dom.chatModeMsg.textContent = 'To party:';
 			}
-			else if (mode === '/gsay') {
+			else if (mode === '/guild') {
 				chat.dom.chatInputMode.className = 'chat-guild';
 				chat.dom.chatModeMsg.textContent = 'To guild:';
 			}
@@ -197,7 +197,7 @@ var chat = {
 				'<div '+ h +'>Main Chat Channels:</div>',
 				'<div '+ z +'>/say : Say a message in your current chat channel : /say hail</div>',
 				'<div '+ z +'>/party : Message your party : /party hail</div>',
-				'<div '+ z +'>/gsay : Message your guild : /gsay hail</div>',
+				'<div '+ z +'>/guild : Message your guild : /guild hail</div>',
 				'<div '+ z +'>@ : Send a private message by name : @bob hi</div>',
 				'<div '+ h +'>Change Channels:</div>',
 				'<div '+ z +'>/join channel : Join a channel : /join bros</div>',
@@ -249,17 +249,23 @@ var chat = {
 			leader
 			boot
 		 */
-		else if (msgLower === '/gmotd') {
-			chat.invite();
+		else if (msgLower.indexOf('/motd') === 0) {
+			guild.motd(guild.motdParse(msg));
 		}
-		else if (msgLower === '/gleader') {
-			chat.invite();
+		else if (msgLower.indexOf('/gleader') === 0) {
+			guild.leader(chat.party.parse(msg));
 		}
-		else if (msgLower === '/gremove') {
-			chat.invite();
+		else if (msgLower.indexOf('/gpromote') === 0) {
+			guild.promote(chat.party.parse(msg));
 		}
-		else if (msgLower === '/ginvite') {
-			chat.invite();
+		else if (msgLower.indexOf('/gboot') === 0) {
+			guild.boot(chat.party.parse(msg));
+		}
+		else if (msgLower === '/gquit') {
+			guild.quit();
+		}
+		else if (msgLower.indexOf('/ginvite') === 0) {
+			guild.invite(chat.party.parse(msg));
 		}
 		else if (msgLower.indexOf('/promote') === 0) {
 			chat.promote(chat.party.parse(msg));
@@ -333,14 +339,23 @@ var chat = {
 			if (msg) {
 				var o = chat.getMsgObject(msg);
 				if (o.msg[0] !== '/') {
-					$.ajax({
-						url: app.url + 'php2/chat/send.php',
-						data: {
-							msg: o.msg,
-							class: o.class,
-							category: o.category
-						}
-					});
+					console.info(o);
+					if (!my.p_id && o.category.indexOf('party') === 0) {
+						chat.log("You are not in a party.", 'chat-warning');
+					}
+					else if (!my.guild.id && o.category.indexOf('guild') === 0) {
+						chat.log("You are not in a guild.", 'chat-warning');
+					}
+					else {
+						$.ajax({
+							url: app.url + 'php2/chat/send.php',
+							data: {
+								msg: o.msg,
+								class: o.class,
+								category: o.category
+							}
+						});
+					}
 				}
 			}
 		}
@@ -389,7 +404,7 @@ var chat = {
 			o.msg = shortCommandMsg;
 			o.class = 'chat-guild';
 		}
-		else if (chat.mode.command === '/gsay'){
+		else if (chat.mode.command === '/guild'){
 			o.category = 'guild:' + my.guild.id;
 			o.msg = msg;
 			o.class = 'chat-guild';
@@ -509,7 +524,7 @@ var chat = {
 			chat.log("You can't invite yourself to a party.", "chat-warning");
 		}
 		else if (my.p_id && !my.party[0].isLeader) {
-			chat.log("You're still in a party! Try /disband to leave your party.", "chat-warning");
+			chat.log("Only the party leader may send invites.", "chat-warning");
 		}
 		else {
 			if (p) {
@@ -566,15 +581,17 @@ var chat = {
 				e = document.createElement('div'),
 				id = ng.getId();
 
-			e.id = 'party-invite-'+ data.row;
+			console.info('prompt.add', data);
+			e.id = data.action +'-'+ data.row;
 			e.className = 'prompt-row prompt-row-' + id + ' ' + data.css;
 			// write innerHTML
 			s +=
-				'<div class="chat-prompt-msg">'+ data.msg +'</div>' + // col 1
-				'<div class="chat-prompt-options">'+ // col 2
+				'<div class="chat-prompt-msg stag-blue">'+ data.msg +'</div>' + // col 1
+				'<div class="chat-prompt-options stag-blue">'+ // col 2
 					'<span data-row="'+ data.row +'" '+
 						'data-id="'+ id +'" '+
 						'data-action="'+ data.action +'" '+
+						'data-guild-name="'+ data.guildName +'" '+
 						'class="chat-prompt-btn chat-prompt-yes">'+
 						'<i class="fa fa-check chat-prompt-yes-icon"></i>&thinsp;Confirm'+
 					'</span>' +
@@ -609,14 +626,19 @@ var chat = {
 			// actually add me to the party and ZMQ msg on callback success
 			// and call a method to draw the whole party including hp, mp, names etc
 			// party table needs extra values... hp, mp, buffs, etc
-			console.info('Joining party: ', data.row, data);
-			chat.party.join(data);
+			console.info('Prompt confirmed: ', data.action, data.row, data);
+			if (data.action === 'party-invite') {
+				chat.party.join(data);
+			}
+			else if (data.action === 'guild-invite') {
+				guild.join(data);
+			}
 		},
 		deny: function(data){
 			console.info('deny ', data);
 			$("#"+ data.action +"-"+ data.row).remove();
 			socket.zmq.publish("name:"+ data.name, {
-				action: 'party-deny',
+				action: data.action + '-deny',
 				name: my.name
 			});
 		}
@@ -695,7 +717,7 @@ var chat = {
 							str +=
 								'<div class="chat-whisper">[' +
 								s.level +' '+ ng.jobLong[s.job] +'] '+ ng.friends[i] + ' ('+ s.race +
-								')</div>';
+								')' + guild.format(s) + '</div>';
 						} else {
 							// offline
 							str += '<div class="chat-emote">[Offline] ' + name +'</div>';
@@ -873,7 +895,7 @@ var chat = {
 						str +=
 							'<div class="chat-whisper">[' +
 							v.level +' '+ ng.jobLong[v.job] +'] '+ v.name + ' ('+ v.race +
-							')</div>';
+							')' + guild.format(v) +'</div>';
 					});
 					chat.log(str, 'chat-whisper');
 				}
@@ -901,7 +923,7 @@ var chat = {
 						str +=
 							'<div class="chat-whisper">[' +
 							v.level +' '+ ng.jobLong[v.job] +'] '+ v.name + ' ('+ v.race +
-							')</div>';
+							')' + guild.format(v) +'</div>';
 					});
 					chat.log(str, 'chat-whisper');
 				}

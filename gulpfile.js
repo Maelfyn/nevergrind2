@@ -10,7 +10,6 @@ var rename = require('gulp-rename');
 var imagemin = require('imagemin');
 var imageminPngquant = require('imagemin-pngquant');
 var fs = require('fs');
-// var resizeImg = require('resize-img');
 var imageResize = require('gulp-image-resize');
 
 gulp.task('minify-ng-classic-js', function(){
@@ -73,7 +72,6 @@ return gulp.src([
 	'./js/my.js',
 	'./js/dom.js',
 	'./js/modal.js',
-	'./js/video.js',
 	'./js/audio.js',
 	'./js/game.js',
 	'./js/title.js',
@@ -95,7 +93,7 @@ return gulp.src([
 ])
 .pipe(concat('nevergrind-2.js'))
 .pipe(gulp.dest('./js'))
-//.pipe(stripDebug())
+.pipe(stripDebug()) // watch out for this for nwjs
 .pipe(uglify())
 .pipe(rename('nevergrind-2.min.js'))
 .pipe(gulp.dest('./js'));

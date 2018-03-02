@@ -326,6 +326,7 @@ var ng = {
 		}
 	},
 	logout: function(){
+		if (ng.locked) return;
 		ng.lock();
 		// socket.removePlayer(my.account);
 		$.ajax({

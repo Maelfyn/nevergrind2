@@ -1122,10 +1122,17 @@ var my = {
 	channel: 'town',
 	lastReceivedWhisper: '',
 	p_id: 0,
-	g_id: 0,
 	leader: '',
 	isLeader: 0,
 	party: [],
+	guild: {
+		id: 0,
+		rank: '',
+		name: ''
+	},
+	guildChannel: function() {
+		return 'guild:' + my.guild.id;
+	},
 	getPartyNames: function(){
 		var a = [];
 		my.party.forEach(function(v){
@@ -1133,7 +1140,6 @@ var my = {
 		});
 		return a;
 	},
-	guild: [],
 	isLowestPartyIdMine: function() {
 		var lowestId = my.party[0].id;
 		my.party.forEach(function(v) {
@@ -1191,8 +1197,13 @@ var my = {
 			hp: 0,
 			maxHp: 0,
 			mp: 0,
-			maxMp: 0
+			maxMp: 0,
+			heartbeat: Date.now()
 		}
+	},
+	resetClientPartyValues: function(o) {
+		o.heartbeat = Date.now();
+		o.linkdead = 0;
 	},
 	team: 0,
 	slot: 1,
@@ -1599,6 +1610,9 @@ audio.init = (function(){
 var game = {
 	maxPlayers: 6,
 	init: 0,
+	session: {
+		timer: 0
+	},
 	ping: {
 		start: 0,
 		oneWay: function() {
@@ -1612,13 +1626,21 @@ var game = {
 		// only called once
 		if (!game.init) {
 			game.init = 1;
-			game.heartbeat.send();
+			clearTimeout(game.session.timer);
+			game.heartbeat.start();
 			game.socket.start();
 			game.played.start();
+			game.sanity.party.start();
+			game.sanity.chat.start();
 		}
 	},
 	heartbeat: {
 		timer: 0,
+		start: function() {
+			game.heartbeat.send();
+			clearInterval(game.heartbeat.timer);
+			game.heartbeat.timer = setInterval(game.heartbeat.send, 5000);
+		},
 		send: function() {
 			game.ping.start = Date.now();
 			$.ajax({
@@ -1626,16 +1648,6 @@ var game = {
 				url: app.url + 'php2/heartbeat.php'
 			}).done(function () {
 				console.info("%c Ping: ", 'background: #0f0', game.ping.oneWay());
-			}).fail(function () {
-				clearTimeout(game.heartbeat.timer);
-				game.heartbeat.timer = setTimeout(function () {
-					game.heartbeat.start();
-				}, 1000);
-			}).always(function(){
-				clearTimeout(game.heartbeat.timer);
-				game.heartbeat.timer = setTimeout(function() {
-					game.heartbeat.send();
-				}, 5000);
 			});
 		}
 	},
@@ -1643,31 +1655,123 @@ var game = {
 		timer: 0,
 		start: function() {
 			clearInterval(game.socket.timer);
-			game.socket.timer = setInterval(function(){
-				socket.healthTime = Date.now();
-				socket.startHealthCheck();
-				socket.zmq.publish('hb:' + my.name, {});
-			}, 20000);
+			game.socket.timer = setInterval(game.socket.send, 20000);
+		},
+		send: function() {
+			socket.healthTime = Date.now();
+			socket.startHealthCheck();
+			socket.zmq.publish('hb:' + my.name, {});
 		}
 	},
 	played: {
 		timer: 0,
 		start: function() {
 			clearInterval(game.played.timer);
-			game.played.timer = setInterval(function(){
-				$.ajax({
-					type: 'GET',
-					url: app.url + 'php2/update-played.php'
-				}).done(function(){
-					// nada
-				}).fail(function(){
-					setTimeout(function(){
-						game.played.start();
-					}, 5000);
-				}).always(function(){
-					!app.isLocal && console.clear();
+			game.played.timer = setInterval(game.played.send, 60000);
+		},
+		send: function() {
+			$.ajax({
+				type: 'GET',
+				url: app.url + 'php2/update-played.php'
+			}).always(function(){
+				!app.isLocal && console.clear();
+			});
+		}
+	},
+	sanity: {
+		party: {
+			timer: 0,
+			start: function() {
+				clearInterval(game.sanity.party.timer);
+				game.sanity.party.timer = setInterval(function(){
+					if (my.p_id) {
+						game.sanity.party.send();
+						game.sanity.party.check();
+					}
+				}, 5000);
+			},
+			send: function() {
+				console.info("Sending party heartbeats....");
+				socket.zmq.publish('party:' + my.p_id, {
+					id: my.row,
+					route: 'party->hb'
 				});
-			}, 60000);
+
+				/*$.ajax({
+					type: 'GET',
+					url: app.url + 'php2/chat/sanity-party.php'
+				}).done(function (data) {
+					for (var i = 0, len = data.players.length; i < len; i++) {
+						data.players[i] *= 1;
+					}
+					var newChatArray = [];
+					chat.inChannel.forEach(function (v) {
+						if (!~data.players.indexOf(v)) {
+							$("#chat-player-" + v).remove();
+						}
+						else {
+							newChatArray.push(v);
+						}
+					});
+					if (newChatArray.length) {
+						chat.inChannel = newChatArray;
+						chat.setHeader();
+
+					}
+				});*/
+			},
+			check: function() {
+				var now = Date.now(),
+					linkdead = [];
+				for (var i=1; i<6; i++) {
+					console.info("Checking: ", my.party[i].id, now - my.party[i].heartbeat > 15000)
+					if (my.party[i].id &&
+						!my.party[i].linkdead &&
+						(now - my.party[i].heartbeat > 15000)) {
+						linkdead.push(my.party[i].name);
+						my.party[i].linkdead = 1;
+					}
+				}
+				linkdead.forEach(function(name){
+					socket.zmq.publish('party:' + my.p_id, {
+						name: name,
+						route: 'party->linkdead'
+					});
+				});
+			}
+		},
+		chat: {
+			timer: 0,
+			start: function() {
+				clearInterval(game.sanity.chat.timer);
+				game.sanity.chat.timer = setInterval(game.sanity.chat.send, 60000);
+			},
+			send: function() {
+				if (ng.view === 'town') {
+					$.ajax({
+						type: 'GET',
+						url: app.url + 'php2/chat/sanity-chat.php'
+					}).done(function (data) {
+						for (var i = 0, len = data.players.length; i < len; i++) {
+							data.players[i] *= 1;
+						}
+						var newChatArray = [];
+						chat.inChannel.forEach(function (v) {
+							if (!~data.players.indexOf(v)) {
+								$("#chat-player-" + v).remove();
+							}
+							else {
+								newChatArray.push(v);
+							}
+						});
+						if (newChatArray.length) {
+							chat.inChannel = newChatArray;
+							chat.setHeader();
+
+						}
+					});
+				}
+			}
 		}
 	},
 	exit: function() {
@@ -1760,8 +1864,7 @@ var title = {
 			// console.info("Initializing title screen...");
 			setTimeout(function() {
 				ng.initGame();
-				clearTimeout(game.heartbeat.timer);
-				game.heartbeat.timer = setTimeout(function(){
+				game.session.timer = setTimeout(function(){
 					ng.keepAlive();
 				}, 180000);
 				// init events
@@ -2008,13 +2111,13 @@ $(document).on(env.click, function(e){
 			chat.reply();
 			return false;
 		}
-		else if (!chat.hasFocus && code === 65) {
+		else if (!chat.hasFocus && !guild.hasFocus && code === 65) {
 			// no select all of webpage elements
 			e.preventDefault();
 		}
 	} else {
 		if (ng.view === 'title'){
-			if (!ng.isModalOpen){
+			if (!ng.isModalOpen && !init.isMobile){
 				$("#create-character-name").focus();
 			}
 		} else {
@@ -2053,8 +2156,13 @@ $(document).on(env.click, function(e){
 						return false;
 					}
 				} else {
-					// no chat focus
-					chat.dom.chatInput.focus();
+					// no aside && no chat focus
+					!town.aside.selected && chat.dom.chatInput.focus();
+					if (guild.hasFocus) {
+						if (code === 13) {
+							guild.create();
+						}
+					}
 				}
 			} else {
 				// game
@@ -2145,8 +2253,12 @@ var socket = {
 				}
 				// receive pong
 				else if (data.action === 'receive') {
-					console.info('receive, ', data);
-					data.msg = chat.whisper.prefix() + " whispers: " + chat.whisper.parse(data.msg);
+					if (!chat.lastWhisper.name) {
+						chat.lastWhisper = {
+							name: data.name
+						}
+					}
+					data.msg = chat.whisper.to(data) + chat.whisper.parse(data.msg);
 					route.town(data, 'chat->log');
 				}
 				// party invite
@@ -2199,7 +2311,7 @@ var socket = {
 	},
 	initialConnection: 1,
 	routeMainChat: function(topic, data) {
-		console.info('rx ', topic, data);
+		// console.info('rx ', topic, data);
 		route.town(data, data.route);
 	},
 	connectionSuccess: function(){
@@ -2224,19 +2336,11 @@ var socket = {
 				route.town(data, data.route);
 			});
 
-			// subscribe to test guild for now
-			var guild = 'guild:' + Date.now();
-			my.guild = guild;
-			console.info("subscribing to channel: ", guild);
-			socket.zmq.subscribe(guild, function(topic, data) {
-				console.info('rx ', topic, data);
-				route.town(data, data.route);
-			});
-
 			(function repeat(){
 				if (my.name){
 					socket.initWhisper();
 					socket.initFriendAlerts();
+					socket.initGuild();
 				} else {
 					setTimeout(repeat, 200);
 				}
@@ -2260,11 +2364,38 @@ var socket = {
 				chat.friend.notify(topic, data);
 			});
 		});
+	},
+	initParty: function(row) {
+		// unsub to current party?
+		socket.unsubscribe('party:'+ my.p_id);
+		// sub to party
+		var party = 'party:' + row;
+		my.p_id = row;
+		console.info("subscribing to channel: ", party);
+		socket.zmq.subscribe(party, function(topic, data) {
+			console.info('party rx ', topic, data);
+			if (data.route === 'chat->log') {
+				route.town(data, data.route);
+			}
+			else {
+				route.party(data, data.route);
+			}
+		});
+	},
+	initGuild: function() {
+		// subscribe to test guild for now
+		if (my.guild.id) {
+			console.info("subscribing to guild channel: ", my.guildChannel());
+			socket.zmq.subscribe(my.guildChannel(), function(topic, data) {
+				console.info('rx ', topic, data);
+				route.town(data, data.route);
+			});
+		}
 	}
 }
 // chat.js
 var chat = {
-	prefix: 't:',
+	prefix: 'ng2:',
 	default: 'town',
 	getChannel: function() {
 		return chat.prefix + my.channel;
@@ -2464,7 +2595,6 @@ var chat = {
 				'<div '+ z +'>/gsay : Message your guild : /gsay hail</div>',
 				'<div '+ z +'>@ : Send a private message by name : @bob hi</div>',
 				'<div '+ h +'>Change Channels:</div>',
-				'<div '+ z +'>/join : Join the default chat channel : /join</div>',
 				'<div '+ z +'>/join channel : Join a channel : /join bros</div>',
 				'<div '+ h +'>Social Commands:</div>',
 				'<div '+ z +'>/flist or /friends : Show your friends\' online status</div>',
@@ -2650,12 +2780,12 @@ var chat = {
 			o.class = 'chat-party';
 		}
 		else if (parse.first === '/g') {
-			o.category = 'guild:' + my.g_id;
+			o.category = 'guild:' + my.guild.id;
 			o.msg = shortCommandMsg;
 			o.class = 'chat-guild';
 		}
 		else if (chat.mode.command === '/gsay'){
-			o.category = 'guild:' + my.g_id;
+			o.category = 'guild:' + my.guild.id;
 			o.msg = msg;
 			o.class = 'chat-guild';
 		}
@@ -2815,6 +2945,7 @@ var chat = {
 		}, 1000);
 	},
 	reply: function() {
+		console.info('chat.lastWhisper.name', chat.lastWhisper.name);
 		if (chat.lastWhisper.name) {
 			var o = {
 				mode: '@',
@@ -2887,21 +3018,7 @@ var chat = {
 	},
 	party: {
 		subscribe: function(row) {
-			// unsub to current party?
-			socket.unsubscribe('party:'+ my.p_id);
-			// sub to party
-			var party = 'party:' + row;
-			my.p_id = row;
-			console.info("subscribing to channel: ", party);
-			socket.zmq.subscribe(party, function(topic, data) {
-				console.info('party rx ', topic, data);
-				if (data.route === 'chat->log') {
-					route.town(data, data.route);
-				}
-				else {
-					route.party(data, data.route);
-				}
-			});
+			socket.initParty(row);
 		},
 		join: function(z) {
 			// clicked CONFIRM
@@ -2935,6 +3052,9 @@ var chat = {
 		},
 		prefix: function() {
 			return '[' + my.level +':<span class="chat-'+ my.job +'">'+ my.name + '</span>]';
+		},
+		to: function(data) {
+			return 'You whispered to ' + data.name + ': ';
 		}
 	},
 	friend: {
@@ -3275,7 +3395,6 @@ var chat = {
 	},
 	// players receive update from socket
 	addPlayer: function(v) {
-		// console.info('chat.inChannel', v.row, chat.inChannel);
 		if (chat.inChannel.indexOf(v.row) === -1) {
 			var e = document.createElement('div');
 			e.innerHTML =
@@ -3454,10 +3573,12 @@ var bar = {
 					console.info('SET BARS ', i, v);
 					if (v.name === my.name) {
 						my.party[0] = v;
+						my.resetClientPartyValues(0);
 						bar.updatePlayerBar(0);
 					}
 					else {
 						my.party[npIndex] = v;
+						my.resetClientPartyValues(npIndex);
 						bar.updatePlayerBar(npIndex++);
 					}
 				});
@@ -3496,6 +3617,23 @@ var bar = {
 				document.getElementById('bar-player-wrap-' + i).style.display = 'none';
 			}
 		});
+	},
+	heartbeat: {
+		receive: function(data) {
+			console.info('heartbeat.receive', data);
+			var index = 0;
+			for (var i=1; i<6; i++) {
+				if (data.id === my.party[i].id) {
+					index = i;
+				}
+			}
+			if (index) {
+				my.resetClientPartyValues(index);
+			}
+		},
+		linkdead: function(data) {
+			chat.log(data.name + ' has gone linkdead.', 'chat-warning');
+		}
 	},
 	get: function() {
 
@@ -5167,6 +5305,7 @@ var town = {
 					row: create.selected
 				}
 			}).done(function(data) {
+				console.info('loadCharacter: ', data);
 				socket.init();
 				var z = data.characterData;
 				my.name = z.name;
@@ -5175,6 +5314,8 @@ var town = {
 				my.level = z.level;
 				my.row = z.row;
 				my.party[0] = z;
+				my.resetClientPartyValues(0);
+				my.guild = data.guild;
 				// init party member values
 				for (var i=1; i<game.maxPlayers; i++) {
 					my.party[i] = my.Party();
@@ -5220,47 +5361,154 @@ var town = {
 	aside: {
 		selected: '',
 		html: {
-			'town-merchant':
+			close: '<i class="close-aside fa fa-times text-danger"></i>',
+			sleeve: '<div class="stag-blue sleeve"></div>',
+			'town-merchant': function(id) {
+				var s =
 				'<img class="aside-bg" src="img2/town/halas.jpg">' +
-				'<img class="aside-npc" src="img2/town/rendo-surefoot.png?v1">' +
+				'<img class="aside-npc" src="img2/town/rendo-surefoot.png">' +
 				'<div class="aside-text">' +
-					'<div class="aside-title-wrap">' +
+					'<div class="aside-title-wrap stag-blue">' +
 						'<div class="aside-title">Merchant</div>' +
-						'<i class="close-aside fa fa-times text-danger"></i>' +
+						town.aside.html.close +
 					'</div>' +
-				'</div>',
-			'town-trainer':
+				'</div>';
+				return s;
+			},
+			'town-trainer': function(id) {
+				var s =
 				'<img class="aside-bg" src="img2/town/surefall.jpg">' +
-				'<img class="aside-npc" src="img2/town/arwen-reinhardt.png?v1">' +
+				'<img class="aside-npc" src="img2/town/arwen-reinhardt.png">' +
 				'<div class="aside-text">' +
-					'<div class="aside-title-wrap">' +
+					'<div class="aside-title-wrap stag-blue">' +
 						'<div class="aside-title">Skill Trainer</div>' +
-						'<i class="close-aside fa fa-times text-danger"></i>' +
+						town.aside.html.close +
 					'</div>' +
-				'</div>',
-			'town-guild':
+				'</div>';
+				return s;
+			},
+			'town-guild': function(id) {
+				var s =
 				'<img class="aside-bg" src="img2/town/poh.jpg">' +
-				'<img class="aside-npc" src="img2/town/valeska-windcrest.png?v1">' +
+				'<img class="aside-npc" src="img2/town/valeska-windcrest.png">' +
 				'<div class="aside-text">' +
-					'<div class="aside-title-wrap">' +
+					'<div class="aside-title-wrap stag-blue">' +
 						'<div class="aside-title">Guild Hall</div>' +
-						'<i class="close-aside fa fa-times text-danger"></i>' +
+						town.aside.html.close +
 					'</div>' +
-				'</div>',
-			'town-mission':
+					'<div id="aside-menu">' +
+					town.aside.menu[id]() +
+					'</div>' +
+				'</div>';
+				return s;
+			},
+
+			'town-mission': function(id) {
+				var s =
 				'<img class="aside-bg" src="img2/town/neriak.jpg">' +
-				'<img class="aside-npc" src="img2/town/miranda-crossheart.png?v1">' +
+				'<img class="aside-npc" src="img2/town/miranda-crossheart.png">' +
 				'<div class="aside-text">' +
-					'<div class="aside-title-wrap">' +
+					'<div class="aside-title-wrap stag-blue">' +
 						'<div class="aside-title">Mission Counter</div>' +
-						'<i class="close-aside fa fa-times text-danger"></i>' +
+						town.aside.html.close +
 					'</div>' +
-				'</div>'
+				'</div>';
+				return s;
+			},
+		},
+		menu: {
+			'town-trainer': function() {
+				var s = '';
+				return s;
+			},
+			'town-merchant': function() {
+				var s = '';
+				return s;
+			},
+			'town-guild': function() {
+				var s = '';
+				if (my.guild.name) {
+					s += '<div>Guild: '+ my.guild.name +'</div> ';
+				}
+				else {
+					s +=
+					'<input id="guild-input" type="text" maxlength="30" autocomplete="off" spellcheck="false">' +
+					'<div id="guild-create" class="ng-btn">Create Guild</div> ' +
+					'<div id="guild-create-help">Only letters A through Z and apostrophes are accepted in guild names. Standarized capitalization will be automatically applied. The guild name must be between 4 and 30 characters. All guild names are subject to the royal statutes regarding public decency in Vandamor.</div>';
+				}
+				return s;
+			},
+			'town-mission': function() {
+				var s = '';
+				return s;
+			}
 		},
 		getHtml: function(id) {
-			return town.aside.html[id];
+			return town.aside.html[id](id);
 		},
+		init: function(id) {
+			if (id === town.aside.selected) return;
+			// remove old aside
+			var z = $(".town-aside");
+			TweenMax.to(z, .2, {
+				scale: 0,
+				x: town.lastAside.x + '%',
+				y: town.lastAside.y + '%',
+				onComplete: function(){
+					z.remove();
+				}
+			});
+			town.lastAside = town.data[id].aside;
+			// animate town BG
+			TweenMax.to('#town-bg', 1.25, {
+				scale: 1.5,
+				x: town.data[id].bg.x,
+				y: town.data[id].bg.y
+			});
+			// create aside
+			var e = document.createElement('div');
+			e.className = 'town-aside text-shadow';
+			e.innerHTML = town.aside.getHtml(id);
+			document.getElementById('scene-town').appendChild(e);
+			// animate aside things
+			setTimeout(function() {
+				TweenMax.to(e, .5, {
+					startAt: {
+						display: 'block',
+						alpha: 1,
+						scale: 0,
+						x: town.data[id].aside.x + '%',
+						y: town.data[id].aside.y + '%'
+					},
+					x: '2%',
+					y: '2%',
+					scale: 1
+				});
+				setTimeout(function () {
+					TweenMax.to('.aside-bg', 1, {
+						startAt: {
+							left: '60%'
+						},
+						left: '50%'
+					}, 100);
+				});
+				TweenMax.to('.aside-npc', 1, {
+					left: '-5%'
+				});
+				setTimeout(function() {
+					$(".town-aside:last-child").find("input").focus();
+					town.data[id].msg();
+				}, 100);
+			}, town.aside.selected ? 0 : 500);
+			// set aside id
+			town.aside.selected = id;
+		},
+		update: function(id) {
+			var s = town.aside.menu[id]();
+			$("#aside-menu").html(s);
+		}
 	},
+	lastAside: {},
 	events: function(){
 		$("#scene-town").on(env.click, '.close-aside', function(){
 			// close town asides
@@ -5277,74 +5525,72 @@ var town = {
 				x: '-50%',
 				y: '-50%'
 			});
-		});
+		}).on(env.click, '#guild-create', function(){
+			// create a guild
+			guild.create();
+		}).on(env.click + ' focus', '#guild-input', function() {
+			guild.hasFocus = 1;
+		}).on('blur', '#guild-input', function() {
+			guild.hasFocus = 0;
+		})
 		$(".town-action").on(env.click, function(){
-			var id = $(this).attr('id'),
-				// don't exceed 25-75 range
-				pos = {
-					'town-merchant': {
-						x: '-75%',
-						y: '-60%'
-					},
-					'town-trainer': {
-						x: '-75%',
-						y: '-25%'
-					},
-					'town-guild': {
-						x: '-25%',
-						y: '-25%'
-					},
-					'town-mission': {
-						x: '-50%',
-						y: '-75%'
-					}
-				};
-			if (id === town.aside.selected) return;
-			// remove old aside
-			var z = $(".town-aside");
-			TweenMax.to(z, .5, {
-				scale: 0,
-				onComplete: function(){
-					z.remove();
-				}
-			});
-			// animate town BG
-			TweenMax.to('#town-bg', 1.25, {
-				scale: 1.5,
-				x: pos[id].x,
-				y: pos[id].y
-			});
-			// create aside
-			var e = document.createElement('div'),
-				to = document.getElementById('scene-town');
-			e.className = 'town-aside text-shadow';
-			e.innerHTML = town.aside.getHtml(id);
-			to.appendChild(e);
-			// animate aside things
-			setTimeout(function() {
-				TweenMax.to(e, .5, {
-					startAt: {
-						display: 'block',
-						alpha: 1,
-						scale: 0
-					},
-					scale: 1
-				});
-				setTimeout(function () {
-					TweenMax.to('.aside-bg', 1, {
-						startAt: {
-							scale: 1.2
-						},
-						scale: 1
-					}, 100);
-				});
-				TweenMax.to('.aside-npc', 1, {
-					left: '-5%'
-				})
-			}, town.aside.selected ? 0 : 500);
-			// set aside id
-			town.aside.selected = id;
+			town.aside.init($(this).attr('id'));
 		});
+	},
+	data: {
+		'town-merchant': {
+			msg: function() {
+				chat.log('Rendo Surefoot says, "Hello, '+ my.name +'. I have got a once-in-a-lifetime smokin\' deal for you, my friend! Today, we just received a limited edition Lanfeld champion sword from our supply chain!"')
+			},
+			bg: {
+				// don't exceed 25-75 range
+				x: '-75%',
+				y: '-60%',
+			},
+			aside: {
+				x: 112,
+				y: 30
+			}
+		},
+		'town-trainer': {
+			msg: function() {
+				chat.log('Arwen Reinhardt says, "Hail to thee, '+ my.name +'. You had better sharpen up your skills, kiddo, or you\'ll be dead meat out there. Take it from me—a battle-hardened warrior that has seen more than his fair share of death and despair."')
+			},
+			bg: {
+				x: '-75%',
+				y: '-25%',
+			},
+			aside: {
+				x: 112,
+				y: -10
+			}
+		},
+		'town-guild': {
+			msg: function() {
+				chat.log('Valeska Windcrest says, "Good day, '+ my.name +'. What would you ask of me?"')
+			},
+			bg: {
+				x: '-25%',
+				y: '-25%',
+			},
+			aside: {
+				x: -30,
+				y: -30
+			}
+		},
+		'town-mission': {
+			msg: function() {
+				chat.log('Miranda Crossheart says, "Hey, sunshine! Are you itching for a bit of action?! There\'s no shortage of miscreants to dispatch around these parts!"')
+			},
+			bg: {
+				x: '-67%',
+				y: '-60%',
+			},
+			aside: {
+				x: 75,
+				y: 24
+			}
+		}
 	},
 	initialized: 0,
 	init: function(){
@@ -5374,7 +5620,31 @@ var town = {
 	},
 };
 var guild = {
-
+	hasFocus: 0,
+	create: function() {
+		var name = $("#guild-input").val().replace(/\]/g, '').trim();
+		console.info("Name: ", name);
+		ng.lock();
+		$.ajax({
+			url: app.url + 'php2/guild/create.php',
+			data: {
+				name: name.replace(/\]/g, '').trim()
+			}
+		}).done(function(data) {
+			console.info(data);
+			my.guild = data;
+			chat.log('Valeska Windcrest says, "By the powers vested in me, I hereby declare you supreme sovereign Leader of a new guild: ' + data.name +'."');
+			chat.log('Type /help to view guild commands', 'chat-emote');
+			socket.initGuild();
+			town.aside.update('town-guild');
+			// redraw the #aside-menu with new option
+		}).fail(function(data){
+			console.info(data);
+			ng.msg(data.responseText);
+		}).always(function(){
+			ng.unlock();
+		});
+	}
 }
 var cache = {
 	images: [],
@@ -5441,7 +5711,13 @@ var route = {
 		}
 	},
 	party: function(data, r) {
-		if (r === 'party->join') {
+		if (r === 'party->hb') {
+			bar.heartbeat.receive(data);
+		}
+		else if (r === 'party->linkdead') {
+			bar.heartbeat.linkdead(data);
+		}
+		else if (r === 'party->join') {
 			bar.party.join(data);
 		}
 		else if (r === 'party->disband') {
@@ -5487,12 +5763,13 @@ var route = {
 // test methods
 var test = {
 	chat: {
+		id: 999999999,
 		room: function(){
 			for (var i=0; i<100; i++) {
 				var c = ng.toJobShort(ng.jobs[~~(Math.random() * 14)]);
 				socket.zmq.publish(chat.getChannel(), {
 					route: 'chat->add',
-					row: ~~(Math.random() * 9999),
+					row: test.chat.id+i,
 					level: Math.ceil(Math.random() * 50),
 					job: c,
 					name: 'WWWWWWWWWWWWWWWW'

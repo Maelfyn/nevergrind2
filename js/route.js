@@ -68,5 +68,25 @@ var route = {
 				bar.getParty();
 			}, 1000);
 		}
+	},
+	guild: function(data, r) {
+		if (r === 'guild->hasJoined') {
+			guild.hasJoined(data);
+		}
+		else if (r === 'guild->quit') {
+			guild.hasQuit(data);
+		}
+		else if (r === 'guild->boot') {
+			guild.wasBooted(data);
+		}
+		else if (r === 'guild->promote') {
+			guild.wasPromoted(data);
+		}
+		else if (r === 'guild->leader') {
+			guild.wasLeader(data);
+		}
+		else if (r === 'guild->motd') {
+			guild.zmqMotd(data);
+		}
 	}
 };

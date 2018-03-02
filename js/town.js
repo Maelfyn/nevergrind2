@@ -131,7 +131,10 @@ var town = {
 			'town-guild': function() {
 				var s = '';
 				if (my.guild.name) {
-					s += '<div>Guild: '+ my.guild.name +'</div> ';
+					s +=
+						'<div>Guild: '+ my.guild.name +'</div> ' +
+						'<div>Title: '+ guild.ranks[my.guild.rank] +'</div> ' +
+						'<div>Member Number: '+ my.guild.memberNumber +'</div> ';
 				}
 				else {
 					s +=

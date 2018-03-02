@@ -129,7 +129,7 @@ var create = {
 		});
 		$("#create-character-btn").on(x, function(){
 			//client-side validation
-			if (!ng.locked){
+			if (ng.locked) return;
 				
 			ng.lock(1);
 			var f = create.form,
@@ -165,8 +165,6 @@ var create = {
 					ng.unlock();
 				});
 			}
-			
-			}
 		});
 		$("#ch-card-list").on(x, '.select-player-card', function(){
 			var z = $(this);
@@ -176,23 +174,22 @@ var create = {
 	},
 	deleteCharacter: function(){
 		// send to server
-		if (!ng.locked){
-			ng.lock();
-			$.ajax({
-				url: app.url + 'php2/create/delete-character.php',
-				data: {
-					row: create.selected
-				}
-			}).done(function(r){
-				console.info('Deleted character: ', r);
-				ng.msg(create.name + ' has been deleted!');
-				modal.hide();
-				ng.initGame();
-			}).fail(function(r){
-				ng.msg(r.responseText, 8);
-				ng.unlock();
-			});
-		}
+		if (ng.locked) return;
+		ng.lock();
+		$.ajax({
+			url: app.url + 'php2/create/delete-character.php',
+			data: {
+				row: create.selected
+			}
+		}).done(function(r){
+			console.info('Deleted character: ', r);
+			ng.msg(create.name + ' has been deleted!');
+			modal.hide();
+			ng.initGame();
+		}).fail(function(r){
+			ng.msg(r.responseText, 8);
+			ng.unlock();
+		});
 	},
 	msg: function(key, val){
 		var z = {

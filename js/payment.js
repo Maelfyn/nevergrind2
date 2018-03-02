@@ -54,6 +54,7 @@ var payment = {
         if (response.error) {
             payment.error(response.error.message);
         } else {
+		    if (ng.locked) return;
             // submit the form
             ng.lock();
             ng.msg("Communicating with the server...");
