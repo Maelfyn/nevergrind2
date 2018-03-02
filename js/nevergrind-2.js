@@ -175,7 +175,7 @@ var create = {
 		});
 		$("#create-character-btn").on(x, function(){
 			//client-side validation
-			if (!ng.locked){
+			if (ng.locked) return;
 				
 			ng.lock(1);
 			var f = create.form,
@@ -211,8 +211,6 @@ var create = {
 					ng.unlock();
 				});
 			}
-			
-			}
 		});
 		$("#ch-card-list").on(x, '.select-player-card', function(){
 			var z = $(this);
@@ -222,23 +220,22 @@ var create = {
 	},
 	deleteCharacter: function(){
 		// send to server
-		if (!ng.locked){
-			ng.lock();
-			$.ajax({
-				url: app.url + 'php2/create/delete-character.php',
-				data: {
-					row: create.selected
-				}
-			}).done(function(r){
-				console.info('Deleted character: ', r);
-				ng.msg(create.name + ' has been deleted!');
-				modal.hide();
-				ng.initGame();
-			}).fail(function(r){
-				ng.msg(r.responseText, 8);
-				ng.unlock();
-			});
-		}
+		if (ng.locked) return;
+		ng.lock();
+		$.ajax({
+			url: app.url + 'php2/create/delete-character.php',
+			data: {
+				row: create.selected
+			}
+		}).done(function(r){
+			console.info('Deleted character: ', r);
+			ng.msg(create.name + ' has been deleted!');
+			modal.hide();
+			ng.initGame();
+		}).fail(function(r){
+			ng.msg(r.responseText, 8);
+			ng.unlock();
+		});
 	},
 	msg: function(key, val){
 		var z = {
@@ -916,6 +913,7 @@ var ng = {
 		}
 	},
 	logout: function(){
+		if (ng.locked) return;
 		ng.lock();
 		// socket.removePlayer(my.account);
 		$.ajax({
@@ -1386,24 +1384,6 @@ var modal = {
 		return str;
 	}
 };
-
-
-var video = {
-	cache: {},
-	load: {
-		title: function(){
-			var x = [
-				'xicotl.png'
-			];
-			for (var i=0, len=x.length; i<len; i++){
-				var z = x[i];
-				video.cache[z] = new Image();
-				video.cache[z].src = "images/" + z;
-			}
-		}
-	}
-}
-video.load.title();
 // audio.js
 var audio = {
 	events: function(){
@@ -2261,13 +2241,21 @@ var socket = {
 					data.msg = chat.whisper.to(data) + chat.whisper.parse(data.msg);
 					route.town(data, 'chat->log');
 				}
+				// guild invite
+				else if (data.action === 'guild-invite') {
+					console.info("guild invite received! ", data);
+					chat.prompt.add(data);
+				}
 				// party invite
 				else if (data.action === 'party-invite') {
 					console.info("party invite received! ", data);
 					chat.prompt.add(data);
 				}
-				else if (data.action === 'party-deny') {
+				else if (data.action === 'party-invite-deny') {
 					chat.log(data.name + " has denied your party invite.", 'chat-warning');
+				}
+				else if (data.action === 'guild-invite-deny') {
+					chat.log(data.name + " has denied your guild invite.", 'chat-warning');
 				}
 				else if (data.action === 'party-accept') {
 					chat.log(data.name + " has joined the party.", 'chat-warning');
@@ -2386,9 +2374,15 @@ var socket = {
 		// subscribe to test guild for now
 		if (my.guild.id) {
 			console.info("subscribing to guild channel: ", my.guildChannel());
+			my.guild.motd && chat.log('Guild Message of the day: ' + my.guild.motd, 'chat-guild');
 			socket.zmq.subscribe(my.guildChannel(), function(topic, data) {
 				console.info('rx ', topic, data);
-				route.town(data, data.route);
+				if (data.route === 'chat->log') {
+					route.town(data, data.route);
+				}
+				else {
+					route.guild(data, data.route);
+				}
 			});
 		}
 	}
@@ -2437,7 +2431,7 @@ var chat = {
 		types: [
 			'/say',
 			'/party',
-			'/gsay'
+			'/guild'
 		],
 		command: '/say',
 		name: '',
@@ -2491,7 +2485,7 @@ var chat = {
 				chat.dom.chatInputMode.className = 'chat-party';
 				chat.dom.chatModeMsg.textContent = 'To party:';
 			}
-			else if (mode === '/gsay') {
+			else if (mode === '/guild') {
 				chat.dom.chatInputMode.className = 'chat-guild';
 				chat.dom.chatModeMsg.textContent = 'To guild:';
 			}
@@ -2592,7 +2586,7 @@ var chat = {
 				'<div '+ h +'>Main Chat Channels:</div>',
 				'<div '+ z +'>/say : Say a message in your current chat channel : /say hail</div>',
 				'<div '+ z +'>/party : Message your party : /party hail</div>',
-				'<div '+ z +'>/gsay : Message your guild : /gsay hail</div>',
+				'<div '+ z +'>/guild : Message your guild : /guild hail</div>',
 				'<div '+ z +'>@ : Send a private message by name : @bob hi</div>',
 				'<div '+ h +'>Change Channels:</div>',
 				'<div '+ z +'>/join channel : Join a channel : /join bros</div>',
@@ -2644,17 +2638,23 @@ var chat = {
 			leader
 			boot
 		 */
-		else if (msgLower === '/gmotd') {
-			chat.invite();
+		else if (msgLower.indexOf('/motd') === 0) {
+			guild.motd(guild.motdParse(msg));
 		}
-		else if (msgLower === '/gleader') {
-			chat.invite();
+		else if (msgLower.indexOf('/gleader') === 0) {
+			guild.leader(chat.party.parse(msg));
 		}
-		else if (msgLower === '/gremove') {
-			chat.invite();
+		else if (msgLower.indexOf('/gpromote') === 0) {
+			guild.promote(chat.party.parse(msg));
 		}
-		else if (msgLower === '/ginvite') {
-			chat.invite();
+		else if (msgLower.indexOf('/gboot') === 0) {
+			guild.boot(chat.party.parse(msg));
+		}
+		else if (msgLower === '/gquit') {
+			guild.quit();
+		}
+		else if (msgLower.indexOf('/ginvite') === 0) {
+			guild.invite(chat.party.parse(msg));
 		}
 		else if (msgLower.indexOf('/promote') === 0) {
 			chat.promote(chat.party.parse(msg));
@@ -2728,14 +2728,23 @@ var chat = {
 			if (msg) {
 				var o = chat.getMsgObject(msg);
 				if (o.msg[0] !== '/') {
-					$.ajax({
-						url: app.url + 'php2/chat/send.php',
-						data: {
-							msg: o.msg,
-							class: o.class,
-							category: o.category
-						}
-					});
+					console.info(o);
+					if (!my.p_id && o.category.indexOf('party') === 0) {
+						chat.log("You are not in a party.", 'chat-warning');
+					}
+					else if (!my.guild.id && o.category.indexOf('guild') === 0) {
+						chat.log("You are not in a guild.", 'chat-warning');
+					}
+					else {
+						$.ajax({
+							url: app.url + 'php2/chat/send.php',
+							data: {
+								msg: o.msg,
+								class: o.class,
+								category: o.category
+							}
+						});
+					}
 				}
 			}
 		}
@@ -2784,7 +2793,7 @@ var chat = {
 			o.msg = shortCommandMsg;
 			o.class = 'chat-guild';
 		}
-		else if (chat.mode.command === '/gsay'){
+		else if (chat.mode.command === '/guild'){
 			o.category = 'guild:' + my.guild.id;
 			o.msg = msg;
 			o.class = 'chat-guild';
@@ -2904,7 +2913,7 @@ var chat = {
 			chat.log("You can't invite yourself to a party.", "chat-warning");
 		}
 		else if (my.p_id && !my.party[0].isLeader) {
-			chat.log("You're still in a party! Try /disband to leave your party.", "chat-warning");
+			chat.log("Only the party leader may send invites.", "chat-warning");
 		}
 		else {
 			if (p) {
@@ -2961,15 +2970,17 @@ var chat = {
 				e = document.createElement('div'),
 				id = ng.getId();
 
-			e.id = 'party-invite-'+ data.row;
+			console.info('prompt.add', data);
+			e.id = data.action +'-'+ data.row;
 			e.className = 'prompt-row prompt-row-' + id + ' ' + data.css;
 			// write innerHTML
 			s +=
-				'<div class="chat-prompt-msg">'+ data.msg +'</div>' + // col 1
-				'<div class="chat-prompt-options">'+ // col 2
+				'<div class="chat-prompt-msg stag-blue">'+ data.msg +'</div>' + // col 1
+				'<div class="chat-prompt-options stag-blue">'+ // col 2
 					'<span data-row="'+ data.row +'" '+
 						'data-id="'+ id +'" '+
 						'data-action="'+ data.action +'" '+
+						'data-guild-name="'+ data.guildName +'" '+
 						'class="chat-prompt-btn chat-prompt-yes">'+
 						'<i class="fa fa-check chat-prompt-yes-icon"></i>&thinsp;Confirm'+
 					'</span>' +
@@ -3004,14 +3015,19 @@ var chat = {
 			// actually add me to the party and ZMQ msg on callback success
 			// and call a method to draw the whole party including hp, mp, names etc
 			// party table needs extra values... hp, mp, buffs, etc
-			console.info('Joining party: ', data.row, data);
-			chat.party.join(data);
+			console.info('Prompt confirmed: ', data.action, data.row, data);
+			if (data.action === 'party-invite') {
+				chat.party.join(data);
+			}
+			else if (data.action === 'guild-invite') {
+				guild.join(data);
+			}
 		},
 		deny: function(data){
 			console.info('deny ', data);
 			$("#"+ data.action +"-"+ data.row).remove();
 			socket.zmq.publish("name:"+ data.name, {
-				action: 'party-deny',
+				action: data.action + '-deny',
 				name: my.name
 			});
 		}
@@ -3090,7 +3106,7 @@ var chat = {
 							str +=
 								'<div class="chat-whisper">[' +
 								s.level +' '+ ng.jobLong[s.job] +'] '+ ng.friends[i] + ' ('+ s.race +
-								')</div>';
+								')' + guild.format(s) + '</div>';
 						} else {
 							// offline
 							str += '<div class="chat-emote">[Offline] ' + name +'</div>';
@@ -3268,7 +3284,7 @@ var chat = {
 						str +=
 							'<div class="chat-whisper">[' +
 							v.level +' '+ ng.jobLong[v.job] +'] '+ v.name + ' ('+ v.race +
-							')</div>';
+							')' + guild.format(v) +'</div>';
 					});
 					chat.log(str, 'chat-whisper');
 				}
@@ -3296,7 +3312,7 @@ var chat = {
 						str +=
 							'<div class="chat-whisper">[' +
 							v.level +' '+ ng.jobLong[v.job] +'] '+ v.name + ' ('+ v.race +
-							')</div>';
+							')' + guild.format(v) +'</div>';
 					});
 					chat.log(str, 'chat-whisper');
 				}
@@ -5428,7 +5444,10 @@ var town = {
 			'town-guild': function() {
 				var s = '';
 				if (my.guild.name) {
-					s += '<div>Guild: '+ my.guild.name +'</div> ';
+					s +=
+						'<div>Guild: '+ my.guild.name +'</div> ' +
+						'<div>Title: '+ guild.ranks[my.guild.rank] +'</div> ' +
+						'<div>Member Number: '+ my.guild.memberNumber +'</div> ';
 				}
 				else {
 					s +=
@@ -5620,15 +5639,34 @@ var town = {
 	},
 };
 var guild = {
+	Guild: function() {
+		return {
+			id: 0,
+			rank: 0,
+			memberNumber: 0,
+			motd: '',
+			name: ''
+		}
+	},
+	format: function(s) {
+		return s.guild ? (' &lt;' + s.guild + '&gt;') : '';
+	},
 	hasFocus: 0,
+	ranks: [
+		'Leader',
+		'Officer',
+		'Member'
+	],
 	create: function() {
-		var name = $("#guild-input").val().replace(/\]/g, '').trim();
+		if (ng.locked) return;
+		var name = $("#guild-input").val().replace(/ +/g, " ").trim();
 		console.info("Name: ", name);
 		ng.lock();
 		$.ajax({
 			url: app.url + 'php2/guild/create.php',
 			data: {
-				name: name.replace(/\]/g, '').trim()
+				// replace
+				name: name.replace(/ +/g, " ").trim()
 			}
 		}).done(function(data) {
 			console.info(data);
@@ -5644,6 +5682,194 @@ var guild = {
 		}).always(function(){
 			ng.unlock();
 		});
+	},
+	invite: function(name) {
+		if (my.name === name) {
+			chat.log("You can't invite yourself to a guild. Go to the Guild Hall to create a guild.", "chat-warning");
+		}
+		else if (!my.guild.id) {
+			chat.log("You're not in a guild.", "chat-warning");
+		}
+		else if (my.guild.rank > 1) {
+			chat.log("Only the guild Leader and Officers may send guild invites.", "chat-warning");
+		}
+		else {
+			if (name) {
+				chat.log('Sent guild invite to '+ name +'.', 'chat-warning');
+				$.ajax({
+					url: app.url + 'php2/guild/invite.php',
+					data: {
+						player: name
+					}
+				}).done(function(r){
+					// nothing
+				}).fail(function(r){
+					chat.log(r.responseText, 'chat-warning');
+				});
+			}
+			else {
+				chat.log("Syntax: /invite [player_name]", "chat-warning");
+			}
+		}
+	},
+	join: function(z) {
+		if (my.guild.id) return;
+		console.info("JOINING GUILD!", z);
+		// clicked CONFIRM
+		$.ajax({
+			url: app.url + 'php2/guild/join.php',
+			data: {
+				row: z.row,
+				guildName: z.guildName
+			}
+		}).done(function(data){
+			console.info("guild.join() response ", data);
+			console.info("guild guild data", data.guild);
+			my.guild = data.guild;
+			chat.log("You have joined the guild: "+ data.guildName, "chat-warning");
+			socket.initGuild();
+		}).fail(function(data){
+			console.info("Oh no", data);
+			chat.log(data.responseText, 'chat-warning');
+		});
+	},
+	hasJoined: function(z) {
+		chat.log(z.msg, 'chat-warning');
+	},
+	quit: function() {
+		if (!my.guild.id) return;
+		console.info("Quitting guild!");
+		var o = my.guild;
+		$.ajax({
+			url: app.url + 'php2/guild/quit.php'
+		}).done(function(data){
+			my.guild = guild.Guild(); // nice!
+			console.info("guild.quit() response ", data);
+			chat.log("You have quit the guild: "+ o.name, "chat-warning");
+			socket.unsubscribe('guild:'+ o.id);
+		}).fail(function(data){
+			chat.log(data.responseText, 'chat-warning');
+		});
+	},
+	hasQuit: function(r) {
+		chat.log(r.msg, 'chat-warning')
+	},
+	boot: function(name) {
+		if (my.guild.rank > 1) {
+			chat.log("Only the guild Leader and Officers can boot people from the guild", 'chat-warning');
+		}
+		else {
+			$.ajax({
+				url: app.url + 'php2/guild/boot.php',
+				data: {
+					name: name
+				}
+			}).done(function () {
+				// nothing
+			}).fail(function (data) {
+				chat.log(data.responseText, 'chat-warning');
+			});
+		}
+	},
+	wasBooted: function(data) {
+		if (!my.guild.id) return;
+		console.info("Booting! ", data);
+		chat.log(data.msg, 'chat-warning');
+		if (data.name === my.name) {
+			$.ajax({
+				url: app.url + 'php2/guild/quit.php',
+				data: {
+					action: 'boot'
+				}
+			}).done(function(){
+				socket.unsubscribe('guild:'+ my.guild.id);
+				my.guild = guild.Guild(); // nice!
+			}).fail(function(data){
+				chat.log(data.responseText, 'chat-warning');
+			});
+		}
+	},
+	promote: function(name) {
+		if (my.guild.rank > 1) {
+			chat.log("Only the guild Leader and Officers can promote members.", 'chat-warning');
+		}
+		else {
+			$.ajax({
+				url: app.url + 'php2/guild/promote.php',
+				data: {
+					name: name
+				}
+			}).done(function () {
+				// nothing
+			}).fail(function (data) {
+				chat.log(data.responseText, 'chat-warning');
+			});
+		}
+	},
+	wasPromoted: function(data) {
+		if (!my.guild.id) return;
+		chat.log(data.msg, 'chat-warning');
+		guild.updateSession(data);
+	},
+	leader: function(name) {
+		if (my.guild.rank > 0) {
+			chat.log("Only the guild Leader can assign a new leader.", 'chat-warning');
+		}
+		else {
+			$.ajax({
+				url: app.url + 'php2/guild/leader.php',
+				data: {
+					name: name
+				}
+			}).done(function (data) {
+				console.info('leader: ', data);
+				my.guild.rank = 1;
+				// nothing
+			}).fail(function (data) {
+				chat.log(data.responseText, 'chat-warning');
+			});
+		}
+	},
+	wasLeader: function(data) {
+		if (!my.guild.id) return;
+		chat.log(data.msg, 'chat-warning');
+		guild.updateSession(data);
+
+	},
+	updateSession: function(data) {
+		if (data.name === my.name) {
+			$.ajax({
+				type: 'GET',
+				url: app.url + 'php2/guild/update-session.php'
+			}).done(function (data) {
+				console.info('update-session: ', data);
+				my.guild = data.guild;
+				// nothing
+			}).fail(function (data) {
+				chat.log(data.responseText, 'chat-warning');
+			});
+		}
+	},
+	motdParse: function(msg) {
+		var a = msg.replace(/ +/g, " ").split(" ");
+		a.shift();
+		return a.join(" ");
+	},
+	motd: function(msg) {
+		if (my.guild.rank > 1) return;
+		$.ajax({
+			url: app.url + 'php2/guild/motd.php',
+			data: {
+				msg: msg
+			}
+		}).done(function (data) {
+			// nothing
+		}).fail(function (data) {
+			chat.log(data.responseText, 'chat-warning');
+		});
+	},
+	zmqMotd: function(data) {
+		chat.log(data.msg, 'chat-guild');
 	}
 }
 var cache = {
@@ -5757,6 +5983,26 @@ var route = {
 			setTimeout(function(){
 				bar.getParty();
 			}, 1000);
+		}
+	},
+	guild: function(data, r) {
+		if (r === 'guild->hasJoined') {
+			guild.hasJoined(data);
+		}
+		else if (r === 'guild->quit') {
+			guild.hasQuit(data);
+		}
+		else if (r === 'guild->boot') {
+			guild.wasBooted(data);
+		}
+		else if (r === 'guild->promote') {
+			guild.wasPromoted(data);
+		}
+		else if (r === 'guild->leader') {
+			guild.wasLeader(data);
+		}
+		else if (r === 'guild->motd') {
+			guild.zmqMotd(data);
 		}
 	}
 };
