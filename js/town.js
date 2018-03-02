@@ -17,7 +17,7 @@ var town = {
 				my.level = z.level;
 				my.row = z.row;
 				my.party[0] = z;
-				my.resetClientPartyValues(0);
+				my.resetClientPartyValues(my.party[0]);
 				my.guild = data.guild;
 				// init party member values
 				for (var i=1; i<game.maxPlayers; i++) {

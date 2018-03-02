@@ -3589,7 +3589,7 @@ var bar = {
 					console.info('SET BARS ', i, v);
 					if (v.name === my.name) {
 						my.party[0] = v;
-						my.resetClientPartyValues(0);
+						my.resetClientPartyValues(my.party[0]);
 						bar.updatePlayerBar(0);
 					}
 					else {
@@ -5330,7 +5330,7 @@ var town = {
 				my.level = z.level;
 				my.row = z.row;
 				my.party[0] = z;
-				my.resetClientPartyValues(0);
+				my.resetClientPartyValues(my.party[0]);
 				my.guild = data.guild;
 				// init party member values
 				for (var i=1; i<game.maxPlayers; i++) {
