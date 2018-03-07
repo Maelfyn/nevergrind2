@@ -190,17 +190,31 @@ var chat = {
 		chat.history.push(o);
 		chat.historyIndex = chat.history.length;
 	},
+	divider: '<div class="chat-emote">========================================</div>',
 	help: function() {
 		var z = 'class="chat-emote"',
 			h = 'class="chat-help-header"',
 			s = [
+				chat.divider,
 				'<div '+ h +'>Main Chat Channels:</div>',
 				'<div '+ z +'>/say : Say a message in your current chat channel : /say hail</div>',
 				'<div '+ z +'>/party : Message your party : /party hail</div>',
 				'<div '+ z +'>/guild : Message your guild : /guild hail</div>',
 				'<div '+ z +'>@ : Send a private message by name : @bob hi</div>',
-				'<div '+ h +'>Change Channels:</div>',
-				'<div '+ z +'>/join channel : Join a channel : /join bros</div>',
+				'<div '+ h +'>Guild Commands</div>',
+				'<div '+ z +'>/ginvite: Invite a player to your guild: /ginvite Bob</div>',
+				'<div '+ z +'>/gpromote: Promote a guild member to Officer: /gpromote Bob</div>',
+				'<div '+ z +'>/gleader: Promote a guild member to Leader: /gleader Bob</div>',
+				'<div '+ z +'>/gboot: Boot a member from the guild: /gboot Bob</div>',
+				'<div '+ z +'>/motd: Set a new message of the day for your guild: /motd message</div>',
+				'<div '+ z +'>/gquit: Leave your guild: /gquit</div>',
+				'<div '+ z +'>/ginvite: Invite a player to your guild: /ginvite Bob</div>',
+				'<div '+ z +'>/ginvite: Invite a player to your guild: /ginvite Bob</div>',
+				'<div '+ h +'>Party Commands</div>',
+				'<div '+ z +'>/invite: Invite a player to your party : /invite Bob</div>',
+				'<div '+ z +'>/disband: Leave your party</div>',
+				'<div '+ z +'>/promote: Promote a player in your party to leader : /promote Bob</div>',
+				'<div '+ z +'>/boot: Boot a player from the party: /boot Bob</div>',
 				'<div '+ h +'>Social Commands:</div>',
 				'<div '+ z +'>/flist or /friends : Show your friends\' online status</div>',
 				'<div '+ z +'>/friend add : Add a friend : /friend add Bob</div>',
@@ -210,12 +224,8 @@ var chat = {
 				'<div '+ z +'>/ignore remove : Remove someone from your ignore list</div>',
 				'<div '+ z +'>/who : Show all players currently playing</div>',
 				'<div '+ z +'>/who class : Show current players by class : /who warrior</div>',
-				'<div '+ h +'>Party Commands</div>',
-				'<div '+ z +'>/invite: Invite a player to your party : /invite Bob</div>',
-				'<div '+ z +'>/disband: Leave your party</div>',
-				'<div '+ z +'>/promote: Promote a player in your party to leader : /promote Bob</div>',
-				'<div '+ z +'>/boot: Boot a player from the party: /boot Bob</div>',
 				'<div '+ h +'>Miscellaneous Commands:</div>',
+				'<div '+ z +'>/join channel : Join a channel : /join bros</div>',
 				'<div '+ z +'>/clear: clear the chat log</div>',
 				'<div '+ z +'>/played: Show character creation, session duration, and total playtime</div>',
 				'<div '+ z +'>/me : Send an emote to your current chat channel : /me waves</div>',
@@ -444,7 +454,7 @@ var chat = {
 		},
 		list: function() {
 			if (ng.ignore.length) {
-				var s = '<div class="chat-warning">Checking ignore list...</div>';
+				var s = chat.divider + '<div class="chat-warning">Checking ignore list...</div>';
 				ng.ignore.forEach(function(v) {
 					s += '<div class="chat-emote">' + v + '</div>';
 				});
@@ -687,7 +697,7 @@ var chat = {
 	friend: {
 		parse: function(o) { // 3-part parse
 			var a = o.replace(/ +/g, " ").split(" ");
-			return a[2][0].toUpperCase() + a[2].substr(1);
+			return a[2][0].toUpperCase() + a[2].substr(1).toLowerCase().trim();
 		},
 		init: function() {
 			ng.friends = ng.friends || [];
@@ -707,7 +717,7 @@ var chat = {
 				}).done(function(r){
 					ng.friends = r.friends;
 					console.info(r);
-					var str = '<div>Friend List ('+ r.friends.length +')</div>';
+					var str = chat.divider + '<div>Friend List ('+ r.friends.length +')</div>';
 
 					ng.friends.forEach(function(name, i){
 						var index = r.players.indexOf(name);
@@ -861,7 +871,7 @@ var chat = {
 		parse: function(msg) { // complex parse for class names
 			var a = msg.replace(/ +/g, " ").split(" "),
 				job = a[1],
-				longJob = job[0].toUpperCase() + job.substr(1);
+				longJob = job[0].toUpperCase() + job.substr(1).toLowerCase().trim();
 
 			// long name?
 			if (ng.jobs.indexOf(longJob) > -1) {
@@ -887,7 +897,7 @@ var chat = {
 			}).done(function(r){
 				console.info('who ', r);
 				if (r.len) {
-					chat.log("There " + (r.len > 1 ? "are" : "is") +" currently "+
+					chat.log(chat.divider + "There " + (r.len > 1 ? "are" : "is") +" currently "+
 						r.len + " "+ (r.len > 1 ? "players" : "players") +" in Vandamor.", "chat-warning");
 					// online
 					var str = '';
@@ -915,7 +925,7 @@ var chat = {
 				console.info('r ', r);
 				var jobLong = ng.toJobLong(job);
 				if (r.len) {
-					chat.log("There " + (r.len > 1 ? "are" : "is") +" currently "+
+					chat.log(chat.divider + "There " + (r.len > 1 ? "are" : "is") +" currently "+
 						r.len + " "+ (r.len > 1 ? jobLong + 's' : jobLong) +" in Vandamor.", "chat-warning");
 					// online
 					var str = '';

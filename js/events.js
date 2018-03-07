@@ -42,11 +42,23 @@ $(document).on(env.click, function(e){
 			chat.reply();
 			return false;
 		}
-		else if (!chat.hasFocus && !guild.hasFocus && code === 65) {
+		else if (!chat.hasFocus && !guild.hasFocus) {
 			// no select all of webpage elements
-			e.preventDefault();
+			if (code === 65 || code === 70) {
+				e.preventDefault();
+			}
+			// ctrl A, F
 		}
 	} else {
+		if (!chat.hasFocus && !guild.hasFocus) {
+			if (code === 191) {
+				var z = $("#chat-input"),
+					text = z.val();
+				!text && $("#chat-input").focus();
+				return;
+			}
+
+		}
 		if (ng.view === 'title'){
 			if (!ng.isModalOpen && !init.isMobile){
 				$("#create-character-name").focus();

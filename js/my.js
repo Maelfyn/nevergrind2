@@ -87,9 +87,9 @@ var my = {
 			heartbeat: Date.now()
 		}
 	},
-	resetClientPartyValues: function(o) {
-		o.heartbeat = Date.now();
-		o.linkdead = 0;
+	resetClientPartyValues: function(s) {
+		my.party[s].heartbeat = Date.now();
+		my.party[s].linkdead = 0;
 	},
 	team: 0,
 	slot: 1,

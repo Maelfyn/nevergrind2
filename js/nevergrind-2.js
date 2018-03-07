@@ -726,6 +726,8 @@ var ng = {
 	copy: function(o){
 		return JSON.parse(JSON.stringify(o));
 	},
+	loadMsg:
+		"<div class='text-shadow text-center'>Loading... <i class='fa fa-cog fa-spin load-cog'></i></div>",
 	attrs: ['str', 'sta', 'agi', 'dex', 'wis', 'intel', 'cha'],
 	resists: ['bleed', 'poison', 'arcane', 'lightning', 'fire', 'cold'],
 	dungeon: ['traps', 'treasure', 'scout', 'pulling'],
@@ -1199,9 +1201,9 @@ var my = {
 			heartbeat: Date.now()
 		}
 	},
-	resetClientPartyValues: function(o) {
-		o.heartbeat = Date.now();
-		o.linkdead = 0;
+	resetClientPartyValues: function(s) {
+		my.party[s].heartbeat = Date.now();
+		my.party[s].linkdead = 0;
 	},
 	team: 0,
 	slot: 1,
@@ -1622,27 +1624,57 @@ var game = {
 			game.heartbeat.timer = setInterval(game.heartbeat.send, 5000);
 		},
 		send: function() {
+			console.info("%c Last heartbeat send: ", "background: #ff0", Date.now() - game.ping.start);
 			game.ping.start = Date.now();
 			$.ajax({
 				type: 'GET',
 				url: app.url + 'php2/heartbeat.php'
 			}).done(function () {
 				console.info("%c Ping: ", 'background: #0f0', game.ping.oneWay());
+			}).fail(function(data){
+				console.info(data);
+				setTimeout(function(){
+					chat.camp();
+
+				}, 10000);
 			});
 		}
 	},
 	socket: {
 		timer: 0,
+		sendTime: Date.now(),
+		receiveTime: Date.now(),
+		timeout: 25000,
+		interval: 20000,
 		start: function() {
 			clearInterval(game.socket.timer);
-			game.socket.timer = setInterval(game.socket.send, 20000);
+			game.socket.timer = setInterval(game.socket.send, game.socket.interval);
 		},
 		send: function() {
-			socket.healthTime = Date.now();
-			socket.startHealthCheck();
+			console.info("%c Last socket send: ", "background: #0ff", Date.now() - game.socket.sendTime);
+			game.socket.sendTime = Date.now();
 			socket.zmq.publish('hb:' + my.name, {});
+			setTimeout(function(){
+				console.info("%c Socket ping: ", "background: #08f", game.socket.getDifference());
+				game.socket.getDifference() > game.socket.interval + 1000 && ng.disconnect();
+			}, 1000);
+		},
+		getDifference: function() {
+			return Date.now() - game.socket.receiveTime;
 		}
 	},
+
+	/*startHealthCheck: function() {
+		socket.isHealthy = 0;
+		setTimeout(function() {
+			socket.checkHealth();
+		}, 10000);
+	},
+	checkHealth: function(){
+		if (!game.socket.isHealthy()) {
+			ng.disconnect();
+		}
+	},*/
 	played: {
 		timer: 0,
 		start: function() {
@@ -1676,38 +1708,15 @@ var game = {
 					id: my.row,
 					route: 'party->hb'
 				});
-
-				/*$.ajax({
-					type: 'GET',
-					url: app.url + 'php2/chat/sanity-party.php'
-				}).done(function (data) {
-					for (var i = 0, len = data.players.length; i < len; i++) {
-						data.players[i] *= 1;
-					}
-					var newChatArray = [];
-					chat.inChannel.forEach(function (v) {
-						if (!~data.players.indexOf(v)) {
-							$("#chat-player-" + v).remove();
-						}
-						else {
-							newChatArray.push(v);
-						}
-					});
-					if (newChatArray.length) {
-						chat.inChannel = newChatArray;
-						chat.setHeader();
-
-					}
-				});*/
 			},
 			check: function() {
 				var now = Date.now(),
 					linkdead = [];
 				for (var i=1; i<6; i++) {
-					console.info("Checking: ", my.party[i].id, now - my.party[i].heartbeat > 15000)
+					console.info("Checking: ", my.party[i].id, now - my.party[i].heartbeat > game.socket.interval * 2)
 					if (my.party[i].id &&
 						!my.party[i].linkdead &&
-						(now - my.party[i].heartbeat > 15000)) {
+						(now - my.party[i].heartbeat > game.socket.interval * 2)) {
 						linkdead.push(my.party[i].name);
 						my.party[i].linkdead = 1;
 					}
@@ -2091,11 +2100,23 @@ $(document).on(env.click, function(e){
 			chat.reply();
 			return false;
 		}
-		else if (!chat.hasFocus && !guild.hasFocus && code === 65) {
+		else if (!chat.hasFocus && !guild.hasFocus) {
 			// no select all of webpage elements
-			e.preventDefault();
+			if (code === 65 || code === 70) {
+				e.preventDefault();
+			}
+			// ctrl A, F
 		}
 	} else {
+		if (!chat.hasFocus && !guild.hasFocus) {
+			if (code === 191) {
+				var z = $("#chat-input"),
+					text = z.val();
+				!text && $("#chat-input").focus();
+				return;
+			}
+
+		}
 		if (ng.view === 'title'){
 			if (!ng.isModalOpen && !init.isMobile){
 				$("#create-character-name").focus();
@@ -2201,15 +2222,13 @@ var socket = {
 			}
 		})();
 	},
-	isHealthy: 0,
 	initWhisper: function() {
 		if (socket.enabled) {
 			var channel = 'hb:' + my.name;
 			// heartbeat
 			console.info("subscribing to heartbeat channel: ", channel);
 			socket.zmq.subscribe(channel, function(){
-				socket.isHealthy = 1;
-				// console.info("socket heartbeat received: ", Date.now() - socket.healthTime + 'ms');
+				game.socket.receiveTime = Date.now();
 			});
 			// whisper
 			channel = 'name:' + my.name;
@@ -2265,19 +2284,6 @@ var socket = {
 				}
 
 			});
-		}
-	},
-	healthTime: 0,
-	startHealthCheck: function() {
-		socket.healthTime = Date.now();
-		socket.isHealthy = 0;
-		setTimeout(function() {
-			socket.checkHealth();
-		}, 8000);
-	},
-	checkHealth: function(){
-		if (!socket.isHealthy) {
-			ng.disconnect();
 		}
 	},
 	enabled: 0,
@@ -2579,17 +2585,31 @@ var chat = {
 		chat.history.push(o);
 		chat.historyIndex = chat.history.length;
 	},
+	divider: '<div class="chat-emote">========================================</div>',
 	help: function() {
 		var z = 'class="chat-emote"',
 			h = 'class="chat-help-header"',
 			s = [
+				chat.divider,
 				'<div '+ h +'>Main Chat Channels:</div>',
 				'<div '+ z +'>/say : Say a message in your current chat channel : /say hail</div>',
 				'<div '+ z +'>/party : Message your party : /party hail</div>',
 				'<div '+ z +'>/guild : Message your guild : /guild hail</div>',
 				'<div '+ z +'>@ : Send a private message by name : @bob hi</div>',
-				'<div '+ h +'>Change Channels:</div>',
-				'<div '+ z +'>/join channel : Join a channel : /join bros</div>',
+				'<div '+ h +'>Guild Commands</div>',
+				'<div '+ z +'>/ginvite: Invite a player to your guild: /ginvite Bob</div>',
+				'<div '+ z +'>/gpromote: Promote a guild member to Officer: /gpromote Bob</div>',
+				'<div '+ z +'>/gleader: Promote a guild member to Leader: /gleader Bob</div>',
+				'<div '+ z +'>/gboot: Boot a member from the guild: /gboot Bob</div>',
+				'<div '+ z +'>/motd: Set a new message of the day for your guild: /motd message</div>',
+				'<div '+ z +'>/gquit: Leave your guild: /gquit</div>',
+				'<div '+ z +'>/ginvite: Invite a player to your guild: /ginvite Bob</div>',
+				'<div '+ z +'>/ginvite: Invite a player to your guild: /ginvite Bob</div>',
+				'<div '+ h +'>Party Commands</div>',
+				'<div '+ z +'>/invite: Invite a player to your party : /invite Bob</div>',
+				'<div '+ z +'>/disband: Leave your party</div>',
+				'<div '+ z +'>/promote: Promote a player in your party to leader : /promote Bob</div>',
+				'<div '+ z +'>/boot: Boot a player from the party: /boot Bob</div>',
 				'<div '+ h +'>Social Commands:</div>',
 				'<div '+ z +'>/flist or /friends : Show your friends\' online status</div>',
 				'<div '+ z +'>/friend add : Add a friend : /friend add Bob</div>',
@@ -2599,12 +2619,8 @@ var chat = {
 				'<div '+ z +'>/ignore remove : Remove someone from your ignore list</div>',
 				'<div '+ z +'>/who : Show all players currently playing</div>',
 				'<div '+ z +'>/who class : Show current players by class : /who warrior</div>',
-				'<div '+ h +'>Party Commands</div>',
-				'<div '+ z +'>/invite: Invite a player to your party : /invite Bob</div>',
-				'<div '+ z +'>/disband: Leave your party</div>',
-				'<div '+ z +'>/promote: Promote a player in your party to leader : /promote Bob</div>',
-				'<div '+ z +'>/boot: Boot a player from the party: /boot Bob</div>',
 				'<div '+ h +'>Miscellaneous Commands:</div>',
+				'<div '+ z +'>/join channel : Join a channel : /join bros</div>',
 				'<div '+ z +'>/clear: clear the chat log</div>',
 				'<div '+ z +'>/played: Show character creation, session duration, and total playtime</div>',
 				'<div '+ z +'>/me : Send an emote to your current chat channel : /me waves</div>',
@@ -2833,7 +2849,7 @@ var chat = {
 		},
 		list: function() {
 			if (ng.ignore.length) {
-				var s = '<div class="chat-warning">Checking ignore list...</div>';
+				var s = chat.divider + '<div class="chat-warning">Checking ignore list...</div>';
 				ng.ignore.forEach(function(v) {
 					s += '<div class="chat-emote">' + v + '</div>';
 				});
@@ -3076,7 +3092,7 @@ var chat = {
 	friend: {
 		parse: function(o) { // 3-part parse
 			var a = o.replace(/ +/g, " ").split(" ");
-			return a[2][0].toUpperCase() + a[2].substr(1);
+			return a[2][0].toUpperCase() + a[2].substr(1).toLowerCase().trim();
 		},
 		init: function() {
 			ng.friends = ng.friends || [];
@@ -3096,7 +3112,7 @@ var chat = {
 				}).done(function(r){
 					ng.friends = r.friends;
 					console.info(r);
-					var str = '<div>Friend List ('+ r.friends.length +')</div>';
+					var str = chat.divider + '<div>Friend List ('+ r.friends.length +')</div>';
 
 					ng.friends.forEach(function(name, i){
 						var index = r.players.indexOf(name);
@@ -3250,7 +3266,7 @@ var chat = {
 		parse: function(msg) { // complex parse for class names
 			var a = msg.replace(/ +/g, " ").split(" "),
 				job = a[1],
-				longJob = job[0].toUpperCase() + job.substr(1);
+				longJob = job[0].toUpperCase() + job.substr(1).toLowerCase().trim();
 
 			// long name?
 			if (ng.jobs.indexOf(longJob) > -1) {
@@ -3276,7 +3292,7 @@ var chat = {
 			}).done(function(r){
 				console.info('who ', r);
 				if (r.len) {
-					chat.log("There " + (r.len > 1 ? "are" : "is") +" currently "+
+					chat.log(chat.divider + "There " + (r.len > 1 ? "are" : "is") +" currently "+
 						r.len + " "+ (r.len > 1 ? "players" : "players") +" in Vandamor.", "chat-warning");
 					// online
 					var str = '';
@@ -3304,7 +3320,7 @@ var chat = {
 				console.info('r ', r);
 				var jobLong = ng.toJobLong(job);
 				if (r.len) {
-					chat.log("There " + (r.len > 1 ? "are" : "is") +" currently "+
+					chat.log(chat.divider + "There " + (r.len > 1 ? "are" : "is") +" currently "+
 						r.len + " "+ (r.len > 1 ? jobLong + 's' : jobLong) +" in Vandamor.", "chat-warning");
 					// online
 					var str = '';
@@ -3589,7 +3605,7 @@ var bar = {
 					console.info('SET BARS ', i, v);
 					if (v.name === my.name) {
 						my.party[0] = v;
-						my.resetClientPartyValues(my.party[0]);
+						my.resetClientPartyValues(0);
 						bar.updatePlayerBar(0);
 					}
 					else {
@@ -5330,7 +5346,7 @@ var town = {
 				my.level = z.level;
 				my.row = z.row;
 				my.party[0] = z;
-				my.resetClientPartyValues(my.party[0]);
+				my.resetClientPartyValues(0);
 				my.guild = data.guild;
 				// init party member values
 				for (var i=1; i<game.maxPlayers; i++) {
@@ -5413,7 +5429,7 @@ var town = {
 						town.aside.html.close +
 					'</div>' +
 					'<div id="aside-menu">' +
-					town.aside.menu[id]() +
+						town.aside.menu[id]() +
 					'</div>' +
 				'</div>';
 				return s;
@@ -5445,15 +5461,27 @@ var town = {
 				var s = '';
 				if (my.guild.name) {
 					s +=
-						'<div>Guild: '+ my.guild.name +'</div> ' +
-						'<div>Title: '+ guild.ranks[my.guild.rank] +'</div> ' +
-						'<div>Member Number: '+ my.guild.memberNumber +'</div> ';
+						'<div class="guild-aside-frame">' +
+							'<div>Guild: '+ my.guild.name +'</div> ' +
+							'<div>Title: '+ guild.ranks[my.guild.rank] +'</div> ' +
+							'<div>Total Members: '+ my.guild.members +'</div> ' +
+							'<div>Member Number: '+ my.guild.memberNumber +'</div> ' +
+						'</div>' +
+						'<div class="guild-aside-frame">' +
+							'<div id="guild-member-flex">'+
+								'<div id="guild-member-label">Guild Members:</div>'+
+								'<div id="guild-member-refresh-icon"><i class="fa fa-refresh refresh"></i></div>'+
+							'</div>'+
+							'<div id="aside-guild-members"></div>'+
+						'</div>';
+
+						s += '</div>';
 				}
 				else {
 					s +=
-					'<input id="guild-input" type="text" maxlength="30" autocomplete="off" spellcheck="false">' +
+					'<input id="guild-input" class="text-shadow" type="text" maxlength="30" autocomplete="off" spellcheck="false">' +
 					'<div id="guild-create" class="ng-btn">Create Guild</div> ' +
-					'<div id="guild-create-help">Only letters A through Z and apostrophes are accepted in guild names. Standarized capitalization will be automatically applied. The guild name must be between 4 and 30 characters. All guild names are subject to the royal statutes regarding public decency in Vandamor.</div>';
+					'<div class="guild-aside-frame">Only letters A through Z and apostrophes are accepted in guild names. Standarized capitalization will be automatically applied. The guild name must be between 4 and 30 characters. All guild names are subject to the royal statutes regarding common decency in Vandamor.</div>';
 				}
 				return s;
 			},
@@ -5487,6 +5515,7 @@ var town = {
 			// create aside
 			var e = document.createElement('div');
 			e.className = 'town-aside text-shadow';
+			// set aside HTML
 			e.innerHTML = town.aside.getHtml(id);
 			document.getElementById('scene-town').appendChild(e);
 			// animate aside things
@@ -5521,6 +5550,16 @@ var town = {
 			}, town.aside.selected ? 0 : 500);
 			// set aside id
 			town.aside.selected = id;
+			// AJAX calls if necessary
+			if (id === 'town-guild'){
+				if (guild.memberList.length) {
+					guild.setGuildList(guild);
+				}
+				else {
+					$("#aside-guild-members").html('Loading...');
+					guild.getMembers(0);
+				}
+			}
 		},
 		update: function(id) {
 			var s = town.aside.menu[id]();
@@ -5551,7 +5590,11 @@ var town = {
 			guild.hasFocus = 1;
 		}).on('blur', '#guild-input', function() {
 			guild.hasFocus = 0;
-		})
+		}).on(env.click, '#guild-member-refresh-icon', function() {
+			$("#aside-guild-members").html(ng.loadMsg);
+			guild.getMembers(1500);
+		});
+
 		$(".town-action").on(env.click, function(){
 			town.aside.init($(this).attr('id'));
 		});
@@ -5645,7 +5688,9 @@ var guild = {
 			rank: 0,
 			memberNumber: 0,
 			motd: '',
-			name: ''
+			members: 0,
+			name: '',
+			memberList: []
 		}
 	},
 	format: function(s) {
@@ -5669,15 +5714,17 @@ var guild = {
 				name: name.replace(/ +/g, " ").trim()
 			}
 		}).done(function(data) {
-			console.info(data);
-			my.guild = data;
-			chat.log('Valeska Windcrest says, "By the powers vested in me, I hereby declare you supreme sovereign Leader of a new guild: ' + data.name +'."');
+			console.info('create', data.guild);
+			my.guild = data.guild;
+			chat.log('Valeska Windcrest says, "By the powers vested in me, I hereby declare you supreme sovereign Leader of a new guild: ' + data.guild.name +'."');
 			chat.log('Type /help to view guild commands', 'chat-emote');
 			socket.initGuild();
-			town.aside.update('town-guild');
 			// redraw the #aside-menu with new option
+			town.aside.update('town-guild');
+			guild.getMembers();
 		}).fail(function(data){
 			console.info(data);
+			$("#guild-input").focus();
 			ng.msg(data.responseText);
 		}).always(function(){
 			ng.unlock();
@@ -5723,10 +5770,8 @@ var guild = {
 				guildName: z.guildName
 			}
 		}).done(function(data){
-			console.info("guild.join() response ", data);
-			console.info("guild guild data", data.guild);
 			my.guild = data.guild;
-			chat.log("You have joined the guild: "+ data.guildName, "chat-warning");
+			chat.log("You have joined the guild: "+ data.guild.name, "chat-warning");
 			socket.initGuild();
 		}).fail(function(data){
 			console.info("Oh no", data);
@@ -5870,6 +5915,34 @@ var guild = {
 	},
 	zmqMotd: function(data) {
 		chat.log(data.msg, 'chat-guild');
+	},
+	getMembers: function(throttleTime) {
+		if (!my.guild.id) return;
+		ng.lock(1);
+		$.ajax({
+			type: 'GET',
+			url: app.url + 'php2/guild/get-member-list.php'
+		}).done(function (data) {
+			setTimeout(function(){
+				guild.setGuildList(data);
+			}, throttleTime);
+			// nothing
+		}).fail(function (data) {
+			chat.log(data.responseText, 'chat-warning');
+		}).always(function(){
+			setTimeout(function(){
+				ng.unlock();
+			}, throttleTime);
+		});
+	},
+	memberList: [],
+	setGuildList: function(data) {
+		var s = '';
+		guild.memberList = data.memberList;
+		guild.memberList.forEach(function(v){
+			s += '<div>' + v.level +' '+ v.name +' '+ v.race +' <span class="chat-'+ v.job +'">'+ ng.toJobLong(v.job) +'</span></div>';
+		});
+		$("#aside-guild-members").html(s);
 	}
 }
 var cache = {

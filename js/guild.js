@@ -5,7 +5,9 @@ var guild = {
 			rank: 0,
 			memberNumber: 0,
 			motd: '',
-			name: ''
+			members: 0,
+			name: '',
+			memberList: []
 		}
 	},
 	format: function(s) {
@@ -29,15 +31,17 @@ var guild = {
 				name: name.replace(/ +/g, " ").trim()
 			}
 		}).done(function(data) {
-			console.info(data);
-			my.guild = data;
-			chat.log('Valeska Windcrest says, "By the powers vested in me, I hereby declare you supreme sovereign Leader of a new guild: ' + data.name +'."');
+			console.info('create', data.guild);
+			my.guild = data.guild;
+			chat.log('Valeska Windcrest says, "By the powers vested in me, I hereby declare you supreme sovereign Leader of a new guild: ' + data.guild.name +'."');
 			chat.log('Type /help to view guild commands', 'chat-emote');
 			socket.initGuild();
-			town.aside.update('town-guild');
 			// redraw the #aside-menu with new option
+			town.aside.update('town-guild');
+			guild.getMembers();
 		}).fail(function(data){
 			console.info(data);
+			$("#guild-input").focus();
 			ng.msg(data.responseText);
 		}).always(function(){
 			ng.unlock();
@@ -83,10 +87,8 @@ var guild = {
 				guildName: z.guildName
 			}
 		}).done(function(data){
-			console.info("guild.join() response ", data);
-			console.info("guild guild data", data.guild);
 			my.guild = data.guild;
-			chat.log("You have joined the guild: "+ data.guildName, "chat-warning");
+			chat.log("You have joined the guild: "+ data.guild.name, "chat-warning");
 			socket.initGuild();
 		}).fail(function(data){
 			console.info("Oh no", data);
@@ -230,5 +232,33 @@ var guild = {
 	},
 	zmqMotd: function(data) {
 		chat.log(data.msg, 'chat-guild');
+	},
+	getMembers: function(throttleTime) {
+		if (!my.guild.id) return;
+		ng.lock(1);
+		$.ajax({
+			type: 'GET',
+			url: app.url + 'php2/guild/get-member-list.php'
+		}).done(function (data) {
+			setTimeout(function(){
+				guild.setGuildList(data);
+			}, throttleTime);
+			// nothing
+		}).fail(function (data) {
+			chat.log(data.responseText, 'chat-warning');
+		}).always(function(){
+			setTimeout(function(){
+				ng.unlock();
+			}, throttleTime);
+		});
+	},
+	memberList: [],
+	setGuildList: function(data) {
+		var s = '';
+		guild.memberList = data.memberList;
+		guild.memberList.forEach(function(v){
+			s += '<div>' + v.level +' '+ v.name +' '+ v.race +' <span class="chat-'+ v.job +'">'+ ng.toJobLong(v.job) +'</span></div>';
+		});
+		$("#aside-guild-members").html(s);
 	}
 }

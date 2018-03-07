@@ -66,7 +66,5 @@ $lastInsert = mysqli_insert_id($link);
 
 
 // return to client
-$r['name'] = $name;
-$r['rank'] = 'Leader';
-$r['id'] = $g_id;
+require 'getGuildData.php';
 echo json_encode($r);

@@ -1,8 +1,9 @@
 <?php
 	$preMsg = strip_tags($_POST['msg']);
-	if (!$preMsg){
-		exit('no message found');
-	}
+
+	!$preMsg && exit('no message found');
+	!isset($_SESSION['ng2']['name']) && exit('Session not found');
+
 	function getPrefix() {
 		return '[' . $_SESSION['ng2']['level'] .':<span class="chat-'.
 			$_SESSION['ng2']['job'] .'">'.

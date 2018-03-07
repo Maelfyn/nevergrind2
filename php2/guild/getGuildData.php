@@ -4,6 +4,7 @@ $stmt = $link->prepare('select m.rank,
 	m.g_id, 
 	m.member_number,
 	n.motd,
+	n.members,
 	n.name 
 	from ng2_guild_members m 
 	left join ng2_guilds n 
@@ -12,7 +13,7 @@ $stmt = $link->prepare('select m.rank,
 	limit 1');
 $stmt->bind_param('s', $_SESSION['ng2']['row']);
 $stmt->execute();
-$stmt->bind_result($rank, $g_id, $member_number, $motd, $name);
+$stmt->bind_result($rank, $g_id, $member_number, $motd, $members, $name);
 // default value
 require 'guildReset.php';
 // assigned if exists
@@ -22,6 +23,7 @@ while($stmt->fetch()){
 		'rank' => $rank,
 		'memberNumber' => $member_number,
 		'motd' => $motd,
+		'members' => $members,
 		'name' => $name
 	];
 }

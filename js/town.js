@@ -17,7 +17,7 @@ var town = {
 				my.level = z.level;
 				my.row = z.row;
 				my.party[0] = z;
-				my.resetClientPartyValues(my.party[0]);
+				my.resetClientPartyValues(0);
 				my.guild = data.guild;
 				// init party member values
 				for (var i=1; i<game.maxPlayers; i++) {
@@ -100,7 +100,7 @@ var town = {
 						town.aside.html.close +
 					'</div>' +
 					'<div id="aside-menu">' +
-					town.aside.menu[id]() +
+						town.aside.menu[id]() +
 					'</div>' +
 				'</div>';
 				return s;
@@ -132,15 +132,27 @@ var town = {
 				var s = '';
 				if (my.guild.name) {
 					s +=
-						'<div>Guild: '+ my.guild.name +'</div> ' +
-						'<div>Title: '+ guild.ranks[my.guild.rank] +'</div> ' +
-						'<div>Member Number: '+ my.guild.memberNumber +'</div> ';
+						'<div class="guild-aside-frame">' +
+							'<div>Guild: '+ my.guild.name +'</div> ' +
+							'<div>Title: '+ guild.ranks[my.guild.rank] +'</div> ' +
+							'<div>Total Members: '+ my.guild.members +'</div> ' +
+							'<div>Member Number: '+ my.guild.memberNumber +'</div> ' +
+						'</div>' +
+						'<div class="guild-aside-frame">' +
+							'<div id="guild-member-flex">'+
+								'<div id="guild-member-label">Guild Members:</div>'+
+								'<div id="guild-member-refresh-icon"><i class="fa fa-refresh refresh"></i></div>'+
+							'</div>'+
+							'<div id="aside-guild-members"></div>'+
+						'</div>';
+
+						s += '</div>';
 				}
 				else {
 					s +=
-					'<input id="guild-input" type="text" maxlength="30" autocomplete="off" spellcheck="false">' +
+					'<input id="guild-input" class="text-shadow" type="text" maxlength="30" autocomplete="off" spellcheck="false">' +
 					'<div id="guild-create" class="ng-btn">Create Guild</div> ' +
-					'<div id="guild-create-help">Only letters A through Z and apostrophes are accepted in guild names. Standarized capitalization will be automatically applied. The guild name must be between 4 and 30 characters. All guild names are subject to the royal statutes regarding public decency in Vandamor.</div>';
+					'<div class="guild-aside-frame">Only letters A through Z and apostrophes are accepted in guild names. Standarized capitalization will be automatically applied. The guild name must be between 4 and 30 characters. All guild names are subject to the royal statutes regarding common decency in Vandamor.</div>';
 				}
 				return s;
 			},
@@ -174,6 +186,7 @@ var town = {
 			// create aside
 			var e = document.createElement('div');
 			e.className = 'town-aside text-shadow';
+			// set aside HTML
 			e.innerHTML = town.aside.getHtml(id);
 			document.getElementById('scene-town').appendChild(e);
 			// animate aside things
@@ -208,6 +221,16 @@ var town = {
 			}, town.aside.selected ? 0 : 500);
 			// set aside id
 			town.aside.selected = id;
+			// AJAX calls if necessary
+			if (id === 'town-guild'){
+				if (guild.memberList.length) {
+					guild.setGuildList(guild);
+				}
+				else {
+					$("#aside-guild-members").html('Loading...');
+					guild.getMembers(0);
+				}
+			}
 		},
 		update: function(id) {
 			var s = town.aside.menu[id]();
@@ -238,7 +261,11 @@ var town = {
 			guild.hasFocus = 1;
 		}).on('blur', '#guild-input', function() {
 			guild.hasFocus = 0;
-		})
+		}).on(env.click, '#guild-member-refresh-icon', function() {
+			$("#aside-guild-members").html(ng.loadMsg);
+			guild.getMembers(1500);
+		});
+
 		$(".town-action").on(env.click, function(){
 			town.aside.init($(this).attr('id'));
 		});

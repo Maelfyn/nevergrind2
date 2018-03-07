@@ -24,15 +24,13 @@ var socket = {
 			}
 		})();
 	},
-	isHealthy: 0,
 	initWhisper: function() {
 		if (socket.enabled) {
 			var channel = 'hb:' + my.name;
 			// heartbeat
 			console.info("subscribing to heartbeat channel: ", channel);
 			socket.zmq.subscribe(channel, function(){
-				socket.isHealthy = 1;
-				// console.info("socket heartbeat received: ", Date.now() - socket.healthTime + 'ms');
+				game.socket.receiveTime = Date.now();
 			});
 			// whisper
 			channel = 'name:' + my.name;
@@ -88,19 +86,6 @@ var socket = {
 				}
 
 			});
-		}
-	},
-	healthTime: 0,
-	startHealthCheck: function() {
-		socket.healthTime = Date.now();
-		socket.isHealthy = 0;
-		setTimeout(function() {
-			socket.checkHealth();
-		}, 8000);
-	},
-	checkHealth: function(){
-		if (!socket.isHealthy) {
-			ng.disconnect();
 		}
 	},
 	enabled: 0,

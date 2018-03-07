@@ -10,14 +10,19 @@ $stmt->execute();
 $stmt->store_result();
 
 if ($stmt->num_rows) exit("You are already in a guild.");
+// increment guild member count
+$query = 'update ng2_guilds set members=members+1, member_number=member_number+1 where row=?';
+$stmt = $link->prepare($query);
+$stmt->bind_param('s', $_POST['row']);
+$stmt->execute();
+
 // get guild number
-$query = 'SELECT count(row) count FROM ng2_guild_members where g_id=?';
+$query = 'SELECT member_number FROM ng2_guilds where row=?';
 $stmt = $link->prepare($query);
 $stmt->bind_param('s', $_POST['row']);
 $stmt->execute();
 $stmt->bind_result($dbCount);
 $memberNumber = 0;
-
 while ($stmt->fetch()){
 	$memberNumber = $dbCount * 1;
 }
@@ -42,5 +47,4 @@ $zmq->route = 'guild->hasJoined';
 $zmq->category = 'guild:'. $_POST['row'];
 $socket->send(json_encode($zmq));
 
-$r['guildName'] = $_POST['guildName'];
 echo json_encode($r);

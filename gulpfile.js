@@ -88,12 +88,13 @@ return gulp.src([
 	'./js/guild.js',
 	'./js/cache.js',
 	'./js/route.js',
+	'./js/mission.js',
 	'./js/test.js',
 	'./js/endWrap.js'
 ])
 .pipe(concat('nevergrind-2.js'))
 .pipe(gulp.dest('./js'))
-.pipe(stripDebug()) // watch out for this for nwjs
+//.pipe(stripDebug()) // watch out for this for nwjs
 .pipe(uglify())
 .pipe(rename('nevergrind-2.min.js'))
 .pipe(gulp.dest('./js'));

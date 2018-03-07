@@ -4,5 +4,6 @@ $r['guild'] = [
 	'rank' => '',
 	'memberNumber' => 0,
 	'motd' => '',
+	'members' => 0,
 	'name' => ''
 ];

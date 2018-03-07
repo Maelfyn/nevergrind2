@@ -5,15 +5,10 @@ var bar = {
 		e.style.display = 'block';
 
 		for (var i=0; i<game.maxPlayers; i++) {
-			bar.dom[i] = {
-				playerWrap: document.getElementById('bar-player-wrap-' + i),
-				name: document.getElementById('bar-name-' + i),
-				hpFg: document.getElementById('bar-hp-fg-' + i),
-				hpBg: document.getElementById('bar-hp-bg-' + i),
-				mpWrap: document.getElementById('bar-mp-wrap-' + i),
-				mpFg: document.getElementById('bar-mp-fg-' + i),
-			}
+			bar.setEvents(i);
 		}
+		// draw all bars
+		bar.setAllBars();
 		// bar events
 		$("#bar-wrap").on(env.context, '.bar-col-icon', function(e){
 			var id = $(this).attr('id'),
@@ -23,6 +18,16 @@ var bar = {
 			console.info(id, slot, my.party[slot].name);
 			context.getPartyMenu(my.party[slot].name);
 		});
+	},
+	setEvents: function(i) {
+		bar.dom[i] = {
+			playerWrap: document.getElementById('bar-player-wrap-' + i),
+			name: document.getElementById('bar-name-' + i),
+			hpFg: document.getElementById('bar-hp-fg-' + i),
+			// hpBg: document.getElementById('bar-hp-bg-' + i),
+			mpWrap: document.getElementById('bar-mp-wrap-' + i),
+			mpFg: document.getElementById('bar-mp-fg-' + i),
+		}
 	},
 	dom: {},
 	getPlayerHtml: function(p, i, ignoreWrap) {
@@ -40,6 +45,7 @@ var bar = {
 		return s;
 	},
 	getPlayerInnerHtml: function(p, i) {
+		// inner portion of getPlayerHtml
 		var s =
 		'<div id="bar-col-icon-'+ i +'" class="bar-col-icon player-icon-'+ p.job +'">' +
 			'<div id="bar-level-'+ i +'" class="bar-level no-pointer">'+ p.level +'</div>' +
@@ -49,7 +55,7 @@ var bar = {
 			'<div id="bar-name-'+ i +'" class="bar-hp-name">'+ p.name +'</div>' +
 			'<div id="bar-hp-wrap-'+ i +'" class="bar-any-wrap">' +
 				'<div id="bar-hp-fg-'+ i +'" class="bar-hp-fg"></div>' +
-				'<div id="bar-hp-bg-'+ i +'" class="bar-any-bg"></div>' +
+				//'<div id="bar-hp-bg-'+ i +'" class="bar-any-bg"></div>' +
 			'</div>' +
 			'<div id="bar-mp-wrap-'+ i +'" class="bar-any-wrap">' +
 				'<div id="bar-mp-fg-'+ i +'" class="bar-mp-fg"></div>' +
@@ -59,19 +65,53 @@ var bar = {
 	},
 	html: function() {
 		// my bar
-		var s = bar.getPlayerHtml(my.party[0], 0);
+		var s = '';
 		// party bars
 		for (var i=0; i<game.maxPlayers; i++) {
-			if (my.party[i].name !== my.name) {
-				s += bar.getPlayerHtml(my.party[i], i);
-			}
+			s += bar.getPlayerHtml(my.party[i], i);
 		}
 		return s;
 	},
 	updatePlayerBar: function(index) {
-		var e = document.getElementById('bar-player-wrap-' + index);
-		e.style.display = 'flex';
-		e.innerHTML = bar.getPlayerInnerHtml(my.party[index], index);
+		bar.dom[index].playerWrap.style.display = 'flex';
+		bar.dom[index].playerWrap.innerHTML = bar.getPlayerInnerHtml(my.party[index], index);
+		bar.setEvents(index);
+		bar.setBars(index, 0);
+	},
+	setAllBars: function() {
+		// draw all hp/mp values using my.party data
+		for (var i=0; i<game.maxPlayers; i++) {
+			bar.setHp(i);
+			bar.setMp(i);
+		}
+	},
+	setBars: function(index, delay) {
+		bar.setHp(index, delay);
+		bar.setMp(index, delay);
+	},
+	setHp: function(index, delay) {
+		if (!my.party[index].name) return;
+		var percent = ~~((my.party[index].hp / my.party[index].maxHp) * 100) + '%',
+				delay = delay === undefined ? .3 : delay;
+		TweenMax.to(bar.dom[index].hpFg, delay, {
+			width: percent
+		});
+		/*TweenMax.to(bar.dom[index].hpBg, .5, {
+			width: percent
+		});*/
+	},
+	setMp: function(index, delay) {
+		if (!my.party[index].name) return;
+		if (my.party[index].maxMp) {
+			var percent = ~~((my.party[index].mp / my.party[index].maxMp) * 100) + '%',
+				delay = delay === undefined ? .3 : delay;
+			TweenMax.to(bar.dom[index].mpFg, delay, {
+				width: percent
+			});
+		}
+		else {
+			bar.dom[index].mpWrap.style.display = 'none';
+		}
 	},
 	party: {
 		join: function(data) {
@@ -137,7 +177,7 @@ var bar = {
 					console.info('SET BARS ', i, v);
 					if (v.name === my.name) {
 						my.party[0] = v;
-						my.resetClientPartyValues(my.party[0]);
+						my.resetClientPartyValues(0);
 						bar.updatePlayerBar(0);
 					}
 					else {

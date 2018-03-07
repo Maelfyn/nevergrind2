@@ -139,6 +139,8 @@ var ng = {
 	copy: function(o){
 		return JSON.parse(JSON.stringify(o));
 	},
+	loadMsg:
+		"<div class='text-shadow text-center'>Loading... <i class='fa fa-cog fa-spin load-cog'></i></div>",
 	attrs: ['str', 'sta', 'agi', 'dex', 'wis', 'intel', 'cha'],
 	resists: ['bleed', 'poison', 'arcane', 'lightning', 'fire', 'cold'],
 	dungeon: ['traps', 'treasure', 'scout', 'pulling'],

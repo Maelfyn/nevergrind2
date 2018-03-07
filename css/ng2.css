@@ -12,7 +12,7 @@ fieldset {
 #login-header{
 	position:relative;
 	height:32px;
-	box-shadow: 0 100px rgba(0,0,0,.75) inset;
+	box-shadow: 0 100 rgba(0,0,0,.75) inset;
 	border-bottom:2px groove #444;
 	overflow:hidden;
 	left:0;
@@ -26,8 +26,8 @@ fieldset {
 	right:0;
 	font-size: 14px;
 	margin:0 auto;
-	width:280px;
-	padding-bottom:40px;
+	width:280;
+	padding-bottom:40;
 	text-align:center;
 }
 .textLeft{
@@ -56,22 +56,22 @@ fieldset {
 	border:1px solid #666;
 	font-size:16px;
 	line-height:22px;
-	width:250px;
+	width:250;
 	background:#132239;
-	background-image: -webkit-radial-gradient(80px 0px, farthest-corner, #132239 0%, #001 100%);
-	background-image: -moz-radial-gradient(80px 0px, farthest-corner, #132239 0%, #001 100%);
-	background-image: -ms-radial-gradient(80px 0px, farthest-corner, #132239 0%, #001 100%);
-	background-image: -o-radial-gradient(80px 0px, farthest-corner, #132239 0%, #001 100%);
+	background-image: -webkit-radial-gradient(80 0, farthest-corner, #132239 0%, #001 100%);
+	background-image: -moz-radial-gradient(80 0, farthest-corner, #132239 0%, #001 100%);
+	background-image: -ms-radial-gradient(80 0, farthest-corner, #132239 0%, #001 100%);
+	background-image: -o-radial-gradient(80 0, farthest-corner, #132239 0%, #001 100%);
 	color:#fff;
 	border-radius:4px;
 	text-indent:2px;
 }
 .loginInputs:focus{
 	background:#4478c7;
-	background-image: -webkit-radial-gradient(80px 0px, farthest-corner, #5488da 0%, #132239 100%);
-	background-image: -moz-radial-gradient(80px 0px, farthest-corner, #5488da 0%, #132239 100%);
-	background-image: -ms-radial-gradient(80px 0px, farthest-corner, #5488da 0%, #132239 100%);
-	background-image: -o-radial-gradient(80px 0px, farthest-corner, #5488da 0%, #132239 100%);
+	background-image: -webkit-radial-gradient(80 0, farthest-corner, #5488da 0%, #132239 100%);
+	background-image: -moz-radial-gradient(80 0, farthest-corner, #5488da 0%, #132239 100%);
+	background-image: -ms-radial-gradient(80 0, farthest-corner, #5488da 0%, #132239 100%);
+	background-image: -o-radial-gradient(80 0, farthest-corner, #5488da 0%, #132239 100%);
 }
 #tosWrap {
 	margin: .5rem;
@@ -93,7 +93,7 @@ body{
 	left: 0;
 	right: 0;
 	margin: 0 auto;
-	max-width: 1920px
+	max-width: 1920
 }
 .abcRioButton{
 	margin: 5px auto;
@@ -117,7 +117,7 @@ body{
 }
 #mainBG{
 	width: 100%;
-	height: 1080px;
+	height: 1080;
 	background: url('/img2/ng2-bg.jpg')
 }
 label{
@@ -127,7 +127,7 @@ label{
 }
 #twitter-wrap {
 	margin:0 0 5px 0;
-	width:240px;
+	width:240;
 	border-radius: 6px;
 	background: #337ab7;
 	color: #fff;
@@ -147,7 +147,7 @@ label{
 	display: inline-block;
 	margin-bottom: 0;
 	font-size: 14px;
-	line-height: 20px;
+	line-height: 20;
 	text-align: center;
 	white-space: nowrap;
 	vertical-align: middle;
@@ -156,9 +156,9 @@ label{
 	float: left;
 }
 #twitter-icon {
-	font-size:20px;
+	font-size:20;
 	text-shadow: none;
-	height:20px;
+	height:20;
 	display:inline-block;
 	cursor: url('cursor/pointer.cur'), pointer!important;
 }
@@ -224,21 +224,21 @@ label{
 	left: 0;
 	right: 0;
 	margin: 0 auto;
-	width: 280px;
+	width: 280;
 	text-align: center;
-	top: 30px;
+	top: 30;
 	bottom: auto;
-	padding: 10px 0;
+	padding: 10 0;
 	border-radius: 6px;
 	border: 2px ridge #337ab7;
 	background: #0a0a1a;
-	box-shadow: 0 0 20px #000,
-	0 0 40px #000,
-	0 0 60px #000
+	box-shadow: 0 0 20 #000,
+	0 0 40 #000,
+	0 0 60 #000
 }
 #loginWrap p {
 	line-height: 1.5;
-	margin: 0 0 10px;
+	margin: 0 0 10;
 }
 #loginWrap .btn-primary {
 	color: #fff;
@@ -304,22 +304,22 @@ html {
 	height: 100%;
 	background: #000;
 }
-@media only screen and (min-width: 0px) and (max-width: 479px) {
+@media only screen and (min-width: 0) and (max-width: 479px) {
 	html {
-		font-size: 10px
+		font-size: 10
 	}
 }
-@media only screen and (min-width: 480px) {
+@media only screen and (min-width: 480) {
 	html {
 		font-size: 11px
 	}
 }
-@media only screen and (min-width: 600px) {
+@media only screen and (min-width: 600) {
 	html {
 		font-size: 12px
 	}
 }
-@media only screen and (min-width: 680px) {
+@media only screen and (min-width: 680) {
 	html {
 		font-size: 13px
 	}
@@ -329,7 +329,7 @@ html {
 		font-size: 14px
 	}
 }
-@media only screen and (min-width: 900px) {
+@media only screen and (min-width: 900) {
 	html {
 		font-size: 16px
 	}
@@ -339,9 +339,9 @@ html {
 		font-size: 18px
 	}
 }
-@media only screen and (min-width: 1280px) {
+@media only screen and (min-width: 1280) {
 	html {
-		font-size: 20px
+		font-size: 20
 	}
 }
 body {
@@ -353,11 +353,11 @@ body {
 	background: #000;
 	color: #fff;
 	width: 100%;
-	min-width: 360px;
-	max-width: 1920px;
+	min-width: 360;
+	max-width: 1920;
 	height: 100%;
-	min-height: 900px;
-	max-height: 1080px;
+	min-height: 900;
+	max-height: 1080;
 	overflow: hidden;
 	overflow-y: auto
 }
@@ -524,6 +524,16 @@ tbody {
 			1px -1px #000,
 			-1px -1px #000
 }
+.text-shadow-blur {
+	text-shadow:
+			1px 1px #000,
+			-1px 0 #000,
+			1px 0 #000,
+			-1px 1px #000,
+			1px -1px #000,
+			-1px -1px #000,
+		0 0 2px #000, 0 0 4px #000, 0 0 8px #000, 0 0 12px #000
+}
 /* shadow with blur */
 .text-shadow2 {
 	text-shadow:
@@ -533,8 +543,8 @@ tbody {
 			.6px 0 #000,
 			0 .6px #000,
 			0 -.6px #000,
-			0px 0px 5px #000,
-			0px 0px 2px #000;
+			0 0 5px #000,
+			0 0 2px #000;
 }
 @keyframes flash-outline {
 	0% { outline-color: #0f0; }
@@ -570,6 +580,9 @@ tbody {
 	margin: 0 auto;
 	left: 0;
 	right: 0;
+}
+.text-center {
+	text-align: center;
 }
 .w33 {
 	width: 33%
@@ -613,8 +626,8 @@ tbody {
 }
 .img-bg {
 	position: absolute;
-	width: 1920px;
-	height: 1080px;
+	width: 1920;
+	height: 1080;
 	left: 50%;
 	top: 50%;
 	transform: translate(-50%, -50%);
@@ -637,7 +650,7 @@ tbody {
 	position: absolute;
 	bottom: 0;
 	left: 0;
-	width: 140px
+	width: 140
 }
 #version {
 	position: absolute;
@@ -661,9 +674,9 @@ tbody {
 	right: 0;
 	margin: 0 auto;
 	width: 100%;
-	max-width: 1280px;
-	min-width: 360px;
-	max-height: 1080px;
+	max-width: 1280;
+	min-width: 360;
+	max-height: 1080;
 	overflow: hidden
 }
 #title-header {
@@ -861,7 +874,14 @@ tbody {
 .ch-card-active {
 	background: #159;
 	color: #ff2!important;
-	text-shadow: 0 0 2px #000, 0 0 4px #000, 0 0 8px #000, 0 0 12px #000
+	text-shadow:
+			1px 1px #000,
+			-1px 0 #000,
+			1px 0 #000,
+			-1px 1px #000,
+			1px -1px #000,
+			-1px -1px #000,
+		0 0 2px #000, 0 0 4px #000, 0 0 8px #000, 0 0 12px #000
 }
 .select-create-wrap {
 	border: .2rem groove #579
@@ -890,7 +910,7 @@ tbody {
 	pointer-events: none;
 	background: #013;
 	border: .1rem inset #013;
-	box-shadow: 0 0 10px #579 inset;
+	box-shadow: 0 0 10 #579 inset;
 	color: #048
 }
 #gender-wrap {
@@ -983,11 +1003,11 @@ tbody {
 #modal-wrap {
 	position: absolute;
 	visibility: hidden;
-	top: 50px;
+	top: 50;
 	left: 0;
 	right: 0;
 	margin: 0 auto;
-	max-width: 480px;
+	max-width: 480;
 	border: .1rem ridge #048;
 	background: #013;
 	z-index: 999999
@@ -1000,7 +1020,7 @@ tbody {
 #modal-body {
 	text-align: center;
 	padding: .5rem 2rem;
-	min-height: 60px
+	min-height: 60
 }
 #modal-footer {
 	padding-bottom: .2rem
@@ -1034,12 +1054,12 @@ tbody {
 #msg {
 	opacity: 0;
 	position: fixed;
-	top: 10px;
+	top: 10;
 	left: 0;
 	right: 0;
 	margin: 0 auto;
 	width: 80%;
-	max-width: 800px;
+	max-width: 800;
 	padding: 0 8%;
 	text-align: center;
 	font-size: 1rem;
@@ -1095,19 +1115,19 @@ tbody {
 	height: 0;
 	overflow: visible;
 }
-#mob-wrap-0 { bottom: 180px; left: 10%; z-index: 1}
-#mob-wrap-1 { bottom: 180px; left: 30%; z-index: 1 }
-#mob-wrap-2 { bottom: 180px; left: 50%; z-index: 1 }
-#mob-wrap-3 { bottom: 180px; left: 70%; z-index: 1 }
-#mob-wrap-4 { bottom: 180px; left: 90%; z-index: 1 }
-#mob-wrap-5 { bottom: 280px; left: 20%}
-#mob-wrap-6 { bottom: 280px; left: 40%; }
-#mob-wrap-7 { bottom: 280px; left: 60%; }
-#mob-wrap-8 { bottom: 280px; left: 80%; }
+#mob-wrap-0 { bottom: 180; left: 10%; z-index: 1}
+#mob-wrap-1 { bottom: 180; left: 30%; z-index: 1 }
+#mob-wrap-2 { bottom: 180; left: 50%; z-index: 1 }
+#mob-wrap-3 { bottom: 180; left: 70%; z-index: 1 }
+#mob-wrap-4 { bottom: 180; left: 90%; z-index: 1 }
+#mob-wrap-5 { bottom: 280; left: 20%}
+#mob-wrap-6 { bottom: 280; left: 40%; }
+#mob-wrap-7 { bottom: 280; left: 60%; }
+#mob-wrap-8 { bottom: 280; left: 80%; }
 .mob-details {
 	position: absolute;
-	left: -100px;
-	width: 200px;
+	left: -100;
+	width: 200;
 	cursor: url('cursor/pointer.cur'), pointer;
 }
 .mob-name {
@@ -1116,8 +1136,8 @@ tbody {
 }
 .mob-bar {
 	position: relative;
-	width: 200px;
-	height: 20px;
+	width: 200;
+	height: 20;
 	border: 2px ridge #aaa;
 	box-shadow: 0 0 0 1px #111;
 	left: 0;
@@ -1132,12 +1152,12 @@ tbody {
 }
 .mob-shadow {
 	position: absolute;
-	left: -200px;
-	bottom: 30px;
+	left: -200;
+	bottom: 30;
 	border-radius: 50%;
 	background: rgba(0,0,0,.3);
-	height: 40px;
-	width: 400px;
+	height: 40;
+	width: 400;
 	z-index: 0;
 }
 .mob-img {
@@ -1233,16 +1253,17 @@ tbody {
 	background: rgba(0,0,0,.8);
 	z-index: 2;
 	height: 50vh;
+	width: 50vw;
 }
 #chat-present-wrap {
 	display: flex;
 	flex-direction: column;
-	width: 12vw;
+	flex-basis: 30%;
 }
 #chat-log-wrap {
 	display: flex;
 	flex-direction: column;
-	width: 38vw;
+	flex-basis: 70%;
 }
 #chat-header {
 	text-align: center;
@@ -1506,8 +1527,8 @@ background-clip: content-box;
 		.6px 0 #000,
 		0 .6px #000,
 		0 -.6px #000,
-		0px 0px 5px #000,
-		0px 0px 2px #000,
+		0 0 5px #000,
+		0 0 2px #000,
 		1px 1px 2px #fff,
 		0 0 2px #fd0,
 		0 0 5px #fd0;
@@ -1586,7 +1607,7 @@ background-clip: content-box;
 	background: #777;
 	margin: .1rem .2rem;
 	height: .4rem;
-	border-radius: 10px;
+	border-radius: 10;
 	overflow: hidden;
 }
 .bar-hp-fg {
@@ -1606,7 +1627,7 @@ background-clip: content-box;
 .bar-mp-fg {
 	background: #05b;
 	height: 100%;
-	width: 75%;
+	width: 100%;
 }
 .player-icon-WAR { background-position: 0; }
 .player-icon-ROG { background-position: -100%; }
@@ -1731,7 +1752,7 @@ background-clip: content-box;
 	font-size: 1rem;
 	flex-direction: column;
 	margin-top: 1rem;
-	margin-left: 50%;
+	margin-left: 35%;
 }
 /* guild aside */
 #guild-input {
@@ -1746,11 +1767,40 @@ background-clip: content-box;
 	-o-transition : border 300ms ease-out;
 	transition : border 300ms ease-out;
 }
-#guild-create-help {
+.guild-aside-frame {
 	background: rgba(0,0,0,.5);
-	border: .2rem groove #777;
+	border: .2rem groove #444;
 	padding: .2rem .4rem;
-	margin: 1rem 0;
+	margin: 1rem 0 0;
+}
+#aside-guild-members {
+	max-height: 50vh;
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+#guild-member-flex {
+	display: flex;
+	align-content: center;
+}
+#guild-member-label {
+	flex: 1;
+}
+#guild-member-refresh-icon {
+	flex: 0;
+	cursor: url('cursor/pointer.cur'), pointer;
+}
+.refresh {
+	color: #05b;
+	-webkit-transition : color 300ms ease-out;
+	-moz-transition : color 300ms ease-out;
+	-o-transition : color 300ms ease-out;
+	transition : color 300ms ease-out;
+}
+.refresh:hover {
+	color: #27d;
+}
+.load-cog {
+	color: #b21212;
 }
 
 /* show game */

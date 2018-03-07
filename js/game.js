@@ -34,27 +34,57 @@ var game = {
 			game.heartbeat.timer = setInterval(game.heartbeat.send, 5000);
 		},
 		send: function() {
+			console.info("%c Last heartbeat send: ", "background: #ff0", Date.now() - game.ping.start);
 			game.ping.start = Date.now();
 			$.ajax({
 				type: 'GET',
 				url: app.url + 'php2/heartbeat.php'
 			}).done(function () {
 				console.info("%c Ping: ", 'background: #0f0', game.ping.oneWay());
+			}).fail(function(data){
+				console.info(data);
+				setTimeout(function(){
+					chat.camp();
+
+				}, 10000);
 			});
 		}
 	},
 	socket: {
 		timer: 0,
+		sendTime: Date.now(),
+		receiveTime: Date.now(),
+		timeout: 25000,
+		interval: 20000,
 		start: function() {
 			clearInterval(game.socket.timer);
-			game.socket.timer = setInterval(game.socket.send, 20000);
+			game.socket.timer = setInterval(game.socket.send, game.socket.interval);
 		},
 		send: function() {
-			socket.healthTime = Date.now();
-			socket.startHealthCheck();
+			console.info("%c Last socket send: ", "background: #0ff", Date.now() - game.socket.sendTime);
+			game.socket.sendTime = Date.now();
 			socket.zmq.publish('hb:' + my.name, {});
+			setTimeout(function(){
+				console.info("%c Socket ping: ", "background: #08f", game.socket.getDifference());
+				game.socket.getDifference() > game.socket.interval + 1000 && ng.disconnect();
+			}, 1000);
+		},
+		getDifference: function() {
+			return Date.now() - game.socket.receiveTime;
 		}
 	},
+
+	/*startHealthCheck: function() {
+		socket.isHealthy = 0;
+		setTimeout(function() {
+			socket.checkHealth();
+		}, 10000);
+	},
+	checkHealth: function(){
+		if (!game.socket.isHealthy()) {
+			ng.disconnect();
+		}
+	},*/
 	played: {
 		timer: 0,
 		start: function() {
@@ -88,38 +118,15 @@ var game = {
 					id: my.row,
 					route: 'party->hb'
 				});
-
-				/*$.ajax({
-					type: 'GET',
-					url: app.url + 'php2/chat/sanity-party.php'
-				}).done(function (data) {
-					for (var i = 0, len = data.players.length; i < len; i++) {
-						data.players[i] *= 1;
-					}
-					var newChatArray = [];
-					chat.inChannel.forEach(function (v) {
-						if (!~data.players.indexOf(v)) {
-							$("#chat-player-" + v).remove();
-						}
-						else {
-							newChatArray.push(v);
-						}
-					});
-					if (newChatArray.length) {
-						chat.inChannel = newChatArray;
-						chat.setHeader();
-
-					}
-				});*/
 			},
 			check: function() {
 				var now = Date.now(),
 					linkdead = [];
 				for (var i=1; i<6; i++) {
-					console.info("Checking: ", my.party[i].id, now - my.party[i].heartbeat > 15000)
+					console.info("Checking: ", my.party[i].id, now - my.party[i].heartbeat > game.socket.interval * 2)
 					if (my.party[i].id &&
 						!my.party[i].linkdead &&
-						(now - my.party[i].heartbeat > 15000)) {
+						(now - my.party[i].heartbeat > game.socket.interval * 2)) {
 						linkdead.push(my.party[i].name);
 						my.party[i].linkdead = 1;
 					}
