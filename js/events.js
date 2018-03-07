@@ -20,9 +20,29 @@ $(document).on(env.click, function(e){
 			// key input view router
 			if (key === 'b') {
 				battle.go();
+				TweenMax.set('#chat-present-wrap', {
+					display: 'none'
+				});
+				TweenMax.set('#chat-wrap', {
+					height: '25vh',
+					width: '35vw'
+				});
+				TweenMax.set('#chat-log-wrap', {
+					flexBasis: '100%'
+				});
 			}
 			else if (key === 't') {
 				town.go();
+				TweenMax.set('#chat-present-wrap', {
+					display: 'flex'
+				});
+				TweenMax.set('#chat-wrap', {
+					height: '50vh',
+					width: '50vw'
+				});
+				TweenMax.set('#chat-log-wrap', {
+					flexBasis: '70%'
+				});
 			}
 		}
 	}
@@ -64,8 +84,12 @@ $(document).on(env.click, function(e){
 				$("#create-character-name").focus();
 			}
 		} else {
-			// always works town,dungeon and combat
+			// always works town, dungeon and combat
 			if (chat.hasFocus) {
+				if (chat.mode.change()) {
+					// changing chat mode - matches possible mode change
+					return false;
+				}
 				// has chat focus
 				if (code === 38) {
 					// chat focus history nav up
@@ -93,12 +117,8 @@ $(document).on(env.click, function(e){
 			}
 
 			if (ng.view === 'town') {
-				if (chat.hasFocus) {
-					if (chat.mode.change()) {
-						// changing chat mode - matches possible mode change
-						return false;
-					}
-				} else {
+				// town only actions
+				if (!chat.hasFocus) {
 					// no aside && no chat focus
 					!town.aside.selected && chat.dom.chatInput.focus();
 					if (guild.hasFocus) {

@@ -15,7 +15,6 @@ if (!empty($_SESSION['guild']) && $_SESSION['guild']['rank'] < 2) {
 	while ($stmt->fetch()) {
 		$row = $dbRow;
 	}
-	error_log("ROW: ". $row);
 	// check rank
 	$stmt = $link->prepare('select rank from ng2_guild_members where c_id=?');
 	$stmt->bind_param('i', $row);
@@ -25,9 +24,6 @@ if (!empty($_SESSION['guild']) && $_SESSION['guild']['rank'] < 2) {
 	while ($stmt->fetch()) {
 		$rank = $dbRank;
 	}
-	error_log("rank: ". $rank);
-	error_log("guildrank: ". $_SESSION['guild']['rank']);
-	error_log("?: ". $_SESSION['guild']['rank'] < $rank);
 
 	if ($rank <= $_SESSION['guild']['rank']) {
 		exit('You may only boot members that you outrank.');

@@ -115,6 +115,9 @@ var town = {
 						'<div class="aside-title">Mission Counter</div>' +
 						town.aside.html.close +
 					'</div>' +
+					'<div id="aside-menu">' +
+						town.aside.menu[id]() +
+					'</div>' +
 				'</div>';
 				return s;
 			},
@@ -132,13 +135,13 @@ var town = {
 				var s = '';
 				if (my.guild.name) {
 					s +=
-						'<div class="guild-aside-frame">' +
+						'<div class="aside-frame">' +
 							'<div>Guild: '+ my.guild.name +'</div> ' +
 							'<div>Title: '+ guild.ranks[my.guild.rank] +'</div> ' +
 							'<div>Total Members: '+ my.guild.members +'</div> ' +
 							'<div>Member Number: '+ my.guild.memberNumber +'</div> ' +
 						'</div>' +
-						'<div class="guild-aside-frame">' +
+						'<div class="aside-frame">' +
 							'<div id="guild-member-flex">'+
 								'<div id="guild-member-label">Guild Members:</div>'+
 								'<div id="guild-member-refresh-icon"><i class="fa fa-refresh refresh"></i></div>'+
@@ -152,17 +155,27 @@ var town = {
 					s +=
 					'<input id="guild-input" class="text-shadow" type="text" maxlength="30" autocomplete="off" spellcheck="false">' +
 					'<div id="guild-create" class="ng-btn">Create Guild</div> ' +
-					'<div class="guild-aside-frame">Only letters A through Z and apostrophes are accepted in guild names. Standarized capitalization will be automatically applied. The guild name must be between 4 and 30 characters. All guild names are subject to the royal statutes regarding common decency in Vandamor.</div>';
+					'<div class="aside-frame">Only letters A through Z and apostrophes are accepted in guild names. Standarized capitalization will be automatically applied. The guild name must be between 4 and 30 characters. All guild names are subject to the royal statutes regarding common decency in Vandamor.</div>';
 				}
 				return s;
 			},
 			'town-mission': function() {
 				var s = '';
+				if (mission.loaded) {
+					s +=
+					'<div id="mission-counter" class="aside-frame">';
+						s += mission.asideHtml();
+					s += '</div>';
+				}
+				else {
+					s +=
+						'<div id="mission-counter" class="aside-frame">' +
+							ng.loadMsg +
+						'</div>';
+					mission.init();
+				}
 				return s;
 			}
-		},
-		getHtml: function(id) {
-			return town.aside.html[id](id);
 		},
 		init: function(id) {
 			if (id === town.aside.selected) return;
@@ -187,10 +200,15 @@ var town = {
 			var e = document.createElement('div');
 			e.className = 'town-aside text-shadow';
 			// set aside HTML
-			e.innerHTML = town.aside.getHtml(id);
+			var html = town.aside.html[id](id);
+			console.info("HTML: ", html);
+			e.innerHTML = html;
 			document.getElementById('scene-town').appendChild(e);
 			// animate aside things
 			setTimeout(function() {
+				TweenMax.set('.now-loading', {
+					alpha: 0
+				});
 				TweenMax.to(e, .5, {
 					startAt: {
 						display: 'block',
@@ -201,7 +219,12 @@ var town = {
 					},
 					x: '2%',
 					y: '2%',
-					scale: 1
+					scale: 1,
+					onComplete: function() {
+						TweenMax.to('.now-loading', .3, {
+							alpha: 1
+						});
+					}
 				});
 				setTimeout(function () {
 					TweenMax.to('.aside-bg', 1, {

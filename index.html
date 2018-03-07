@@ -764,16 +764,18 @@
 				xfbml: true,
 				version: 'v2.8'
 			});
+			/*
 			FB.getLoginStatus(function (response) {
 				fbLoginCallback(response);
 			});
+			*/
 			// only triggers upon login event
 			FB.Event.subscribe('auth.authResponseChange', function (response) {
 				response.status === 'connected' && fbLoginCallback(response);
 			});
 		}
 	}
-	function checkLoginState() {
+	function checkLoginState() { // called from FB button
 		FB.getLoginStatus(function(response) {
 			fbLoginCallback(response);
 		});

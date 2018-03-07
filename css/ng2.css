@@ -26,8 +26,8 @@ fieldset {
 	right:0;
 	font-size: 14px;
 	margin:0 auto;
-	width:280;
-	padding-bottom:40;
+	width:280px;
+	padding-bottom:40px;
 	text-align:center;
 }
 .textLeft{
@@ -56,7 +56,7 @@ fieldset {
 	border:1px solid #666;
 	font-size:16px;
 	line-height:22px;
-	width:250;
+	width:250px;
 	background:#132239;
 	background-image: -webkit-radial-gradient(80 0, farthest-corner, #132239 0%, #001 100%);
 	background-image: -moz-radial-gradient(80 0, farthest-corner, #132239 0%, #001 100%);
@@ -127,7 +127,7 @@ label{
 }
 #twitter-wrap {
 	margin:0 0 5px 0;
-	width:240;
+	width:240px;
 	border-radius: 6px;
 	background: #337ab7;
 	color: #fff;
@@ -147,7 +147,7 @@ label{
 	display: inline-block;
 	margin-bottom: 0;
 	font-size: 14px;
-	line-height: 20;
+	line-height: 20px;
 	text-align: center;
 	white-space: nowrap;
 	vertical-align: middle;
@@ -156,9 +156,9 @@ label{
 	float: left;
 }
 #twitter-icon {
-	font-size:20;
+	font-size:20px;
 	text-shadow: none;
-	height:20;
+	height:20px;
 	display:inline-block;
 	cursor: url('cursor/pointer.cur'), pointer!important;
 }
@@ -226,7 +226,7 @@ label{
 	margin: 0 auto;
 	width: 280;
 	text-align: center;
-	top: 30;
+	top: 30px;
 	bottom: auto;
 	padding: 10 0;
 	border-radius: 6px;
@@ -238,7 +238,7 @@ label{
 }
 #loginWrap p {
 	line-height: 1.5;
-	margin: 0 0 10;
+	margin: 0 0 10px;
 }
 #loginWrap .btn-primary {
 	color: #fff;
@@ -353,11 +353,11 @@ body {
 	background: #000;
 	color: #fff;
 	width: 100%;
-	min-width: 360;
-	max-width: 1920;
+	min-width: 360px;
+	max-width: 1920px;
 	height: 100%;
-	min-height: 900;
-	max-height: 1080;
+	min-height: 900px;
+	max-height: 1080px;
 	overflow: hidden;
 	overflow-y: auto
 }
@@ -626,8 +626,8 @@ tbody {
 }
 .img-bg {
 	position: absolute;
-	width: 1920;
-	height: 1080;
+	width: 1920px;
+	height: 1080px;
 	left: 50%;
 	top: 50%;
 	transform: translate(-50%, -50%);
@@ -650,7 +650,7 @@ tbody {
 	position: absolute;
 	bottom: 0;
 	left: 0;
-	width: 140
+	width: 140px
 }
 #version {
 	position: absolute;
@@ -674,9 +674,9 @@ tbody {
 	right: 0;
 	margin: 0 auto;
 	width: 100%;
-	max-width: 1280;
-	min-width: 360;
-	max-height: 1080;
+	max-width: 1280px;
+	min-width: 360px;
+	max-height: 1080px;
 	overflow: hidden
 }
 #title-header {
@@ -1003,11 +1003,11 @@ tbody {
 #modal-wrap {
 	position: absolute;
 	visibility: hidden;
-	top: 50;
+	top: 50px;
 	left: 0;
 	right: 0;
 	margin: 0 auto;
-	max-width: 480;
+	max-width: 480px;
 	border: .1rem ridge #048;
 	background: #013;
 	z-index: 999999
@@ -1029,7 +1029,9 @@ tbody {
 	color: #f22
 }
 .modal-buttons {
-	margin: .2rem .4rem
+	font-size: .9rem;
+	margin: .5rem;
+	display: inline-block;
 }
 #flash-overlay {
 	background: '#ffffff';
@@ -1054,12 +1056,12 @@ tbody {
 #msg {
 	opacity: 0;
 	position: fixed;
-	top: 10;
+	top: 10px;
 	left: 0;
 	right: 0;
 	margin: 0 auto;
 	width: 80%;
-	max-width: 800;
+	max-width: 800px;
 	padding: 0 8%;
 	text-align: center;
 	font-size: 1rem;
@@ -1115,19 +1117,19 @@ tbody {
 	height: 0;
 	overflow: visible;
 }
-#mob-wrap-0 { bottom: 180; left: 10%; z-index: 1}
-#mob-wrap-1 { bottom: 180; left: 30%; z-index: 1 }
-#mob-wrap-2 { bottom: 180; left: 50%; z-index: 1 }
-#mob-wrap-3 { bottom: 180; left: 70%; z-index: 1 }
-#mob-wrap-4 { bottom: 180; left: 90%; z-index: 1 }
-#mob-wrap-5 { bottom: 280; left: 20%}
-#mob-wrap-6 { bottom: 280; left: 40%; }
-#mob-wrap-7 { bottom: 280; left: 60%; }
-#mob-wrap-8 { bottom: 280; left: 80%; }
+#mob-wrap-0 { bottom: 180px; left: 10%; z-index: 1}
+#mob-wrap-1 { bottom: 180px; left: 30%; z-index: 1 }
+#mob-wrap-2 { bottom: 180px; left: 50%; z-index: 1 }
+#mob-wrap-3 { bottom: 180px; left: 70%; z-index: 1 }
+#mob-wrap-4 { bottom: 180px; left: 90%; z-index: 1 }
+#mob-wrap-5 { bottom: 280px; left: 20%}
+#mob-wrap-6 { bottom: 280px; left: 40%; }
+#mob-wrap-7 { bottom: 280px; left: 60%; }
+#mob-wrap-8 { bottom: 280px; left: 80%; }
 .mob-details {
 	position: absolute;
-	left: -100;
-	width: 200;
+	left: -100px;
+	width: 200px;
 	cursor: url('cursor/pointer.cur'), pointer;
 }
 .mob-name {
@@ -1136,8 +1138,8 @@ tbody {
 }
 .mob-bar {
 	position: relative;
-	width: 200;
-	height: 20;
+	width: 200px;
+	height: 20px;
 	border: 2px ridge #aaa;
 	box-shadow: 0 0 0 1px #111;
 	left: 0;
@@ -1152,12 +1154,12 @@ tbody {
 }
 .mob-shadow {
 	position: absolute;
-	left: -200;
-	bottom: 30;
+	left: -200px;
+	bottom: 30px;
 	border-radius: 50%;
 	background: rgba(0,0,0,.3);
-	height: 40;
-	width: 400;
+	height: 40px;
+	width: 400px;
 	z-index: 0;
 }
 .mob-img {
@@ -1607,7 +1609,7 @@ background-clip: content-box;
 	background: #777;
 	margin: .1rem .2rem;
 	height: .4rem;
-	border-radius: 10;
+	border-radius: 10px;
 	overflow: hidden;
 }
 .bar-hp-fg {
@@ -1748,7 +1750,6 @@ background-clip: content-box;
 	left: -30%;
 }
 #aside-menu {
-	display: flex;
 	font-size: 1rem;
 	flex-direction: column;
 	margin-top: 1rem;
@@ -1767,7 +1768,7 @@ background-clip: content-box;
 	-o-transition : border 300ms ease-out;
 	transition : border 300ms ease-out;
 }
-.guild-aside-frame {
+.aside-frame {
 	background: rgba(0,0,0,.5);
 	border: .2rem groove #444;
 	padding: .2rem .4rem;
@@ -1801,6 +1802,10 @@ background-clip: content-box;
 }
 .load-cog {
 	color: #b21212;
+}
+/* missions */
+#mission-counter {
+	word-break: break-all;
 }
 
 /* show game */

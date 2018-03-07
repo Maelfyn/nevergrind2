@@ -35,19 +35,7 @@
 	if (in_array($f['name'], $jobs, true)){
 		exit('This name is not valid.');
 	}
-	/*
-	// paid?
-	$query = "select row from ng2_paid where account=?";
-	$stmt = $link->prepare($query);
-	$stmt->bind_param('s', $_SESSION['account']);
-	$stmt->execute();
-	$stmt->store_result();
-	$count = $stmt->num_rows;
-	$paid = 0;
-	if($count > 0){
-		$paid = 1;
-	}
-	*/
+
 	// how many characters do they have?
 	$query = "select row from ng2_chars where account=? and deleted=0";
 	$stmt = $link->prepare($query);
@@ -178,104 +166,70 @@
 	
 	$r['row'] = mysqli_insert_id($link);
 	// add inventory data
-	require '../item/getItemString.php';
+
 	// insert items
-	$paid = 0;
-	if ($paid){
-		// replace with 0-8 later when paid is in place
-		$loops = 32;
-		$slots = [];
-		for ($i = 0; $i < $loops; $i++){
-			$slots[$i] = 0;
-		}
-		$queryValues = getItemString($r['row'], $slots, 1);
-		
-		$query = 'insert into ng2_items (
-			charRow, 
-			uniqueId, 
-			slotType, 
-			slot,
-			lootRow
-		) VALUES '. $queryValues;
-		// must set inventory to 1
-		$uniqueId = [];
-		for ($i = 0; $i < $loops; $i++){
-			$uniqueId[$i] = $r['row'] . '-1' . $i;
-		}
-		
-		$stmt = $link->prepare($query);
-		$stmt->bind_param('ssssssssssssssssssssssssssssssss', 
-			$uniqueId[0], 
-			$uniqueId[1], 
-			$uniqueId[2], 
-			$uniqueId[3], 
-			$uniqueId[4], 
-			$uniqueId[5], 
-			$uniqueId[6], 
-			$uniqueId[7], 
-			$uniqueId[8], 
-			$uniqueId[9], 
-			$uniqueId[10], 
-			$uniqueId[11], 
-			$uniqueId[12], 
-			$uniqueId[13], 
-			$uniqueId[14], 
-			$uniqueId[15], 
-			$uniqueId[16], 
-			$uniqueId[17], 
-			$uniqueId[18], 
-			$uniqueId[19], 
-			$uniqueId[20], 
-			$uniqueId[21], 
-			$uniqueId[22], 
-			$uniqueId[23], 
-			$uniqueId[24], 
-			$uniqueId[25], 
-			$uniqueId[26], 
-			$uniqueId[27], 
-			$uniqueId[28], 
-			$uniqueId[29], 
-			$uniqueId[30], 
-			$uniqueId[31]);
-		$stmt->execute();
-	} else {
-		// replace with 0-8 later when paid is in place
-		$loops = 8;
-		$slots = [];
-		for ($i = 0; $i < $loops; $i++){
-			$slots[$i] = 0;
-		}
-		$queryValues = getItemString($r['row'], $slots, 1);
-		
-		$query = 'insert into ng2_items (
-			charRow, 
-			uniqueId, 
-			slotType, 
-			slot,
-			lootRow
-		) VALUES '. $queryValues;
-		// must set inventory to 1
-		$uniqueId = [];
-		for ($i = 0; $i < $loops; $i++){
-			$uniqueId[$i] = $r['row'] . '-1' . $i;
-		}
-		
-		$stmt = $link->prepare($query);
-		$stmt->bind_param('ssssssss', 
-			$uniqueId[0], 
-			$uniqueId[1], 
-			$uniqueId[2], 
-			$uniqueId[3], 
-			$uniqueId[4], 
-			$uniqueId[5], 
-			$uniqueId[6], 
-			$uniqueId[7]);
-		$stmt->execute();
+	require '../item/getItemString.php';
+	$loops = 32;
+	$slots = [];
+	for ($i = 0; $i < $loops; $i++){
+		$slots[$i] = 0;
 	}
+	$queryValues = getItemString($r['row'], $slots, 1);
+
+	$query = 'insert into ng2_items (
+		charRow, 
+		uniqueId, 
+		slotType, 
+		slot,
+		lootRow
+	) VALUES '. $queryValues;
+	// must set inventory to 1
+	$uniqueId = [];
+	for ($i = 0; $i < $loops; $i++){
+		$uniqueId[$i] = $r['row'] . '-1' . $i;
+	}
+
+	$stmt = $link->prepare($query);
+	$stmt->bind_param('ssssssssssssssssssssssssssssssss',
+		$uniqueId[0],
+		$uniqueId[1],
+		$uniqueId[2],
+		$uniqueId[3],
+		$uniqueId[4],
+		$uniqueId[5],
+		$uniqueId[6],
+		$uniqueId[7],
+		$uniqueId[8],
+		$uniqueId[9],
+		$uniqueId[10],
+		$uniqueId[11],
+		$uniqueId[12],
+		$uniqueId[13],
+		$uniqueId[14],
+		$uniqueId[15],
+		$uniqueId[16],
+		$uniqueId[17],
+		$uniqueId[18],
+		$uniqueId[19],
+		$uniqueId[20],
+		$uniqueId[21],
+		$uniqueId[22],
+		$uniqueId[23],
+		$uniqueId[24],
+		$uniqueId[25],
+		$uniqueId[26],
+		$uniqueId[27],
+		$uniqueId[28],
+		$uniqueId[29],
+		$uniqueId[30],
+		$uniqueId[31]);
+	$stmt->execute();
+
 	// add equipment data
 	$loops = 16;
 	$slots = [];
 	// starting equipment map
+	// sets the item id for each equipment slot
 	$jobEquipment = [
 		'WAR' => [0,0,0,0,0,0,2,0,0,0,0,0,0,5,0,0],
 		'SHD' => [0,0,0,0,0,0,2,0,0,0,0,0,0,5,0,0],
@@ -295,6 +249,7 @@
 	for ($i = 0; $i < $loops; $i++){
 		$slots[$i] = $jobEquipment[$f['shortJob']][$i];
 	}
+	// type 0 is equipment
 	$queryValues = getItemString($r['row'], $slots, 0);
 	
 	$query = 'insert into ng2_items (
@@ -330,8 +285,11 @@
 		$uniqueId[15]);
 	$stmt->execute();
 	
-	// add quest data
-	
+	// add mission data
+	$query = 'insert into ng2_missions (c_id) VALUES (?)';
+	$stmt = $link->prepare($query);
+	$stmt->bind_param('s', $f['row']);
+	$stmt->execute();
 	
 	// echo something for fun
 	$r['hero'] = $f;

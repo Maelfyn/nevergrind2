@@ -98,6 +98,7 @@
 		}
 		// get guild info
 		require '../guild/getGuildData.php';
+
 		echo json_encode($r);
 	}
 	else {

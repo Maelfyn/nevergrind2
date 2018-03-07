@@ -123,8 +123,8 @@ var modal = {
 	footer: function(e){
 		var str =
 			'<div id="modal-footer" class="text-center">'+
-				'<a id="modal-dismiss" class="btn btn-info btn-sm modal-buttons">Cancel</a>'+
-				'<a id="'+ e.key +'-confirm" class="btn btn-info btn-sm modal-buttons">Confirm</a>'+
+				'<a id="modal-dismiss" class="ng-btn modal-buttons">Cancel</a>'+
+				'<a id="'+ e.key +'-confirm" class="ng-btn modal-buttons">Confirm</a>'+
 			'</div>';
 		return str;
 	}
