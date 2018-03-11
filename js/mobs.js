@@ -1060,7 +1060,7 @@ mobs.images = {
 		enableSecondary: 1,
 		enableSpecial: 1
 	},
-	'beholder': {
+	'evil-eye': {
 		imgW: 1200,
 		imgH: 1000,
 		imgCy: 240,

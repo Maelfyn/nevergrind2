@@ -141,7 +141,7 @@ var town = {
 							'<div>Total Members: '+ my.guild.members +'</div> ' +
 							'<div>Member Number: '+ my.guild.memberNumber +'</div> ' +
 						'</div>' +
-						'<div class="aside-frame">' +
+						'<div id="guild-member-wrap" class="aside-frame">' +
 							'<div id="guild-member-flex">'+
 								'<div id="guild-member-label">Guild Members:</div>'+
 								'<div id="guild-member-refresh-icon"><i class="fa fa-refresh refresh"></i></div>'+
@@ -163,7 +163,7 @@ var town = {
 				var s = '';
 				if (mission.loaded) {
 					s +=
-					'<div id="mission-counter" class="aside-frame">';
+					'<div id="mission-counter" class="aside-frame text-shadow">';
 						s += mission.asideHtml();
 					s += '</div>';
 				}

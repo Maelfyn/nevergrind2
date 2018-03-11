@@ -30,10 +30,11 @@ var game = {
 		timer: 0,
 		start: function() {
 			game.heartbeat.send();
-			clearInterval(game.heartbeat.timer);
-			game.heartbeat.timer = setInterval(game.heartbeat.send, 5000);
+			clearTimeout(game.heartbeat.timer);
+			game.heartbeat.send();
 		},
 		send: function() {
+			clearTimeout(game.heartbeat.timer);
 			console.info("%c Last heartbeat send: ", "background: #ff0", Date.now() - game.ping.start);
 			game.ping.start = Date.now();
 			$.ajax({
@@ -41,12 +42,12 @@ var game = {
 				url: app.url + 'php2/heartbeat.php'
 			}).done(function () {
 				console.info("%c Ping: ", 'background: #0f0', game.ping.oneWay());
+				game.heartbeat.timer = setTimeout(function() {
+					game.heartbeat.send();
+				}, 5000);
 			}).fail(function(data){
 				console.info(data);
-				setTimeout(function(){
-					chat.camp();
-
-				}, 10000);
+				ng.disconnect(data.responseText);
 			});
 		}
 	},
@@ -73,18 +74,6 @@ var game = {
 			return Date.now() - game.socket.receiveTime;
 		}
 	},
-
-	/*startHealthCheck: function() {
-		socket.isHealthy = 0;
-		setTimeout(function() {
-			socket.checkHealth();
-		}, 10000);
-	},
-	checkHealth: function(){
-		if (!game.socket.isHealthy()) {
-			ng.disconnect();
-		}
-	},*/
 	played: {
 		timer: 0,
 		start: function() {
@@ -166,7 +155,6 @@ var game = {
 						if (newChatArray.length) {
 							chat.inChannel = newChatArray;
 							chat.setHeader();
-
 						}
 					});
 				}

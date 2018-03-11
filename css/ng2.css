@@ -1254,7 +1254,7 @@ tbody {
 	border: 2px groove #013;
 	background: rgba(0,0,0,.8);
 	z-index: 2;
-	height: 50vh;
+	height: 50%;
 	width: 50vw;
 }
 #chat-present-wrap {
@@ -1539,6 +1539,7 @@ background-clip: content-box;
 	background: -moz-radial-gradient(center center, farthest-corner, rgba(16, 16, 16, 1) 0, rgba(0, 0, 0, 1) 100%);
 	background: -o-radial-gradient(center center, farthest-corner, rgba(16, 16, 16, 1) 0, rgba(0, 0, 0, 1) 100%);
 	background: radial-gradient(center center, farthest-corner, rgba(16, 16, 16, 1) 0, rgba(0, 0, 0, 1) 100%);
+	z-index: 999999;
 }
 /* bar wrap */
 #bar-wrap {
@@ -1700,7 +1701,7 @@ background-clip: content-box;
 	display: none;
 	top: 0;
 	left: 0;
-	height: 92vh;
+	height: 92%;
 	padding: 1rem 1.5rem;
 	font-size: 1.5rem;
 	width: 46vw;
@@ -1716,7 +1717,10 @@ background-clip: content-box;
 }
 .aside-text {
 	position: relative;
+	display: flex;
+	flex-direction: column;
 	z-index: 1;
+	height: 100%;
 }
 .aside-title-wrap {
 	display: flex;
@@ -1750,12 +1754,18 @@ background-clip: content-box;
 	left: -30%;
 }
 #aside-menu {
-	font-size: 1rem;
+	display: flex;
 	flex-direction: column;
-	margin-top: 1rem;
+	flex: 1;
+	font-size: 1rem;
 	margin-left: 35%;
 }
 /* guild aside */
+#guild-member-wrap {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+}
 #guild-input {
 	background: rgba(0,64,128,.5);
 	color: #fff;
@@ -1772,10 +1782,10 @@ background-clip: content-box;
 	background: rgba(0,0,0,.5);
 	border: .2rem groove #444;
 	padding: .2rem .4rem;
-	margin: 1rem 0 0;
+	margin-top: 1rem;
 }
 #aside-guild-members {
-	max-height: 50vh;
+	flex: 1;
 	overflow-x: hidden;
 	overflow-y: auto;
 }
@@ -1806,6 +1816,55 @@ background-clip: content-box;
 /* missions */
 #mission-counter {
 	word-break: break-all;
+}
+.mission-zone {
+	cursor: url('cursor/pointer.cur'), pointer;
+}
+.mission-zone:hover {
+	background: #048;
+}
+.mission-grey {
+	color: #999;
+}
+.mission-green {
+	color: #191;
+}
+.mission-low-blue {
+	color: #1cc;
+}
+.mission-high-blue {
+	color: #15f;
+}
+.mission-white {
+	color: #fff;
+}
+.mission-yellow {
+	color: #ff1;
+}
+.mission-red {
+	color: #f11;
+}
+.fa-mission-stack {
+	height: 1rem;
+	line-height: 1rem;
+}
+.mission-plus-bg {
+	color: #611;
+	text-shadow: 1px 1px #777, -1px -1px #777, -1px 1px #777, 1px -1px #777, 2px 2px #000, -2px -2px #000, -2px 2px #000, 2px -2px #000;
+}
+.mission-plus {
+	font-size: .75rem;
+	color: #fdd700;
+}
+.mission-minus {
+	font-size: .75rem;
+	color: #fdd700;
+}
+.mission-quest-list {
+	display: none;
+}
+.mission-quest-li {
+	text-indent: 1rem;
 }
 
 /* show game */

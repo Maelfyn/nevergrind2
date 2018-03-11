@@ -62,7 +62,7 @@ var battle = {
 		//for (var i=2; i<3; i++){
 			var m = mobs[i],
 				//mobKey = mob.getRandomMobKey();
-				mobKey = 'toadlok';
+				mobKey = 'angler';
 			mob.preloadMob(mobKey);
 			m.type = mobKey;
 			mob.setMob(m);
