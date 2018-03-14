@@ -727,7 +727,7 @@ var ng = {
 		return JSON.parse(JSON.stringify(o));
 	},
 	loadMsg:
-		"<div class='text-shadow text-center'>Loading... <i class='fa fa-cog fa-spin load-cog'></i></div>",
+		"<div class='text-shadow text-center now-loading'>Loading... <i class='fa fa-cog fa-spin load-cog'></i></div>",
 	attrs: ['str', 'sta', 'agi', 'dex', 'wis', 'intel', 'cha'],
 	resists: ['bleed', 'poison', 'arcane', 'lightning', 'fire', 'cold'],
 	dungeon: ['traps', 'treasure', 'scout', 'pulling'],
@@ -1380,8 +1380,8 @@ var modal = {
 	footer: function(e){
 		var str =
 			'<div id="modal-footer" class="text-center">'+
-				'<a id="modal-dismiss" class="btn btn-info btn-sm modal-buttons">Cancel</a>'+
-				'<a id="'+ e.key +'-confirm" class="btn btn-info btn-sm modal-buttons">Confirm</a>'+
+				'<a id="modal-dismiss" class="ng-btn modal-buttons">Cancel</a>'+
+				'<a id="'+ e.key +'-confirm" class="ng-btn modal-buttons">Confirm</a>'+
 			'</div>';
 		return str;
 	}
@@ -1620,10 +1620,11 @@ var game = {
 		timer: 0,
 		start: function() {
 			game.heartbeat.send();
-			clearInterval(game.heartbeat.timer);
-			game.heartbeat.timer = setInterval(game.heartbeat.send, 5000);
+			clearTimeout(game.heartbeat.timer);
+			game.heartbeat.send();
 		},
 		send: function() {
+			clearTimeout(game.heartbeat.timer);
 			console.info("%c Last heartbeat send: ", "background: #ff0", Date.now() - game.ping.start);
 			game.ping.start = Date.now();
 			$.ajax({
@@ -1631,12 +1632,12 @@ var game = {
 				url: app.url + 'php2/heartbeat.php'
 			}).done(function () {
 				console.info("%c Ping: ", 'background: #0f0', game.ping.oneWay());
+				game.heartbeat.timer = setTimeout(function() {
+					game.heartbeat.send();
+				}, 5000);
 			}).fail(function(data){
 				console.info(data);
-				setTimeout(function(){
-					chat.camp();
-
-				}, 10000);
+				ng.disconnect(data.responseText);
 			});
 		}
 	},
@@ -1663,18 +1664,6 @@ var game = {
 			return Date.now() - game.socket.receiveTime;
 		}
 	},
-
-	/*startHealthCheck: function() {
-		socket.isHealthy = 0;
-		setTimeout(function() {
-			socket.checkHealth();
-		}, 10000);
-	},
-	checkHealth: function(){
-		if (!game.socket.isHealthy()) {
-			ng.disconnect();
-		}
-	},*/
 	played: {
 		timer: 0,
 		start: function() {
@@ -1756,7 +1745,6 @@ var game = {
 						if (newChatArray.length) {
 							chat.inChannel = newChatArray;
 							chat.setHeader();
-
 						}
 					});
 				}
@@ -2078,9 +2066,29 @@ $(document).on(env.click, function(e){
 			// key input view router
 			if (key === 'b') {
 				battle.go();
+				TweenMax.set('#chat-present-wrap', {
+					display: 'none'
+				});
+				TweenMax.set('#chat-wrap', {
+					height: '25vh',
+					width: '35vw'
+				});
+				TweenMax.set('#chat-log-wrap', {
+					flexBasis: '100%'
+				});
 			}
 			else if (key === 't') {
 				town.go();
+				TweenMax.set('#chat-present-wrap', {
+					display: 'flex'
+				});
+				TweenMax.set('#chat-wrap', {
+					height: '50vh',
+					width: '50vw'
+				});
+				TweenMax.set('#chat-log-wrap', {
+					flexBasis: '70%'
+				});
 			}
 		}
 	}
@@ -2122,8 +2130,12 @@ $(document).on(env.click, function(e){
 				$("#create-character-name").focus();
 			}
 		} else {
-			// always works town,dungeon and combat
+			// always works town, dungeon and combat
 			if (chat.hasFocus) {
+				if (chat.mode.change()) {
+					// changing chat mode - matches possible mode change
+					return false;
+				}
 				// has chat focus
 				if (code === 38) {
 					// chat focus history nav up
@@ -2151,12 +2163,8 @@ $(document).on(env.click, function(e){
 			}
 
 			if (ng.view === 'town') {
-				if (chat.hasFocus) {
-					if (chat.mode.change()) {
-						// changing chat mode - matches possible mode change
-						return false;
-					}
-				} else {
+				// town only actions
+				if (!chat.hasFocus) {
 					// no aside && no chat focus
 					!town.aside.selected && chat.dom.chatInput.focus();
 					if (guild.hasFocus) {
@@ -3473,15 +3481,10 @@ var bar = {
 		e.style.display = 'block';
 
 		for (var i=0; i<game.maxPlayers; i++) {
-			bar.dom[i] = {
-				playerWrap: document.getElementById('bar-player-wrap-' + i),
-				name: document.getElementById('bar-name-' + i),
-				hpFg: document.getElementById('bar-hp-fg-' + i),
-				hpBg: document.getElementById('bar-hp-bg-' + i),
-				mpWrap: document.getElementById('bar-mp-wrap-' + i),
-				mpFg: document.getElementById('bar-mp-fg-' + i),
-			}
+			bar.setEvents(i);
 		}
+		// draw all bars
+		bar.setAllBars();
 		// bar events
 		$("#bar-wrap").on(env.context, '.bar-col-icon', function(e){
 			var id = $(this).attr('id'),
@@ -3491,6 +3494,16 @@ var bar = {
 			console.info(id, slot, my.party[slot].name);
 			context.getPartyMenu(my.party[slot].name);
 		});
+	},
+	setEvents: function(i) {
+		bar.dom[i] = {
+			playerWrap: document.getElementById('bar-player-wrap-' + i),
+			name: document.getElementById('bar-name-' + i),
+			hpFg: document.getElementById('bar-hp-fg-' + i),
+			// hpBg: document.getElementById('bar-hp-bg-' + i),
+			mpWrap: document.getElementById('bar-mp-wrap-' + i),
+			mpFg: document.getElementById('bar-mp-fg-' + i),
+		}
 	},
 	dom: {},
 	getPlayerHtml: function(p, i, ignoreWrap) {
@@ -3508,6 +3521,7 @@ var bar = {
 		return s;
 	},
 	getPlayerInnerHtml: function(p, i) {
+		// inner portion of getPlayerHtml
 		var s =
 		'<div id="bar-col-icon-'+ i +'" class="bar-col-icon player-icon-'+ p.job +'">' +
 			'<div id="bar-level-'+ i +'" class="bar-level no-pointer">'+ p.level +'</div>' +
@@ -3517,7 +3531,7 @@ var bar = {
 			'<div id="bar-name-'+ i +'" class="bar-hp-name">'+ p.name +'</div>' +
 			'<div id="bar-hp-wrap-'+ i +'" class="bar-any-wrap">' +
 				'<div id="bar-hp-fg-'+ i +'" class="bar-hp-fg"></div>' +
-				'<div id="bar-hp-bg-'+ i +'" class="bar-any-bg"></div>' +
+				//'<div id="bar-hp-bg-'+ i +'" class="bar-any-bg"></div>' +
 			'</div>' +
 			'<div id="bar-mp-wrap-'+ i +'" class="bar-any-wrap">' +
 				'<div id="bar-mp-fg-'+ i +'" class="bar-mp-fg"></div>' +
@@ -3527,19 +3541,53 @@ var bar = {
 	},
 	html: function() {
 		// my bar
-		var s = bar.getPlayerHtml(my.party[0], 0);
+		var s = '';
 		// party bars
 		for (var i=0; i<game.maxPlayers; i++) {
-			if (my.party[i].name !== my.name) {
-				s += bar.getPlayerHtml(my.party[i], i);
-			}
+			s += bar.getPlayerHtml(my.party[i], i);
 		}
 		return s;
 	},
 	updatePlayerBar: function(index) {
-		var e = document.getElementById('bar-player-wrap-' + index);
-		e.style.display = 'flex';
-		e.innerHTML = bar.getPlayerInnerHtml(my.party[index], index);
+		bar.dom[index].playerWrap.style.display = 'flex';
+		bar.dom[index].playerWrap.innerHTML = bar.getPlayerInnerHtml(my.party[index], index);
+		bar.setEvents(index);
+		bar.setBars(index, 0);
+	},
+	setAllBars: function() {
+		// draw all hp/mp values using my.party data
+		for (var i=0; i<game.maxPlayers; i++) {
+			bar.setHp(i);
+			bar.setMp(i);
+		}
+	},
+	setBars: function(index, delay) {
+		bar.setHp(index, delay);
+		bar.setMp(index, delay);
+	},
+	setHp: function(index, delay) {
+		if (!my.party[index].name) return;
+		var percent = ~~((my.party[index].hp / my.party[index].maxHp) * 100) + '%',
+				delay = delay === undefined ? .3 : delay;
+		TweenMax.to(bar.dom[index].hpFg, delay, {
+			width: percent
+		});
+		/*TweenMax.to(bar.dom[index].hpBg, .5, {
+			width: percent
+		});*/
+	},
+	setMp: function(index, delay) {
+		if (!my.party[index].name) return;
+		if (my.party[index].maxMp) {
+			var percent = ~~((my.party[index].mp / my.party[index].maxMp) * 100) + '%',
+				delay = delay === undefined ? .3 : delay;
+			TweenMax.to(bar.dom[index].mpFg, delay, {
+				width: percent
+			});
+		}
+		else {
+			bar.dom[index].mpWrap.style.display = 'none';
+		}
 	},
 	party: {
 		join: function(data) {
@@ -3737,8 +3785,8 @@ var battle = {
 		for (var i=0; i<mob.max; i++){
 		//for (var i=2; i<3; i++){
 			var m = mobs[i],
-				mobKey = mob.getRandomMobKey();
-				//mobKey = 'dragon';
+				//mobKey = mob.getRandomMobKey();
+				mobKey = 'angler';
 			mob.preloadMob(mobKey);
 			m.type = mobKey;
 			mob.setMob(m);
@@ -4830,7 +4878,7 @@ mobs.images = {
 		enableSecondary: 1,
 		enableSpecial: 1
 	},
-	'beholder': {
+	'evil-eye': {
 		imgW: 1200,
 		imgH: 1000,
 		imgCy: 240,
@@ -5444,6 +5492,9 @@ var town = {
 						'<div class="aside-title">Mission Counter</div>' +
 						town.aside.html.close +
 					'</div>' +
+					'<div id="aside-menu">' +
+						town.aside.menu[id]() +
+					'</div>' +
 				'</div>';
 				return s;
 			},
@@ -5461,13 +5512,13 @@ var town = {
 				var s = '';
 				if (my.guild.name) {
 					s +=
-						'<div class="guild-aside-frame">' +
+						'<div class="aside-frame">' +
 							'<div>Guild: '+ my.guild.name +'</div> ' +
 							'<div>Title: '+ guild.ranks[my.guild.rank] +'</div> ' +
 							'<div>Total Members: '+ my.guild.members +'</div> ' +
 							'<div>Member Number: '+ my.guild.memberNumber +'</div> ' +
 						'</div>' +
-						'<div class="guild-aside-frame">' +
+						'<div id="guild-member-wrap" class="aside-frame">' +
 							'<div id="guild-member-flex">'+
 								'<div id="guild-member-label">Guild Members:</div>'+
 								'<div id="guild-member-refresh-icon"><i class="fa fa-refresh refresh"></i></div>'+
@@ -5481,17 +5532,27 @@ var town = {
 					s +=
 					'<input id="guild-input" class="text-shadow" type="text" maxlength="30" autocomplete="off" spellcheck="false">' +
 					'<div id="guild-create" class="ng-btn">Create Guild</div> ' +
-					'<div class="guild-aside-frame">Only letters A through Z and apostrophes are accepted in guild names. Standarized capitalization will be automatically applied. The guild name must be between 4 and 30 characters. All guild names are subject to the royal statutes regarding common decency in Vandamor.</div>';
+					'<div class="aside-frame">Only letters A through Z and apostrophes are accepted in guild names. Standarized capitalization will be automatically applied. The guild name must be between 4 and 30 characters. All guild names are subject to the royal statutes regarding common decency in Vandamor.</div>';
 				}
 				return s;
 			},
 			'town-mission': function() {
 				var s = '';
+				if (mission.loaded) {
+					s +=
+					'<div id="mission-counter" class="aside-frame text-shadow">';
+						s += mission.asideHtml();
+					s += '</div>';
+				}
+				else {
+					s +=
+						'<div id="mission-counter" class="aside-frame">' +
+							ng.loadMsg +
+						'</div>';
+					mission.init();
+				}
 				return s;
 			}
-		},
-		getHtml: function(id) {
-			return town.aside.html[id](id);
 		},
 		init: function(id) {
 			if (id === town.aside.selected) return;
@@ -5516,10 +5577,15 @@ var town = {
 			var e = document.createElement('div');
 			e.className = 'town-aside text-shadow';
 			// set aside HTML
-			e.innerHTML = town.aside.getHtml(id);
+			var html = town.aside.html[id](id);
+			console.info("HTML: ", html);
+			e.innerHTML = html;
 			document.getElementById('scene-town').appendChild(e);
 			// animate aside things
 			setTimeout(function() {
+				TweenMax.set('.now-loading', {
+					alpha: 0
+				});
 				TweenMax.to(e, .5, {
 					startAt: {
 						display: 'block',
@@ -5530,7 +5596,12 @@ var town = {
 					},
 					x: '2%',
 					y: '2%',
-					scale: 1
+					scale: 1,
+					onComplete: function() {
+						TweenMax.to('.now-loading', .3, {
+							alpha: 1
+						});
+					}
 				});
 				setTimeout(function () {
 					TweenMax.to('.aside-bg', 1, {
@@ -6079,6 +6150,195 @@ var route = {
 		}
 	}
 };
+var mission = {
+	data: {},
+	loaded: 0,
+	zones: [
+		{
+			name: 'Ashenflow Peak',
+			level: 35,
+			id: 16,
+			isOpen: 0
+		},
+		{
+			name: 'Galeblast Fortress',
+			level: 35,
+			id: 15,
+			isOpen: 0
+		},
+		{
+			name: 'Anuran Ruins',
+			level: 32,
+			id: 14,
+			isOpen: 0
+		},
+		{
+			name: 'Fahlnir Citadel',
+			level: 28,
+			id: 13,
+			isOpen: 0
+		},
+		{
+			name: 'Temple of Prenssor',
+			level: 24,
+			id: 12,
+			isOpen: 0
+		},
+		{
+			name: "Arcturin's Crypt",
+			level: 20,
+			id: 11,
+			isOpen: 0
+		},
+		{
+			name: 'Sylong Mausoleum',
+			level: 16,
+			id: 10,
+			isOpen: 0
+		},
+		{
+			name: 'Kordata Cove',
+			level: 12,
+			id: 9,
+			isOpen: 0
+		},
+		{
+			name: "Babel's Bastille",
+			level: 8,
+			id: 8,
+			isOpen: 0
+		},
+		{
+			name: 'Lanfeld Refuge',
+			level: 5,
+			id: 7,
+			isOpen: 0
+		},
+		{
+			name: 'Riven Grotto',
+			level: 5,
+			id: 6,
+			isOpen: 0
+		},
+		{
+			name: 'Greenthorn Cavern',
+			level: 5,
+			id: 5,
+			isOpen: 0
+		},
+		{
+			name: 'Tendolin Hollow',
+			level: 1,
+			id: 4,
+			isOpen: 0
+		},
+		{
+			name: 'Salubrin Den',
+			level: 1,
+			id: 3,
+			isOpen: 0
+		}
+	],
+	init: function() {
+		ng.lock();
+		$.ajax({
+			url: app.url + 'php2/mission/load-mission-data.php'
+		}).done(function(data) {
+			console.info('load-mission-data', data.mission);
+			mission.loaded = 1;
+			mission.data = data.mission;
+			mission.show();
+		}).fail(function(data){
+			ng.msg(data.responseText);
+		}).always(function(){
+			ng.unlock();
+		});
+		$("#scene-town").on(env.click, '.mission-zone', function() {
+			mission.loadMission($(this));
+		});
+	},
+	getDiffClass: function(minQuestLvl) {
+		var resp = 'mission-grey';
+		if (minQuestLvl >= my.level + 3) {
+			resp = 'mission-red';
+		}
+		else if (minQuestLvl > my.level) {
+			resp = 'mission-yellow';
+		}
+		else if (minQuestLvl === my.level) {
+			resp = 'mission-white';
+		}
+		else if (minQuestLvl >= ~~(my.level * .88) ) {
+			resp = 'mission-high-blue';
+		}
+		else if (minQuestLvl >= ~~(my.level * .77) ) {
+			resp = 'mission-low-blue';
+		}
+		else if (minQuestLvl >= ~~(my.level * .66) ) {
+			resp = 'mission-green';
+		}
+		return resp;
+	},
+	asideHtml: function() {
+		var s = '<div>Mission Data</div>';
+		mission.zones.forEach(function(v) {
+			//if (my.level >= v.level) {
+				s += '<div class="mission-zone '+ mission.getDiffClass(v.level) +'" '+
+				'data-id="'+ v.id +'">'+
+					'<span class="fa-stack fa fa-mission-stack">'+
+						'<i class="fa fa-square fa-stack-1x mission-plus-bg text-shadow"></i>'+
+						'<i class="fa fa-plus fa-stack-1x mission-plus text-shadow"></i>'+
+					'</span>' + v.name +'</div>' +
+					'<div id="mission-zone-'+ v.id +'" class="mission-quest-list">'+
+						ng.loadMsg +
+					'</div>'
+			//}
+		});
+		return s;
+	},
+	show: function() {
+		document.getElementById('mission-counter').innerHTML = mission.asideHtml();
+	},
+	loadMission: function(that) {
+		console.info("ZONE ID: ", that.data('id'));
+		var index = mission.findIndexById(that.data('id') * 1),
+			id = mission.zones[index].id,
+			o = mission.zones[index];
+		console.info("isOpen: ", o.isOpen);
+		if (o.isOpen) {
+			// closed
+			var e = that.find('.mission-minus');
+			e.removeClass('fa-minus mission-minus').addClass('fa-plus mission-plus');
+			$("#mission-zone-" + id).css('display', 'none');
+			o.isOpen = 0;
+		}
+		else {
+			// opened
+			var e = that.find('.mission-plus');
+			console.info('ELEMENT: ', e);
+			e.removeClass('fa-plus mission-plus').addClass('fa-minus mission-minus');
+			$("#mission-zone-" + id).css('display', 'block');
+			o.isOpen = 1;
+			mission.loadQuests(id);
+		}
+
+	},
+	findIndexById: function(id) {
+		var resp = 0;
+		mission.zones.forEach(function(v, i) {
+			if (id === v.id) {
+				resp = i;
+			}
+		});
+		return resp;
+	},
+	loadQuests: function(id) {
+		// get quests from server side
+		// start with salubrin den
+		// store in session... return session if it's set for that zone
+		console.info("LOADING QUESTS: ", id);
+	}
+}
 // test methods
 var test = {
 	chat: {

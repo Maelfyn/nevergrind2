@@ -50,6 +50,13 @@
 	echo '<pre>$_SESSION[party]'; var_dump($_SESSION['party']); echo '</pre>';
 	echo '<pre>$_SESSION[guild] '; var_dump($_SESSION['guild']); echo '</pre>';
 
+	if (!empty($_SESSION['quest'])) {
+		echo '<pre>$_SESSION[quest] '; var_dump($_SESSION['quest']); echo '</pre>';
+	}
+	else {
+		echo "QUEST EMPTY<br>";
+	}
+
 	$test = [
 		//'id' => 5
 	];

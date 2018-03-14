@@ -1818,6 +1818,7 @@ background-clip: content-box;
 	word-break: break-all;
 }
 .mission-zone {
+	color: #aaa;
 	cursor: url('cursor/pointer.cur'), pointer;
 }
 .mission-zone:hover {
@@ -1864,7 +1865,41 @@ background-clip: content-box;
 	display: none;
 }
 .mission-quest-li {
-	text-indent: 1rem;
+	text-indent: 2rem;
+	cursor: url('cursor/pointer.cur'), pointer;
+}
+.mission-quest-li:hover {
+	background: #048;
+}
+.mission-quest-li:active {
+	background: #05b;
+}
+#mission-wrap {
+	padding-top: .5rem;
+	padding-bottom: .5rem;
+}
+#mission-title {
+	font-family: Cinzel, Palatino Linotype, serif;
+	color: gold;
+	font-size: 1.375rem;
+	font-weight: bold;
+	margin-bottom: .5rem;
+	background: #025;
+	background-image: -webkit-radial-gradient(top center, farthest-side, #29d 0%, #103860 100%);
+	background-image: -moz-radial-gradient(top center, farthest-side, #29d 0%, #103860 100%);
+	background-image: -ms-radial-gradient(top center, farthest-side, #29d 0%, #103860 100%);
+	background-image: -o-radial-gradient(top center, farthest-side, #29d 0%, #103860 100%);
+}
+#mission-embark {
+	font-size: 1.75rem;
+	display: none;
+}
+#mission-help {
+	font-size: 1rem;
+	line-height: 1;
+	border: .1rem groove #29d;
+	padding: .2rem .4rem;
+	background: rgba(0,64,128,.3);
 }
 
 /* show game */

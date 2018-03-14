@@ -5,85 +5,85 @@ var mission = {
 		{
 			name: 'Ashenflow Peak',
 			level: 35,
-			id: 16,
+			id: 14,
 			isOpen: 0
 		},
 		{
 			name: 'Galeblast Fortress',
 			level: 35,
-			id: 15,
+			id: 13,
 			isOpen: 0
 		},
 		{
 			name: 'Anuran Ruins',
 			level: 32,
-			id: 14,
+			id: 12,
 			isOpen: 0
 		},
 		{
 			name: 'Fahlnir Citadel',
 			level: 28,
-			id: 13,
+			id: 11,
 			isOpen: 0
 		},
 		{
 			name: 'Temple of Prenssor',
 			level: 24,
-			id: 12,
+			id: 10,
 			isOpen: 0
 		},
 		{
 			name: "Arcturin's Crypt",
 			level: 20,
-			id: 11,
+			id: 9,
 			isOpen: 0
 		},
 		{
 			name: 'Sylong Mausoleum',
 			level: 16,
-			id: 10,
+			id: 8,
 			isOpen: 0
 		},
 		{
 			name: 'Kordata Cove',
 			level: 12,
-			id: 9,
+			id: 7,
 			isOpen: 0
 		},
 		{
 			name: "Babel's Bastille",
 			level: 8,
-			id: 8,
+			id: 6,
 			isOpen: 0
 		},
 		{
 			name: 'Lanfeld Refuge',
 			level: 5,
-			id: 7,
+			id: 5,
 			isOpen: 0
 		},
 		{
 			name: 'Riven Grotto',
 			level: 5,
-			id: 6,
+			id: 4,
 			isOpen: 0
 		},
 		{
 			name: 'Greenthorn Cavern',
 			level: 5,
-			id: 5,
+			id: 3,
 			isOpen: 0
 		},
 		{
 			name: 'Tendolin Hollow',
 			level: 1,
-			id: 4,
+			id: 2,
 			isOpen: 0
 		},
 		{
 			name: 'Salubrin Den',
 			level: 1,
-			id: 3,
+			id: 1,
 			isOpen: 0
 		}
 	],
@@ -96,13 +96,17 @@ var mission = {
 			mission.loaded = 1;
 			mission.data = data.mission;
 			mission.show();
+			$(".mission-zone:first")[0].click();
 		}).fail(function(data){
 			ng.msg(data.responseText);
-		}).always(function(){
 			ng.unlock();
 		});
 		$("#scene-town").on(env.click, '.mission-zone', function() {
 			mission.loadMission($(this));
+		}).on(env.click, '.mission-quest-li', function() {
+			mission.selectQuest($(this));
+		}).on(env.click, '#mission-embark', function(){
+			mission.embark();
 		});
 	},
 	getDiffClass: function(minQuestLvl) {
@@ -127,11 +131,24 @@ var mission = {
 		}
 		return resp;
 	},
+	asideHtmlHead: function() {
+		var helpMsg = my.p_id ?
+			'The party leader must select a zone and embark to begin!' :
+			'Select a quest from any zone and embark to begin!';
+		var s =
+		'<div id="mission-wrap" class="aside-frame text-center">' +
+			'<div id="mission-title">Select A Mission</div>' +
+			'<div id="mission-embark" class="ng-btn">Embark!</div>' +
+			'<div id="mission-help">'+ helpMsg +'</div>' +
+		'</div>';
+		return s;
+	},
 	asideHtml: function() {
-		var s = '<div>Mission Data</div>';
+		var s = '';
 		mission.zones.forEach(function(v) {
-			//if (my.level >= v.level) {
-				s += '<div class="mission-zone '+ mission.getDiffClass(v.level) +'" '+
+			if (my.level >= v.level) {
+				s +=
+				'<div class="mission-zone" '+
 				'data-id="'+ v.id +'">'+
 					'<span class="fa-stack fa fa-mission-stack">'+
 						'<i class="fa fa-square fa-stack-1x mission-plus-bg text-shadow"></i>'+
@@ -140,9 +157,21 @@ var mission = {
 					'<div id="mission-zone-'+ v.id +'" class="mission-quest-list">'+
 						ng.loadMsg +
 					'</div>'
-			//}
+			}
 		});
 		return s;
+	},
+	questHtml: function(data) {
+		console.info('load-zone-missions', data);
+		var str = '';
+		data.quests !== undefined && data.quests.forEach(function(v){
+			str += '<div class="mission-quest-li '+ mission.getDiffClass(v.level) +'" '+
+				'data-id="'+ v.row +'">'+
+					v.title +
+				'</div>';
+		});
+		if (!str) str = '<div class="mission-quest-li">No missions found.</div>';
+		$("#mission-zone-" + data.id).html(str);
 	},
 	show: function() {
 		document.getElementById('mission-counter').innerHTML = mission.asideHtml();
@@ -185,5 +214,55 @@ var mission = {
 		// start with salubrin den
 		// store in session... return session if it's set for that zone
 		console.info("LOADING QUESTS: ", id);
+		ng.lock(1);
+		$.ajax({
+			url: app.url + 'php2/mission/load-zone-missions.php',
+			data: {
+				id: id
+			}
+		}).done(function(data) {
+			data.id = id;
+			setTimeout(function() {
+				mission.questHtml(data);
+				ng.unlock();
+			}, 500);
+		}).fail(function(data){
+			ng.msg(data.responseText);
+			ng.unlock();
+		});
+	},
+	quest: {
+		id: 0,
+		title: ''
+	},
+	showEmbark: function() {
+		$("#mission-help").css('display', 'none');
+		$("#mission-embark").css('display', 'block');
+	},
+	selectQuest: function(that) {
+		var id = that.data('id') * 1;
+		if (id) {
+			mission.quest.id = id;
+			console.info("QUEST SELECTED: ", id);
+			if (my.p_id && my.party[0].isLeader || !my.p_id) {
+				mission.showEmbark();
+			}
+		}
+	},
+	embark: function() {
+		ng.lock(1);
+		$.ajax({
+			url: app.url + 'php2/mission/select-quest.php',
+			data: {
+				id: mission.quest.id
+			}
+		}).done(function(data) {
+			console.info('select-quest ', data);
+		}).fail(function(data){
+			ng.msg(data.responseText);
+		}).always(function() {
+			ng.unlock();
+		});
+
 	}
 }

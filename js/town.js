@@ -17,6 +17,7 @@ var town = {
 				my.level = z.level;
 				my.row = z.row;
 				my.party[0] = z;
+				my.party[0].isLeader = 0;
 				my.resetClientPartyValues(0);
 				my.guild = data.guild;
 				// init party member values
@@ -162,13 +163,13 @@ var town = {
 			'town-mission': function() {
 				var s = '';
 				if (mission.loaded) {
-					s +=
+					s += mission.asideHtmlHead() +
 					'<div id="mission-counter" class="aside-frame text-shadow">';
 						s += mission.asideHtml();
 					s += '</div>';
 				}
 				else {
-					s +=
+					s += mission.asideHtmlHead() +
 						'<div id="mission-counter" class="aside-frame">' +
 							ng.loadMsg +
 						'</div>';
