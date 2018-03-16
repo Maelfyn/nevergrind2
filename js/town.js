@@ -2,6 +2,16 @@ var town = {
 	go: function(){
 		if (create.selected) {
 			ng.lock(1);
+			TweenMax.set('#chat-present-wrap', {
+				display: 'flex'
+			});
+			TweenMax.set('#chat-wrap', {
+				height: '50vh',
+				width: '50vw'
+			});
+			TweenMax.set('#chat-log-wrap', {
+				flexBasis: '70%'
+			});
 			$.ajax({
 				url: app.url + 'php2/character/loadCharacter.php',
 				data: {
@@ -202,7 +212,7 @@ var town = {
 			e.className = 'town-aside text-shadow';
 			// set aside HTML
 			var html = town.aside.html[id](id);
-			console.info("HTML: ", html);
+			// console.info("HTML: ", html);
 			e.innerHTML = html;
 			document.getElementById('scene-town').appendChild(e);
 			// animate aside things

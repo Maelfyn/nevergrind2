@@ -28,6 +28,7 @@ var game = {
 	},
 	heartbeat: {
 		timer: 0,
+		fails: 0,
 		start: function() {
 			game.heartbeat.send();
 			clearTimeout(game.heartbeat.timer);
@@ -41,13 +42,18 @@ var game = {
 				type: 'GET',
 				url: app.url + 'php2/heartbeat.php'
 			}).done(function () {
+				if (game.heartbeat.fails) {
+					game.resync();
+				}
+				game.heartbeat.fails = 0;
 				console.info("%c Ping: ", 'background: #0f0', game.ping.oneWay());
+			}).fail(function(data){
+				game.heartbeat.fails++;
+				game.heartbeat.fails > 2 && ng.disconnect(data.responseText);
+			}).always(function() {
 				game.heartbeat.timer = setTimeout(function() {
 					game.heartbeat.send();
 				}, 5000);
-			}).fail(function(data){
-				console.info(data);
-				ng.disconnect(data.responseText);
 			});
 		}
 	},
@@ -180,6 +186,9 @@ var game = {
 			});
 			socket.zmq.close();
 		}
+	},
+	resync: function() {
+		// do nothing!
 	},
 	getGameState: function(){
 	},

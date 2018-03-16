@@ -89,6 +89,9 @@ return gulp.src([
 	'./js/cache.js',
 	'./js/route.js',
 	'./js/mission.js',
+	'./js/dungeon.js',
+	'./js/skills.js',
+	'./js/zone.js',
 	'./js/test.js',
 	'./js/endWrap.js'
 ])

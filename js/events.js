@@ -20,29 +20,9 @@ $(document).on(env.click, function(e){
 			// key input view router
 			if (key === 'b') {
 				battle.go();
-				TweenMax.set('#chat-present-wrap', {
-					display: 'none'
-				});
-				TweenMax.set('#chat-wrap', {
-					height: '25vh',
-					width: '35vw'
-				});
-				TweenMax.set('#chat-log-wrap', {
-					flexBasis: '100%'
-				});
 			}
 			else if (key === 't') {
 				town.go();
-				TweenMax.set('#chat-present-wrap', {
-					display: 'flex'
-				});
-				TweenMax.set('#chat-wrap', {
-					height: '50vh',
-					width: '50vw'
-				});
-				TweenMax.set('#chat-log-wrap', {
-					flexBasis: '70%'
-				});
 			}
 		}
 	}

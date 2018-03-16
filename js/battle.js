@@ -1,6 +1,16 @@
 // battle
 var battle = {
 	go: function(){
+		TweenMax.set('#chat-present-wrap', {
+			display: 'none'
+		});
+		TweenMax.set('#chat-wrap', {
+			height: '25vh',
+			width: '35vw'
+		});
+		TweenMax.set('#chat-log-wrap', {
+			flexBasis: '100%'
+		});
 		mob.init();
 		ng.setScene('battle');
 	},
@@ -62,8 +72,8 @@ var battle = {
 		//for (var i=2; i<3; i++){
 			var m = mobs[i],
 				//mobKey = mob.getRandomMobKey();
-				mobKey = 'angler';
-			mob.preloadMob(mobKey);
+				mobKey = 'toadlok';
+			cache.preload.mob(mobKey);
 			m.type = mobKey;
 			mob.setMob(m);
 			mob.idle(m);

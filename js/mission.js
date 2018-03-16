@@ -88,7 +88,7 @@ var mission = {
 		}
 	],
 	init: function() {
-		ng.lock();
+		ng.lock(1);
 		$.ajax({
 			url: app.url + 'php2/mission/load-mission-data.php'
 		}).done(function(data) {
@@ -102,9 +102,9 @@ var mission = {
 			ng.unlock();
 		});
 		$("#scene-town").on(env.click, '.mission-zone', function() {
-			mission.loadMission($(this));
+			mission.toggleZone($(this));
 		}).on(env.click, '.mission-quest-li', function() {
-			mission.selectQuest($(this));
+			mission.clickQuest($(this));
 		}).on(env.click, '#mission-embark', function(){
 			mission.embark();
 		});
@@ -150,13 +150,15 @@ var mission = {
 				s +=
 				'<div class="mission-zone" '+
 				'data-id="'+ v.id +'">'+
-					'<span class="fa-stack fa fa-mission-stack">'+
+					'<div class="fa-stack fa fa-mission-stack">'+
 						'<i class="fa fa-square fa-stack-1x mission-plus-bg text-shadow"></i>'+
 						'<i class="fa fa-plus fa-stack-1x mission-plus text-shadow"></i>'+
-					'</span>' + v.name +'</div>' +
-					'<div id="mission-zone-'+ v.id +'" class="mission-quest-list">'+
-						ng.loadMsg +
-					'</div>'
+					'</div>' +
+					'<div>' + v.name + '</div>' +
+				'</div>' +
+				'<div id="mission-zone-'+ v.id +'" class="mission-quest-list">'+
+					ng.loadMsg +
+				'</div>'
 			}
 		});
 		return s;
@@ -165,8 +167,11 @@ var mission = {
 		console.info('load-zone-missions', data);
 		var str = '';
 		data.quests !== undefined && data.quests.forEach(function(v){
-			str += '<div class="mission-quest-li '+ mission.getDiffClass(v.level) +'" '+
-				'data-id="'+ v.row +'">'+
+			str +=
+				'<div class="mission-quest-li '+ mission.getDiffClass(v.level) +'" '+
+					'data-id="'+ v.row +'" ' +
+					'data-zone="'+ v.zone +'" ' +
+					'data-level="'+ v.level +'">' +
 					v.title +
 				'</div>';
 		});
@@ -176,8 +181,32 @@ var mission = {
 	show: function() {
 		document.getElementById('mission-counter').innerHTML = mission.asideHtml();
 	},
-	loadMission: function(that) {
-		console.info("ZONE ID: ", that.data('id'));
+	loadQuests: function(id) {
+		// get quests from server side
+		// start with salubrin den
+		// store in session... return session if it's set for that zone
+		console.info("LOADING QUESTS: ", id);
+		ng.lock(1);
+		$.ajax({
+			url: app.url + 'php2/mission/load-zone-missions.php',
+			data: {
+				id: id
+			}
+		}).done(function(data) {
+			data.id = id;
+			ng.unlock();
+			console.info('load-zone-missions', data);
+			data.quests.forEach(function(v){
+				mission.quests[v.row] = v;
+			});
+			mission.questHtml(data);
+		}).fail(function(data){
+			ng.msg(data.responseText);
+			ng.unlock();
+		});
+	},
+	toggleZone: function(that) {
+		console.info("toggleZone: ", that.data('id'), that.data('level'), that.data('zone'));
 		var index = mission.findIndexById(that.data('id') * 1),
 			id = mission.zones[index].id,
 			o = mission.zones[index];
@@ -198,7 +227,6 @@ var mission = {
 			o.isOpen = 1;
 			mission.loadQuests(id);
 		}
-
 	},
 	findIndexById: function(id) {
 		var resp = 0;
@@ -209,40 +237,15 @@ var mission = {
 		});
 		return resp;
 	},
-	loadQuests: function(id) {
-		// get quests from server side
-		// start with salubrin den
-		// store in session... return session if it's set for that zone
-		console.info("LOADING QUESTS: ", id);
-		ng.lock(1);
-		$.ajax({
-			url: app.url + 'php2/mission/load-zone-missions.php',
-			data: {
-				id: id
-			}
-		}).done(function(data) {
-			data.id = id;
-			setTimeout(function() {
-				mission.questHtml(data);
-				ng.unlock();
-			}, 500);
-		}).fail(function(data){
-			ng.msg(data.responseText);
-			ng.unlock();
-		});
-	},
-	quest: {
-		id: 0,
-		title: ''
-	},
+	quests: [],
 	showEmbark: function() {
 		$("#mission-help").css('display', 'none');
 		$("#mission-embark").css('display', 'block');
 	},
-	selectQuest: function(that) {
+	clickQuest: function(that) {
 		var id = that.data('id') * 1;
 		if (id) {
-			mission.quest.id = id;
+			my.selectedQuest = id;
 			console.info("QUEST SELECTED: ", id);
 			if (my.p_id && my.party[0].isLeader || !my.p_id) {
 				mission.showEmbark();
@@ -254,10 +257,15 @@ var mission = {
 		$.ajax({
 			url: app.url + 'php2/mission/select-quest.php',
 			data: {
-				id: mission.quest.id
+				quest: mission.quests[my.selectedQuest]
 			}
 		}).done(function(data) {
-			console.info('select-quest ', data);
+			console.info('select-quest', data);
+			my.quest = mission.quests[my.selectedQuest];
+			data.zoneMobs.forEach(function(v){
+				cache.preload.mob(v);
+			});
+			battle.go();
 		}).fail(function(data){
 			ng.msg(data.responseText);
 		}).always(function() {

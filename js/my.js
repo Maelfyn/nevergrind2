@@ -128,5 +128,7 @@ var my = {
 				location.reload();
 			});
 		}
-	}
+	},
+	selectedQuest: '',
+	quest: {},
 };

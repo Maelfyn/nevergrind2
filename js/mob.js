@@ -1,6 +1,6 @@
 // test methods
 var mob = {
-	test: 1,
+	test: 0, // used to enable test mode to show all animations looping
 	imageKeysLen: 0,
 	index: 0,
 	cache: {},
@@ -8,14 +8,6 @@ var mob = {
 	getRandomMobKey: function(){
 		var i = ~~(Math.random() * mob.imageKeysLen);
 		return mob.imageKeys[i];
-	},
-	preloadMob: function(type){
-		if (!mobs.images[type].cache.length) {
-			for (var i = 1; i <= 105; i++) {
-				mobs.images[type].cache[i] = new Image();
-				mobs.images[type].cache[i].src = 'mobs/' + type + '/' + i + '.png';
-			}
-		}
 	},
 	initialized: 0,
 	max: 9,
@@ -77,6 +69,7 @@ var mob = {
 		m.dom.img.style.left = (w * -.5) + 'px';
 		m.dom.img.style.width = w + 'px';
 		m.dom.img.style.bottom = (mobs.images[m.type].yFloor * m.size) + 'px';
+		m.dom.img.src = 'mobs/' + m.type + '/1.png';
 		// details
 		TweenMax.set(m.dom.details, {
 			bottom: m.detailAliveBottom * m.size

@@ -845,10 +845,17 @@ tbody {
 	border-radius: 0;
 	cursor: url('cursor/pointer.cur'), pointer;
 	letter-spacing: 2px;
-	background: #bba
+	background: #aa9;
+	text-shadow:
+			1px 1px #000,
+			-1px 0 #000,
+			1px 0 #000,
+			-1px 1px #000,
+			1px -1px #000,
+			-1px -1px #000
 }
 .ng-btn:hover {
-	background: #ccb
+	background: #bba
 }
 .ng-btn:active {
 	outline: 1px solid #579!important;
@@ -1818,8 +1825,17 @@ background-clip: content-box;
 	word-break: break-all;
 }
 .mission-zone {
+	display: flex;
+	align-content: center;
 	color: #aaa;
 	cursor: url('cursor/pointer.cur'), pointer;
+}
+.fa-mission-stack {
+	top: .05rem;
+}
+.mission-zone > div {
+	height: 1.5rem;
+	line-height: 1.5rem;
 }
 .mission-zone:hover {
 	background: #048;
@@ -1844,10 +1860,6 @@ background-clip: content-box;
 }
 .mission-red {
 	color: #f11;
-}
-.fa-mission-stack {
-	height: 1rem;
-	line-height: 1rem;
 }
 .mission-plus-bg {
 	color: #611;

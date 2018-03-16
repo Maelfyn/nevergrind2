@@ -3,7 +3,7 @@
 require '../header.php';
 require '../db.php';
 
-$stmt = $link->prepare('SELECT m.row, m.level, m.title, z.zone 
+$stmt = $link->prepare('SELECT m.row, m.level, m.title, z.zone, m.mob_id, m.description 
 	FROM ng2_mission_list m
 	join ng2_zones z
 	on m.zone=z.row
@@ -14,7 +14,9 @@ $stmt->bind_result(
 	$row,
 	$level,
 	$title,
-	$zone
+	$zone,
+	$mob_id,
+	$description
 );
 $i = 0;
 while ($stmt->fetch()) {
@@ -22,7 +24,9 @@ while ($stmt->fetch()) {
 		'row' => $row,
 		'level' => $level,
 		'title' => $title,
-		'zone' => $zone
+		'zone' => $zone,
+		'mobId' => $mob_id,
+		'description' => $description
 	];
 }
 

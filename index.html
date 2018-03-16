@@ -79,9 +79,13 @@
 			  onSubmit="return loginAuthenticate(this);">
 			<fieldset>
 				<p>
-					<div><a id="createAccount" class="login-actions strongShadow">Create an Account</a></div>
+					<div>
+						<a id="createAccount" class="login-actions strongShadow">Create an Account</a>
+					</div>
 					<div>or</div>
-					<div><a id="gotoAccount" class="login-actions strongShadow">Login with your Neverworks Account</a></div>
+					<div>
+						<a id="gotoAccount" class="login-actions strongShadow">Login with your Neverworks Account</a>
+					</div>
 				</p>
 				<div id="login-form-contents"></div>
 
@@ -562,24 +566,15 @@
 </div> <!-- end scene-title -->
 
 <div id="bar-wrap" class="no-select text-shadow"></div>
-
 <div id="chat-wrap" class="text-shadow"></div>
-
 <div id="tooltip-social-wrap" class="no-select stag-blue text-shadow"></div>
 
-<div id="scene-town" class="scene none no-select">
-</div> <!-- end scene-town -->
-
-<div id="scene-dungeon" class="scene none no-select">
-</div> <!-- end scene-dungeon -->
-
-<div id="scene-battle" class="scene none no-select">
-</div> <!-- end scene-battle -->
-
+<div id="scene-town" class="scene none no-select"></div>
+<div id="scene-dungeon" class="scene none no-select"></div>
+<div id="scene-battle" class="scene none no-select"></div>
 <div id="scene-error" class="scene none no-select text-shadow"></div>
 
 <audio id="bgmusic" autoplay loop preload="auto"></audio>
-
 
 <div id="modal-overlay" class="overlay"></div>
 <div id="modal-wrap" class="text-shadow"></div>
@@ -628,7 +623,7 @@
 				'<input name="username"' +
 					'type="text"' +
 					'id="loginEmail"' +
-					'class="loginInputs"' +
+					'class="loginInputs text-shadow"' +
 					'maxlength="255"' +
 					'placeholder="Account or Email Address"' +
 					'required="required"' +
@@ -638,7 +633,7 @@
 					'<input name="password"' +
 						'type="password"' +
 						'id="password"' +
-						'class="loginInputs"' +
+						'class="loginInputs text-shadow"' +
 						'maxlength="20"' +
 						'autocomplete="current-password"' +
 						'placeholder="Password"' +
@@ -647,7 +642,7 @@
 				'<label for="rememberMe">' +
 					'<input type="checkbox" id="rememberMe" name="rememberMe" checked> Remember Me' +
 				'</label>' +
-				'<input id="login-btn" type="submit" value="Login" class="ng-btn strongShadow" />' +
+				'<input id="login-btn" type="submit" value="Login" class="ng-btn" />' +
 				'<div class="error-msg text-shadow"></div>' +
 				'<div id="forgotPasswordWrap">' +
 					'<a title="Neverworks Games will send you an email. Click the link to reset your password." ' +
@@ -1162,6 +1157,9 @@
 				"cache",
 				"route",
 				"mission",
+				"dungeon",
+				"skills",
+				"zone",
 				"test"
 			]
 		}
