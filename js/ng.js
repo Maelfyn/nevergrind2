@@ -447,7 +447,7 @@ var ng = {
 					town.go();
 				}
 				else if (h === '#battle') {
-					battle.go();
+					town.go();
 				}
 			}
 		});

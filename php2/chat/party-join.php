@@ -33,7 +33,7 @@ if ($partyCount >= 1 && $partyCount < 6) {
 
 		$stmt->execute();
 
-		$_SESSION['party']['id'] = $_POST['row'];
+		$_SESSION['party']['id'] = $_POST['row'] * 1;
 
 		// notify party
 		require '../zmq.php';

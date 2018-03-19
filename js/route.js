@@ -24,6 +24,12 @@ var route = {
 		if (r === 'party->hb') {
 			bar.heartbeat.receive(data);
 		}
+		else if (r === 'party->updateBars') {
+			bar.updateBars(data);
+		}
+		else if (r === 'party->missionUpdate') {
+			party.missionUpdate(data);
+		}
 		else if (r === 'party->linkdead') {
 			bar.heartbeat.linkdead(data);
 		}

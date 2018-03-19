@@ -30,16 +30,34 @@
 		'leader' => '',
 		'played' => time()
 	];
-	$_SESSION['party'] = [];
+	if (empty($_SESSION['party'])) {
+		$_SESSION['party'] = [];
+	}
+	else {
+		$r['party']['id'] = $_SESSION['party']['id'];
+	}
 	$_SESSION['guild'] = [];
 
 	// get my character data
-	$query = 'select row, name, level, race, job, hp, maxHp, mp, maxMp from `ng2_chars` where account=? and row=? limit 1';
+	$query = 'select row, name, level, race, job, hp, maxHp, mp, maxMp,
+		exp, gold,
+	 	str, sta, agi, dex, wis, intel, cha,
+	 	offense, defense, dualWield, doubleAttack, 
+	 	oneHandSlash, twoHandSlash, oneHandBlunt, twoHandBlunt, piercing, handToHand,
+	 	dodge, parry, riposte,
+	 	alteration, conjuration, evocation
+	 	from `ng2_chars` where account=? and row=? limit 1';
 	$stmt = $link->prepare($query);
 	$stmt->bind_param('ss', $_SESSION['account'], $_POST['row']);
 	$stmt->execute();
 	$stmt->store_result();
-	$stmt->bind_result($row, $name, $level, $race, $job, $hp, $maxHp, $mp, $maxMp);
+	$stmt->bind_result($row, $name, $level, $race, $job, $hp, $maxHp, $mp, $maxMp,
+		$exp, $gold,
+		$str, $sta, $agi, $dex, $wis, $intel, $cha,
+		$offense, $defense, $dualWield, $doubleAttack,
+		$oneHandSlash, $twoHandSlash, $oneHandBlunt, $twoHandBlunt, $piercing, $handToHand,
+		$dodge, $parry, $riposte,
+		$alteration, $conjuration, $evocation);
 
 	$r['characterData'] = [];
 	$i = 0;
@@ -54,21 +72,50 @@
 			'hp' => $hp,
 			'maxHp' => $maxHp,
 			'mp' => $mp,
-			'maxMp' => $maxMp
+			'maxMp' => $maxMp,
+			'exp' => $exp,
+			'gold' => $gold,
+			'str' => $str,
+			'sta' => $sta,
+			'agi' => $agi,
+			'dex' => $dex,
+			'wis' => $wis,
+			'intel' => $intel,
+			'cha' => $cha,
+			'offense' => $offense,
+			'defense' => $defense,
+			'dualWield' => $dualWield,
+			'doubleAttack' => $doubleAttack,
+			'oneHandSlash' => $oneHandSlash,
+			'twoHandSlash' => $twoHandSlash,
+			'oneHandBlunt' => $oneHandBlunt,
+			'twoHandBlunt' => $twoHandBlunt,
+			'piercing' => $piercing,
+			'handToHand' => $handToHand,
+			'dodge' => $dodge,
+			'parry' => $parry,
+			'riposte' => $riposte,
+			'alteration' => $alteration,
+			'conjuration' => $conjuration,
+			'evocation' => $evocation
 		];
 		$i++;
 	}
 
 	if ($i) {
 		// delete from any party
-		mysqli_query($link,
+		/*
+		 mysqli_query($link,
 			'delete from ng2_parties where c_id='. $r['characterData']['row']
 		);
+		*/
 
 		// set session values for my character
 		foreach ($r['characterData'] as $key => $val) {
 			$_SESSION['ng2'][$key] = $val;
 		}
+		// set hp/mp regen, etc
+		require 'setEquipmentValues.php';
 		// count active players
 		$result = mysqli_query(
 			$link,
@@ -98,6 +145,12 @@
 		}
 		// get guild info
 		require '../guild/getGuildData.php';
+
+		// get mission info
+		$r['quest'] = [];
+		if (!empty($_SESSION['quest'])) {
+			$r['quest'] = $_SESSION['quest'];
+		};
 
 		echo json_encode($r);
 	}

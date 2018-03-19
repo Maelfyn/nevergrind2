@@ -1,11 +1,24 @@
 <?php
-require 'header-session-start.php';
+require 'header.php';
 if (empty($_SESSION['account'])) {
 	header('HTTP/1.1 500 Your session has expired.');
 }
 else {
 	require 'db.php';
-	// insert / replace into fwplayers
+	// tick HP & MP
+	$_SESSION['ng2']['hp'] += $_SESSION['ng2']['hpRegen'];
+	if ($_SESSION['ng2']['hp'] > $_SESSION['ng2']['maxHp']) {
+		$_SESSION['ng2']['hp'] = $_SESSION['ng2']['maxHp'];
+	}
+	$r['hp'] = $_SESSION['ng2']['hp'];
+
+	$_SESSION['ng2']['mp'] += $_SESSION['ng2']['mpRegen'];
+	if ($_SESSION['ng2']['mp'] > $_SESSION['ng2']['maxMp']) {
+		$_SESSION['ng2']['mp'] = $_SESSION['ng2']['maxMp'];
+	}
+	$r['mp'] = $_SESSION['ng2']['mp'];
+
+	// insert / replace into ng2_players
 	$stmt = $link->prepare('insert into ng2_players 
 			(`id`, `account`, `name`, `leader`, `level`, `race`, `job`, `zone`) 
 			values (?, ?, ?, ?, ?, ?, ?, ?) 
@@ -28,4 +41,31 @@ else {
 		$_SESSION['ng2']['zone']);
 
 	$stmt->execute();
+	// update ng2_chars
+	$stmt = $link->prepare('update ng2_chars set hp=?, mp=? where row=?');
+	$stmt->bind_param('iii',
+		$_SESSION['ng2']['hp'],
+		$_SESSION['ng2']['mp'],
+		$_SESSION['ng2']['row']);
+	$stmt->execute();
+	// update ng2_parties hp/mp
+	if (!empty($_SESSION['party'])) {
+		$stmt = $link->prepare('update ng2_parties set hp=?, mp=? where c_id=?');
+		$stmt->bind_param('iii',
+			$_SESSION['ng2']['hp'],
+			$_SESSION['ng2']['mp'],
+			$_SESSION['ng2']['row']);
+		$stmt->execute();
+
+		require 'zmq.php';
+		$zmq = new stdClass();
+		$zmq->hp = $_SESSION['ng2']['hp'];
+		$zmq->mp = $_SESSION['ng2']['mp'];
+		$zmq->name = $_SESSION['ng2']['name'];
+		$zmq->route = 'party->updateBars';
+		$zmq->category = 'party:'. $_SESSION['party']['id'];
+		$socket->send(json_encode($zmq));
+	}
+
+	echo json_encode($r);
 }

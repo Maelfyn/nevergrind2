@@ -255,22 +255,24 @@ var mission = {
 	embark: function() {
 		ng.lock(1);
 		$.ajax({
-			url: app.url + 'php2/mission/select-quest.php',
+			url: app.url + 'php2/mission/embark-quest.php',
 			data: {
 				quest: mission.quests[my.selectedQuest]
 			}
 		}).done(function(data) {
-			console.info('select-quest', data);
-			my.quest = mission.quests[my.selectedQuest];
-			data.zoneMobs.forEach(function(v){
-				cache.preload.mob(v);
-			});
-			battle.go();
+			mission.embarkHandle(data);
 		}).fail(function(data){
 			ng.msg(data.responseText);
 		}).always(function() {
 			ng.unlock();
 		});
-
+	},
+	embarkHandle: function(data) {
+		console.info('embarkHandle ', data);
+		my.quest = mission.quests[my.selectedQuest];
+		data.zoneMobs.forEach(function(v){
+			cache.preload.mob(v);
+		});
+		battle.go();
 	}
 }

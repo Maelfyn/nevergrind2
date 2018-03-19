@@ -41,12 +41,16 @@ var game = {
 			$.ajax({
 				type: 'GET',
 				url: app.url + 'php2/heartbeat.php'
-			}).done(function () {
+			}).done(function (data) {
 				if (game.heartbeat.fails) {
+					// this does nothing right now
 					game.resync();
 				}
 				game.heartbeat.fails = 0;
 				console.info("%c Ping: ", 'background: #0f0', game.ping.oneWay());
+				// console.info("HB DATA: ", data);
+				data.name = my.name;
+				bar.updateBars(data);
 			}).fail(function(data){
 				game.heartbeat.fails++;
 				game.heartbeat.fails > 2 && ng.disconnect(data.responseText);
@@ -173,11 +177,13 @@ var game = {
 			chat.broadcast.remove();
 			if (my.p_id) {
 				// boot from party
+				/*
 				socket.zmq.publish('party:' + my.p_id, {
 					id: my.row,
 					name: my.name,
 					route: 'party->bootme'
 				});
+				*/
 			}
 			// notify friends
 			socket.zmq.publish('friend:' + my.name, {

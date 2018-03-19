@@ -92,6 +92,7 @@ return gulp.src([
 	'./js/dungeon.js',
 	'./js/skills.js',
 	'./js/zone.js',
+	'./js/party.js',
 	'./js/test.js',
 	'./js/endWrap.js'
 ])
@@ -121,7 +122,7 @@ gulp.task('minify-png', function(){
 
 gulp.task('resize-png', function(){
 	// add minify-png pipe
-	var img = 'wolf';
+	var img = 'zombie';
 	var promise = new Promise(function(resolve) {
 		gulp.src('./mobs-huge/' + img + '/*')
 			.pipe(imageResize({

@@ -57,8 +57,6 @@
 		echo "QUEST EMPTY<br>";
 	}
 
-	echo '<pre>$_SERVER '; var_dump($_SERVER); echo '</pre>';
-
 	$test = [
 		//'id' => 5
 	];

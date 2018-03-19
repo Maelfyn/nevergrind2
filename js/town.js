@@ -47,6 +47,23 @@ var town = {
 				chat.setRoom(data.players);
 				bar.init();
 
+				if (data.party !== undefined && data.party.id) {
+					// reload entire party state
+					data.party.id *= 1;
+					my.p_id = data.party.id;
+					(function repeat() {
+						if (socket.enabled) {
+							chat.party.subscribe(my.p_id);
+							bar.getParty();
+						}
+						else {
+							setTimeout(repeat, 100);
+						}
+					})();
+				}
+
+				// route to battle in local mode
+				app.isLocal && location.hash === '#battle' && data.quest.level && battle.go();
 			}).fail(function(data){
 				ng.disconnect(data.responseText);
 			}).always(function(){

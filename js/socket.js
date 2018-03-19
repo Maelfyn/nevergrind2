@@ -169,7 +169,7 @@ var socket = {
 		my.p_id = row;
 		console.info("subscribing to channel: ", party);
 		socket.zmq.subscribe(party, function(topic, data) {
-			console.info('party rx ', topic, data);
+			// console.info('party rx ', topic, data);
 			if (data.route === 'chat->log') {
 				route.town(data, data.route);
 			}

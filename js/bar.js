@@ -89,6 +89,20 @@ var bar = {
 		bar.setHp(index, delay);
 		bar.setMp(index, delay);
 	},
+	updateBars: function(data) {
+		for (var i=0, len=my.party.length; i<len; i++) {
+			if (data.name === my.party[i].name) {
+				if (data.hp) {
+					my.party[i].hp = data.hp;
+					bar.setHp(i);
+				}
+				if (data.mp) {
+					my.party[i].mp = data.mp;
+					bar.setMp(i);
+				}
+			}
+		}
+	},
 	setHp: function(index, delay) {
 		if (!my.party[index].name) return;
 		var percent = ~~((my.party[index].hp / my.party[index].maxHp) * 100) + '%',
@@ -171,7 +185,7 @@ var bar = {
 				type: 'GET',
 				url: app.url + 'php2/chat/party-get-all.php'
 			}).done(function (data) {
-				console.info('getParty ', data.party);
+				console.info('getParty ', data);
 				var npIndex = 1;
 				data.party.forEach(function(v, i){
 					console.info('SET BARS ', i, v);
@@ -192,12 +206,6 @@ var bar = {
 					document.getElementById('bar-player-wrap-' + i).style.display = 'none';
 					my.party[i] = my.Party();
 				}
-				// continue here
-				// TODO: /disband remove bar when person leaves party
-				// TODO: leader leaves? New leader logic
-				// TODO: add/remove people from party
-				// TODO: /promote leader
-
 			});
 		}
 	},
