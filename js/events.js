@@ -24,6 +24,9 @@ $(document).on(env.click, function(e){
 			else if (key === 't') {
 				town.go();
 			}
+			else if (key === 'd') {
+				dungeon.go();
+			}
 		}
 	}
 	else {

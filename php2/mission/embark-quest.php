@@ -14,39 +14,31 @@ $_SESSION['quest'] = [
 	'description' => $_POST['quest']['description']
 ];
 
+require 'get-zone-mobs.php';
+
+require '../zmq.php';
 if (!empty($_SESSION['party'])) {
 
 	$_SESSION['party']['mission_id'] = $_POST['quest']['row'] * 1;
 
 	if ($_SESSION['party']['isLeader']) {
 		// leader broadcasts mission update to party
-		require '../zmq.php';
+		// my.quest updates
 		$zmq = new stdClass();
 		$zmq->quest = $_SESSION['quest'];
+		$zmq->zoneMobs = $r['zoneMobs'];
 		$zmq->route = 'party->missionUpdate';
 		$zmq->category = 'party:'. $_SESSION['party']['id'];
 		$socket->send(json_encode($zmq));
 	}
 }
-
-// load all zone mob images and preload them client-side
-
- $stmt = $link->prepare('SELECT i.name
-	FROM ng2_mobs m
-	join ng2_mob_img i
-	on m.img=i.row
-	join ng2_zones z
-	on m.zone=z.row
-	where z.zone=?
-	group by i.name');
-$stmt->bind_param('s', $_SESSION['quest']['zone']);
-$stmt->execute();
-$stmt->bind_result($name);
-$i = 0;
-$r['zoneMobs'] = [];
-while ($stmt->fetch()) {
-	$r['zoneMobs'][$i++] = $name;
-}
+// notify party
+$zmq = new stdClass();
+$zmq->msg = $_SESSION['ng2']['name'] . ' has embarked into ' . $_SESSION['quest']['zone'] . '.';
+$zmq->route = 'chat->log';
+$zmq->class = 'chat-warning';
+$zmq->category = 'party:'. $_SESSION['party']['id'];
+$socket->send(json_encode($zmq));
 
 $r['quest'] = $_SESSION['quest']['row'];
 

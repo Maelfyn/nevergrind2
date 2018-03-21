@@ -36,7 +36,7 @@ var game = {
 		},
 		send: function() {
 			clearTimeout(game.heartbeat.timer);
-			console.info("%c Last heartbeat send: ", "background: #ff0", Date.now() - game.ping.start);
+			console.info("%c Last heartbeat interval: ", "background: #ff0", Date.now() - game.ping.start);
 			game.ping.start = Date.now();
 			$.ajax({
 				type: 'GET',

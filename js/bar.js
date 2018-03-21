@@ -232,7 +232,7 @@ var bar = {
 	},
 	heartbeat: {
 		receive: function(data) {
-			console.info('heartbeat.receive', data);
+			console.info('%c heartbeat.receive id:', "background: #0ff", data.id);
 			var index = 0;
 			for (var i=1; i<6; i++) {
 				if (data.id === my.party[i].id) {

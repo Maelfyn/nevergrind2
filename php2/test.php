@@ -27,6 +27,16 @@
 	if (!ctype_alpha($formattedName)){
 		echo '<br>This name contains illegal characters!<br>';
 	}
+	// AM I IN A PARTY
+	$stmt = $link->prepare('SELECT count(row) count FROM ng2_parties where c_id=?');
+	$stmt->bind_param('s', $_SESSION['ng2']['row']);
+	$stmt->execute();
+	$stmt->bind_result($dbCount);
+	$inParty = 0;
+	while ($stmt->fetch()) {
+		$inParty = $dbCount;
+	}
+	echo "inParty: ". $inParty .'<br>';
 
 	$stmt = $link->prepare('select name from ng2_guilds where name=?');
 	$stmt->bind_param('s', $formattedName);

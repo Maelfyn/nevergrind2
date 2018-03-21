@@ -442,11 +442,10 @@ var ng = {
 
 			var h = location.hash;
 			if (app.isLocal) {
-				// hastag routing
-				if (h === '#town') {
-					town.go();
-				}
-				else if (h === '#battle') {
+				// initial hashtag routing
+				if (h === '#town' ||
+					h === '#battle' ||
+					h === '#dungeon') {
 					town.go();
 				}
 			}

@@ -949,7 +949,7 @@ var chat = {
 		},
 	},
 	scrollBottom: function(){
-		if (!chat.isClicked){
+		if (!chat.isClicked && chat.initialized){
 			chat.dom.chatLog.scrollTop = chat.dom.chatLog.scrollHeight;
 		}
 	},
@@ -1067,6 +1067,32 @@ var chat = {
 			socket.zmq.publish(chat.getChannel(), {
 				route: 'chat->remove',
 				row: my.row
+			});
+		}
+	},
+	size: {
+		small: function() {
+			TweenMax.set('#chat-present-wrap', {
+				display: 'none'
+			});
+			TweenMax.set('#chat-wrap', {
+				height: '25vh',
+				width: '35vw'
+			});
+			TweenMax.set('#chat-log-wrap', {
+				flexBasis: '100%'
+			});
+		},
+		large: function() {
+			TweenMax.set('#chat-present-wrap', {
+				display: 'flex'
+			});
+			TweenMax.set('#chat-wrap', {
+				height: '50vh',
+				width: '50vw'
+			});
+			TweenMax.set('#chat-log-wrap', {
+				flexBasis: '70%'
 			});
 		}
 	}

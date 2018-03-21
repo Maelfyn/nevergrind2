@@ -2,16 +2,7 @@ var town = {
 	go: function(){
 		if (create.selected) {
 			ng.lock(1);
-			TweenMax.set('#chat-present-wrap', {
-				display: 'flex'
-			});
-			TweenMax.set('#chat-wrap', {
-				height: '50vh',
-				width: '50vw'
-			});
-			TweenMax.set('#chat-log-wrap', {
-				flexBasis: '70%'
-			});
+			chat.size.large();
 			$.ajax({
 				url: app.url + 'php2/character/loadCharacter.php',
 				data: {
@@ -30,6 +21,12 @@ var town = {
 				my.party[0].isLeader = 0;
 				my.resetClientPartyValues(0);
 				my.guild = data.guild;
+				if (data.quest.level) {
+					// quest still active
+					mission.setQuest(data.quest);
+					my.zoneMobs = data.zoneMobs;
+				}
+
 				// init party member values
 				for (var i=1; i<game.maxPlayers; i++) {
 					my.party[i] = my.Party();
@@ -63,7 +60,16 @@ var town = {
 				}
 
 				// route to battle in local mode
-				app.isLocal && location.hash === '#battle' && data.quest.level && battle.go();
+				if (app.isLocal) {
+					if (data.quest.level) {
+						if (location.hash === '#battle') {
+							battle.go();
+						}
+						else if (location.hash === '#dungeon') {
+							dungeon.go();
+						}
+					}
+				}
 			}).fail(function(data){
 				ng.disconnect(data.responseText);
 			}).always(function(){
@@ -188,15 +194,15 @@ var town = {
 				return s;
 			},
 			'town-mission': function() {
-				var s = '';
+				var s = mission.asideHtmlHead();
 				if (mission.loaded) {
-					s += mission.asideHtmlHead() +
+					s +=
 					'<div id="mission-counter" class="aside-frame text-shadow">';
 						s += mission.asideHtml();
 					s += '</div>';
 				}
 				else {
-					s += mission.asideHtmlHead() +
+					s +=
 						'<div id="mission-counter" class="aside-frame">' +
 							ng.loadMsg +
 						'</div>';
@@ -229,7 +235,6 @@ var town = {
 			e.className = 'town-aside text-shadow';
 			// set aside HTML
 			var html = town.aside.html[id](id);
-			// console.info("HTML: ", html);
 			e.innerHTML = html;
 			document.getElementById('scene-town').appendChild(e);
 			// animate aside things
@@ -400,6 +405,7 @@ var town = {
 			p + 'rendo-surefoot.png',
 			p + 'surefall.jpg',
 			p + 'valeska-windcrest.png',
+			'img2/dungeon/braxxen1.jpg',
 		])
 	},
 };

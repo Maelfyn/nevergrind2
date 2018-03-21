@@ -23,6 +23,28 @@
 		}
 	}
 
+	// check party data
+	if (empty($_SESSION['party']) || !$_SESSION['party']['id']) {
+		$_SESSION['party'] = [];
+		if (isset($_SESSION['ng2']['row'])) {
+			// delete from parties if player data is known
+			mysqli_query(
+			$link, 'delete from ng2_parties where c_id='. $_SESSION['ng2']['row']
+			);
+		}
+		// am I in a party? This will trigger party-get-all client-side
+		/*$stmt = $link->prepare('SELECT count(row) count FROM ng2_parties where c_id=?');
+		$stmt->bind_param('i', $r['characterData']['row']);
+		$stmt->execute();
+		$stmt->bind_result($inParty);
+		$inParty = 0;
+		while ($stmt->fetch()) {
+			$r['inParty'] = $inParty;
+		}*/
+	}
+	else {
+		$r['party']['id'] = $_SESSION['party']['id'];
+	}
 	// init session values
 	$_SESSION['ng2'] = [];
 	$_SESSION['ng2'] = [
@@ -30,12 +52,6 @@
 		'leader' => '',
 		'played' => time()
 	];
-	if (empty($_SESSION['party'])) {
-		$_SESSION['party'] = [];
-	}
-	else {
-		$r['party']['id'] = $_SESSION['party']['id'];
-	}
 	$_SESSION['guild'] = [];
 
 	// get my character data
@@ -103,12 +119,6 @@
 	}
 
 	if ($i) {
-		// delete from any party
-		/*
-		 mysqli_query($link,
-			'delete from ng2_parties where c_id='. $r['characterData']['row']
-		);
-		*/
 
 		// set session values for my character
 		foreach ($r['characterData'] as $key => $val) {
@@ -150,6 +160,7 @@
 		$r['quest'] = [];
 		if (!empty($_SESSION['quest'])) {
 			$r['quest'] = $_SESSION['quest'];
+			require '../mission/get-zone-mobs.php';
 		};
 
 		echo json_encode($r);

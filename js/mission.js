@@ -131,15 +131,30 @@ var mission = {
 		}
 		return resp;
 	},
+	showEmbark: function() {
+		$("#mission-help").css('display', 'none');
+		$("#mission-embark").css('display', 'block');
+	},
 	asideHtmlHead: function() {
-		var helpMsg = my.p_id ?
-			'The party leader must select a zone and embark to begin!' :
-			'Select a quest from any zone and embark to begin!';
+		var headMsg = 'Mission Counter',
+			helpMsg = 'The party leader must select a zone and embark to begin!',
+			embarkClass = 'none',
+			helpClass = 'block';
+		if (my.party[0].isLeader) {
+			headMsg = 'Select A Mission';
+			helpMsg = 'Select a quest from any zone and embark to venture forth!';
+		}
+		if (my.quest.level) {
+			headMsg = my.quest.title;
+			embarkClass = 'block';
+			helpClass = 'none';
+		}
+
 		var s =
 		'<div id="mission-wrap" class="aside-frame text-center">' +
-			'<div id="mission-title">Select A Mission</div>' +
-			'<div id="mission-embark" class="ng-btn">Embark!</div>' +
-			'<div id="mission-help">'+ helpMsg +'</div>' +
+			'<div id="mission-title">'+ headMsg +'</div>' +
+			'<div id="mission-embark" class="ng-btn '+ embarkClass +'">Embark!</div>' +
+			'<div id="mission-help" class=" '+ helpClass +'">'+ helpMsg +'</div>' +
 		'</div>';
 		return s;
 	},
@@ -238,41 +253,52 @@ var mission = {
 		return resp;
 	},
 	quests: [],
-	showEmbark: function() {
-		$("#mission-help").css('display', 'none');
-		$("#mission-embark").css('display', 'block');
-	},
 	clickQuest: function(that) {
 		var id = that.data('id') * 1;
-		if (id) {
+		if (id && my.party[0].isLeader) {
 			my.selectedQuest = id;
 			console.info("QUEST SELECTED: ", id);
-			if (my.p_id && my.party[0].isLeader || !my.p_id) {
+			if (my.p_id) {
 				mission.showEmbark();
 			}
+		}
+		else {
+			// TODO: non-party member needs to see something... EMBARK?
 		}
 	},
 	embark: function() {
 		ng.lock(1);
-		$.ajax({
-			url: app.url + 'php2/mission/embark-quest.php',
-			data: {
-				quest: mission.quests[my.selectedQuest]
+		if (my.party[0].isLeader) {
+			$.ajax({
+				url: app.url + 'php2/mission/embark-quest.php',
+				data: {
+					quest: mission.quests[my.selectedQuest]
+				}
+			}).done(function(data) {
+				console.info('embark isLeader! ', data);
+				mission.setQuest(mission.quests[my.selectedQuest]);
+				my.zoneMobs = data.zoneMobs;
+				dungeon.go();
+			}).fail(function(data){
+				ng.msg(data.responseText);
+			}).always(function() {
+				ng.unlock();
+			});
+		}
+		else {
+			// joining
+			if (my.quest.level) {
+				dungeon.go();
 			}
-		}).done(function(data) {
-			mission.embarkHandle(data);
-		}).fail(function(data){
-			ng.msg(data.responseText);
-		}).always(function() {
+			else {
+				chat.log("Quest data not found.", "chat-alert")
+			}
 			ng.unlock();
-		});
+		}
 	},
-	embarkHandle: function(data) {
-		console.info('embarkHandle ', data);
-		my.quest = mission.quests[my.selectedQuest];
-		data.zoneMobs.forEach(function(v){
-			cache.preload.mob(v);
-		});
-		battle.go();
+	setQuest: function(quest) {
+		console.info("SETTING QUEST", quest);
+		my.selectedQuest = quest.row;
+		my.quest = quest;
 	}
 }

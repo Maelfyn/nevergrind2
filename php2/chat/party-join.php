@@ -50,5 +50,5 @@ if ($partyCount >= 1 && $partyCount < 6) {
 	}
 }
 else {
-	exit("You cannot join this party. ". $partyCount);
+	exit("You cannot join this party.");
 }

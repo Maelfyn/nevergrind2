@@ -1387,10 +1387,10 @@ tbody {
 	cursor: url('cursor/pointer.cur'), pointer;
 	padding: .2rem .4rem;
 	border: 1px groove #013;
-	-webkit-transition : border 300ms ease-out;
-	-moz-transition : border 300ms ease-out;
-	-o-transition : border 300ms ease-out;
-	transition : border 300ms ease-out;
+	-webkit-transition : border .3s ease-out;
+	-moz-transition : border .3s ease-out;
+	-o-transition : border .3s ease-out;
+	transition : border .3s ease-out;
 }
 #chat-input:focus {
 	border: 1px groove #048;
@@ -1780,10 +1780,10 @@ background-clip: content-box;
 	padding: .2rem .4rem;
 	border: 1px groove #013;
 	margin: 1rem 0;
-	-webkit-transition : border 300ms ease-out;
-	-moz-transition : border 300ms ease-out;
-	-o-transition : border 300ms ease-out;
-	transition : border 300ms ease-out;
+	-webkit-transition : border .3s ease-out;
+	-moz-transition : border .3s ease-out;
+	-o-transition : border .3s ease-out;
+	transition : border .3s ease-out;
 }
 .aside-frame {
 	background: rgba(0,0,0,.5);
@@ -1809,10 +1809,10 @@ background-clip: content-box;
 }
 .refresh {
 	color: #05b;
-	-webkit-transition : color 300ms ease-out;
-	-moz-transition : color 300ms ease-out;
-	-o-transition : color 300ms ease-out;
-	transition : color 300ms ease-out;
+	-webkit-transition : color .3s ease-out;
+	-moz-transition : color .3s ease-out;
+	-o-transition : color .3s ease-out;
+	transition : color .3s ease-out;
 }
 .refresh:hover {
 	color: #27d;
@@ -1897,14 +1897,13 @@ background-clip: content-box;
 	font-weight: bold;
 	margin-bottom: .5rem;
 	background: #025;
-	background-image: -webkit-radial-gradient(top center, farthest-side, #29d 0%, #103860 100%);
-	background-image: -moz-radial-gradient(top center, farthest-side, #29d 0%, #103860 100%);
-	background-image: -ms-radial-gradient(top center, farthest-side, #29d 0%, #103860 100%);
-	background-image: -o-radial-gradient(top center, farthest-side, #29d 0%, #103860 100%);
+	background-image: -webkit-radial-gradient(top center, farthest-corner, #29d 0%, #103860 100%);
+	background-image: -moz-radial-gradient(top center, farthest-corner, #29d 0%, #103860 100%);
+	background-image: -ms-radial-gradient(top center, farthest-corner, #29d 0%, #103860 100%);
+	background-image: -o-radial-gradient(top center, farthest-corner, #29d 0%, #103860 100%);
 }
 #mission-embark {
 	font-size: 1.75rem;
-	display: none;
 }
 #mission-help {
 	font-size: 1rem;
@@ -1913,6 +1912,7 @@ background-clip: content-box;
 	padding: .2rem .4rem;
 	background: rgba(0,64,128,.3);
 }
+/* dungeon */
 
 /* show game */
 body {
