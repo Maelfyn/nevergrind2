@@ -42,7 +42,7 @@ if (!empty($_SESSION['guild']) &&
 	}
 
 	// notify guild members
-	require '../zmq.php';
+	require_once '../zmq.php';
 	$zmq = new stdClass();
 	if (!isset($_POST['action'])) {
 		$zmq->msg = $_SESSION['ng2']['name'] . ' has left '. $_SESSION['guild']['name'] .'.';
@@ -52,7 +52,7 @@ if (!empty($_SESSION['guild']) &&
 	$socket->send(json_encode($zmq));
 
 	// set guild session values
-	require 'guildReset.php';
+	require '../session/init-guild.php';
 	echo json_encode($r);
 }
 else {

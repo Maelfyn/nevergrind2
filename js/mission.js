@@ -87,26 +87,9 @@ var mission = {
 			isOpen: 0
 		}
 	],
-	init: function() {
-		ng.lock(1);
-		$.ajax({
-			url: app.url + 'php2/mission/load-mission-data.php'
-		}).done(function(data) {
-			console.info('load-mission-data', data.mission);
-			mission.loaded = 1;
-			mission.data = data.mission;
-			mission.show();
-			$(".mission-zone:first")[0].click();
-		}).fail(function(data){
-			ng.msg(data.responseText);
-			ng.unlock();
-		});
-		$("#scene-town").on(env.click, '.mission-zone', function() {
-			mission.toggleZone($(this));
-		}).on(env.click, '.mission-quest-li', function() {
-			mission.clickQuest($(this));
-		}).on(env.click, '#mission-embark', function(){
-			mission.embark();
+	resetMissionLists: function() {
+		mission.zones.forEach(function(v) {
+			v.isOpen = 0;
 		});
 	},
 	getDiffClass: function(minQuestLvl) {
@@ -131,16 +114,47 @@ var mission = {
 		}
 		return resp;
 	},
+	init: function() {
+		ng.lock(1);
+		$.ajax({
+			url: app.url + 'php2/mission/load-mission-data.php'
+		}).done(function(data) {
+			console.info('load-mission-data', data.mission);
+			mission.loaded = 1;
+			mission.data = data.mission;
+			mission.show();
+			mission.openFirstTwoZones();
+			ng.unlock();
+		}).fail(function(data){
+			chat.log(data.responseText, 'chat-alert');
+			ng.unlock();
+		});
+		// delegation
+		$("#scene-town").on(env.click, '.mission-zone', function() {
+			mission.toggleZone($(this));
+		}).on(env.click, '.mission-quest-li', function() {
+			mission.clickQuest($(this));
+		}).on(env.click, '#mission-embark', function(){
+			mission.embark();
+		}).on(env.click, '#mission-abandon', function() {
+			mission.abandon();
+		});
+	},
 	showEmbark: function() {
 		$("#mission-help").css('display', 'none');
 		$("#mission-embark").css('display', 'block');
+	},
+	updateTitle: function() {
+		$("#mission-title").html(mission.quests[my.selectedQuest].title);
 	},
 	asideHtmlHead: function() {
 		var headMsg = 'Mission Counter',
 			helpMsg = 'The party leader must select a zone and embark to begin!',
 			embarkClass = 'none',
 			helpClass = 'block';
-		if (my.party[0].isLeader) {
+
+		if (party.isSoloOrLeading()) {
+			// is solo or a leader
 			headMsg = 'Select A Mission';
 			helpMsg = 'Select a quest from any zone and embark to venture forth!';
 		}
@@ -178,10 +192,21 @@ var mission = {
 		});
 		return s;
 	},
+	asideFooter: function() {
+		var s = '';
+		if (party.isSoloOrLeading()) {
+			s +=
+			'<div id="mission-footer" class="aside-frame text-shadow">' +
+				'<div id="mission-abandon" class="ng-btn ng-btn-alert">Abandon Mission</div>' +
+			'</div>';
+		}
+		return s;
+	},
 	questHtml: function(data) {
 		console.info('load-zone-missions', data);
 		var str = '';
-		data.quests !== undefined && data.quests.forEach(function(v){
+		data.quests !== undefined &&
+		data.quests.forEach(function(v){
 			str +=
 				'<div class="mission-quest-li '+ mission.getDiffClass(v.level) +'" '+
 					'data-id="'+ v.row +'" ' +
@@ -194,7 +219,13 @@ var mission = {
 		$("#mission-zone-" + data.id).html(str);
 	},
 	show: function() {
-		document.getElementById('mission-counter').innerHTML = mission.asideHtml();
+		$('#mission-counter').html(mission.asideHtml());
+	},
+	updateTitle: function() {
+		$("#mission-title").html(my.quest.title);
+	},
+	updateAll: function() {
+		$("#aside-menu").html(town.aside.menu['town-mission']());
 	},
 	loadQuests: function(id) {
 		// get quests from server side
@@ -221,11 +252,11 @@ var mission = {
 		});
 	},
 	toggleZone: function(that) {
-		console.info("toggleZone: ", that.data('id'), that.data('level'), that.data('zone'));
+		// console.info("toggleZone: ", that.data('id'), that.data('level'), that.data('zone'));
 		var index = mission.findIndexById(that.data('id') * 1),
 			id = mission.zones[index].id,
 			o = mission.zones[index];
-		console.info("isOpen: ", o.isOpen);
+		// console.info("isOpen: ", o.isOpen);
 		if (o.isOpen) {
 			// closed
 			var e = that.find('.mission-minus');
@@ -255,20 +286,19 @@ var mission = {
 	quests: [],
 	clickQuest: function(that) {
 		var id = that.data('id') * 1;
-		if (id && my.party[0].isLeader) {
+		if (id && party.isSoloOrLeading()) {
 			my.selectedQuest = id;
 			console.info("QUEST SELECTED: ", id);
-			if (my.p_id) {
-				mission.showEmbark();
-			}
+			mission.showEmbark();
+			mission.updateTitle();
 		}
 		else {
 			// TODO: non-party member needs to see something... EMBARK?
 		}
 	},
 	embark: function() {
-		ng.lock(1);
-		if (my.party[0].isLeader) {
+		if (party.isSoloOrLeading()) {
+			ng.lock(1);
 			$.ajax({
 				url: app.url + 'php2/mission/embark-quest.php',
 				data: {
@@ -289,16 +319,48 @@ var mission = {
 			// joining
 			if (my.quest.level) {
 				dungeon.go();
+				$.ajax({
+					url: app.url + 'php2/mission/notify-party-embarked.php'
+				}).done(function(data) {
+					console.info(data);
+				});
 			}
 			else {
 				chat.log("Quest data not found.", "chat-alert")
 			}
-			ng.unlock();
 		}
+	},
+	initQuest: function() {
+		my.selectedQuest = '';
+		my.quest = {};
+		mission.updateAll();
 	},
 	setQuest: function(quest) {
 		console.info("SETTING QUEST", quest);
 		my.selectedQuest = quest.row;
 		my.quest = quest;
+	},
+	abandon: function() {
+		if (my.quest.level && party.isSoloOrLeading()) {
+			ng.lock(1);
+			$.ajax({
+				url: app.url + 'php2/mission/abandon-quest.php'
+			}).done(function (data) {
+				console.info('abandon ', data);
+				mission.initQuest();
+			}).fail(function (data) {
+				chat.log(data.responseText, 'chat-alert');
+			}).always(function () {
+				ng.unlock();
+			});
+		}
+	},
+	openFirstTwoZones: function() {
+		for (var i=0; i<2; i++) {
+			var e = $(".mission-zone").eq(i).get(0);
+			if (e !== undefined) {
+				e.click();
+			}
+		}
 	}
 }

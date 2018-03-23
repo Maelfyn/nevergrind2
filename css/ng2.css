@@ -844,7 +844,7 @@ tbody {
 	text-align: center;
 	border-radius: 0;
 	cursor: url('cursor/pointer.cur'), pointer;
-	letter-spacing: 2px;
+	letter-spacing: .1rem;
 	background: #aa9;
 	text-shadow:
 			1px 1px #000,
@@ -861,6 +861,19 @@ tbody {
 	outline: 1px solid #579!important;
 	border: .1rem inset #eed;
 	background: #998
+}
+.ng-btn-alert {
+	outline: 1px solid #511;
+	border: .1rem outset #711;
+	background: #911;
+}
+.ng-btn-alert:hover {
+	background: #b11;
+}
+.ng-btn-alert:active {
+	outline: 1px solid #711!important;
+	border: .1rem inset #b22;
+	background: #811
 }
 .ch-card {
 	background: #27a;
@@ -1063,7 +1076,7 @@ tbody {
 #msg {
 	opacity: 0;
 	position: fixed;
-	top: 10px;
+	top: 10%;
 	left: 0;
 	right: 0;
 	margin: 0 auto;
@@ -1276,7 +1289,7 @@ tbody {
 }
 #chat-header {
 	text-align: center;
-	color: gold;
+	color: #ffb700;
 	border: .1rem groove #048;
 	margin: 1px;
 	background: -webkit-radial-gradient(top center,farthest-side,rgba(0,48,96,1) 0,rgba(0,0,0,1) 100%);
@@ -1417,6 +1430,9 @@ tbody {
 .chat-warning {
 	color: #ffff1a;
 }
+.chat-quest {
+	color: #ffb700;
+}
 .chat-help-header {
 	color: #ffff1a;
 	background: rgba(255,255,32,.2);
@@ -1430,7 +1446,7 @@ tbody {
 	color: #f80;
 }
 .chat-exp {
-	color: gold;
+	color: #ffb700;
 }
 .chat-join {
 	cursor: url('cursor/pointer.cur'), pointer
@@ -1526,7 +1542,7 @@ background-clip: content-box;
 }
 #scene-error {
 	padding: 30vh 10vw 0;
-	color: gold;
+	color: #ffb700;
 	text-align: center;
 	font: 3rem Cinzel;
 	text-shadow:
@@ -1589,7 +1605,7 @@ background-clip: content-box;
 .bar-level {
 	font-size: .9rem;
 	line-height: .8;
-	color: gold;
+	color: #ffb700;
 }
 .bar-is-leader {
 	position: absolute;
@@ -1659,7 +1675,7 @@ background-clip: content-box;
 	visibility: hidden;
 	width: 8rem;
 	font: .9rem/1.5 Cinzel, Palatino Linotype, serif;
-	border: 2px ridge gold;
+	border: 2px ridge #ffb700;
 	z-index: 2;
 	transform: translate(-50%, 0%);
 	background: #0a0a0a;
@@ -1892,15 +1908,15 @@ background-clip: content-box;
 }
 #mission-title {
 	font-family: Cinzel, Palatino Linotype, serif;
-	color: gold;
-	font-size: 1.375rem;
+	color: #ffb700;
+	font-size: 1.125rem;
 	font-weight: bold;
 	margin-bottom: .5rem;
-	background: #025;
+	/*background: #025;
 	background-image: -webkit-radial-gradient(top center, farthest-corner, #29d 0%, #103860 100%);
 	background-image: -moz-radial-gradient(top center, farthest-corner, #29d 0%, #103860 100%);
 	background-image: -ms-radial-gradient(top center, farthest-corner, #29d 0%, #103860 100%);
-	background-image: -o-radial-gradient(top center, farthest-corner, #29d 0%, #103860 100%);
+	background-image: -o-radial-gradient(top center, farthest-corner, #29d 0%, #103860 100%);*/
 }
 #mission-embark {
 	font-size: 1.75rem;
@@ -1911,6 +1927,9 @@ background-clip: content-box;
 	border: .1rem groove #29d;
 	padding: .2rem .4rem;
 	background: rgba(0,64,128,.3);
+}
+#mission-abandon {
+	box-shadow: 0 500px 0 rgba(255,0,0,.4) inset;
 }
 /* dungeon */
 

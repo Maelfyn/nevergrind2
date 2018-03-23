@@ -203,8 +203,11 @@ var bar = {
 				// hide empty rows
 				var len = data.party.length;
 				for (var i=len; i<game.maxPlayers; i++) {
-					document.getElementById('bar-player-wrap-' + i).style.display = 'none';
-					my.party[i] = my.Party();
+					if (i) {
+						// never overwrite self
+						document.getElementById('bar-player-wrap-' + i).style.display = 'none';
+						my.party[i] = my.Party();
+					}
 				}
 			});
 		}
@@ -220,7 +223,7 @@ var bar = {
 		// update server
 		socket.unsubscribe('party:'+ my.p_id);
 		my.p_id = 0;
-		my.isLeader = 0;
+		my.party[0].isLeader = 0;
 		document.getElementById('bar-is-leader-0').style.display = 'none';
 	},
 	hideParty: function() {

@@ -7,9 +7,7 @@ $stmt = $link->prepare('delete from ng2_players where account=?');
 $stmt->bind_param('s', $_SESSION['account']);
 $stmt->execute();
 // try party log
-if (!empty($_SESSION['party']) &&
-	isset($_SESSION['party']) &&
-	isset($_SESSION['party']['id']) ){
+if ($_SESSION['party']['id']){
 	// delete from party
 	$stmt = $link->prepare('delete from ng2_parties where c_id=?');
 	$stmt->bind_param('s', $_SESSION['party']['id']);

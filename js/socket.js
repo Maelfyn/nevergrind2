@@ -4,7 +4,7 @@ var socket = {
 		try {
 			socket.zmq.unsubscribe(channel);
 		} catch(err) {
-			console.warn(err);
+			console.info(err);
 		}
 	},
 	joinGame: function(){
@@ -97,7 +97,7 @@ var socket = {
 		}, function (code, reason) {
 			console.info('Websocket connection closed. Code: '+code+'; reason: '+reason);
 			// on close/fail
-			console.warn('WebSocket connection failed. Retrying...');
+			console.debug('WebSocket connection failed. Retrying...');
 			socket.enabled = 0;
 			setTimeout(socket.init, 100);
 		}, {

@@ -49,7 +49,7 @@ else {
 		$_SESSION['ng2']['row']);
 	$stmt->execute();
 	// update ng2_parties hp/mp
-	if (!empty($_SESSION['party'])) {
+	if ($_SESSION['party']['id']) {
 		$stmt = $link->prepare('update ng2_parties set hp=?, mp=? where c_id=?');
 		$stmt->bind_param('iii',
 			$_SESSION['ng2']['hp'],
@@ -57,7 +57,7 @@ else {
 			$_SESSION['ng2']['row']);
 		$stmt->execute();
 
-		require 'zmq.php';
+		require_once 'zmq.php';
 		$zmq = new stdClass();
 		$zmq->hp = $_SESSION['ng2']['hp'];
 		$zmq->mp = $_SESSION['ng2']['mp'];

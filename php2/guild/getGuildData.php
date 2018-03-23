@@ -15,7 +15,7 @@ $stmt->bind_param('s', $_SESSION['ng2']['row']);
 $stmt->execute();
 $stmt->bind_result($rank, $g_id, $member_number, $motd, $members, $name);
 // default value
-require 'guildReset.php';
+require '../session/init-guild.php';
 // assigned if exists
 while($stmt->fetch()){
 	$r['guild'] = [

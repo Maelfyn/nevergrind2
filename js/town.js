@@ -38,7 +38,7 @@ var town = {
 				chat.ignore.init();
 				// things that only happen once
 				chat.log("There are currently " + data.count + " players exploring Vandamor.", 'chat-emote');
-
+				// init town
 				town.init();
 				game.start();
 				chat.setRoom(data.players);
@@ -196,17 +196,25 @@ var town = {
 			'town-mission': function() {
 				var s = mission.asideHtmlHead();
 				if (mission.loaded) {
+					// subsequent loads
 					s +=
 					'<div id="mission-counter" class="aside-frame text-shadow">';
 						s += mission.asideHtml();
 					s += '</div>';
+					setTimeout(function() {
+						mission.openFirstTwoZones();
+					}, 100);
 				}
 				else {
+					// first load
 					s +=
 						'<div id="mission-counter" class="aside-frame">' +
 							ng.loadMsg +
 						'</div>';
 					mission.init();
+				}
+				if (my.quest.level) {
+					s += mission.asideFooter();
 				}
 				return s;
 			}
@@ -230,6 +238,9 @@ var town = {
 				x: town.data[id].bg.x,
 				y: town.data[id].bg.y
 			});
+			if (id === 'town-mission') {
+				mission.resetMissionLists();
+			}
 			// create aside
 			var e = document.createElement('div');
 			e.className = 'town-aside text-shadow';

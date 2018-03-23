@@ -23,7 +23,7 @@ if (!empty($_SESSION['guild']) &&
 	$stmt->execute();
 
 	// notify guild members
-	require '../zmq.php';
+	require_once '../zmq.php';
 	$zmq = new stdClass();
 	$zmq->name = $_POST['name'];
 	$zmq->msg = $_POST['name'] . ' has been promoted to Officer by '. $_SESSION['ng2']['name'] .'.';

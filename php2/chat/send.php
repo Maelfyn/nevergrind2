@@ -2,7 +2,7 @@
 	session_start();
 	require('prepare.php');
 	
-    require '../zmq.php';
+    require_once '../zmq.php';
 	$zmq = new stdClass();
 	$zmq->msg = $postMsg;
 	$zmq->name = $_SESSION['ng2']['name'];

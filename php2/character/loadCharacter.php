@@ -22,10 +22,16 @@
 			exit("One of your characters is already logged in or has not timed out yet.");
 		}
 	}
+	if (!isset($_SESSION['party'])) {
+		require '../session/init-party.php';
+	}
+	if (!isset($_SESSION['quest'])) {
+		require '../session/init-quest.php';
+	}
 
 	// check party data
-	if (empty($_SESSION['party']) || !$_SESSION['party']['id']) {
-		$_SESSION['party'] = [];
+	if (!$_SESSION['party']['id']) {
+		require '../session/init-party.php';
 		if (isset($_SESSION['ng2']['row'])) {
 			// delete from parties if player data is known
 			mysqli_query(
@@ -46,13 +52,8 @@
 		$r['party']['id'] = $_SESSION['party']['id'];
 	}
 	// init session values
-	$_SESSION['ng2'] = [];
-	$_SESSION['ng2'] = [
-		'zone' => 'ng2:town',
-		'leader' => '',
-		'played' => time()
-	];
-	$_SESSION['guild'] = [];
+	require '../session/init-ng.php';
+	require '../session/init-guild.php';
 
 	// get my character data
 	$query = 'select row, name, level, race, job, hp, maxHp, mp, maxMp,

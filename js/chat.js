@@ -499,17 +499,21 @@ var chat = {
 		}
 	},
 	disband: function() {
-		if (my.p_id) {
-			$.ajax({
-				type: 'GET',
-				url: app.url + 'php2/chat/disband.php'
-			}).done(function(r){
-				console.info('disband ', r);
-				bar.disband();
-			}).fail(function(r) {
-				chat.log(r.responseText, 'chat-warning');
-			});
-		}
+		$.ajax({
+			type: 'GET',
+			url: app.url + 'php2/chat/disband.php'
+		}).done(function(r){
+			// console.info('disband ', r);
+			if (my.p_id) {
+				my.quest.level && ng.msg('Quest abandoned: '+ my.quest.title);
+			}
+			mission.initQuest();
+			bar.disband();
+		}).fail(function(r) {
+			chat.log(r.responseText, 'chat-warning');
+		}).always(function() {
+			ng.unlock();
+		});
 	},
 	boot: function(name, bypass) {
 		console.info('/promote ', name, bypass);
@@ -601,6 +605,7 @@ var chat = {
 					'<span data-row="'+ data.row +'" '+
 						'data-id="'+ id +'" '+
 						'data-action="'+ data.action +'" '+
+						'data-c-id="'+ data.cId +'" '+
 						'data-guild-name="'+ data.guildName +'" '+
 						'class="chat-prompt-btn chat-prompt-yes">'+
 						'<i class="fa fa-check chat-prompt-yes-icon"></i>&thinsp;Confirm'+
@@ -663,7 +668,8 @@ var chat = {
 			$.ajax({
 				url: app.url + 'php2/chat/party-join.php',
 				data: {
-					row: z.row
+					row: z.row,
+					cId: z.cId
 				}
 			}).done(function(data){
 				console.info("party-join.php ", data);

@@ -2,15 +2,14 @@
 require '../header.php';
 require '../db.php';
 
-// not leading a party yet
-if (!empty($_SESSION['party']) ) {
+if ($_SESSION['party']['id']) {
 	// delete from party
 	$stmt = $link->prepare('delete from ng2_parties where c_id=?');
 	$stmt->bind_param('s', $_POST['id']);
 	$stmt->execute();
 
 	// notify party members
-	require '../zmq.php';
+	require_once '../zmq.php';
 	$zmq = new stdClass();
 	$zmq->row = $_POST['id'];
 	$zmq->name = $_POST['name'];

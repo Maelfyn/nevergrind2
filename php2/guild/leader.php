@@ -29,7 +29,7 @@ if (!empty($_SESSION['guild']) &&
 	$_SESSION['guild']['rank'] = 1;
 
 	// notify guild members
-	require '../zmq.php';
+	require_once '../zmq.php';
 	$zmq = new stdClass();
 	$zmq->name = $_POST['name'];
 	$zmq->msg = $_POST['name'] . ' has been promoted to guild Leader by '. $_SESSION['ng2']['name'] .'.';

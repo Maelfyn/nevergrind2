@@ -5,8 +5,10 @@ require '../db.php';
 $mobId = isset($_POST['quest']['mobId']) ?
 	$_POST['quest']['mobId'] * 1 : $_POST['quest']['mob_id'] * 1;
 
+$mission_id = $_POST['quest']['row'] * 1;
+
 $_SESSION['quest'] = [
-	'row' => $_POST['quest']['row'] * 1,
+	'row' => $mission_id,
 	'zone' => $_POST['quest']['zone'],
 	'level' => $_POST['quest']['level'] * 1,
 	'mob_id' => $mobId,
@@ -14,10 +16,15 @@ $_SESSION['quest'] = [
 	'description' => $_POST['quest']['description']
 ];
 
+$stmt = $link->prepare('update ng2_players set mission_id=? where id=?');
+$stmt->bind_param('ii', $mission_id, $_SESSION['ng2']['row']);
+$stmt->execute();
+
 require 'get-zone-mobs.php';
 
-require '../zmq.php';
-if (!empty($_SESSION['party'])) {
+require_once '../zmq.php';
+
+if ($_SESSION['party']['id']) {
 
 	$_SESSION['party']['mission_id'] = $_POST['quest']['row'] * 1;
 
@@ -32,13 +39,8 @@ if (!empty($_SESSION['party'])) {
 		$socket->send(json_encode($zmq));
 	}
 }
-// notify party
-$zmq = new stdClass();
-$zmq->msg = $_SESSION['ng2']['name'] . ' has embarked into ' . $_SESSION['quest']['zone'] . '.';
-$zmq->route = 'chat->log';
-$zmq->class = 'chat-warning';
-$zmq->category = 'party:'. $_SESSION['party']['id'];
-$socket->send(json_encode($zmq));
+
+require 'send-party-embark-message.php';
 
 $r['quest'] = $_SESSION['quest']['row'];
 

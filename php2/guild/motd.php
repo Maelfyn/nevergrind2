@@ -11,7 +11,7 @@ if (!empty($_SESSION['guild']) &&
 	$stmt->execute();
 
 	// notify guild members
-	require '../zmq.php';
+	require_once '../zmq.php';
 	$zmq = new stdClass();
 	$zmq->msg = $_SESSION['ng2']['name'] . ' has set a new message of the day:<br>' . $_POST['msg'];
 	$zmq->route = 'guild->motd';

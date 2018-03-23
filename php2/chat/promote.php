@@ -3,7 +3,7 @@ require '../header.php';
 require '../db.php';
 
 // not leading a party yet
-if (!empty($_SESSION['party']) ) {
+if ($_SESSION['party']['id']) {
 	// set all to non-leader
 	$stmt = $link->prepare('update ng2_parties set is_leader=0 where p_id=?');
 	$stmt->bind_param('i', $_SESSION['party']['id']);
@@ -15,7 +15,7 @@ if (!empty($_SESSION['party']) ) {
 	$stmt->execute();
 
 	// notify party members
-	require '../zmq.php';
+	require_once '../zmq.php';
 	$zmq = new stdClass();
 	$zmq->row = $_SESSION['ng2']['row'];
 	$zmq->name = $_POST['name'];

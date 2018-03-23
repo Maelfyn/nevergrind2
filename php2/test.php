@@ -57,15 +57,11 @@
 	// details object data
 	echo '<pre>$_SESSION[account]'; var_dump($_SESSION['account']); echo '</pre>';
 	echo '<pre>$_SESSION[ng2]'; var_dump($_SESSION['ng2']); echo '</pre>';
+
 	echo '<pre>$_SESSION[party]'; var_dump($_SESSION['party']); echo '</pre>';
 	echo '<pre>$_SESSION[guild] '; var_dump($_SESSION['guild']); echo '</pre>';
 
-	if (!empty($_SESSION['quest'])) {
-		echo '<pre>$_SESSION[quest] '; var_dump($_SESSION['quest']); echo '</pre>';
-	}
-	else {
-		echo "QUEST EMPTY<br>";
-	}
+	echo '<pre>$_SESSION[quest] '; var_dump($_SESSION['quest']); echo '</pre>';
 
 	$test = [
 		//'id' => 5
@@ -77,7 +73,7 @@
 	else {
 		echo "<br>IT IS NOT EMPTY!";
 	}
-	if (empty($_SESSION['party'])) {
+	if (!$_SESSION['party']['id']) {
 		echo "<br>party IS EMPTY!";
 	}
 	else {

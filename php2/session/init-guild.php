@@ -1,7 +1,7 @@
 <?php
-$r['guild'] = [
+$_SESSION['guild'] = [
 	'id' => 0,
-	'rank' => '',
+	'rank' => 0,
 	'memberNumber' => 0,
 	'motd' => '',
 	'members' => 0,

@@ -3,15 +3,14 @@ require '../header.php';
 require('../db.php');
 
 // not leading a party yet
-if (!empty($_SESSION['party']) &&
-	isset($_SESSION['party']['id']) ) {
+if ($_SESSION['party']['id']) {
 	// delete from party
 	$stmt = $link->prepare('delete from ng2_parties where c_id=?');
 	$stmt->bind_param('s', $_SESSION['ng2']['row']);
 	$stmt->execute();
 
 	// notify party members
-	require '../zmq.php';
+	require_once '../zmq.php';
 	$zmq = new stdClass();
 	$zmq->row = $_SESSION['ng2']['row'];
 	$zmq->route = 'party->disband';
@@ -20,7 +19,8 @@ if (!empty($_SESSION['party']) &&
 	$socket->send(json_encode($zmq));
 
 	// set party session values
-	$_SESSION['party'] = [];
+	require '../session/init-party.php';
+	require '../session/init-quest.php';
 	echo json_encode($r);
 }
 else {

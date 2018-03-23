@@ -40,7 +40,7 @@ $stmt->execute();
 require '../guild/getGuildData.php';
 
 // notify party
-require '../zmq.php';
+require_once '../zmq.php';
 $zmq = new stdClass();
 $zmq->msg = $_SESSION['ng2']['name'] . ' has joined ' . $_POST['guildName'] .'.';
 $zmq->route = 'guild->hasJoined';

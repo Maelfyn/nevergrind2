@@ -9,7 +9,7 @@ var route = {
 				chat.log(data.msg, data.class);
 			}
 			else {
-				console.warn("Message from " + data.name + " has been ignored.");
+				console.info("Message from " + data.name + " has been ignored.");
 			}
 		}
 		else if (r === 'chat->add') {
@@ -26,6 +26,9 @@ var route = {
 		}
 		else if (r === 'party->updateBars') {
 			bar.updateBars(data);
+		}
+		else if (r === 'party->notifyMissionStatus') {
+			party.notifyMissionStatus(data);
 		}
 		else if (r === 'party->missionUpdate') {
 			party.missionUpdate(data);

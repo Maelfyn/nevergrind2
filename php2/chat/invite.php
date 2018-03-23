@@ -24,8 +24,7 @@ if (is_null($r['id']) ) {
 // notify if null (not in a party)
 if (is_null($r['c_id'])) {
 
-	// not leading a party yet
-	if (!empty($_SESSION['party']) ) {
+	if ($_SESSION['party']['id']) {
 		// party has been created
 		if (!$_SESSION['party']['isLeader']) {
 			// must be leader to invite
@@ -35,7 +34,7 @@ if (is_null($r['c_id'])) {
 	else {
 		// create new party with me as leader
 		$newParty = 1;
-		$_SESSION['party'] = [];
+		require '../session/init-party.php';
 		$stmt = mysqli_query($link,
 			'insert into ng2_parties (is_leader, c_id, hp, maxHp, mp, maxMp) VALUES (1, '. $_SESSION['ng2']['row'] .', '.
 			$_SESSION['ng2']['hp'] .', '.
@@ -54,11 +53,12 @@ if (is_null($r['c_id'])) {
 		);
 	}
 	// send invite
-	require '../zmq.php';
+	require_once '../zmq.php';
 	$zmq = new stdClass();
 	$zmq->row = $_SESSION['party']['id'];
 	$zmq->msg = $_SESSION['ng2']['name'] . ' has invited you to join his party.';
 	$zmq->name = $_SESSION['ng2']['name'];
+	$zmq->cId = $_SESSION['ng2']['row'];
 	$zmq->action = 'party-invite';
 	$zmq->css = 'prompt-party-invite';
 	$zmq->category = 'name:'. $_POST['player'];

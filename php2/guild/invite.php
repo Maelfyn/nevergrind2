@@ -40,7 +40,7 @@ if (is_null($r['c_id'])) {
 		}
 	}
 	// send guild invite
-	require '../zmq.php';
+	require_once '../zmq.php';
 	$zmq = new stdClass();
 	$zmq->row = $_SESSION['guild']['id'];
 	$zmq->msg = $_SESSION['ng2']['name'] . ' has invited you to join the guild: '. $_SESSION['guild']['name'];

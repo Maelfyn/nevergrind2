@@ -1,6 +1,6 @@
 // test methods
 var mob = {
-	test: 0, // used to enable test mode to show all animations looping
+	test: 1, // used to enable test mode to show all animations looping
 	imageKeysLen: 0,
 	index: 0,
 	cache: {},
