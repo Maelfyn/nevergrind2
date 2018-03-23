@@ -1029,12 +1029,11 @@ var ng = {
 
 			var h = location.hash;
 			if (app.isLocal) {
-				// hastag routing
-				if (h === '#town') {
+				// initial hashtag routing
+				if (h === '#town' ||
+					h === '#battle' ||
+					h === '#dungeon') {
 					town.go();
-				}
-				else if (h === '#battle') {
-					battle.go();
 				}
 			}
 		});
@@ -1242,7 +1241,9 @@ var my = {
 				location.reload();
 			});
 		}
-	}
+	},
+	selectedQuest: '',
+	quest: {},
 };
 // dom.js
 var dom;
@@ -1618,6 +1619,7 @@ var game = {
 	},
 	heartbeat: {
 		timer: 0,
+		fails: 0,
 		start: function() {
 			game.heartbeat.send();
 			clearTimeout(game.heartbeat.timer);
@@ -1625,19 +1627,28 @@ var game = {
 		},
 		send: function() {
 			clearTimeout(game.heartbeat.timer);
-			console.info("%c Last heartbeat send: ", "background: #ff0", Date.now() - game.ping.start);
+			console.info("%c Last heartbeat interval: ", "background: #ff0", Date.now() - game.ping.start);
 			game.ping.start = Date.now();
 			$.ajax({
 				type: 'GET',
 				url: app.url + 'php2/heartbeat.php'
-			}).done(function () {
+			}).done(function (data) {
+				if (game.heartbeat.fails) {
+					// this does nothing right now
+					game.resync();
+				}
+				game.heartbeat.fails = 0;
 				console.info("%c Ping: ", 'background: #0f0', game.ping.oneWay());
+				// console.info("HB DATA: ", data);
+				data.name = my.name;
+				bar.updateBars(data);
+			}).fail(function(data){
+				game.heartbeat.fails++;
+				game.heartbeat.fails > 2 && ng.disconnect(data.responseText);
+			}).always(function() {
 				game.heartbeat.timer = setTimeout(function() {
 					game.heartbeat.send();
 				}, 5000);
-			}).fail(function(data){
-				console.info(data);
-				ng.disconnect(data.responseText);
 			});
 		}
 	},
@@ -1757,11 +1768,13 @@ var game = {
 			chat.broadcast.remove();
 			if (my.p_id) {
 				// boot from party
+				/*
 				socket.zmq.publish('party:' + my.p_id, {
 					id: my.row,
 					name: my.name,
 					route: 'party->bootme'
 				});
+				*/
 			}
 			// notify friends
 			socket.zmq.publish('friend:' + my.name, {
@@ -1770,6 +1783,9 @@ var game = {
 			});
 			socket.zmq.close();
 		}
+	},
+	resync: function() {
+		// do nothing!
 	},
 	getGameState: function(){
 	},
@@ -2066,29 +2082,12 @@ $(document).on(env.click, function(e){
 			// key input view router
 			if (key === 'b') {
 				battle.go();
-				TweenMax.set('#chat-present-wrap', {
-					display: 'none'
-				});
-				TweenMax.set('#chat-wrap', {
-					height: '25vh',
-					width: '35vw'
-				});
-				TweenMax.set('#chat-log-wrap', {
-					flexBasis: '100%'
-				});
 			}
 			else if (key === 't') {
 				town.go();
-				TweenMax.set('#chat-present-wrap', {
-					display: 'flex'
-				});
-				TweenMax.set('#chat-wrap', {
-					height: '50vh',
-					width: '50vw'
-				});
-				TweenMax.set('#chat-log-wrap', {
-					flexBasis: '70%'
-				});
+			}
+			else if (key === 'd') {
+				dungeon.go();
 			}
 		}
 	}
@@ -2210,7 +2209,7 @@ var socket = {
 		try {
 			socket.zmq.unsubscribe(channel);
 		} catch(err) {
-			console.warn(err);
+			console.info(err);
 		}
 	},
 	joinGame: function(){
@@ -2303,7 +2302,7 @@ var socket = {
 		}, function (code, reason) {
 			console.info('Websocket connection closed. Code: '+code+'; reason: '+reason);
 			// on close/fail
-			console.warn('WebSocket connection failed. Retrying...');
+			console.debug('WebSocket connection failed. Retrying...');
 			socket.enabled = 0;
 			setTimeout(socket.init, 100);
 		}, {
@@ -2375,7 +2374,7 @@ var socket = {
 		my.p_id = row;
 		console.info("subscribing to channel: ", party);
 		socket.zmq.subscribe(party, function(topic, data) {
-			console.info('party rx ', topic, data);
+			// console.info('party rx ', topic, data);
 			if (data.route === 'chat->log') {
 				route.town(data, data.route);
 			}
@@ -2902,17 +2901,21 @@ var chat = {
 		}
 	},
 	disband: function() {
-		if (my.p_id) {
-			$.ajax({
-				type: 'GET',
-				url: app.url + 'php2/chat/disband.php'
-			}).done(function(r){
-				console.info('disband ', r);
-				bar.disband();
-			}).fail(function(r) {
-				chat.log(r.responseText, 'chat-warning');
-			});
-		}
+		$.ajax({
+			type: 'GET',
+			url: app.url + 'php2/chat/disband.php'
+		}).done(function(r){
+			// console.info('disband ', r);
+			if (my.p_id) {
+				my.quest.level && ng.msg('Quest abandoned: '+ my.quest.title);
+			}
+			mission.initQuest();
+			bar.disband();
+		}).fail(function(r) {
+			chat.log(r.responseText, 'chat-warning');
+		}).always(function() {
+			ng.unlock();
+		});
 	},
 	boot: function(name, bypass) {
 		console.info('/promote ', name, bypass);
@@ -3004,6 +3007,7 @@ var chat = {
 					'<span data-row="'+ data.row +'" '+
 						'data-id="'+ id +'" '+
 						'data-action="'+ data.action +'" '+
+						'data-c-id="'+ data.cId +'" '+
 						'data-guild-name="'+ data.guildName +'" '+
 						'class="chat-prompt-btn chat-prompt-yes">'+
 						'<i class="fa fa-check chat-prompt-yes-icon"></i>&thinsp;Confirm'+
@@ -3066,7 +3070,8 @@ var chat = {
 			$.ajax({
 				url: app.url + 'php2/chat/party-join.php',
 				data: {
-					row: z.row
+					row: z.row,
+					cId: z.cId
 				}
 			}).done(function(data){
 				console.info("party-join.php ", data);
@@ -3352,7 +3357,7 @@ var chat = {
 		},
 	},
 	scrollBottom: function(){
-		if (!chat.isClicked){
+		if (!chat.isClicked && chat.initialized){
 			chat.dom.chatLog.scrollTop = chat.dom.chatLog.scrollHeight;
 		}
 	},
@@ -3472,6 +3477,32 @@ var chat = {
 				row: my.row
 			});
 		}
+	},
+	size: {
+		small: function() {
+			TweenMax.set('#chat-present-wrap', {
+				display: 'none'
+			});
+			TweenMax.set('#chat-wrap', {
+				height: '25vh',
+				width: '35vw'
+			});
+			TweenMax.set('#chat-log-wrap', {
+				flexBasis: '100%'
+			});
+		},
+		large: function() {
+			TweenMax.set('#chat-present-wrap', {
+				display: 'flex'
+			});
+			TweenMax.set('#chat-wrap', {
+				height: '50vh',
+				width: '50vw'
+			});
+			TweenMax.set('#chat-log-wrap', {
+				flexBasis: '70%'
+			});
+		}
 	}
 };
 var bar = {
@@ -3565,6 +3596,20 @@ var bar = {
 		bar.setHp(index, delay);
 		bar.setMp(index, delay);
 	},
+	updateBars: function(data) {
+		for (var i=0, len=my.party.length; i<len; i++) {
+			if (data.name === my.party[i].name) {
+				if (data.hp) {
+					my.party[i].hp = data.hp;
+					bar.setHp(i);
+				}
+				if (data.mp) {
+					my.party[i].mp = data.mp;
+					bar.setMp(i);
+				}
+			}
+		}
+	},
 	setHp: function(index, delay) {
 		if (!my.party[index].name) return;
 		var percent = ~~((my.party[index].hp / my.party[index].maxHp) * 100) + '%',
@@ -3647,7 +3692,7 @@ var bar = {
 				type: 'GET',
 				url: app.url + 'php2/chat/party-get-all.php'
 			}).done(function (data) {
-				console.info('getParty ', data.party);
+				console.info('getParty ', data);
 				var npIndex = 1;
 				data.party.forEach(function(v, i){
 					console.info('SET BARS ', i, v);
@@ -3665,15 +3710,12 @@ var bar = {
 				// hide empty rows
 				var len = data.party.length;
 				for (var i=len; i<game.maxPlayers; i++) {
-					document.getElementById('bar-player-wrap-' + i).style.display = 'none';
-					my.party[i] = my.Party();
+					if (i) {
+						// never overwrite self
+						document.getElementById('bar-player-wrap-' + i).style.display = 'none';
+						my.party[i] = my.Party();
+					}
 				}
-				// continue here
-				// TODO: /disband remove bar when person leaves party
-				// TODO: leader leaves? New leader logic
-				// TODO: add/remove people from party
-				// TODO: /promote leader
-
 			});
 		}
 	},
@@ -3688,7 +3730,7 @@ var bar = {
 		// update server
 		socket.unsubscribe('party:'+ my.p_id);
 		my.p_id = 0;
-		my.isLeader = 0;
+		my.party[0].isLeader = 0;
 		document.getElementById('bar-is-leader-0').style.display = 'none';
 	},
 	hideParty: function() {
@@ -3700,7 +3742,7 @@ var bar = {
 	},
 	heartbeat: {
 		receive: function(data) {
-			console.info('heartbeat.receive', data);
+			console.info('%c heartbeat.receive id:', "background: #0ff", data.id);
 			var index = 0;
 			for (var i=1; i<6; i++) {
 				if (data.id === my.party[i].id) {
@@ -3725,6 +3767,16 @@ var bar = {
 // battle
 var battle = {
 	go: function(){
+		TweenMax.set('#chat-present-wrap', {
+			display: 'none'
+		});
+		TweenMax.set('#chat-wrap', {
+			height: '25vh',
+			width: '35vw'
+		});
+		TweenMax.set('#chat-log-wrap', {
+			flexBasis: '100%'
+		});
 		mob.init();
 		ng.setScene('battle');
 	},
@@ -3786,8 +3838,8 @@ var battle = {
 		//for (var i=2; i<3; i++){
 			var m = mobs[i],
 				//mobKey = mob.getRandomMobKey();
-				mobKey = 'angler';
-			mob.preloadMob(mobKey);
+				mobKey = 'toadlok';
+			cache.preload.mob(mobKey);
 			m.type = mobKey;
 			mob.setMob(m);
 			mob.idle(m);
@@ -4184,8 +4236,8 @@ mobs.images = {
 		imgW: 900,
 		imgH: 1000,
 		imgCy: 400,
-		w: 720,
-		h: 800,
+		w: 630,
+		h: 700,
 		yFloor: -15,
 		yoyo: true,
 		cache: [],
@@ -4953,7 +5005,7 @@ mobs.images = {
 };
 // test methods
 var mob = {
-	test: 1,
+	test: 1, // used to enable test mode to show all animations looping
 	imageKeysLen: 0,
 	index: 0,
 	cache: {},
@@ -4961,14 +5013,6 @@ var mob = {
 	getRandomMobKey: function(){
 		var i = ~~(Math.random() * mob.imageKeysLen);
 		return mob.imageKeys[i];
-	},
-	preloadMob: function(type){
-		if (!mobs.images[type].cache.length) {
-			for (var i = 1; i <= 105; i++) {
-				mobs.images[type].cache[i] = new Image();
-				mobs.images[type].cache[i].src = 'mobs/' + type + '/' + i + '.png';
-			}
-		}
 	},
 	initialized: 0,
 	max: 9,
@@ -5030,6 +5074,7 @@ var mob = {
 		m.dom.img.style.left = (w * -.5) + 'px';
 		m.dom.img.style.width = w + 'px';
 		m.dom.img.style.bottom = (mobs.images[m.type].yFloor * m.size) + 'px';
+		m.dom.img.src = 'mobs/' + m.type + '/1.png';
 		// details
 		TweenMax.set(m.dom.details, {
 			bottom: m.detailAliveBottom * m.size
@@ -5379,6 +5424,7 @@ var town = {
 	go: function(){
 		if (create.selected) {
 			ng.lock(1);
+			chat.size.large();
 			$.ajax({
 				url: app.url + 'php2/character/loadCharacter.php',
 				data: {
@@ -5394,8 +5440,15 @@ var town = {
 				my.level = z.level;
 				my.row = z.row;
 				my.party[0] = z;
+				my.party[0].isLeader = 0;
 				my.resetClientPartyValues(0);
 				my.guild = data.guild;
+				if (data.quest.level) {
+					// quest still active
+					mission.setQuest(data.quest);
+					my.zoneMobs = data.zoneMobs;
+				}
+
 				// init party member values
 				for (var i=1; i<game.maxPlayers; i++) {
 					my.party[i] = my.Party();
@@ -5407,12 +5460,38 @@ var town = {
 				chat.ignore.init();
 				// things that only happen once
 				chat.log("There are currently " + data.count + " players exploring Vandamor.", 'chat-emote');
-
+				// init town
 				town.init();
 				game.start();
 				chat.setRoom(data.players);
 				bar.init();
 
+				if (data.party !== undefined && data.party.id) {
+					// reload entire party state
+					data.party.id *= 1;
+					my.p_id = data.party.id;
+					(function repeat() {
+						if (socket.enabled) {
+							chat.party.subscribe(my.p_id);
+							bar.getParty();
+						}
+						else {
+							setTimeout(repeat, 100);
+						}
+					})();
+				}
+
+				// route to battle in local mode
+				if (app.isLocal) {
+					if (data.quest.level) {
+						if (location.hash === '#battle') {
+							battle.go();
+						}
+						else if (location.hash === '#dungeon') {
+							dungeon.go();
+						}
+					}
+				}
 			}).fail(function(data){
 				ng.disconnect(data.responseText);
 			}).always(function(){
@@ -5537,19 +5616,27 @@ var town = {
 				return s;
 			},
 			'town-mission': function() {
-				var s = '';
+				var s = mission.asideHtmlHead();
 				if (mission.loaded) {
+					// subsequent loads
 					s +=
 					'<div id="mission-counter" class="aside-frame text-shadow">';
 						s += mission.asideHtml();
 					s += '</div>';
+					setTimeout(function() {
+						mission.openFirstTwoZones();
+					}, 100);
 				}
 				else {
+					// first load
 					s +=
 						'<div id="mission-counter" class="aside-frame">' +
 							ng.loadMsg +
 						'</div>';
 					mission.init();
+				}
+				if (my.quest.level) {
+					s += mission.asideFooter();
 				}
 				return s;
 			}
@@ -5573,12 +5660,14 @@ var town = {
 				x: town.data[id].bg.x,
 				y: town.data[id].bg.y
 			});
+			if (id === 'town-mission') {
+				mission.resetMissionLists();
+			}
 			// create aside
 			var e = document.createElement('div');
 			e.className = 'town-aside text-shadow';
 			// set aside HTML
 			var html = town.aside.html[id](id);
-			console.info("HTML: ", html);
 			e.innerHTML = html;
 			document.getElementById('scene-town').appendChild(e);
 			// animate aside things
@@ -5749,6 +5838,7 @@ var town = {
 			p + 'rendo-surefoot.png',
 			p + 'surefall.jpg',
 			p + 'valeska-windcrest.png',
+			'img2/dungeon/braxxen1.jpg',
 		])
 	},
 };
@@ -6017,15 +6107,23 @@ var guild = {
 	}
 }
 var cache = {
-	images: [],
-	imageStrings: [],
+	images: [], // actual image in memory
+	imageStrings: [], // string values
 	audio: [],
 	audioStrings: [],
 	preload: {
+		mob: function(type) {
+			var a = [];
+			for (var i = 1; i <= 105; i++) {
+				a[i] = 'mobs/' + type + '/' + i + '.png';
+			}
+			cache.preload.images(a);
+		},
 		images: function(a) {
+			var e;
 			a.forEach(function(v){
-				if (!~cache.imageStrings.indexOf(v)) {
-					var e = new Image();
+				if (v && !~cache.imageStrings.indexOf(v)) {
+					e = new Image();
 					e.src = v;
 					cache.images.push(e);
 					cache.imageStrings.push(v);
@@ -6033,9 +6131,10 @@ var cache = {
 			});
 		},
 		audio: function(a){
+			var e;
 			a.forEach(function(v){
 				if (!~cache.audioStrings.indexOf(v)) {
-					var e = new Audio();
+					e = new Audio();
 					e.src = v;
 					cache.audio.push(e);
 					cache.audioStrings.push(v);
@@ -6069,7 +6168,7 @@ var route = {
 				chat.log(data.msg, data.class);
 			}
 			else {
-				console.warn("Message from " + data.name + " has been ignored.");
+				console.info("Message from " + data.name + " has been ignored.");
 			}
 		}
 		else if (r === 'chat->add') {
@@ -6083,6 +6182,15 @@ var route = {
 	party: function(data, r) {
 		if (r === 'party->hb') {
 			bar.heartbeat.receive(data);
+		}
+		else if (r === 'party->updateBars') {
+			bar.updateBars(data);
+		}
+		else if (r === 'party->notifyMissionStatus') {
+			party.notifyMissionStatus(data);
+		}
+		else if (r === 'party->missionUpdate') {
+			party.missionUpdate(data);
 		}
 		else if (r === 'party->linkdead') {
 			bar.heartbeat.linkdead(data);
@@ -6157,104 +6265,91 @@ var mission = {
 		{
 			name: 'Ashenflow Peak',
 			level: 35,
-			id: 16,
+			id: 14,
 			isOpen: 0
 		},
 		{
 			name: 'Galeblast Fortress',
 			level: 35,
-			id: 15,
+			id: 13,
 			isOpen: 0
 		},
 		{
 			name: 'Anuran Ruins',
 			level: 32,
-			id: 14,
+			id: 12,
 			isOpen: 0
 		},
 		{
 			name: 'Fahlnir Citadel',
 			level: 28,
-			id: 13,
+			id: 11,
 			isOpen: 0
 		},
 		{
 			name: 'Temple of Prenssor',
 			level: 24,
-			id: 12,
+			id: 10,
 			isOpen: 0
 		},
 		{
 			name: "Arcturin's Crypt",
 			level: 20,
-			id: 11,
+			id: 9,
 			isOpen: 0
 		},
 		{
 			name: 'Sylong Mausoleum',
 			level: 16,
-			id: 10,
+			id: 8,
 			isOpen: 0
 		},
 		{
 			name: 'Kordata Cove',
 			level: 12,
-			id: 9,
+			id: 7,
 			isOpen: 0
 		},
 		{
 			name: "Babel's Bastille",
 			level: 8,
-			id: 8,
+			id: 6,
 			isOpen: 0
 		},
 		{
 			name: 'Lanfeld Refuge',
 			level: 5,
-			id: 7,
+			id: 5,
 			isOpen: 0
 		},
 		{
 			name: 'Riven Grotto',
 			level: 5,
-			id: 6,
+			id: 4,
 			isOpen: 0
 		},
 		{
 			name: 'Greenthorn Cavern',
 			level: 5,
-			id: 5,
+			id: 3,
 			isOpen: 0
 		},
 		{
 			name: 'Tendolin Hollow',
 			level: 1,
-			id: 4,
+			id: 2,
 			isOpen: 0
 		},
 		{
 			name: 'Salubrin Den',
 			level: 1,
-			id: 3,
+			id: 1,
 			isOpen: 0
 		}
 	],
-	init: function() {
-		ng.lock();
-		$.ajax({
-			url: app.url + 'php2/mission/load-mission-data.php'
-		}).done(function(data) {
-			console.info('load-mission-data', data.mission);
-			mission.loaded = 1;
-			mission.data = data.mission;
-			mission.show();
-		}).fail(function(data){
-			ng.msg(data.responseText);
-		}).always(function(){
-			ng.unlock();
-		});
-		$("#scene-town").on(env.click, '.mission-zone', function() {
-			mission.loadMission($(this));
+	resetMissionLists: function() {
+		mission.zones.forEach(function(v) {
+			v.isOpen = 0;
 		});
 	},
 	getDiffClass: function(minQuestLvl) {
@@ -6279,32 +6374,149 @@ var mission = {
 		}
 		return resp;
 	},
+	init: function() {
+		ng.lock(1);
+		$.ajax({
+			url: app.url + 'php2/mission/load-mission-data.php'
+		}).done(function(data) {
+			console.info('load-mission-data', data.mission);
+			mission.loaded = 1;
+			mission.data = data.mission;
+			mission.show();
+			mission.openFirstTwoZones();
+			ng.unlock();
+		}).fail(function(data){
+			chat.log(data.responseText, 'chat-alert');
+			ng.unlock();
+		});
+		// delegation
+		$("#scene-town").on(env.click, '.mission-zone', function() {
+			mission.toggleZone($(this));
+		}).on(env.click, '.mission-quest-li', function() {
+			mission.clickQuest($(this));
+		}).on(env.click, '#mission-embark', function(){
+			mission.embark();
+		}).on(env.click, '#mission-abandon', function() {
+			mission.abandon();
+		});
+	},
+	showEmbark: function() {
+		$("#mission-help").css('display', 'none');
+		$("#mission-embark").css('display', 'block');
+	},
+	updateTitle: function() {
+		$("#mission-title").html(mission.quests[my.selectedQuest].title);
+	},
+	asideHtmlHead: function() {
+		var headMsg = 'Mission Counter',
+			helpMsg = 'The party leader must select a zone and embark to begin!',
+			embarkClass = 'none',
+			helpClass = 'block';
+
+		if (party.isSoloOrLeading()) {
+			// is solo or a leader
+			headMsg = 'Select A Mission';
+			helpMsg = 'Select a quest from any zone and embark to venture forth!';
+		}
+		if (my.quest.level) {
+			headMsg = my.quest.title;
+			embarkClass = 'block';
+			helpClass = 'none';
+		}
+
+		var s =
+		'<div id="mission-wrap" class="aside-frame text-center">' +
+			'<div id="mission-title">'+ headMsg +'</div>' +
+			'<div id="mission-embark" class="ng-btn '+ embarkClass +'">Embark!</div>' +
+			'<div id="mission-help" class=" '+ helpClass +'">'+ helpMsg +'</div>' +
+		'</div>';
+		return s;
+	},
 	asideHtml: function() {
-		var s = '<div>Mission Data</div>';
+		var s = '';
 		mission.zones.forEach(function(v) {
-			//if (my.level >= v.level) {
-				s += '<div class="mission-zone '+ mission.getDiffClass(v.level) +'" '+
+			if (my.level >= v.level) {
+				s +=
+				'<div class="mission-zone" '+
 				'data-id="'+ v.id +'">'+
-					'<span class="fa-stack fa fa-mission-stack">'+
+					'<div class="fa-stack fa fa-mission-stack">'+
 						'<i class="fa fa-square fa-stack-1x mission-plus-bg text-shadow"></i>'+
 						'<i class="fa fa-plus fa-stack-1x mission-plus text-shadow"></i>'+
-					'</span>' + v.name +'</div>' +
-					'<div id="mission-zone-'+ v.id +'" class="mission-quest-list">'+
-						ng.loadMsg +
-					'</div>'
-			//}
+					'</div>' +
+					'<div>' + v.name + '</div>' +
+				'</div>' +
+				'<div id="mission-zone-'+ v.id +'" class="mission-quest-list">'+
+					ng.loadMsg +
+				'</div>'
+			}
 		});
 		return s;
 	},
-	show: function() {
-		document.getElementById('mission-counter').innerHTML = mission.asideHtml();
+	asideFooter: function() {
+		var s = '';
+		if (party.isSoloOrLeading()) {
+			s +=
+			'<div id="mission-footer" class="aside-frame text-shadow">' +
+				'<div id="mission-abandon" class="ng-btn ng-btn-alert">Abandon Mission</div>' +
+			'</div>';
+		}
+		return s;
 	},
-	loadMission: function(that) {
-		console.info("ZONE ID: ", that.data('id'));
+	questHtml: function(data) {
+		console.info('load-zone-missions', data);
+		var str = '';
+		data.quests !== undefined &&
+		data.quests.forEach(function(v){
+			str +=
+				'<div class="mission-quest-li '+ mission.getDiffClass(v.level) +'" '+
+					'data-id="'+ v.row +'" ' +
+					'data-zone="'+ v.zone +'" ' +
+					'data-level="'+ v.level +'">' +
+					v.title +
+				'</div>';
+		});
+		if (!str) str = '<div class="mission-quest-li">No missions found.</div>';
+		$("#mission-zone-" + data.id).html(str);
+	},
+	show: function() {
+		$('#mission-counter').html(mission.asideHtml());
+	},
+	updateTitle: function() {
+		$("#mission-title").html(my.quest.title);
+	},
+	updateAll: function() {
+		$("#aside-menu").html(town.aside.menu['town-mission']());
+	},
+	loadQuests: function(id) {
+		// get quests from server side
+		// start with salubrin den
+		// store in session... return session if it's set for that zone
+		console.info("LOADING QUESTS: ", id);
+		ng.lock(1);
+		$.ajax({
+			url: app.url + 'php2/mission/load-zone-missions.php',
+			data: {
+				id: id
+			}
+		}).done(function(data) {
+			data.id = id;
+			ng.unlock();
+			console.info('load-zone-missions', data);
+			data.quests.forEach(function(v){
+				mission.quests[v.row] = v;
+			});
+			mission.questHtml(data);
+		}).fail(function(data){
+			ng.msg(data.responseText);
+			ng.unlock();
+		});
+	},
+	toggleZone: function(that) {
+		// console.info("toggleZone: ", that.data('id'), that.data('level'), that.data('zone'));
 		var index = mission.findIndexById(that.data('id') * 1),
 			id = mission.zones[index].id,
 			o = mission.zones[index];
-		console.info("isOpen: ", o.isOpen);
+		// console.info("isOpen: ", o.isOpen);
 		if (o.isOpen) {
 			// closed
 			var e = that.find('.mission-minus');
@@ -6321,7 +6533,6 @@ var mission = {
 			o.isOpen = 1;
 			mission.loadQuests(id);
 		}
-
 	},
 	findIndexById: function(id) {
 		var resp = 0;
@@ -6332,11 +6543,290 @@ var mission = {
 		});
 		return resp;
 	},
-	loadQuests: function(id) {
-		// get quests from server side
-		// start with salubrin den
-		// store in session... return session if it's set for that zone
-		console.info("LOADING QUESTS: ", id);
+	quests: [],
+	clickQuest: function(that) {
+		var id = that.data('id') * 1;
+		if (id && party.isSoloOrLeading()) {
+			my.selectedQuest = id;
+			console.info("QUEST SELECTED: ", id);
+			mission.showEmbark();
+			mission.updateTitle();
+		}
+		else {
+			// TODO: non-party member needs to see something... EMBARK?
+		}
+	},
+	embark: function() {
+		if (party.isSoloOrLeading()) {
+			ng.lock(1);
+			$.ajax({
+				url: app.url + 'php2/mission/embark-quest.php',
+				data: {
+					quest: mission.quests[my.selectedQuest]
+				}
+			}).done(function(data) {
+				console.info('embark isLeader! ', data);
+				mission.setQuest(mission.quests[my.selectedQuest]);
+				my.zoneMobs = data.zoneMobs;
+				dungeon.go();
+			}).fail(function(data){
+				ng.msg(data.responseText);
+			}).always(function() {
+				ng.unlock();
+			});
+		}
+		else {
+			// joining
+			if (my.quest.level) {
+				dungeon.go();
+				$.ajax({
+					url: app.url + 'php2/mission/notify-party-embarked.php'
+				}).done(function(data) {
+					console.info(data);
+				});
+			}
+			else {
+				chat.log("Quest data not found.", "chat-alert")
+			}
+		}
+	},
+	initQuest: function() {
+		my.selectedQuest = '';
+		my.quest = {};
+		mission.updateAll();
+	},
+	setQuest: function(quest) {
+		console.info("SETTING QUEST", quest);
+		my.selectedQuest = quest.row;
+		my.quest = quest;
+	},
+	abandon: function() {
+		if (my.quest.level && party.isSoloOrLeading()) {
+			ng.lock(1);
+			$.ajax({
+				url: app.url + 'php2/mission/abandon-quest.php'
+			}).done(function (data) {
+				console.info('abandon ', data);
+				mission.initQuest();
+			}).fail(function (data) {
+				chat.log(data.responseText, 'chat-alert');
+			}).always(function () {
+				ng.unlock();
+			});
+		}
+	},
+	openFirstTwoZones: function() {
+		for (var i=0; i<2; i++) {
+			var e = $(".mission-zone").eq(i).get(0);
+			if (e !== undefined) {
+				e.click();
+			}
+		}
+	}
+}
+var dungeon = {
+	go: function() {
+		chat.size.small();
+		ng.setScene('dungeon');
+		dungeon.init();
+		console.info("DUNGEON GO");
+	},
+	initialized: 0,
+	init: function() {
+		my.zoneMobs.forEach(function(v){
+			cache.preload.mob(v);
+		});
+		if (dungeon.initialized) {
+			document.getElementById('scene-dungeon').style.display = 'block';
+		}
+		else {
+			document.getElementById('scene-dungeon').innerHTML = dungeon.html();
+			battle.events();
+		}
+		chat.scrollBottom();
+	},
+	events: function() {
+
+	},
+	html: function() {
+		var s =
+		'<img id="dungeon-bg" class="img-bg" src="/img2/dungeon/braxxen1.jpg">' +
+
+		'</img>';
+
+		return s;
+	},
+	enterCombat: function() {
+		console.info("ENTERING COMBAT");
+	}
+}
+var skills = {
+	WAR: {
+		bash: function() {},
+		taunt: function() {},
+		kick: function() {},
+		demoralize: function() {}
+	},
+	PAL: {
+		layHands: function() {},
+		bash: function() {},
+		taunt: function() {},
+		heal: function() {},
+		blessedHammer: function() {},
+		smite: function() {},
+		resolution: function() {},
+		holyMight: function() {}
+	},
+	SHD: {
+		harmTouch: function() {},
+		bash: function() {},
+		taunt: function() {},
+		lifeTap: function() {},
+		engulfingDarkness: function() {},
+		bloodBoil: function() {},
+		invokeFear: function() {},
+		waveOfHorror: function() {}
+	},
+	RNG: {
+		trueshotStrike: function() {},
+		kick: function() {},
+		ensnare: function() {},
+		ignite: function() {},
+		faerieFlame: function() {},
+		carelessLightning: function() {},
+		healing: function() {},
+		feetLikeCat: function() {},
+	},
+	MNK: {
+		roundhouseKick: function() {},
+		mend: function() {},
+		feignDeath: function() {},
+		intimidation: function() {}
+	},
+	ROG: {
+		backstab: function() {},
+		evade: function() {},
+		widowStrike: function() {},
+		flashPowder: function() {}
+	},
+	DRU: {
+		healing: function() {},
+		starfire: function() {},
+		skinLikeWood: function() {},
+		driftingDeath: function() {},
+		tornado: function() {},
+		endureLightning: function() {},
+		lightningBlast: function() {},
+		chloroplast: function() {},
+	},
+	CLR: {
+		holyMight: function() {},
+		smite: function() {},
+		blessedHammer: function() {},
+		healing: function() {},
+		resolution: function() {},
+		symbolOfYentus: function() {},
+		endureBleed: function() {},
+		armorOfFaith: function() {},
+	},
+	SHM: {
+		healing: function() {},
+		frostRift: function() {},
+		devouringPlague: function() {},
+		drowsy: function() {},
+		spiritOfTheBear: function() {},
+		bloodRitual: function() {},
+		endureCold: function() {},
+		talismanOfTrogmaar: function() {},
+	},
+	BRD: {
+		chantOfBattle: function() {},
+		hymnOfRestoration: function() {},
+		boastfulBellow: function() {},
+		consonantChain: function() {},
+		lucidLullaby: function() {},
+		elementalRhythms: function() {},
+		chorusOfClarity: function() {},
+		sirensSong: function() {},
+	},
+	NEC: {
+		engulfingDarkness: function() {},
+		invokeDeath: function() {},
+		venomBolt: function() {},
+		bloodBoil: function() {},
+		invokeFear: function() {},
+		lifeTap: function() {},
+		endurePoison: function() {},
+		dyingBreath: function() {},
+	},
+	ENC: {
+		discordantMind: function() {},
+		colorShift: function() {},
+		alacrity: function() {},
+		dazzle: function() {},
+		gaspingEmbrace: function() {},
+		clarity: function() {},
+		cajolingWhispers: function() {},
+		mysticRune: function() {},
+	},
+	MAG: {
+		lavaBolt: function() {},
+		summonElemental: function() {},
+		frozenOrb: function() {},
+		elementalFury: function() {},
+		psionicStorm: function() {},
+		malaise: function() {},
+		endureFire: function() {},
+		stasisField: function() {},
+	},
+	WIZ: {
+		iceBolt: function() {},
+		arcaneMissiles: function() {},
+		manaShield: function() {},
+		fireball: function() {},
+		viziersShielding: function() {},
+		lightningStrike: function() {},
+		glacialSpike: function() {},
+		mirrorImages: function() {},
+	},
+}
+var zone = {
+}
+var party = {
+	missionUpdate: function (data) {
+		console.info("MISSION UPDATE! ", data);
+		mission.setQuest(data.quest);
+		my.zoneMobs = data.zoneMobs;
+		if (my.p_id && !my.party[0].isLeader) {
+			$.ajax({
+				data: {
+					quest: data.quest
+				},
+				url: app.url + 'php2/mission/update-quest.php'
+			}).done(function (data) {
+				console.info('missionUpdate ', data);
+				town.aside.selected === 'town-mission' && mission.showEmbark();
+				mission.updateTitle();
+			});
+		}
+	},
+	length: function() {
+		var count = 0;
+		my.party.forEach(function(v) {
+			if (v.name) count++;
+		});
+		return count;
+	},
+	isSoloOrLeading: function() {
+		var leading = 0;
+		var partyLen = party.length();
+		if (partyLen === 1 || partyLen > 1 && my.party[0].isLeader) {
+			leading = 1;
+		}
+		return leading;
+	},
+	notifyMissionStatus: function(data) {
+		ng.msg(data.msg, 6);
 	}
 }
 // test methods
