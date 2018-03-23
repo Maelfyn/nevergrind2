@@ -6945,5 +6945,6 @@ var test = {
 	Array,
 	JSON,
 	Date,
-	Object
+	Object,
+	undefined
 );
