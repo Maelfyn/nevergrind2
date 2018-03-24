@@ -6,7 +6,7 @@ var game = {
 		timer: 0
 	},
 	ping: {
-		start: 0,
+		start: Date.now(),
 		oneWay: function() {
 			return ~~((Date.now() - game.ping.start) / 2);
 		},
@@ -30,12 +30,13 @@ var game = {
 		timer: 0,
 		fails: 0,
 		start: function() {
-			game.heartbeat.send();
-			clearTimeout(game.heartbeat.timer);
+			$.ajax({
+				type: 'GET',
+				url: app.url + 'php2/heartbeat.php'
+			});
 			game.heartbeat.send();
 		},
 		send: function() {
-			clearTimeout(game.heartbeat.timer);
 			console.info("%c Last heartbeat interval: ", "background: #ff0", Date.now() - game.ping.start);
 			game.ping.start = Date.now();
 			$.ajax({
@@ -55,18 +56,16 @@ var game = {
 				game.heartbeat.fails++;
 				game.heartbeat.fails > 2 && ng.disconnect(data.responseText);
 			}).always(function() {
-				game.heartbeat.timer = setTimeout(function() {
-					game.heartbeat.send();
-				}, 5000);
+				setTimeout(game.heartbeat.send, 5000);
 			});
 		}
 	},
 	socket: {
 		timer: 0,
 		sendTime: Date.now(),
-		receiveTime: Date.now(),
 		timeout: 25000,
 		interval: 20000,
+		checkTolerance: 1000,
 		start: function() {
 			clearInterval(game.socket.timer);
 			game.socket.timer = setInterval(game.socket.send, game.socket.interval);
@@ -75,13 +74,17 @@ var game = {
 			console.info("%c Last socket send: ", "background: #0ff", Date.now() - game.socket.sendTime);
 			game.socket.sendTime = Date.now();
 			socket.zmq.publish('hb:' + my.name, {});
-			setTimeout(function(){
-				console.info("%c Socket ping: ", "background: #08f", game.socket.getDifference());
-				game.socket.getDifference() > game.socket.interval + 1000 && ng.disconnect();
-			}, 1000);
+		},
+		checkDifference: function() {
+			var diff = game.socket.getDifference();
+			console.info("%c Socket ping: ", "background: #08f", diff);
+			// longer than interval plus checkTolerance? disconnect (failed 2x)
+			if (diff > game.socket.interval + game.socket.checkTolerance) {
+				ng.disconnect();
+			}
 		},
 		getDifference: function() {
-			return Date.now() - game.socket.receiveTime;
+			return Date.now() - game.socket.sendTime;
 		}
 	},
 	played: {
