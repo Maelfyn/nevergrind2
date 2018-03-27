@@ -16,8 +16,18 @@ $stmt->execute();
 $stmt->bind_result($rank, $g_id, $member_number, $motd, $members, $name);
 // default value
 require '../session/init-guild.php';
+
+$r['guild'] = [
+	'id' => 0,
+	'rank' => 0,
+	'memberNumber' => 0,
+	'motd' => '',
+	'members' => 0,
+	'name' => ''
+];
 // assigned if exists
-while($stmt->fetch()){
+while($stmt->fetch()) {
+	$found = 1;
 	$r['guild'] = [
 		'id' => $g_id,
 		'rank' => $rank,

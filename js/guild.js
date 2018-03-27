@@ -240,6 +240,7 @@ var guild = {
 			type: 'GET',
 			url: app.url + 'php2/guild/get-member-list.php'
 		}).done(function (data) {
+			console.info(data);
 			setTimeout(function(){
 				guild.setGuildList(data);
 			}, throttleTime);

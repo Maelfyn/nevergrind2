@@ -71,8 +71,8 @@ var battle = {
 		for (var i=0; i<mob.max; i++){
 		//for (var i=2; i<3; i++){
 			var m = mobs[i],
-				//mobKey = mob.getRandomMobKey();
-				mobKey = 'toadlok';
+				mobKey = mob.getRandomMobKey();
+				// mobKey = 'toadlok';
 			cache.preload.mob(mobKey);
 			m.type = mobKey;
 			mob.setMob(m);

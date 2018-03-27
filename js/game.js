@@ -37,7 +37,7 @@ var game = {
 			game.heartbeat.send();
 		},
 		send: function() {
-			console.info("%c Last heartbeat interval: ", "background: #ff0", Date.now() - game.ping.start);
+			console.info("%c Last heartbeat interval: ", "background: #ff0", Date.now() - game.ping.start +'ms');
 			game.ping.start = Date.now();
 			$.ajax({
 				type: 'GET',
@@ -48,7 +48,7 @@ var game = {
 					game.resync();
 				}
 				game.heartbeat.fails = 0;
-				console.info("%c Ping: ", 'background: #0f0', game.ping.oneWay());
+				console.info("%c Ping: ", 'background: #0f0', game.ping.oneWay() +'ms');
 				// console.info("HB DATA: ", data);
 				data.name = my.name;
 				bar.updateBars(data);
@@ -71,20 +71,19 @@ var game = {
 			game.socket.timer = setInterval(game.socket.send, game.socket.interval);
 		},
 		send: function() {
-			console.info("%c Last socket send: ", "background: #0ff", Date.now() - game.socket.sendTime);
+			// console.info("%c Last socket send: ", "background: #0ff", Date.now() - game.socket.sendTime);
 			game.socket.sendTime = Date.now();
 			socket.zmq.publish('hb:' + my.name, {});
 		},
 		checkDifference: function() {
-			var diff = game.socket.getDifference();
-			console.info("%c Socket ping: ", "background: #08f", diff);
+			console.info("%c Socket ping: ", "background: #08f", Date.now() - game.socket.sendTime + 'ms');
 			// longer than interval plus checkTolerance? disconnect (failed 2x)
-			if (diff > game.socket.interval + game.socket.checkTolerance) {
+			if (game.socket.isHealthy()) {
 				ng.disconnect();
 			}
 		},
-		getDifference: function() {
-			return Date.now() - game.socket.sendTime;
+		isHealthy: function() {
+			return Date.now() - game.socket.sendTime > game.socket.interval + game.socket.checkTolerance;
 		}
 	},
 	played: {
