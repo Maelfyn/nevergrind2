@@ -10,6 +10,7 @@ var my = {
 	p_id: 0,
 	leader: '',
 	isLeader: 0,
+	zoneMobs: [],
 	party: [],
 	guild: {
 		id: 0,

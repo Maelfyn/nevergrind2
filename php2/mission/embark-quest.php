@@ -15,32 +15,45 @@ $_SESSION['quest'] = [
 	'title' => $_POST['quest']['title'],
 	'description' => $_POST['quest']['description']
 ];
-
-$stmt = $link->prepare('update ng2_players set mission_id=? where id=?');
-$stmt->bind_param('ii', $mission_id, $_SESSION['ng2']['row']);
+$dungeon = 'dng:' . $_POST['quest']['zone'];
+$stmt = $link->prepare('update ng2_players set mission_id=?, zone=? where id=?');
+$stmt->bind_param('isi', $mission_id, $dungeon, $_SESSION['ng2']['row']);
 $stmt->execute();
+
+$_SESSION['ng2']['zone'] = '';
 
 require 'get-zone-mobs.php';
 
 require_once '../zmq.php';
 
-if ($_SESSION['party']['id']) {
-
-	$_SESSION['party']['mission_id'] = $_POST['quest']['row'] * 1;
-
-	if ($_SESSION['party']['isLeader']) {
-		// leader broadcasts mission update to party
-		// my.quest updates
-		$zmq = new stdClass();
-		$zmq->quest = $_SESSION['quest'];
-		$zmq->zoneMobs = $r['zoneMobs'];
-		$zmq->route = 'party->missionUpdate';
-		$zmq->category = 'party:'. $_SESSION['party']['id'];
-		$socket->send(json_encode($zmq));
-	}
+$_SESSION['party']['mission_id'] = $_POST['quest']['row'] * 1;
+if (!$_SESSION['party']['id'] || $_SESSION['party']['isLeader']) {
+	// solo/leader broadcasts mission update to party
+	// my.quest updates
+	$zmq = new stdClass();
+	$zmq->quest = $_SESSION['quest'];
+	$zmq->zoneMobs = $r['zoneMobs'];
+	$zmq->route = 'party->missionUpdate';
+	$zmq->category = 'party:'. $_SESSION['party']['id'];
+	$socket->send(json_encode($zmq));
 }
 
-require 'send-party-embark-message.php';
+$zmq = [
+	'msg' => $_SESSION['ng2']['name'] . ' has embarked into ' . $_SESSION['quest']['zone'],
+	'route' => 'chat->log',
+	'class' => 'chat-quest',
+	'category' => 'party:'. $_SESSION['party']['id']
+];
+$socket->send(json_encode($zmq));
+
+if ($_SESSION['party']['isLeader']) {
+	$zmq = [
+		'msg' => 'Mission started: ' . $_SESSION['quest']['title'],
+		'route' => 'party->notifyMissionStatus',
+		'category' => 'party:'. $_SESSION['party']['id']
+	];
+	$socket->send(json_encode($zmq));
+}
 
 $r['quest'] = $_SESSION['quest']['row'];
 

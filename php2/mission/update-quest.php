@@ -15,8 +15,11 @@ $_SESSION['quest'] = [
 	'description' => $_POST['quest']['description']
 ];
 
-$stmt = $link->prepare('update ng2_players set mission_id=? where id=?');
-$stmt->bind_param('ii', $mission_id, $_SESSION['ng2']['row']);
+$_SESSION['ng2']['zone'] = '';
+
+$dungeon = 'dng:' . $_POST['quest']['zone'];
+$stmt = $link->prepare('update ng2_players set mission_id=?, zone=? where id=?');
+$stmt->bind_param('isi', $mission_id, $dungeon, $_SESSION['ng2']['row']);
 $stmt->execute();
 
 if ($_SESSION['party']['id']) {

@@ -21,8 +21,14 @@ $newParty = 0;
 if (is_null($r['id']) ) {
 	exit("Player not found.");
 }
+
 // notify if null (not in a party)
 if (is_null($r['c_id'])) {
+
+	// cannot send invites from dungeon
+	if (!$_SESSION['ng2']['zone']) {
+		exit("You cannot invite adventurers from the depths of a dungeon.");
+	}
 
 	if ($_SESSION['party']['id']) {
 		// party has been created

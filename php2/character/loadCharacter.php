@@ -6,7 +6,7 @@
 
 	// are they already logged in?
 	if ($_SERVER["SERVER_NAME"] !== "localhost") {
-
+		// prevent double login
 		$query = 'SELECT count(row) count FROM ng2_players where account=? and timestamp > date_sub(now(), interval 15 second)';
 		$stmt = $link->prepare($query);
 		$stmt->bind_param('s', $_SESSION['account']);
@@ -52,6 +52,7 @@
 		$r['party']['id'] = $_SESSION['party']['id'];
 	}
 	// init session values
+	$priorZone = $_SESSION['ng2']['zone'];
 	require '../session/init-ng.php';
 	require '../session/init-guild.php';
 
@@ -158,11 +159,15 @@
 		require '../guild/getGuildData.php';
 
 		// get mission info
+		$cacheQuest = '';
 		$r['quest'] = [];
-		if (!empty($_SESSION['quest'])) {
+		if ($_SESSION['quest']['row']) {
+			$cacheQuest = $_SESSION['quest']['zone'];
 			$r['quest'] = $_SESSION['quest'];
 			require '../mission/get-zone-mobs.php';
 		};
+		// set zone from session
+		$r['dungeon'] = $cacheQuest;
 
 		echo json_encode($r);
 	}

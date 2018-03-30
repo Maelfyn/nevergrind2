@@ -1,23 +1,32 @@
 var bar = {
+	initialized: 0,
 	init: function() {
-		var e = document.getElementById('bar-wrap');
-		e.innerHTML = bar.html();
-		e.style.display = 'block';
+		if (!bar.initialized) {
+			bar.initialized = 1;
+			var e = document.getElementById('bar-wrap');
+			e.innerHTML = bar.html();
+			$(".bar-icons").tooltip({
+				animation: false
+			});
+			e.style.display = 'block';
 
-		for (var i=0; i<game.maxPlayers; i++) {
-			bar.setEvents(i);
+			for (var i = 0; i < game.maxPlayers; i++) {
+				bar.setEvents(i);
+			}
+			// draw all bars
+			bar.setAllBars();
+			// bar events
+			$("#bar-wrap").on(env.context, '.bar-col-icon', function (e) {
+				var id = $(this).attr('id'),
+					arr = id.split("-"),
+					slot = arr[3] * 1;
+
+				console.info(id, slot, my.party[slot].name);
+				context.getPartyMenu(my.party[slot].name);
+			}).on(env.click, '#bar-mission-abandon', function () {
+				mission.abandon();
+			});
 		}
-		// draw all bars
-		bar.setAllBars();
-		// bar events
-		$("#bar-wrap").on(env.context, '.bar-col-icon', function(e){
-			var id = $(this).attr('id'),
-				arr = id.split("-"),
-				slot = arr[3] * 1;
-
-			console.info(id, slot, my.party[slot].name);
-			context.getPartyMenu(my.party[slot].name);
-		});
 	},
 	setEvents: function(i) {
 		bar.dom[i] = {
@@ -44,15 +53,26 @@ var bar = {
 		}
 		return s;
 	},
+	header: function() {
+		var s = '';
+		s +=
+		'<div id="bar-header">' +
+			'<i id="bar-stats" class="fa fa-user-circle-o bar-icons" title="Stat Sheet"></i>' +
+			'<i id="bar-inventory" class="fa fa-suitcase bar-icons" title="Inventory"></i>' +
+			'<i id="bar-options" class="fa fa-gear bar-icons" title="Options"></i>' +
+			'<i id="bar-mission-abandon" class="fa fa-flag bar-icons" title="Abandon Mission"></i>' +
+		'</div>';
+		return s;
+	},
 	getPlayerInnerHtml: function(p, i) {
 		// inner portion of getPlayerHtml
 		var s =
 		'<div id="bar-col-icon-'+ i +'" class="bar-col-icon player-icon-'+ p.job +'">' +
-			'<div id="bar-level-'+ i +'" class="bar-level no-pointer">'+ p.level +'</div>' +
+			//'<div id="bar-level-'+ i +'" class="bar-level no-pointer">'+ p.level +'</div>' +
 			'<div id="bar-is-leader-'+ i +'" class="bar-is-leader '+ (p.isLeader ? 'block' : 'none') +' no-pointer"></div>' +
 		'</div>' +
-		'<div class="bar-col-data">' +
-			'<div id="bar-name-'+ i +'" class="bar-hp-name">'+ p.name +'</div>' +
+		'<div class="'+ (!i ? 'bar-col-data' : 'bar-col-data-sm') +'">' +
+			'<div id="bar-name-'+ i +'" class="bar-hp-name ellipsis">'+ p.name +'</div>' +
 			'<div id="bar-hp-wrap-'+ i +'" class="bar-any-wrap">' +
 				'<div id="bar-hp-fg-'+ i +'" class="bar-hp-fg"></div>' +
 				//'<div id="bar-hp-bg-'+ i +'" class="bar-any-bg"></div>' +
@@ -65,7 +85,7 @@ var bar = {
 	},
 	html: function() {
 		// my bar
-		var s = '';
+		var s = bar.header();
 		// party bars
 		for (var i=0; i<game.maxPlayers; i++) {
 			s += bar.getPlayerHtml(my.party[i], i);

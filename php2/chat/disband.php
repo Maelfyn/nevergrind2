@@ -9,7 +9,7 @@ if ($_SESSION['party']['id']) {
 	$stmt->bind_param('s', $_SESSION['ng2']['row']);
 	$stmt->execute();
 
-	// notify party members
+	// bars notify party members
 	require_once '../zmq.php';
 	$zmq = new stdClass();
 	$zmq->row = $_SESSION['ng2']['row'];
@@ -20,7 +20,10 @@ if ($_SESSION['party']['id']) {
 
 	// set party session values
 	require '../session/init-party.php';
-	require '../session/init-quest.php';
+	if ($_POST['count'] > 1) {
+		require '../session/init-quest.php';
+
+	}
 	echo json_encode($r);
 }
 else {

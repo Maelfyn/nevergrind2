@@ -22,9 +22,9 @@ else {
 	$stmt = $link->prepare('insert into ng2_players 
 			(`id`, `account`, `name`, `leader`, `level`, `race`, `job`, `zone`) 
 			values (?, ?, ?, ?, ?, ?, ?, ?) 
-			on duplicate key update timestamp=now(), name=?, leader=?, level=?, race=?, job=?, zone=?');
+			on duplicate key update timestamp=now(), leader=?');
 
-	$stmt->bind_param('isssisssssisss',
+	$stmt->bind_param('isssissss',
 		$_SESSION['ng2']['row'],
 		$_SESSION['account'],
 		$_SESSION['ng2']['name'],
@@ -33,12 +33,7 @@ else {
 		$_SESSION['ng2']['race'],
 		$_SESSION['ng2']['job'],
 		$_SESSION['ng2']['zone'],
-		$_SESSION['ng2']['name'],
-		$_SESSION['ng2']['leader'],
-		$_SESSION['ng2']['level'],
-		$_SESSION['ng2']['race'],
-		$_SESSION['ng2']['job'],
-		$_SESSION['ng2']['zone']);
+		$_SESSION['ng2']['leader']);
 
 	$stmt->execute();
 	// update ng2_chars

@@ -115,10 +115,14 @@ var game = {
 			},
 			send: function() {
 				console.info("Sending party heartbeats....");
-				socket.zmq.publish('party:' + my.p_id, {
-					id: my.row,
-					route: 'party->hb'
-				});
+				try {
+					socket.zmq.publish('party:' + my.p_id, {
+						id: my.row,
+						route: 'party->hb'
+					});
+				} catch (err) {
+					console.info('sanity.party.send', err);
+				}
 			},
 			check: function() {
 				var now = Date.now(),
@@ -199,6 +203,21 @@ var game = {
 		// do nothing!
 	},
 	getGameState: function(){
+	},
+	scenes: [
+		'scene-town',
+		'scene-dungeon',
+		'scene-battle'
+	],
+	emptyScenesExcept: function(scene) {
+		game.scenes.forEach(function(v) {
+			if (v === scene) {
+				document.getElementById(v).style.opacity = 0;
+			}
+			else {
+				document.getElementById(v).innerHTML = '';
+			}
+		});
 	},
 	getPetName:  function() {
 		var s1 = [

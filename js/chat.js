@@ -51,6 +51,15 @@ var chat = {
 			var mode = h === undefined ? (chat.dom.chatInput.value + ng.lastKey) : h.mode,
 				mode = mode.replace(/^\s+/g, '');
 
+			if (mode === '/say' && !my.channel) {
+				chat.log("You cannot communicate in town while in a dungeon", "chat-warning");
+				setTimeout(function() {
+					// wipe input after keyup to get rid of /say
+					$("#chat-input").val('');
+				});
+				return false;
+			}
+
 			// known standard mode
 			if (chat.mode.types.indexOf(mode) > -1) {
 				chat.mode.command = mode;
@@ -148,18 +157,19 @@ var chat = {
 				// console.info('id name ', playerId, name);
 				context.getChatMenu(name);
 			});
+			// dom cache
+			chat.dom.chatRoom = document.getElementById('chat-room');
+			chat.dom.chatHeader = document.getElementById('chat-header');
+			chat.dom.chatLog = document.getElementById('chat-log');
+			chat.dom.chatInput = document.getElementById('chat-input');
+			chat.dom.chatInputMode = document.getElementById('chat-input-mode');
+			chat.dom.chatModeMsg = document.getElementById('chat-mode-msg');
+			chat.dom.chatPrompt = document.getElementById('chat-prompt');
 		}
 		else {
-			// hide
+			// returned from dungeon
+			chat.clearChatLog();
 		}
-		// dom cache
-		chat.dom.chatRoom = document.getElementById('chat-room');
-		chat.dom.chatHeader = document.getElementById('chat-header');
-		chat.dom.chatLog = document.getElementById('chat-log');
-		chat.dom.chatInput = document.getElementById('chat-input');
-		chat.dom.chatInputMode = document.getElementById('chat-input-mode');
-		chat.dom.chatModeMsg = document.getElementById('chat-mode-msg');
-		chat.dom.chatPrompt = document.getElementById('chat-prompt');
 
 	},
 	// report to chat-log
@@ -357,14 +367,19 @@ var chat = {
 						chat.log("You are not in a guild.", 'chat-warning');
 					}
 					else {
-						$.ajax({
-							url: app.url + 'php2/chat/send.php',
-							data: {
-								msg: o.msg,
-								class: o.class,
-								category: o.category
-							}
-						});
+						if (o.category === 'ng2:') {
+							chat.log("You cannot communicate in town while in a dungeon", "chat-warning");
+						}
+						else {
+							$.ajax({
+								url: app.url + 'php2/chat/send.php',
+								data: {
+									msg: o.msg,
+									class: o.class,
+									category: o.category
+								}
+							});
+						}
 					}
 				}
 			}
@@ -499,21 +514,34 @@ var chat = {
 		}
 	},
 	disband: function() {
-		$.ajax({
-			type: 'GET',
-			url: app.url + 'php2/chat/disband.php'
-		}).done(function(r){
-			// console.info('disband ', r);
-			if (my.p_id) {
-				my.quest.level && ng.msg('Quest abandoned: '+ my.quest.title);
-			}
-			mission.initQuest();
-			bar.disband();
-		}).fail(function(r) {
-			chat.log(r.responseText, 'chat-warning');
-		}).always(function() {
-			ng.unlock();
-		});
+		if (ng.view === 'battle') {
+			chat.log("You cannot disband the party during battle!", "chat-warning");
+		}
+		else {
+			var count = my.partyCount();
+			$.ajax({
+				type: 'POST',
+				url: app.url + 'php2/chat/disband.php',
+				data: {
+					count: count
+				}
+			}).done(function(r){
+				// console.info('disband ', r);
+				if (count > 1) {
+
+				}
+				if (my.p_id) {
+					my.quest.level && ng.msg('Mission abandoned: '+ my.quest.title);
+				}
+				mission.initQuest();
+				bar.disband();
+				mission.abort();
+			}).fail(function(r) {
+				chat.log(r.responseText, 'chat-warning');
+			}).always(function() {
+				ng.unlock();
+			});
+		}
 	},
 	boot: function(name, bypass) {
 		console.info('/promote ', name, bypass);
@@ -540,6 +568,9 @@ var chat = {
 		else if (my.p_id && !my.party[0].isLeader) {
 			chat.log("Only the party leader may send invites.", "chat-warning");
 		}
+		else if (!my.channel) {
+			chat.log("You cannot invite adventurers from the depths of a dungeon.", "chat-warning");
+		}
 		else {
 			if (p) {
 				chat.log('Sent party invite to '+ p +'.', 'chat-warning');
@@ -554,7 +585,7 @@ var chat = {
 						my.party[0].isLeader = 1;
 						bar.updatePlayerBar(0);
 					}
-					chat.party.subscribe(r.p_id);
+					socket.initParty(r.p_id);
 				}).fail(function(r){
 					chat.log(r.responseText, 'chat-warning');
 				});
@@ -565,18 +596,23 @@ var chat = {
 		}
 	},
 	camp: function() {
-		chat.log('Camping...', 'chat-warning');
-		game.exit();
-		setTimeout(function(){
-			$.ajax({
-				type: 'GET',
-				url: app.url + 'php2/chat/camp.php'
-			}).done(function(){
-				location.reload();
-			}).fail(function(){
-				chat.log('Failed to camp successfully.', 'chat-alert');
-			});
-		}, 1000);
+		if (ng.view !== 'town') {
+			chat.log("You can only camp in town!", "chat-warning");
+		}
+		else {
+			chat.log('Camping...', 'chat-warning');
+			game.exit();
+			setTimeout(function(){
+				$.ajax({
+					type: 'GET',
+					url: app.url + 'php2/chat/camp.php'
+				}).done(function(){
+					location.reload();
+				}).fail(function(){
+					chat.log('Failed to camp successfully.', 'chat-alert');
+				});
+			}, 1000);
+		}
 	},
 	reply: function() {
 		console.info('chat.lastWhisper.name', chat.lastWhisper.name);
@@ -659,9 +695,6 @@ var chat = {
 		}
 	},
 	party: {
-		subscribe: function(row) {
-			socket.initParty(row);
-		},
 		join: function(z) {
 			// clicked CONFIRM
 			console.info('party.join: ', z);
@@ -674,7 +707,7 @@ var chat = {
 			}).done(function(data){
 				console.info("party-join.php ", data);
 				chat.log("You have joined the party.", "chat-warning");
-				chat.party.subscribe(z.row);
+				socket.initParty(z.row);
 				bar.getParty();
 			}).fail(function(data){
 				console.info("Oh no", data);
@@ -1070,10 +1103,14 @@ var chat = {
 		},
 		remove: function() {
 			console.info('broadcast.remove');
-			socket.zmq.publish(chat.getChannel(), {
-				route: 'chat->remove',
-				row: my.row
-			});
+			try {
+				socket.zmq.publish(chat.getChannel(), {
+					route: 'chat->remove',
+					row: my.row
+				});
+			} catch (err) {
+				console.info('broadcast.remove: ', err);
+			}
 		}
 	},
 	size: {

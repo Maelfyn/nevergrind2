@@ -168,15 +168,20 @@ var socket = {
 		var party = 'party:' + row;
 		my.p_id = row;
 		console.info("subscribing to channel: ", party);
-		socket.zmq.subscribe(party, function(topic, data) {
-			// console.info('party rx ', topic, data);
-			if (data.route === 'chat->log') {
-				route.town(data, data.route);
-			}
-			else {
-				route.party(data, data.route);
-			}
-		});
+		try {
+			// for some reason I need this when I rejoin town; whatever
+			socket.zmq.subscribe(party, function (topic, data) {
+				// console.info('party rx ', topic, data);
+				if (data.route === 'chat->log') {
+					route.town(data, data.route);
+				}
+				else {
+					route.party(data, data.route);
+				}
+			});
+		} catch (err) {
+			console.info('socket.initParty ', err);
+		}
 	},
 	initGuild: function() {
 		// subscribe to test guild for now

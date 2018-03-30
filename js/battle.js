@@ -1,18 +1,15 @@
 // battle
 var battle = {
 	go: function(){
-		TweenMax.set('#chat-present-wrap', {
-			display: 'none'
-		});
-		TweenMax.set('#chat-wrap', {
-			height: '25vh',
-			width: '35vw'
-		});
-		TweenMax.set('#chat-log-wrap', {
-			flexBasis: '100%'
-		});
+		if (ng.view === 'battle') return;
+		chat.size.small();
 		mob.init();
+		game.emptyScenesExcept('scene-battle');
 		ng.setScene('battle');
+		TweenMax.to('#scene-battle', .5, {
+			delay: .5,
+			opacity: 1
+		});
 	},
 	html: function(){
 		var s = '<img id="battle-bg" class="img-bg" src="img2/bg/fw2.jpg">';

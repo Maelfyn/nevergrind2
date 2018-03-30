@@ -13,6 +13,16 @@ var party = {
 				console.info('missionUpdate ', data);
 				town.aside.selected === 'town-mission' && mission.showEmbark();
 				mission.updateTitle();
+				chat.log("Now departing for " + my.quest.zone +"...", "chat-warning");
+				TweenMax.to('#scene-town', 3, {
+					startAt: { opacity: 1 },
+					delay: 2,
+					opacity: 0,
+					ease: Power4.easeOut
+				});
+				setTimeout(function() {
+					mission.embark();
+				}, 5000);
 			});
 		}
 	},
@@ -33,5 +43,8 @@ var party = {
 	},
 	notifyMissionStatus: function(data) {
 		ng.msg(data.msg, 6);
+		if (data.action === 'abandon') {
+			mission.abort();
+		}
 	}
 }

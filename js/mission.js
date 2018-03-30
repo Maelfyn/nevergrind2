@@ -319,16 +319,17 @@ var mission = {
 			// joining
 			if (my.quest.level) {
 				dungeon.go();
-				$.ajax({
+				/*$.ajax({
 					url: app.url + 'php2/mission/notify-party-embarked.php'
 				}).done(function(data) {
 					console.info(data);
-				});
+				});*/
 			}
 			else {
 				chat.log("Quest data not found.", "chat-alert")
 			}
 		}
+		$(".close-aside").trigger('click');
 	},
 	initQuest: function() {
 		my.selectedQuest = '';
@@ -341,19 +342,67 @@ var mission = {
 		my.quest = quest;
 	},
 	abandon: function() {
-		if (my.quest.level && party.isSoloOrLeading()) {
+		if (!my.quest.level) {
+			chat.log("You have not started a mission!", "chat-warning");
+		}
+		else if (!party.isSoloOrLeading()) {
+			chat.log("Only party leaders can abandon missions!", "chat-warning");
+		}
+		else if (ng.view === 'battle') {
+			chat.log("You cannot abandon missions while in combat!", "chat-warning");
+		}
+		else {
 			ng.lock(1);
 			$.ajax({
 				url: app.url + 'php2/mission/abandon-quest.php'
 			}).done(function (data) {
 				console.info('abandon ', data);
 				mission.initQuest();
+				mission.abort();
 			}).fail(function (data) {
 				chat.log(data.responseText, 'chat-alert');
 			}).always(function () {
-				ng.unlock();
+				setTimeout(function() {
+					ng.unlock();
+				}, 3000);
 			});
 		}
+	},
+	abort: function() {
+		setTimeout(function() {
+			chat.log('Mission abandoned!', 'chat-warning');
+			if (ng.view === 'dungeon') {
+				chat.log('Returning to town...', 'chat-warning');
+				ng.lock(1);
+				(function repeat(){
+					if (my.party[0].isLeader) {
+						mission.abortCallback();
+					}
+					else {
+						$.ajax({
+							type: 'GET',
+							url: app.url + 'php2/session/init-quest.php'
+						}).done(function(){
+							mission.abortCallback();
+						}).fail(function(){
+							repeat();
+						});
+					}
+				})();
+			}
+		});
+	},
+	abortCallback: function() {
+		TweenMax.to('#scene-dungeon', 2, {
+			delay: 1,
+			opacity: 0
+		});
+		setTimeout(function () {
+			ng.unlock();
+			town.go();
+			chat.broadcast.add();
+			chat.setHeader();
+		}, 3000);
 	},
 	openFirstTwoZones: function() {
 		for (var i=0; i<2; i++) {

@@ -1,6 +1,9 @@
 var town = {
 	go: function(){
+		if (ng.view === 'town') return;
 		if (create.selected) {
+			game.emptyScenesExcept('scene-town');
+			my.channel = 'town';
 			ng.lock(1);
 			chat.size.large();
 			$.ajax({
@@ -38,26 +41,46 @@ var town = {
 				chat.ignore.init();
 				// things that only happen once
 				chat.log("There are currently " + data.count + " players exploring Vandamor.", 'chat-emote');
-				// init town
+				// init town ?
+				document.getElementById('scene-town').innerHTML = town.html();
+				town.events();
+				$("#scene-title").remove();
 				town.init();
 				game.start();
 				chat.setRoom(data.players);
 				bar.init();
-
+				// I'm in a party!
 				if (data.party !== undefined && data.party.id) {
 					// reload entire party state
 					data.party.id *= 1;
 					my.p_id = data.party.id;
-					(function repeat() {
-						if (socket.enabled) {
-							chat.party.subscribe(my.p_id);
-							bar.getParty();
+				}
+				// await socket connect
+				(function repeat() {
+					if (socket.enabled) {
+						// stuff to do after the socket wakes up
+						socket.initParty(my.p_id);
+						bar.getParty();
+
+						// reveal scene based on session data
+						if (data.dungeon) {
+							dungeon.go();
 						}
 						else {
-							setTimeout(repeat, 100);
+							// town
+							TweenMax.to('#scene-town', .5, {
+								delay: .5,
+								opacity: 1,
+								onComplete: function() {
+									ng.unlock();
+								}
+							});
 						}
-					})();
-				}
+					}
+					else {
+						setTimeout(repeat, 100);
+					}
+				})();
 
 				// route to battle in local mode
 				if (app.isLocal) {
@@ -396,9 +419,6 @@ var town = {
 	init: function(){
 		if (!town.initialized) {
 			town.initialized = 1;
-			document.getElementById('scene-town').innerHTML = town.html();
-			town.events();
-			$("#scene-title").remove();
 			if (!sessionStorage.getItem('startTime')) {
 				sessionStorage.setItem('startTime', JSON.stringify(Date.now()));
 			}

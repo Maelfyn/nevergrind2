@@ -1,5 +1,6 @@
 <?php
-// notify party
+// notify party when non-party members embark
+// DEPRECATED: no longer valid since all embark together now
 if ($_SESSION['party']['id']) {
 	require_once '../zmq.php';
 	$zmq = [
