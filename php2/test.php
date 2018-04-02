@@ -11,14 +11,14 @@
 </style>
 <?php
 	require('db.php');
-$_SESSION['quest'] = [
-	'row' => 0,
-	'zone' => '',
-	'level' => 0,
-	'mob_id' => 0,
-	'title' => '',
-	'description' => ''
-];
+	$_SESSION['ng2']['hp'] = 1;
+	if ($_SESSION['ng2']['mp']) {
+		$_SESSION['ng2']['mp'] = 1;
+	}
+
+	echo '<pre>HP: '. $_SESSION['ng2']['hp'] .'</pre>';
+	echo '<pre>MP: '. $_SESSION['ng2']['mp'] .'</pre>';
+	echo '<pre>hpRegen: '. $_SESSION['ng2']['hpRegen'] .'</pre>';
 	$name = "DRAGONSOD''d fs 'fds df ds fds";
 	$arr = explode(" ", $name);
 	foreach ($arr as $key => &$value){
@@ -71,6 +71,7 @@ $_SESSION['quest'] = [
 
 	echo '<pre>$_SESSION[quest] '; var_dump($_SESSION['quest']); echo '</pre>';
 
+	echo '<pre>$_SESSION[timers]: '; var_dump($_SESSION['timers']); echo '</pre>';
 	$test = [
 		//'id' => 5
 	];

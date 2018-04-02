@@ -5,6 +5,7 @@ var game = {
 	session: {
 		timer: 0
 	},
+	questDelay: 3000,
 	ping: {
 		start: Date.now(),
 		oneWay: function() {
@@ -30,15 +31,12 @@ var game = {
 		timer: 0,
 		fails: 0,
 		start: function() {
-			$.ajax({
-				type: 'GET',
-				url: app.url + 'php2/heartbeat.php'
-			});
 			game.heartbeat.send();
 		},
 		send: function() {
 			console.info("%c Last heartbeat interval: ", "background: #ff0", Date.now() - game.ping.start +'ms');
 			game.ping.start = Date.now();
+			clearTimeout(game.heartbeat.timer);
 			$.ajax({
 				type: 'GET',
 				url: app.url + 'php2/heartbeat.php'
@@ -51,12 +49,13 @@ var game = {
 				console.info("%c Ping: ", 'background: #0f0', game.ping.oneWay() +'ms');
 				// console.info("HB DATA: ", data);
 				data.name = my.name;
+				console.info('heartbeatCallback', data);
 				bar.updateBars(data);
 			}).fail(function(data){
 				game.heartbeat.fails++;
-				game.heartbeat.fails > 2 && ng.disconnect(data.responseText);
+				game.heartbeat.fails > 1 && ng.disconnect(data.responseText);
 			}).always(function() {
-				setTimeout(game.heartbeat.send, 5000);
+				game.heartbeat.timer = setTimeout(game.heartbeat.send, 5000);
 			});
 		}
 	},

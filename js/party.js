@@ -22,7 +22,7 @@ var party = {
 				});
 				setTimeout(function() {
 					mission.embark();
-				}, 5000);
+				}, game.questDelay);
 			});
 		}
 	},

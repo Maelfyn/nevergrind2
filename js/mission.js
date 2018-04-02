@@ -1,6 +1,7 @@
 var mission = {
 	data: {},
 	loaded: 0,
+	delegated: 0,
 	zones: [
 		{
 			name: 'Ashenflow Peak',
@@ -130,15 +131,19 @@ var mission = {
 			ng.unlock();
 		});
 		// delegation
-		$("#scene-town").on(env.click, '.mission-zone', function() {
-			mission.toggleZone($(this));
-		}).on(env.click, '.mission-quest-li', function() {
-			mission.clickQuest($(this));
-		}).on(env.click, '#mission-embark', function(){
-			mission.embark();
-		}).on(env.click, '#mission-abandon', function() {
-			mission.abandon();
-		});
+		if (!mission.delegated) {
+			mission.delegated = 1;
+			$("#scene-town").on(env.click, '.mission-zone', function() {
+				console.info(".mission-zone CLICK");
+				mission.toggleZone($(this));
+			}).on(env.click, '.mission-quest-item', function() {
+				mission.clickQuest($(this));
+			}).on(env.click, '#mission-embark', function(){
+				mission.embark();
+			}).on(env.click, '#mission-abandon', function() {
+				mission.abandon();
+			});
+		}
 	},
 	showEmbark: function() {
 		$("#mission-help").css('display', 'none');
@@ -208,14 +213,14 @@ var mission = {
 		data.quests !== undefined &&
 		data.quests.forEach(function(v){
 			str +=
-				'<div class="mission-quest-li '+ mission.getDiffClass(v.level) +'" '+
+				'<div class="mission-quest-item '+ mission.getDiffClass(v.level) +'" '+
 					'data-id="'+ v.row +'" ' +
 					'data-zone="'+ v.zone +'" ' +
 					'data-level="'+ v.level +'">' +
 					v.title +
 				'</div>';
 		});
-		if (!str) str = '<div class="mission-quest-li">No missions found.</div>';
+		if (!str) str = '<div class="mission-quest-item">No missions found.</div>';
 		$("#mission-zone-" + data.id).html(str);
 	},
 	show: function() {
@@ -252,22 +257,24 @@ var mission = {
 		});
 	},
 	toggleZone: function(that) {
-		// console.info("toggleZone: ", that.data('id'), that.data('level'), that.data('zone'));
+		 console.info("toggleZone: ", that.data('id'));
 		var index = mission.findIndexById(that.data('id') * 1),
 			id = mission.zones[index].id,
 			o = mission.zones[index];
-		// console.info("isOpen: ", o.isOpen);
+		console.info('JSON ', JSON.parse(JSON.stringify(o)));
+		console.info(index, "isOpen: ", o.isOpen);
 		if (o.isOpen) {
-			// closed
+			// close menu
 			var e = that.find('.mission-minus');
+			console.info('CLOSE MENU: ', e);
 			e.removeClass('fa-minus mission-minus').addClass('fa-plus mission-plus');
 			$("#mission-zone-" + id).css('display', 'none');
 			o.isOpen = 0;
 		}
 		else {
-			// opened
+			// open menu
 			var e = that.find('.mission-plus');
-			console.info('ELEMENT: ', e);
+			console.info('OPEN MENU: ', e);
 			e.removeClass('fa-plus mission-plus').addClass('fa-minus mission-minus');
 			$("#mission-zone-" + id).css('display', 'block');
 			o.isOpen = 1;
@@ -308,7 +315,9 @@ var mission = {
 				console.info('embark isLeader! ', data);
 				mission.setQuest(mission.quests[my.selectedQuest]);
 				my.zoneMobs = data.zoneMobs;
-				dungeon.go();
+				setTimeout(function() {
+					dungeon.go();
+				}, game.questDelay);
 			}).fail(function(data){
 				ng.msg(data.responseText);
 			}).always(function() {
@@ -342,11 +351,12 @@ var mission = {
 		my.quest = quest;
 	},
 	abandon: function() {
+		// clicked flag
 		if (!my.quest.level) {
 			chat.log("You have not started a mission!", "chat-warning");
 		}
 		else if (!party.isSoloOrLeading()) {
-			chat.log("Only party leaders can abandon missions!", "chat-warning");
+			chat.log("Only party leaders can abandon missions, but you can /disband the party to quit.", "chat-warning");
 		}
 		else if (ng.view === 'battle') {
 			chat.log("You cannot abandon missions while in combat!", "chat-warning");
@@ -357,14 +367,13 @@ var mission = {
 				url: app.url + 'php2/mission/abandon-quest.php'
 			}).done(function (data) {
 				console.info('abandon ', data);
-				mission.initQuest();
 				mission.abort();
 			}).fail(function (data) {
 				chat.log(data.responseText, 'chat-alert');
 			}).always(function () {
 				setTimeout(function() {
 					ng.unlock();
-				}, 3000);
+				}, game.questDelay);
 			});
 		}
 	},
@@ -379,6 +388,7 @@ var mission = {
 						mission.abortCallback();
 					}
 					else {
+						// reset session quest for non-leaders
 						$.ajax({
 							type: 'GET',
 							url: app.url + 'php2/session/init-quest.php'
@@ -393,6 +403,8 @@ var mission = {
 		});
 	},
 	abortCallback: function() {
+		// init client and transition back to town
+		mission.initQuest();
 		TweenMax.to('#scene-dungeon', 2, {
 			delay: 1,
 			opacity: 0
@@ -402,7 +414,7 @@ var mission = {
 			town.go();
 			chat.broadcast.add();
 			chat.setHeader();
-		}, 3000);
+		}, game.questDelay);
 	},
 	openFirstTwoZones: function() {
 		for (var i=0; i<2; i++) {

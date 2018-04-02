@@ -53,8 +53,8 @@
 	}
 	// init session values
 	$priorZone = $_SESSION['ng2']['zone'];
-	require '../session/init-ng.php';
 	require '../session/init-guild.php';
+	require '../session/init-timers.php';
 
 	// get my character data
 	$query = 'select row, name, level, race, job, hp, maxHp, mp, maxMp,
@@ -121,10 +121,25 @@
 	}
 
 	if ($i) {
-
+		$cacheHp = -1;
+		$cacheMp = -1;
+		if ($_SESSION['ng2']['hp'] > 0) {
+			// pre-cache hp/mp values if they exist
+			$cacheHp = $_SESSION['ng2']['hp'];
+			$cacheMp = $_SESSION['ng2']['mp'];
+		}
+		require '../session/init-ng.php';
 		// set session values for my character
 		foreach ($r['characterData'] as $key => $val) {
 			$_SESSION['ng2'][$key] = $val;
+		}
+		// assign session hp/mp cache values if a non -1 value was found
+		// this helps avoid relying on hp/mp value in ng2_chars AND parties table
+		if ($cacheHp >= 0) {
+			$_SESSION['ng2']['hp'] = $cacheHp;
+			$r['characterData']['hp'] = $cacheHp;
+			$_SESSION['ng2']['mp'] = $cacheMp;
+			$r['characterData']['mp'] = $cacheMp;
 		}
 		// set hp/mp regen, etc
 		require 'setEquipmentValues.php';

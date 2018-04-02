@@ -888,7 +888,7 @@ tbody {
 	cursor: url('cursor/pointer.cur'), pointer
 }
 .ch-card:active {
-	background: #048;
+	background: rgba(255, 255, 255, .4);
 	outline: 1px solid #05b
 }
 .ch-card-active {
@@ -1571,10 +1571,11 @@ background-clip: content-box;
 	display: none;
 	font-family: Quatro, Roboto Condensed, Roboto, sans-serif;
 	position: absolute;
-	top: 0;
-	left: 0;
+	top: .2rem;
+	left: .2rem;
 	z-index: 2;
-	padding: .2rem .4rem;
+	padding: .3rem;
+	border: 2px groove #013;
 	/*background-image: -webkit-linear-gradient(left, rgba(0, 32, 60, .7), rgba(0, 0, 0, 0));
 	background-image: -moz-linear-gradient(left, rgba(0, 32, 60, .7), rgba(0, 0, 0, 0));
 	background-image: -o-linear-gradient(left, rgba(0, 32, 60, .7), rgba(0, 0, 0, 0));
@@ -1583,10 +1584,21 @@ background-clip: content-box;
 #bar-header {
 	display: flex;
 	justify-content: space-around;
-	background: #1a1a1a;
 	border: 2px groove #025;
 	padding: .2rem 0;
-	margin-bottom: .2rem;
+	margin-bottom: .3rem;
+	background: #012;
+	border: .1rem outset #048;
+	outline: 1px solid #579;
+	background: -webkit-radial-gradient(top center,cover,rgba(0,48,96,1) 0,rgba(0,0,0,1) 100%);
+	background: -moz-radial-gradient(top center, cover,rgba(0,48,96,1) 0,rgba(0,0,0,1) 100%);
+	background: -o-radial-gradient(top center, cover,rgba(0,48,96,1) 0,rgba(0,0,0,1) 100%);
+	background: radial-gradient(top center, cover,rgba(0,48,96,1) 0,rgba(0,0,0,1) 100%);
+}
+#bar-all-player-wrap {
+	border: .1rem outset #048;
+	outline: 1px solid #579;
+	padding: .2rem;
 }
 .bar-icons {
 	color: gold;
@@ -1778,7 +1790,7 @@ background-clip: content-box;
 	width: 46vw;
 	border: 6px double #103860;
 	overflow: hidden;
-	z-index: 1;
+	z-index: 2;
 }
 .aside-bg {
 	position: absolute;
@@ -1940,14 +1952,14 @@ background-clip: content-box;
 .mission-quest-list {
 	display: none;
 }
-.mission-quest-li {
+.mission-quest-item {
 	text-indent: 2rem;
 	cursor: url('cursor/pointer.cur'), pointer;
 }
-.mission-quest-li:hover {
+.mission-quest-item:hover {
 	background: #048;
 }
-.mission-quest-li:active {
+.mission-quest-item:active {
 	background: #05b;
 }
 #mission-wrap {

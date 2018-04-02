@@ -140,9 +140,7 @@ var chat = {
 
 			$("#chat-prompt").on(env.click, '.chat-prompt-yes', function(e){
 				chat.prompt.confirm($(this).data());
-			});
-
-			$("#chat-prompt").on(env.click, '.chat-prompt-no', function(e){
+			}).on(env.click, '.chat-prompt-no', function(e){
 				chat.prompt.deny($(this).data());
 			});
 
@@ -567,6 +565,9 @@ var chat = {
 		}
 		else if (my.p_id && !my.party[0].isLeader) {
 			chat.log("Only the party leader may send invites.", "chat-warning");
+		}
+		else if (my.quest.level) {
+			chat.log("You cannot invite adventurers to the party after starting the mission.", "chat-warning");
 		}
 		else if (!my.channel) {
 			chat.log("You cannot invite adventurers from the depths of a dungeon.", "chat-warning");

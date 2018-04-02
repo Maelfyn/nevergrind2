@@ -87,9 +87,11 @@ var bar = {
 		// my bar
 		var s = bar.header();
 		// party bars
+		s += '<div id="bar-all-player-wrap">';
 		for (var i=0; i<game.maxPlayers; i++) {
 			s += bar.getPlayerHtml(my.party[i], i);
 		}
+		s += '</div>';
 		return s;
 	},
 	updatePlayerBar: function(index) {

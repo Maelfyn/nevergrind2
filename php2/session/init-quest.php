@@ -1,4 +1,5 @@
 <?php
+require '../header-session-start.php';
 require '../db.php';
 $_SESSION['quest'] = [
 	'row' => 0,
