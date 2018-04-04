@@ -16,7 +16,7 @@ $(document).on(env.click, function(e){
 	app.isLocal && console.info('keydown: ', key, code);
 	// local only
 	if (app.isLocal) {
-		if (!chat.hasFocus) {
+		if (!chat.hasFocus && ng.view !== "title") {
 			// key input view router
 			if (key === 'b') {
 				battle.go();

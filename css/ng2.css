@@ -1291,6 +1291,7 @@ tbody {
 	display: flex;
 	flex-direction: column;
 	flex-basis: 70%;
+	min-width: 70%;
 }
 #chat-header {
 	text-align: center;
@@ -1317,6 +1318,7 @@ tbody {
 	overflow-x: hidden;
 	line-height: 1.25;
 	color: #f2f2f2;
+	word-wrap: break-word;
 	word-break: break-word;
 	padding: .1rem .2rem 0 .2rem;
 	margin: .1rem;

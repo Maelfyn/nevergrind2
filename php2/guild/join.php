@@ -41,10 +41,11 @@ require '../guild/getGuildData.php';
 
 // notify party
 require_once '../zmq.php';
-$zmq = new stdClass();
-$zmq->msg = $_SESSION['ng2']['name'] . ' has joined ' . $_POST['guildName'] .'.';
-$zmq->route = 'guild->hasJoined';
-$zmq->category = 'guild:'. $_POST['row'];
+$zmq = [
+	'msg' => $_SESSION['ng2']['name'] . ' has joined ' . $_POST['guildName'] .'.',
+	'route' => 'guild->hasJoined',
+	'category' => 'guild:'. $_POST['row']
+];
 $socket->send(json_encode($zmq));
 
 echo json_encode($r);

@@ -3,13 +3,14 @@
 	require('prepare.php');
 	
     require_once '../zmq.php';
-	$zmq = new stdClass();
-	$zmq->msg = $postMsg;
-	$zmq->name = $_SESSION['ng2']['name'];
-	$zmq->level = $_SESSION['ng2']['level'];
-	$zmq->job = $_SESSION['ng2']['job'];
-	$zmq->class = $_POST['class'];
-	$zmq->route = 'chat->log';
+	$zmq = [
+		'msg' => $postMsg,
+		'name' => $_SESSION['ng2']['name'],
+		'level' => $_SESSION['ng2']['level'],
+		'job' => $_SESSION['ng2']['job'],
+		'class' => $_POST['class'],
+		'route' => 'chat->log'
+	];
 
 	if ($_POST['class'] === 'chat-whisper') {
 		$zmq->action = $_POST['action'];

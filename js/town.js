@@ -74,7 +74,7 @@ var town = {
 									ng.unlock();
 									// sometimes players slip between gaps :(
 									setTimeout(function() {
-										chat.updateChannel();
+										// chat.updateChannel();
 									}, 2500);
 								}
 							});

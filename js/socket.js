@@ -30,7 +30,8 @@ var socket = {
 			// heartbeat
 			console.info("subscribing to heartbeat channel: ", channel);
 			socket.zmq.subscribe(channel, function(){
-				game.socket.checkDifference();
+				// nothin
+				game.socket.receiveTime = Date.now();
 			});
 			// whisper
 			channel = 'name:' + my.name;

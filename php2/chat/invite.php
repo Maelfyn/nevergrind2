@@ -60,14 +60,15 @@ if (is_null($r['c_id'])) {
 	}
 	// send invite
 	require_once '../zmq.php';
-	$zmq = new stdClass();
-	$zmq->row = $_SESSION['party']['id'];
-	$zmq->msg = $_SESSION['ng2']['name'] . ' has invited you to join his party.';
-	$zmq->name = $_SESSION['ng2']['name'];
-	$zmq->cId = $_SESSION['ng2']['row'];
-	$zmq->action = 'party-invite';
-	$zmq->css = 'prompt-party-invite';
-	$zmq->category = 'name:'. $_POST['player'];
+	$zmq = [
+		'row' => $_SESSION['party']['id'],
+		'msg' => $_SESSION['ng2']['name'] . ' has invited you to join his party.',
+		'name' => $_SESSION['ng2']['name'],
+		'cId' => $_SESSION['ng2']['row'],
+		'action' => 'party-invite',
+		'css' => 'prompt-party-invite',
+		'category' => 'name:'. $_POST['player']
+	];
 	$socket->send(json_encode($zmq));
 
 	$r['newParty'] = $newParty;

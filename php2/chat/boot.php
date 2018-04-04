@@ -10,11 +10,12 @@ if ($_SESSION['party']['id']) {
 
 	// notify party members
 	require_once '../zmq.php';
-	$zmq = new stdClass();
-	$zmq->row = $_POST['id'];
-	$zmq->name = $_POST['name'];
-	$zmq->route = 'party->boot';
-	$zmq->category = 'party:'. $_SESSION['party']['id'];
+	$zmq = [
+		'row' => $_POST['id'],
+		'name' => $_POST['name'],
+		'route' => 'party->boot',
+		'category' => 'party:'. $_SESSION['party']['id']
+	];
 	$socket->send(json_encode($zmq));
 	echo json_encode($r);
 }

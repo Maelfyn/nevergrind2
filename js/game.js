@@ -31,9 +31,18 @@ var game = {
 		timer: 0,
 		success: 0,
 		fails: 0,
-		attempts: -1,
+		successiveFails: 0,
+		attempts: 0,
 		start: function() {
-			game.heartbeat.send();
+			game.ping.start = Date.now();
+			$.ajax({
+				type: 'GET',
+				url: app.url + 'php2/heartbeat-first.php'
+			}).done(function (data) {
+				data.name = my.name;
+				game.heartbeat.timer = setTimeout(game.heartbeat.send, 5000);
+				bar.updateBars(data);
+			});
 		},
 		send: function() {
 			console.info("%c Last heartbeat interval: ", "background: #ff0", Date.now() - game.ping.start +'ms');
@@ -44,18 +53,19 @@ var game = {
 				url: app.url + 'php2/heartbeat.php'
 			}).done(function (data) {
 				game.heartbeat.success++;
-				if (game.heartbeat.fails) {
-					// this does nothing right now
+				if (game.heartbeat.successiveFails) {
+					// this does nothing right now, but maybe later?!
 					game.resync();
 				}
-				game.heartbeat.fails = 0;
-				// console.info("HB DATA: ", data);
+				game.heartbeat.successiveFails = 0;
+				console.info("heartbeat data: ", data);
 				data.name = my.name;
-				console.info('heartbeatCallback', data);
 				bar.updateBars(data);
 			}).fail(function(data){
+				console.info('%c heartbeatCallback', 'background: #f00', data.responseText);
 				game.heartbeat.fails++;
-				game.heartbeat.fails > 1 && ng.disconnect(data.responseText);
+				game.heartbeat.successiveFails++;
+				game.heartbeat.successiveFails > 1 && ng.disconnect(data.responseText);
 			}).always(function() {
 				game.heartbeat.timer = setTimeout(game.heartbeat.send, 5000);
 				game.heartbeat.attempts++;
@@ -65,13 +75,16 @@ var game = {
 	},
 	socket: {
 		timer: 0,
-		sendTime: Date.now(),
+		sendTime: 0,
+		receiveTime: 0,
 		timeout: 25000,
 		interval: 20000,
-		checkTolerance: 1000,
 		start: function() {
+			game.socket.sendTime = Date.now();
+			game.socket.receiveTime = Date.now();
 			clearInterval(game.socket.timer);
 			game.socket.timer = setInterval(game.socket.send, game.socket.interval);
+			setInterval(game.socket.checkDifference, game.socket.interval);
 		},
 		send: function() {
 			// console.info("%c Last socket send: ", "background: #0ff", Date.now() - game.socket.sendTime);
@@ -81,12 +94,9 @@ var game = {
 		checkDifference: function() {
 			console.info("%c Socket ping: ", "background: #08f", Date.now() - game.socket.sendTime + 'ms');
 			// longer than interval plus checkTolerance? disconnect (failed 2x)
-			if (game.socket.isHealthy()) {
+			Date.now() - game.socket.receiveTime > game.socket.interval + 1000 &&
 				ng.disconnect();
-			}
-		},
-		isHealthy: function() {
-			return Date.now() - game.socket.sendTime > game.socket.interval + game.socket.checkTolerance;
+
 		}
 	},
 	played: {

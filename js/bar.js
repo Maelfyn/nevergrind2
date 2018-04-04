@@ -150,6 +150,7 @@ var bar = {
 		}
 	},
 	party: {
+		// from ZMQ
 		join: function(data) {
 			console.info('bar.party.join ', data);
 			chat.log(data.msg, 'chat-warning');
@@ -238,7 +239,7 @@ var bar = {
 		my.party.forEach(function(v, i){
 			if (i) {
 				// set client value
-				v = my.Party();
+				my.party[i] = my.Party();
 			}
 		});
 		bar.hideParty();
@@ -257,8 +258,9 @@ var bar = {
 	},
 	heartbeat: {
 		receive: function(data) {
-			console.info('%c heartbeat.receive id:', "background: #0ff", data.id);
+			console.info('%c party heartbeat.receive id:', "background: #0ff", data.id);
 			var index = 0;
+			// check everyone except me
 			for (var i=1; i<6; i++) {
 				if (data.id === my.party[i].id) {
 					index = i;

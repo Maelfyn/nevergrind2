@@ -170,6 +170,12 @@ var create = {
 			var z = $(this);
 			var id = create.selected = z.data('row');
 			var id = create.name = z.data('name');
+			if (ng.playerCardClicks++ === 1) {
+				$.ajax({
+					type: 'GET',
+					url: app.url + 'php2/session/init-character.php'
+				})
+			}
 		});
 	},
 	deleteCharacter: function(){

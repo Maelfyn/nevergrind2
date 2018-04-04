@@ -31,11 +31,12 @@ if (!empty($_SESSION['guild']) && $_SESSION['guild']['rank'] < 2) {
 
 	// notify party members
 	require_once '../zmq.php';
-	$zmq = new stdClass();
-	$zmq->name = $_POST['name'];
-	$zmq->msg = $_POST['name'] . ' has been booted by  '. $_SESSION['ng2']['name'] .'!';
-	$zmq->route = 'guild->boot';
-	$zmq->category = 'guild:'. $_SESSION['guild']['id'];
+	$zmq = [
+		'name' => $_POST['name'],
+		'msg' => $_POST['name'] . ' has been booted by  '. $_SESSION['ng2']['name'] .'!',
+		'route' => 'guild->boot',
+		'category' => 'guild:'. $_SESSION['guild']['id']
+	];
 	$socket->send(json_encode($zmq));
 	echo json_encode($r);
 }

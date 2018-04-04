@@ -30,21 +30,23 @@ $_SESSION['party']['mission_id'] = $_POST['quest']['row'] * 1;
 if (!$_SESSION['party']['id'] || $_SESSION['party']['isLeader']) {
 	// solo/leader broadcasts mission update to party
 	// my.quest updates
-	$zmq = new stdClass();
-	$zmq->quest = $_SESSION['quest'];
-	$zmq->zoneMobs = $r['zoneMobs'];
-	$zmq->route = 'party->missionUpdate';
-	$zmq->category = 'party:'. $_SESSION['party']['id'];
+	$zmq = [
+		'quest' => $_SESSION['quest'],
+		'zoneMobs' => $r['zoneMobs'],
+		'route' => 'party->missionUpdate',
+		'category' => 'party:'. $_SESSION['party']['id']
+	];
 	$socket->send(json_encode($zmq));
 }
-
-$zmq = [
-	'msg' => $_SESSION['ng2']['name'] . ' has embarked into ' . $_SESSION['quest']['zone'],
-	'route' => 'chat->log',
-	'class' => 'chat-quest',
-	'category' => 'party:'. $_SESSION['party']['id']
-];
-$socket->send(json_encode($zmq));
+if ($_SESSION['party']['id']) {
+	$zmq = [
+		'msg' => $_SESSION['ng2']['name'] . ' has embarked into ' . $_SESSION['quest']['zone'],
+		'route' => 'chat->log',
+		'class' => 'chat-quest',
+		'category' => 'party:'. $_SESSION['party']['id']
+	];
+	$socket->send(json_encode($zmq));
+}
 
 if ($_SESSION['party']['isLeader']) {
 	$zmq = [
@@ -52,8 +54,16 @@ if ($_SESSION['party']['isLeader']) {
 		'route' => 'party->notifyMissionStatus',
 		'category' => 'party:'. $_SESSION['party']['id']
 	];
-	$socket->send(json_encode($zmq));
 }
+else {
+	$zmq = [
+		'msg' => 'Mission started: ' . $_SESSION['quest']['title'],
+		'route' => 'party->notifyMissionStatus',
+		'category' => 'party:0'
+	];
+}
+$socket->send(json_encode($zmq));
+
 
 $r['quest'] = $_SESSION['quest']['row'];
 

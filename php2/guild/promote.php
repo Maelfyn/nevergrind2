@@ -24,11 +24,12 @@ if (!empty($_SESSION['guild']) &&
 
 	// notify guild members
 	require_once '../zmq.php';
-	$zmq = new stdClass();
-	$zmq->name = $_POST['name'];
-	$zmq->msg = $_POST['name'] . ' has been promoted to Officer by '. $_SESSION['ng2']['name'] .'.';
-	$zmq->route = 'guild->promote';
-	$zmq->category = 'guild:'. $_SESSION['guild']['id'];
+	$zmq = [
+		'name' => $_POST['name'],
+		'msg' => $_POST['name'] . ' has been promoted to Officer by '. $_SESSION['ng2']['name'] .'.',
+		'route' => 'guild->promote',
+		'category' => 'guild:'. $_SESSION['guild']['id']
+	];
 	$socket->send(json_encode($zmq));
 	echo json_encode($r);
 }

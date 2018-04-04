@@ -4,35 +4,14 @@ if (!isset($_SESSION['account'])) {
 	header('HTTP/1.1 500 Your session has expired.');
 }
 else {
-
-	$now = time();
-	if ($_SESSION['timers']['heartbeat']) {
-		if ($now - $_SESSION['timers']['heartbeat'] >= 5) {
-			$_SESSION['timers']['heartbeat'] = $now;
-		}
-		else {
-			exit('Timing invalid');
-		}
-	}
-
 	require 'db.php';
-	// tick HP & MP
-	$_SESSION['ng2']['hp'] += $_SESSION['ng2']['hpRegen'];
-	if ($_SESSION['ng2']['hp'] > $_SESSION['ng2']['maxHp']) {
-		$_SESSION['ng2']['hp'] = $_SESSION['ng2']['maxHp'];
-	}
-	$r['hp'] = $_SESSION['ng2']['hp'];
 
-	$_SESSION['ng2']['mp'] += $_SESSION['ng2']['mpRegen'];
-	if ($_SESSION['ng2']['mp'] > $_SESSION['ng2']['maxMp']) {
-		$_SESSION['ng2']['mp'] = $_SESSION['ng2']['maxMp'];
-	}
+	$r['hp'] = $_SESSION['ng2']['hp'];
 	$r['mp'] = $_SESSION['ng2']['mp'];
 
 	$stmt = $link->prepare('insert into ng2_players 
 		(`id`, `account`, `name`, `level`, `race`, `job`, `zone`) 
-		values (?, ?, ?, ?, ?, ?, ?) 
-		on duplicate key update timestamp=now()');
+		values (?, ?, ?, ?, ?, ?, ?)');
 
 	$stmt->bind_param('ississs',
 		$_SESSION['ng2']['row'],
@@ -42,7 +21,6 @@ else {
 		$_SESSION['ng2']['race'],
 		$_SESSION['ng2']['job'],
 		$_SESSION['ng2']['zone']);
-
 	$stmt->execute();
 
 	// update ng2_parties hp/mp
@@ -56,11 +34,11 @@ else {
 
 		require_once 'zmq.php';
 		$zmq = [
-			'hp' => $_SESSION['ng2']['hp'],
-			'mp' => $_SESSION['ng2']['mp'],
-			'name' => $_SESSION['ng2']['name'],
-			'route' => 'party->updateBars',
-			'category' => 'party:'. $_SESSION['party']['id']
+			'hp' =>	$_SESSION['ng2']['hp'],
+			'mp' =>	$_SESSION['ng2']['mp'],
+			'name' =>	$_SESSION['ng2']['name'],
+			'route' =>	'party->updateBars',
+			'category' =>	'party:'. $_SESSION['party']['id']
 		];
 		$socket->send(json_encode($zmq));
 	}

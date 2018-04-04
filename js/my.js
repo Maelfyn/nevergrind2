@@ -43,7 +43,7 @@ var my = {
 		var lowestId = my.party[0].id,
 			name = my.party[0].name;
 		my.party.forEach(function(v) {
-			if (v.id < lowestId) {
+			if (v.id && v.id < lowestId) {
 				name = v.name;
 			}
 		});

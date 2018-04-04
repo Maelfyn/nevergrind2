@@ -72,10 +72,11 @@ if ($partyCount >= 1 && $partyCount < 6) {
 
 		// notify party
 		require_once '../zmq.php';
-		$zmq = new stdClass();
-		$zmq->msg = $_SESSION['ng2']['name'] . ' has joined the party.';
-		$zmq->route = 'party->join';
-		$zmq->category = 'party:'. $_POST['row'];
+		$zmq = [
+			'msg' => $_SESSION['ng2']['name'] . ' has joined the party.',
+			'route' => 'party->join',
+			'category' => 'party:'. $_POST['row']
+		];
 		$socket->send(json_encode($zmq));
 
 		echo json_encode($r);

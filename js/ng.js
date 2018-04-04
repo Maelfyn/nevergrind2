@@ -422,7 +422,7 @@ var ng = {
 	},
 	initGame: function(){
 		$.ajax({
-			type: 'POST',
+			type: 'GET',
 			url: app.url + 'php2/initGame.php'
 		}).done(function(r){
 			console.info("initGame: ", r);
@@ -450,6 +450,7 @@ var ng = {
 			}
 		});
 	},
+	playerCardClicks: 0,
 	displayAllCharacters: function(r){
 		var s = '';
 		r.forEach(function(d){
