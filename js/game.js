@@ -29,7 +29,9 @@ var game = {
 	},
 	heartbeat: {
 		timer: 0,
+		success: 0,
 		fails: 0,
+		attempts: -1,
 		start: function() {
 			game.heartbeat.send();
 		},
@@ -41,12 +43,12 @@ var game = {
 				type: 'GET',
 				url: app.url + 'php2/heartbeat.php'
 			}).done(function (data) {
+				game.heartbeat.success++;
 				if (game.heartbeat.fails) {
 					// this does nothing right now
 					game.resync();
 				}
 				game.heartbeat.fails = 0;
-				console.info("%c Ping: ", 'background: #0f0', game.ping.oneWay() +'ms');
 				// console.info("HB DATA: ", data);
 				data.name = my.name;
 				console.info('heartbeatCallback', data);
@@ -56,6 +58,8 @@ var game = {
 				game.heartbeat.fails > 1 && ng.disconnect(data.responseText);
 			}).always(function() {
 				game.heartbeat.timer = setTimeout(game.heartbeat.send, 5000);
+				game.heartbeat.attempts++;
+				console.info("%c Ping: ", 'background: #0f0', game.ping.oneWay() +'ms', "Ratio: " + ((game.heartbeat.success / game.heartbeat.attempts)*100) + "%");
 			});
 		}
 	},

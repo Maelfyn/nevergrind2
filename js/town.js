@@ -3,7 +3,6 @@ var town = {
 		if (ng.view === 'town') return;
 		if (create.selected) {
 			game.emptyScenesExcept('scene-town');
-			my.channel = 'town';
 			ng.lock(1);
 			chat.size.large();
 			$.ajax({
@@ -13,7 +12,6 @@ var town = {
 				}
 			}).done(function(data) {
 				console.info('loadCharacter: ', data);
-				socket.init();
 				var z = data.characterData;
 				my.name = z.name;
 				my.job = z.job;
@@ -37,6 +35,7 @@ var town = {
 				console.info('my.party[0]: ', my.party[0]);
 				ng.setScene('town');
 				chat.init();
+				socket.init();
 				chat.friend.init();
 				chat.ignore.init();
 				// things that only happen once
@@ -47,7 +46,6 @@ var town = {
 				$("#scene-title").remove();
 				town.init();
 				game.start();
-				chat.setRoom(data.players);
 				bar.init();
 				// I'm in a party!
 				if (data.party !== undefined && data.party.id) {
@@ -61,6 +59,7 @@ var town = {
 						// stuff to do after the socket wakes up
 						socket.initParty(my.p_id);
 						bar.getParty();
+						chat.sendMsg('/join');
 
 						// reveal scene based on session data
 						if (data.dungeon) {
@@ -73,6 +72,10 @@ var town = {
 								opacity: 1,
 								onComplete: function() {
 									ng.unlock();
+									// sometimes players slip between gaps :(
+									setTimeout(function() {
+										chat.updateChannel();
+									}, 2500);
 								}
 							});
 						}

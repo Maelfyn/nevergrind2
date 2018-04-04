@@ -12,7 +12,6 @@ var ng = {
 		$(window).focus(function(){
 			/*document.title = g.defaultTitle;
 			ng.titleFlashing = false;*/
-			// my.name && socket.init(1);
 		});
 		// should be delegating no drag start
 		$("body").on('dragstart', 'img', function(e) {

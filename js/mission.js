@@ -315,6 +315,11 @@ var mission = {
 				console.info('embark isLeader! ', data);
 				mission.setQuest(mission.quests[my.selectedQuest]);
 				my.zoneMobs = data.zoneMobs;
+				TweenMax.to('#scene-town', 3, {
+					startAt: { opacity: 1 },
+					opacity: 0,
+					ease: Power4.easeOut
+				});
 				setTimeout(function() {
 					dungeon.go();
 				}, game.questDelay);

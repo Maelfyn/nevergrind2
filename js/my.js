@@ -5,7 +5,7 @@ var my = {
 		x: 0,
 		y: 0
 	},
-	channel: 'town',
+	channel: '',
 	lastReceivedWhisper: '',
 	p_id: 0,
 	leader: '',

@@ -9,7 +9,7 @@ var chat = {
 	html: function() {
 		var s =
 			'<div id="chat-present-wrap" class="no-select">' +
-				'<div id="chat-header">town</div>' +
+				'<div id="chat-header">&nbsp;</div>' +
 				'<div id="chat-room"></div>' +
 			'</div>' +
 			'<div id="chat-log-wrap">' +
@@ -147,7 +147,6 @@ var chat = {
 			$("#chat-room").on(env.context, '.chat-player', function() {
 				var id = $(this).parent().attr('id'),
 					arr = id.split("-"),
-					playerId = arr[2] * 1,
 					text = $(this).text(),
 					a2 = text.split(":"),
 					name = a2[1].replace(/\]/g, '').trim();
@@ -597,12 +596,7 @@ var chat = {
 		}
 	},
 	camp: function() {
-		if (ng.view !== 'town') {
-			chat.log("You can only camp in town!", "chat-warning");
-		}
-		else {
-			chat.log('Camping...', 'chat-warning');
-			game.exit();
+		function callbackSuccess() {
 			setTimeout(function(){
 				$.ajax({
 					type: 'GET',
@@ -612,7 +606,36 @@ var chat = {
 				}).fail(function(){
 					chat.log('Failed to camp successfully.', 'chat-alert');
 				});
-			}, 1000);
+			}, 500);
+		}
+		if (ng.view !== 'town') {
+			chat.log("You can only camp in town!", "chat-warning");
+		}
+		else {
+			chat.log('Camping...', 'chat-warning');
+			game.exit();
+			if (my.p_id) {
+				if (my.party[0].isLeader) {
+					// promote
+					party.promotePlayer();
+				}
+				// disband
+				chat.sendMsg('/disband')
+			}
+			(function repeat(count) {
+				if (!my.p_id) {
+					// successfully disbanded
+					callbackSuccess();
+				}
+				else {
+					if (count < 30) {
+						setTimeout(repeat, 100, ++count);
+					}
+					else {
+						chat.log("Failed to camp successfully.", "chat-warning");
+					}
+				}
+			})(0);
 		}
 	},
 	reply: function() {
@@ -995,7 +1018,7 @@ var chat = {
 	},
 	inChannel: [],
 	setRoom: function(data) {
-		console.info('setRoom', data);
+		console.info('setRoom', data.length, data);
 		var s = '';
 		chat.inChannel = [];
 		data.forEach(function(v){
@@ -1040,6 +1063,7 @@ var chat = {
 			}
 		},
 		default: function() {
+			console.info(my.channel, chat.default);
 			if (my.channel !== chat.default) {
 				$.ajax({
 					url: app.url + 'php2/chat/set-channel.php',
@@ -1069,6 +1093,18 @@ var chat = {
 			chat.setHeader();
 			chat.broadcast.add();
 		}
+	},
+	updateChannel: function() {
+		$.ajax({
+			url: app.url + 'php2/chat/update-channel.php',
+			data: {
+				channel: chat.default
+			}
+		}).done(function (data) {
+			console.info("updateChannel: ", data);
+			chat.setRoom(data.players);
+			chat.setHeader();
+		});
 	},
 	// players receive update from socket
 	addPlayer: function(v) {

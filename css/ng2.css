@@ -73,6 +73,10 @@ fieldset {
 	background-image: -ms-radial-gradient(80 0, farthest-corner, #5488da 0%, #132239 100%);
 	background-image: -o-radial-gradient(80 0, farthest-corner, #5488da 0%, #132239 100%);
 }
+input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 1000px #4478c7 inset;
+	-webkit-text-fill-color: #fff;
+}
 #tosWrap {
 	margin: .5rem;
 }
@@ -1590,15 +1594,19 @@ background-clip: content-box;
 	background: #012;
 	border: .1rem outset #048;
 	outline: 1px solid #579;
-	background: -webkit-radial-gradient(top center,cover,rgba(0,48,96,1) 0,rgba(0,0,0,1) 100%);
-	background: -moz-radial-gradient(top center, cover,rgba(0,48,96,1) 0,rgba(0,0,0,1) 100%);
-	background: -o-radial-gradient(top center, cover,rgba(0,48,96,1) 0,rgba(0,0,0,1) 100%);
-	background: radial-gradient(top center, cover,rgba(0,48,96,1) 0,rgba(0,0,0,1) 100%);
+	background: -webkit-radial-gradient(bottom left,cover,rgba(0,48,96,1) 0,rgba(0,0,0,1) 100%);
+	background: -moz-radial-gradient(bottom left, cover,rgba(0,48,96,1) 0,rgba(0,0,0,1) 100%);
+	background: -o-radial-gradient(bottom left, cover,rgba(0,48,96,1) 0,rgba(0,0,0,1) 100%);
+	background: radial-gradient(bottom left, cover,rgba(0,48,96,1) 0,rgba(0,0,0,1) 100%);
 }
 #bar-all-player-wrap {
 	border: .1rem outset #048;
 	outline: 1px solid #579;
 	padding: .2rem;
+	background: -webkit-radial-gradient(top left,cover,rgba(0,48,96,1) 0,rgba(0,0,0,1) 100%);
+	background: -moz-radial-gradient(top left, cover,rgba(0,48,96,1) 0,rgba(0,0,0,1) 100%);
+	background: -o-radial-gradient(top left, cover,rgba(0,48,96,1) 0,rgba(0,0,0,1) 100%);
+	background: radial-gradient(top left, cover,rgba(0,48,96,1) 0,rgba(0,0,0,1) 100%);
 }
 .bar-icons {
 	color: gold;

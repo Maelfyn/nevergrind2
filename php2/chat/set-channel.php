@@ -16,6 +16,7 @@ if ($_POST['channel']) {
 
 	// get channel players
 	$stmt = $link->prepare('select id, name, level, race, job from ng2_players where zone=? and timestamp > date_sub(now(), interval 15 second)');
+	error_log("Looking by ". $r['fullChannel']);
 	$stmt->bind_param('s', $r['fullChannel']);
 	$stmt->execute();
 	$stmt->bind_result($id, $name, $level, $race, $job);

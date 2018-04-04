@@ -52,9 +52,7 @@
 		$r['party']['id'] = $_SESSION['party']['id'];
 	}
 	// init session values
-	$priorZone = $_SESSION['ng2']['zone'];
 	require '../session/init-guild.php';
-	require '../session/init-timers.php';
 
 	// get my character data
 	$query = 'select row, name, level, race, job, hp, maxHp, mp, maxMp,
@@ -123,7 +121,7 @@
 	if ($i) {
 		$cacheHp = -1;
 		$cacheMp = -1;
-		if ($_SESSION['ng2']['hp'] > 0) {
+		if (isset($_SESSION['ng2']) && $_SESSION['ng2']['hp'] > 0) {
 			// pre-cache hp/mp values if they exist
 			$cacheHp = $_SESSION['ng2']['hp'];
 			$cacheMp = $_SESSION['ng2']['mp'];
@@ -143,6 +141,21 @@
 		}
 		// set hp/mp regen, etc
 		require 'setEquipmentValues.php';
+
+		// update player heartbeat table
+		$stmt = $link->prepare('insert into ng2_players 
+			(`id`, `account`, `name`, `level`, `race`, `job`, `zone`) 
+			values (?, ?, ?, ?, ?, ?, ?) 
+			on duplicate key update timestamp=now()');
+
+		$stmt->bind_param('ississs',
+			$_SESSION['ng2']['row'],
+			$_SESSION['account'],
+			$_SESSION['ng2']['name'],
+			$_SESSION['ng2']['level'],
+			$_SESSION['ng2']['race'],
+			$_SESSION['ng2']['job'],
+			$_SESSION['ng2']['zone']);
 		// count active players
 		$result = mysqli_query(
 			$link,
@@ -152,6 +165,9 @@
 		while ($row = mysqli_fetch_assoc($result)){
 			$r['count'] = $row['count'];
 		}
+		/*
+
+
 		// get all players in chat room
 		$result = mysqli_query(
 			$link,
@@ -169,7 +185,7 @@
 					'job' => $row['job'],
 				];
 			}
-		}
+		}*/
 		// get guild info
 		require '../guild/getGuildData.php';
 

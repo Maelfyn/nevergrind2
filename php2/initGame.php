@@ -23,5 +23,6 @@ else {
 	$r['account'] = $_SESSION['account']; // ?
 	require 'create/loadAllCharacters.php';
 }
+require 'session/init-timers.php';
 
 echo json_encode($r);

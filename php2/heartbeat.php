@@ -30,11 +30,10 @@ else {
 	}
 	$r['mp'] = $_SESSION['ng2']['mp'];
 
-	// insert / replace into ng2_players
 	$stmt = $link->prepare('insert into ng2_players 
-			(`id`, `account`, `name`, `level`, `race`, `job`, `zone`) 
-			values (?, ?, ?, ?, ?, ?, ?) 
-			on duplicate key update timestamp=now()');
+		(`id`, `account`, `name`, `level`, `race`, `job`, `zone`) 
+		values (?, ?, ?, ?, ?, ?, ?) 
+		on duplicate key update timestamp=now()');
 
 	$stmt->bind_param('ississs',
 		$_SESSION['ng2']['row'],

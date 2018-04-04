@@ -46,5 +46,18 @@ var party = {
 		if (data.action === 'abandon') {
 			mission.abort();
 		}
+	},
+	promotePlayer: function() {
+		if (party.length() > 1) {
+			var name = '';
+			my.party.forEach(function(v, i) {
+				if (i) {
+					if (v) {
+						name = v.name;
+					}
+				}
+			});
+			name && chat.sendMsg('/promote ' + name);
+		}
 	}
 }
