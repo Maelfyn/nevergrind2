@@ -92,11 +92,12 @@ var game = {
 			socket.zmq.publish('hb:' + my.name, {});
 		},
 		checkDifference: function() {
-			console.info("%c Socket ping: ", "background: #08f", Date.now() - game.socket.sendTime + 'ms');
 			// longer than interval plus checkTolerance? disconnect (failed 2x)
-			Date.now() - game.socket.receiveTime > game.socket.interval + 1000 &&
+			var diff = Date.now() - game.socket.receiveTime;
+			console.info("%c Socket ping: ", "background: #08f", diff + 'ms');
+			if (diff > game.socket.interval + 1000) {
 				ng.disconnect();
-
+			}
 		}
 	},
 	played: {

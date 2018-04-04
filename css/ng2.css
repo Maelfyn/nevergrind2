@@ -2005,6 +2005,39 @@ background-clip: content-box;
 #scene-dungeon {
 	opacity: 0;
 }
+#button-wrap {
+	display: none;
+	position: absolute;
+	justify-content: flex-start;
+	align-items: stretch;
+	bottom: 0;
+	margin: 0 auto;
+	left: 0;
+	right: 0;
+	height: 3.6rem;
+	width: 26rem;
+	z-index: 1;
+}
+.class-btn {
+	border: .1rem outset #013;
+	background-size: 61.2rem 13.6rem; /* convert via 3.4 * number of buttons?? */
+	flex: 1;
+	cursor: url('cursor/pointer.cur'), pointer
+}
+.class-btn:hover {
+	border: .1rem groove #048;
+}
+.class-btn:active {
+	border: .1rem ridge #ffb700;
+}
+#class-btn-0 { background-position: -3.6rem 0; }
+#class-btn-1 { background-position: -7rem 0; }
+#class-btn-2 { background-position: -10.4rem 0; }
+#class-btn-3 { background-position: -13.8rem 0; }
+#class-btn-4 { background-position: -17.2rem 0; }
+#class-btn-5 { background-position: -20.6rem 0; }
+#class-btn-6 { background-position: -24rem 0; }
+#class-btn-7 { background-position: -27.4rem 0; }
 /* battle */
 #scene-battle {
 	opacity: 0;

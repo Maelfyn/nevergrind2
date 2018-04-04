@@ -442,6 +442,7 @@ var town = {
 			p + 'surefall.jpg',
 			p + 'valeska-windcrest.png',
 			'img2/dungeon/braxxen1.jpg',
+			'img2/skills/' + my.job + '.png'
 		])
 	},
 };

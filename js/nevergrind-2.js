@@ -216,6 +216,12 @@ var create = {
 			var z = $(this);
 			var id = create.selected = z.data('row');
 			var id = create.name = z.data('name');
+			if (ng.playerCardClicks++ === 1) {
+				$.ajax({
+					type: 'GET',
+					url: app.url + 'php2/session/init-character.php'
+				})
+			}
 		});
 	},
 	deleteCharacter: function(){
@@ -1009,7 +1015,7 @@ var ng = {
 	},
 	initGame: function(){
 		$.ajax({
-			type: 'POST',
+			type: 'GET',
 			url: app.url + 'php2/initGame.php'
 		}).done(function(r){
 			console.info("initGame: ", r);
@@ -1037,6 +1043,7 @@ var ng = {
 			}
 		});
 	},
+	playerCardClicks: 0,
 	displayAllCharacters: function(r){
 		var s = '';
 		r.forEach(function(d){
@@ -1155,7 +1162,7 @@ var my = {
 		var lowestId = my.party[0].id,
 			name = my.party[0].name;
 		my.party.forEach(function(v) {
-			if (v.id < lowestId) {
+			if (v.id && v.id < lowestId) {
 				name = v.name;
 			}
 		});
@@ -1625,9 +1632,18 @@ var game = {
 		timer: 0,
 		success: 0,
 		fails: 0,
-		attempts: -1,
+		successiveFails: 0,
+		attempts: 0,
 		start: function() {
-			game.heartbeat.send();
+			game.ping.start = Date.now();
+			$.ajax({
+				type: 'GET',
+				url: app.url + 'php2/heartbeat-first.php'
+			}).done(function (data) {
+				data.name = my.name;
+				game.heartbeat.timer = setTimeout(game.heartbeat.send, 5000);
+				bar.updateBars(data);
+			});
 		},
 		send: function() {
 			console.info("%c Last heartbeat interval: ", "background: #ff0", Date.now() - game.ping.start +'ms');
@@ -1638,18 +1654,19 @@ var game = {
 				url: app.url + 'php2/heartbeat.php'
 			}).done(function (data) {
 				game.heartbeat.success++;
-				if (game.heartbeat.fails) {
-					// this does nothing right now
+				if (game.heartbeat.successiveFails) {
+					// this does nothing right now, but maybe later?!
 					game.resync();
 				}
-				game.heartbeat.fails = 0;
-				// console.info("HB DATA: ", data);
+				game.heartbeat.successiveFails = 0;
+				console.info("heartbeat data: ", data);
 				data.name = my.name;
-				console.info('heartbeatCallback', data);
 				bar.updateBars(data);
 			}).fail(function(data){
+				console.info('%c heartbeatCallback', 'background: #f00', data.responseText);
 				game.heartbeat.fails++;
-				game.heartbeat.fails > 1 && ng.disconnect(data.responseText);
+				game.heartbeat.successiveFails++;
+				game.heartbeat.successiveFails > 1 && ng.disconnect(data.responseText);
 			}).always(function() {
 				game.heartbeat.timer = setTimeout(game.heartbeat.send, 5000);
 				game.heartbeat.attempts++;
@@ -1659,13 +1676,16 @@ var game = {
 	},
 	socket: {
 		timer: 0,
-		sendTime: Date.now(),
+		sendTime: 0,
+		receiveTime: 0,
 		timeout: 25000,
 		interval: 20000,
-		checkTolerance: 1000,
 		start: function() {
+			game.socket.sendTime = Date.now();
+			game.socket.receiveTime = Date.now();
 			clearInterval(game.socket.timer);
 			game.socket.timer = setInterval(game.socket.send, game.socket.interval);
+			setInterval(game.socket.checkDifference, game.socket.interval);
 		},
 		send: function() {
 			// console.info("%c Last socket send: ", "background: #0ff", Date.now() - game.socket.sendTime);
@@ -1673,14 +1693,12 @@ var game = {
 			socket.zmq.publish('hb:' + my.name, {});
 		},
 		checkDifference: function() {
-			console.info("%c Socket ping: ", "background: #08f", Date.now() - game.socket.sendTime + 'ms');
 			// longer than interval plus checkTolerance? disconnect (failed 2x)
-			if (game.socket.isHealthy()) {
+			var diff = Date.now() - game.socket.receiveTime;
+			console.info("%c Socket ping: ", "background: #08f", diff + 'ms');
+			if (diff > game.socket.interval + 1000) {
 				ng.disconnect();
 			}
-		},
-		isHealthy: function() {
-			return Date.now() - game.socket.sendTime > game.socket.interval + game.socket.checkTolerance;
 		}
 	},
 	played: {
@@ -2105,7 +2123,7 @@ $(document).on(env.click, function(e){
 	app.isLocal && console.info('keydown: ', key, code);
 	// local only
 	if (app.isLocal) {
-		if (!chat.hasFocus) {
+		if (!chat.hasFocus && ng.view !== "title") {
 			// key input view router
 			if (key === 'b') {
 				battle.go();
@@ -2262,7 +2280,8 @@ var socket = {
 			// heartbeat
 			console.info("subscribing to heartbeat channel: ", channel);
 			socket.zmq.subscribe(channel, function(){
-				game.socket.checkDifference();
+				// nothin
+				game.socket.receiveTime = Date.now();
 			});
 			// whisper
 			channel = 'name:' + my.name;
@@ -3763,6 +3782,7 @@ var bar = {
 		}
 	},
 	party: {
+		// from ZMQ
 		join: function(data) {
 			console.info('bar.party.join ', data);
 			chat.log(data.msg, 'chat-warning');
@@ -3851,7 +3871,7 @@ var bar = {
 		my.party.forEach(function(v, i){
 			if (i) {
 				// set client value
-				v = my.Party();
+				my.party[i] = my.Party();
 			}
 		});
 		bar.hideParty();
@@ -3870,8 +3890,9 @@ var bar = {
 	},
 	heartbeat: {
 		receive: function(data) {
-			console.info('%c heartbeat.receive id:', "background: #0ff", data.id);
+			console.info('%c party heartbeat.receive id:', "background: #0ff", data.id);
 			var index = 0;
+			// check everyone except me
 			for (var i=1; i<6; i++) {
 				if (data.id === my.party[i].id) {
 					index = i;
@@ -5621,7 +5642,7 @@ var town = {
 									ng.unlock();
 									// sometimes players slip between gaps :(
 									setTimeout(function() {
-										chat.updateChannel();
+										// chat.updateChannel();
 									}, 2500);
 								}
 							});
@@ -5989,6 +6010,7 @@ var town = {
 			p + 'surefall.jpg',
 			p + 'valeska-windcrest.png',
 			'img2/dungeon/braxxen1.jpg',
+			'img2/skills/' + my.job + '.png'
 		])
 	},
 };
@@ -6795,6 +6817,7 @@ var mission = {
 	},
 	abort: function() {
 		setTimeout(function() {
+			button.hide();
 			chat.log('Mission abandoned!', 'chat-warning');
 			if (ng.view === 'dungeon') {
 				chat.log('Returning to town...', 'chat-warning');
@@ -6874,6 +6897,7 @@ var dungeon = {
 		else {
 			document.getElementById('scene-dungeon').innerHTML = dungeon.html();
 			battle.events();
+			button.init();
 		}
 		chat.scrollBottom();
 		// delegate
@@ -7084,6 +7108,38 @@ var party = {
 			});
 			name && chat.sendMsg('/promote ' + name);
 		}
+	}
+}
+var button = {
+	initialized: 0,
+	wrap: document.getElementById('button-wrap'),
+	init: function() {
+		var s = '';
+		// skill buttons
+		for (var i=0; i<8; i++) {
+			s += '<div id="class-btn-'+ i +'" class="class-btn" style="background-image: url(img2/skills/'+ my.job +'.png)"></div>';
+		}
+		button.wrap.innerHTML = s;
+		if (!button.initialized) {
+			$("#button-wrap").on(env.click, '.class-btn', function() {
+				var id = this.id.substr(10) * 1;
+				console.info('CLICKED SKILL: ', id, typeof id);
+			});
+			setTimeout(function() {
+				TweenMax.to(button.wrap, 1.5, {
+					startAt: {
+						display: 'flex',
+						opacity: 0,
+					},
+					opacity: 1
+				});
+			}, 1000);
+		}
+	},
+	hide: function() {
+		TweenMax.set(button.wrap, {
+			display: 'none'
+		});
 	}
 }
 // test methods

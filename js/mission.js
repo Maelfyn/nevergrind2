@@ -384,6 +384,7 @@ var mission = {
 	},
 	abort: function() {
 		setTimeout(function() {
+			button.hide();
 			chat.log('Mission abandoned!', 'chat-warning');
 			if (ng.view === 'dungeon') {
 				chat.log('Returning to town...', 'chat-warning');

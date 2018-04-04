@@ -93,6 +93,7 @@ return gulp.src([
 	'./js/skills.js',
 	'./js/zone.js',
 	'./js/party.js',
+	'./js/button.js',
 	'./js/test.js',
 	'./js/endWrap.js'
 ])

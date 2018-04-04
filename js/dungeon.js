@@ -31,6 +31,7 @@ var dungeon = {
 		else {
 			document.getElementById('scene-dungeon').innerHTML = dungeon.html();
 			battle.events();
+			button.init();
 		}
 		chat.scrollBottom();
 		// delegate
