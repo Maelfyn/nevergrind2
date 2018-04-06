@@ -1594,6 +1594,7 @@ background-clip: content-box;
 	font-size: .675rem;
 	color: #0a0;
 	opacity: 0;
+	line-height: 1.2;
 }
 #bar-header {
 	display: flex;

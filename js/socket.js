@@ -37,7 +37,10 @@ var socket = {
 			channel = 'name:' + my.name;
 			console.info("subscribing to whisper channel: ", channel);
 			socket.zmq.subscribe(channel, function(topic, data) {
-				if (data.action === 'send') {
+				if (data.routeTo === 'party') {
+					route.party(data, data.route);
+				}
+				else if (data.action === 'send') {
 					console.info('Sent whisper: ', data);
 					// report message
 					route.town(data, data.route);

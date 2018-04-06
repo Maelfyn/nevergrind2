@@ -246,8 +246,8 @@ var create = {
 	msg: function(key, val){
 		var z = {
 			gender: {
-				Male: "Males have strong cold and arcane resistance.                                                                                                                                                      ",
-				Female: "Females receive a boost to bleed and poison resistance.                                                                                                                                                      "
+				Male: "Males have strong cold and arcane resistance.",
+				Female: "Females receive a boost to bleed and poison resistance."
 			},
 			race: {
 				Barbarian: 'Barbarians are a hardy race that benefit from high strength and stamina. Living through harsh winters in Fenwoven has given them strong cold resistance and above-average scouting skills.',
@@ -1041,6 +1041,10 @@ var ng = {
 					town.go();
 				}
 			}
+
+			if (r.resetSession === null) {
+				sessionStorage.clear();
+			}
 		});
 	},
 	playerCardClicks: 0,
@@ -1616,6 +1620,24 @@ var game = {
 			return Date.now() - game.ping.start;
 		}
 	},
+	pingColors: [
+		'',
+		'chat-warning',
+		'chat-alert'
+	],
+	pingColor: function(ping) {
+		var index;
+		if (ping < 150) {
+			index = 0;
+		}
+		else if (ping < 350) {
+			index = 1;
+		}
+		else {
+			index = 2;
+		}
+		return game.pingColors[index];
+	},
 	start: function() {
 		// only called once
 		if (!game.init) {
@@ -1670,22 +1692,33 @@ var game = {
 			}).always(function() {
 				game.heartbeat.timer = setTimeout(game.heartbeat.send, 5000);
 				game.heartbeat.attempts++;
-				console.info("%c Ping: ", 'background: #0f0', game.ping.oneWay() +'ms', "Ratio: " + ((game.heartbeat.success / game.heartbeat.attempts)*100) + "%");
+				var ping = game.ping.oneWay();
+				console.info("%c Ping: ", 'background: #0f0', ping +'ms', "Ratio: " + ((game.heartbeat.success / game.heartbeat.attempts)*100) + "%");
+
+				bar.dom.ping.innerHTML =
+					'<span class="'+ game.pingColor(ping) +'">' + (ping) + 'ms</span>';
 			});
 		}
 	},
 	socket: {
 		timer: 0,
+		checkTimer: 0,
 		sendTime: 0,
 		receiveTime: 0,
-		timeout: 25000,
-		interval: 20000,
+		interval: 5000,
+		expired: 12000,
 		start: function() {
+			setTimeout(function() {
+				TweenMax.to('#bar-lag', .5, {
+					opacity: 1
+				});
+			}, game.socket.interval * 2);
 			game.socket.sendTime = Date.now();
 			game.socket.receiveTime = Date.now();
+			clearInterval(game.socket.checkTimer);
+			game.socket.checkTimer = setInterval(game.socket.checkDifference, game.socket.interval);
 			clearInterval(game.socket.timer);
 			game.socket.timer = setInterval(game.socket.send, game.socket.interval);
-			setInterval(game.socket.checkDifference, game.socket.interval);
 		},
 		send: function() {
 			// console.info("%c Last socket send: ", "background: #0ff", Date.now() - game.socket.sendTime);
@@ -1694,9 +1727,14 @@ var game = {
 		},
 		checkDifference: function() {
 			// longer than interval plus checkTolerance? disconnect (failed 2x)
-			var diff = Date.now() - game.socket.receiveTime;
+			var diff = Date.now() - game.socket.receiveTime,
+				ping = game.socket.receiveTime - game.socket.sendTime;
+
+			bar.dom.socket.innerHTML =
+				'<span class="'+ game.pingColor(ping) +'">' + (ping) + 'ms</span>';
+
 			console.info("%c Socket ping: ", "background: #08f", diff + 'ms');
-			if (diff > game.socket.interval + 1000) {
+			if (diff > game.socket.expired) {
 				ng.disconnect();
 			}
 		}
@@ -2140,6 +2178,7 @@ $(document).on(env.click, function(e){
 		// not local
 		if (code >= 112 && code <= 121 || code === 123) {
 			// disable all F keys except F11
+			// TODO: Put party targeting in here later
 			return false;
 		}
 	}
@@ -2218,7 +2257,10 @@ $(document).on(env.click, function(e){
 					}
 				}
 			} else {
-				// game
+				// dungeon & combat
+				if (!chat.hasFocus && code === 13 || code === 191) {
+					chat.dom.chatInput.focus();
+				}
 				if (code === 9) {
 					// tab
 					if (!e.shiftKey) {
@@ -2287,7 +2329,10 @@ var socket = {
 			channel = 'name:' + my.name;
 			console.info("subscribing to whisper channel: ", channel);
 			socket.zmq.subscribe(channel, function(topic, data) {
-				if (data.action === 'send') {
+				if (data.routeTo === 'party') {
+					route.party(data, data.route);
+				}
+				else if (data.action === 'send') {
 					console.info('Sent whisper: ', data);
 					// report message
 					route.town(data, data.route);
@@ -2367,13 +2412,6 @@ var socket = {
 		// chat updates
 		if (socket.initialConnection) {
 			socket.initialConnection = 0;
-			// subscribe to town-1 default channel - general chat
-			var town = chat.getChannel();
-			console.info("subscribing to channel: ", town);
-			chat.log("You have joined channel: " + my.channel, 'chat-warning');
-			socket.zmq.subscribe(town, function(topic, data) {
-				socket.routeMainChat(topic, data);
-			});
 
 			// subscribe to admin broadcasts
 			var admin = 'admin:broadcast';
@@ -3495,8 +3533,8 @@ var chat = {
 			return c[1] === undefined ?
 				'' : c[1].toLowerCase().trim();
 		},
-		channel: function(channel) {
-			if (ng.view === 'town') {
+		channel: function(channel, bypass) {
+			if (ng.view === 'town' || bypass) {
 				if (channel) {
 					// remove from channel
 					if (channel !== my.channel) {
@@ -3582,7 +3620,7 @@ var chat = {
 	// player broadcasts updates from client
 	broadcast: {
 		add: function() {
-			console.info('broadcast.add');
+			console.info('broadcast.add', chat.getChannel());
 			socket.zmq.publish(chat.getChannel(), {
 				route: 'chat->add',
 				row: my.row,
@@ -3669,6 +3707,9 @@ var bar = {
 			mpWrap: document.getElementById('bar-mp-wrap-' + i),
 			mpFg: document.getElementById('bar-mp-fg-' + i),
 		}
+
+		bar.dom.ping = document.getElementById('bar-ping');
+		bar.dom.socket = document.getElementById('bar-socket');
 	},
 	dom: {},
 	getPlayerHtml: function(p, i, ignoreWrap) {
@@ -3688,6 +3729,10 @@ var bar = {
 	header: function() {
 		var s = '';
 		s +=
+		'<div id="bar-lag">' +
+			'<span id="bar-ping">0ms</span>' +
+			'<span id="bar-socket">0ms</span>' +
+		'</div>' +
 		'<div id="bar-header">' +
 			'<i id="bar-stats" class="fa fa-user-circle-o bar-icons" title="Stat Sheet"></i>' +
 			'<i id="bar-inventory" class="fa fa-suitcase bar-icons" title="Inventory"></i>' +
@@ -6646,7 +6691,7 @@ var mission = {
 		data.quests !== undefined &&
 		data.quests.forEach(function(v){
 			str +=
-				'<div class="mission-quest-item '+ mission.getDiffClass(v.level) +'" '+
+				'<div class="mission-quest-item ellipsis '+ mission.getDiffClass(v.level) +'" '+
 					'data-id="'+ v.row +'" ' +
 					'data-zone="'+ v.zone +'" ' +
 					'data-level="'+ v.level +'">' +
@@ -6805,7 +6850,6 @@ var mission = {
 				url: app.url + 'php2/mission/abandon-quest.php'
 			}).done(function (data) {
 				console.info('abandon ', data);
-				mission.abort();
 			}).fail(function (data) {
 				chat.log(data.responseText, 'chat-alert');
 			}).always(function () {
@@ -6843,7 +6887,13 @@ var mission = {
 	},
 	abortCallback: function() {
 		// init client and transition back to town
+		$.ajax({
+			type: 'GET',
+			url: app.url + 'php2/chat/delete-from-players.php'
+		});
 		mission.initQuest();
+		// rejoin main chat
+		chat.join.channel('town', 1);
 		TweenMax.to('#scene-dungeon', 2, {
 			delay: 1,
 			opacity: 0
@@ -6853,6 +6903,9 @@ var mission = {
 			town.go();
 			chat.broadcast.add();
 			chat.setHeader();
+			chat.mode.change({
+				mode: '/say'
+			});
 		}, game.questDelay);
 	},
 	openFirstTwoZones: function() {
@@ -7116,7 +7169,7 @@ var button = {
 	init: function() {
 		var s = '';
 		// skill buttons
-		for (var i=0; i<8; i++) {
+		for (var i=0; i<9; i++) {
 			s += '<div id="class-btn-'+ i +'" class="class-btn" style="background-image: url(img2/skills/'+ my.job +'.png)"></div>';
 		}
 		button.wrap.innerHTML = s;
@@ -7126,13 +7179,14 @@ var button = {
 				console.info('CLICKED SKILL: ', id, typeof id);
 			});
 			setTimeout(function() {
-				TweenMax.to(button.wrap, 1.5, {
+				TweenMax.to(button.wrap, 1, {
 					startAt: {
 						display: 'flex',
-						opacity: 0,
+						y: 90
 					},
-					opacity: 1
+					y: 0
 				});
+
 			}, 1000);
 		}
 	},

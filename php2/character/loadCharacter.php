@@ -50,6 +50,13 @@
 	}
 	else {
 		$r['party']['id'] = $_SESSION['party']['id'];
+		// delete from parties on server no matter what
+		if ($_SERVER["SERVER_NAME"] !== "localhost"){
+			// delete from parties if player data is known
+			require '../session/init-party.php';
+			mysqli_query(
+			$link, 'delete from ng2_parties where c_id='. $_SESSION['ng2']['row']);
+		}
 	}
 	// init session values
 	require '../session/init-guild.php';

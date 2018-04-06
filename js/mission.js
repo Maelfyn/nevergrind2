@@ -409,6 +409,10 @@ var mission = {
 	},
 	abortCallback: function() {
 		// init client and transition back to town
+		$.ajax({
+			type: 'GET',
+			url: app.url + 'php2/chat/delete-from-players.php'
+		});
 		mission.initQuest();
 		// rejoin main chat
 		chat.join.channel('town', 1);

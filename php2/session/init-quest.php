@@ -1,6 +1,6 @@
 <?php
-require '../header-session-start.php';
-require '../db.php';
+require_once '../header-session-start.php';
+require_once '../db.php';
 $_SESSION['quest'] = [
 	'row' => 0,
 	'zone' => '',
