@@ -16,10 +16,9 @@ var button = {
 			setTimeout(function() {
 				TweenMax.to(button.wrap, 1, {
 					startAt: {
-						display: 'flex',
-						y: 90
+						display: 'flex'
 					},
-					y: 0
+					bottom: 0
 				});
 
 			}, 1000);

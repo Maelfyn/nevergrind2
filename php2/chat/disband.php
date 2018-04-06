@@ -28,8 +28,5 @@ if ($_SESSION['party']['id']) {
 		$stmt->bind_param('s', $_SESSION['account']);
 		$stmt->execute();
 	}
-	echo json_encode($r);
 }
-else {
-	exit("You are not in a party.");
-}
+echo json_encode($r);

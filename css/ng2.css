@@ -2019,7 +2019,7 @@ background-clip: content-box;
 	position: fixed;
 	justify-content: flex-start;
 	align-items: stretch;
-	bottom: 0;
+	bottom: -100px;
 	margin: 0 auto;
 	left: 0;
 	right: 0;
