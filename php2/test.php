@@ -11,10 +11,12 @@
 </style>
 <?php
 	require('db.php');
+	/*
 	$_SESSION['ng2']['hp'] = 1;
 	if ($_SESSION['ng2']['mp']) {
 		$_SESSION['ng2']['mp'] = 1;
 	}
+	*/
 
 	echo '<pre>HP: '. $_SESSION['ng2']['hp'] .'</pre>';
 	echo '<pre>MP: '. $_SESSION['ng2']['mp'] .'</pre>';

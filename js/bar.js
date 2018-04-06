@@ -37,6 +37,9 @@ var bar = {
 			mpWrap: document.getElementById('bar-mp-wrap-' + i),
 			mpFg: document.getElementById('bar-mp-fg-' + i),
 		}
+
+		bar.dom.ping = document.getElementById('bar-ping');
+		bar.dom.socket = document.getElementById('bar-socket');
 	},
 	dom: {},
 	getPlayerHtml: function(p, i, ignoreWrap) {
@@ -56,6 +59,10 @@ var bar = {
 	header: function() {
 		var s = '';
 		s +=
+		'<div id="bar-lag">' +
+			'<span id="bar-ping">0ms</span>' +
+			'<span id="bar-socket">0ms</span>' +
+		'</div>' +
 		'<div id="bar-header">' +
 			'<i id="bar-stats" class="fa fa-user-circle-o bar-icons" title="Stat Sheet"></i>' +
 			'<i id="bar-inventory" class="fa fa-suitcase bar-icons" title="Inventory"></i>' +

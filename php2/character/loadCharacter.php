@@ -121,7 +121,9 @@
 	if ($i) {
 		$cacheHp = -1;
 		$cacheMp = -1;
-		if (isset($_SESSION['ng2']) && $_SESSION['ng2']['hp'] > 0) {
+		if (isset($_SESSION['ng2']) &&
+			isset($_SESSION['ng2']['hp']) &&
+			$_SESSION['ng2']['hp'] > 0) {
 			// pre-cache hp/mp values if they exist
 			$cacheHp = $_SESSION['ng2']['hp'];
 			$cacheMp = $_SESSION['ng2']['mp'];

@@ -31,7 +31,7 @@ else {
 		'msg' => 'Mission abandoned: ' . $_SESSION['quest']['title'],
 		'route' => 'party->notifyMissionStatus',
 		'action' => 'abandon',
-		'category' => 'party:0'
+		'category' => 'party:'. $_SESSION['ng2']['name']
 	];
 	$socket->send(json_encode($zmq));
 }

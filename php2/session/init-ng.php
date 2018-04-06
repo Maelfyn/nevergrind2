@@ -1,7 +1,7 @@
 <?php
 $_SESSION['ng2'] = [
 	'row' => 0,
-	'name' => 0,
+	'name' => '',
 	'hp' => 0,
 	'mp' => 0,
 	'leader' => '',

@@ -1042,8 +1042,8 @@ var chat = {
 			return c[1] === undefined ?
 				'' : c[1].toLowerCase().trim();
 		},
-		channel: function(channel) {
-			if (ng.view === 'town') {
+		channel: function(channel, bypass) {
+			if (ng.view === 'town' || bypass) {
 				if (channel) {
 					// remove from channel
 					if (channel !== my.channel) {
@@ -1129,7 +1129,7 @@ var chat = {
 	// player broadcasts updates from client
 	broadcast: {
 		add: function() {
-			console.info('broadcast.add');
+			console.info('broadcast.add', chat.getChannel());
 			socket.zmq.publish(chat.getChannel(), {
 				route: 'chat->add',
 				row: my.row,

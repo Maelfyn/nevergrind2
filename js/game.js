@@ -15,6 +15,24 @@ var game = {
 			return Date.now() - game.ping.start;
 		}
 	},
+	pingColors: [
+		'',
+		'chat-warning',
+		'chat-alert'
+	],
+	pingColor: function(ping) {
+		var index;
+		if (ping < 150) {
+			index = 0;
+		}
+		else if (ping < 350) {
+			index = 1;
+		}
+		else {
+			index = 2;
+		}
+		return game.pingColors[index];
+	},
 	start: function() {
 		// only called once
 		if (!game.init) {
@@ -69,22 +87,33 @@ var game = {
 			}).always(function() {
 				game.heartbeat.timer = setTimeout(game.heartbeat.send, 5000);
 				game.heartbeat.attempts++;
-				console.info("%c Ping: ", 'background: #0f0', game.ping.oneWay() +'ms', "Ratio: " + ((game.heartbeat.success / game.heartbeat.attempts)*100) + "%");
+				var ping = game.ping.oneWay();
+				console.info("%c Ping: ", 'background: #0f0', ping +'ms', "Ratio: " + ((game.heartbeat.success / game.heartbeat.attempts)*100) + "%");
+
+				bar.dom.ping.innerHTML =
+					'<span class="'+ game.pingColor(ping) +'">' + (ping) + 'ms</span>';
 			});
 		}
 	},
 	socket: {
 		timer: 0,
+		checkTimer: 0,
 		sendTime: 0,
 		receiveTime: 0,
-		timeout: 25000,
-		interval: 20000,
+		interval: 5000,
+		expired: 12000,
 		start: function() {
+			setTimeout(function() {
+				TweenMax.to('#bar-lag', .5, {
+					opacity: 1
+				});
+			}, game.socket.interval * 2);
 			game.socket.sendTime = Date.now();
 			game.socket.receiveTime = Date.now();
+			clearInterval(game.socket.checkTimer);
+			game.socket.checkTimer = setInterval(game.socket.checkDifference, game.socket.interval);
 			clearInterval(game.socket.timer);
 			game.socket.timer = setInterval(game.socket.send, game.socket.interval);
-			setInterval(game.socket.checkDifference, game.socket.interval);
 		},
 		send: function() {
 			// console.info("%c Last socket send: ", "background: #0ff", Date.now() - game.socket.sendTime);
@@ -93,9 +122,14 @@ var game = {
 		},
 		checkDifference: function() {
 			// longer than interval plus checkTolerance? disconnect (failed 2x)
-			var diff = Date.now() - game.socket.receiveTime;
+			var diff = Date.now() - game.socket.receiveTime,
+				ping = game.socket.receiveTime - game.socket.sendTime;
+
+			bar.dom.socket.innerHTML =
+				'<span class="'+ game.pingColor(ping) +'">' + (ping) + 'ms</span>';
+
 			console.info("%c Socket ping: ", "background: #08f", diff + 'ms');
-			if (diff > game.socket.interval + 1000) {
+			if (diff > game.socket.expired) {
 				ng.disconnect();
 			}
 		}

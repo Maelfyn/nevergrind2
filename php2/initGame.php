@@ -16,6 +16,11 @@ $_SESSION['referPath'] = '/ng2-test-server';
 $empty = empty($_SESSION['account']);
 
 $r['empty'] = $empty;
+// data to reset sessionStorage.clear();
+$r['resetSession'] = null;
+if (isset($_SESSION['ng2']['name'])) {
+	$r['resetSession'] = $_SESSION['ng2']['name'];
+}
 if ($empty) {
 	// no account data
 }

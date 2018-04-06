@@ -59,7 +59,7 @@ else {
 	$zmq = [
 		'msg' => 'Mission started: ' . $_SESSION['quest']['title'],
 		'route' => 'party->notifyMissionStatus',
-		'category' => 'party:0'
+		'category' => 'party:'. $_SESSION['ng2']['name']
 	];
 }
 $socket->send(json_encode($zmq));

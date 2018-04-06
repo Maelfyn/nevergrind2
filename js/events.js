@@ -33,6 +33,7 @@ $(document).on(env.click, function(e){
 		// not local
 		if (code >= 112 && code <= 121 || code === 123) {
 			// disable all F keys except F11
+			// TODO: Put party targeting in here later
 			return false;
 		}
 	}
@@ -111,7 +112,10 @@ $(document).on(env.click, function(e){
 					}
 				}
 			} else {
-				// game
+				// dungeon & combat
+				if (!chat.hasFocus && code === 13 || code === 191) {
+					chat.dom.chatInput.focus();
+				}
 				if (code === 9) {
 					// tab
 					if (!e.shiftKey) {

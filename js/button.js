@@ -4,7 +4,7 @@ var button = {
 	init: function() {
 		var s = '';
 		// skill buttons
-		for (var i=0; i<8; i++) {
+		for (var i=0; i<9; i++) {
 			s += '<div id="class-btn-'+ i +'" class="class-btn" style="background-image: url(img2/skills/'+ my.job +'.png)"></div>';
 		}
 		button.wrap.innerHTML = s;
@@ -14,13 +14,14 @@ var button = {
 				console.info('CLICKED SKILL: ', id, typeof id);
 			});
 			setTimeout(function() {
-				TweenMax.to(button.wrap, 1.5, {
+				TweenMax.to(button.wrap, 1, {
 					startAt: {
 						display: 'flex',
-						opacity: 0,
+						y: 90
 					},
-					opacity: 1
+					y: 0
 				});
+
 			}, 1000);
 		}
 	},

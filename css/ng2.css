@@ -812,7 +812,7 @@ tbody {
 }
 #ch-cr-detail-col {
 	display: flex;
-	flex-direction: row;
+	flex-direction: column;
 	justify-content: space-between
 }
 .title-ch-well {
@@ -1272,7 +1272,7 @@ tbody {
 	display: none;
 	flex-direction: row;
 	font-family: Play, Roboto Condensed, Roboto, sans-serif;
-	position: absolute;
+	position: fixed;
 	top: 0;
 	right: 0;
 	font-size: 1rem;
@@ -1445,7 +1445,8 @@ tbody {
 	color: #ffff1a;
 	background: rgba(255,255,32,.2);
 }
-.chat-alert {
+.chat-alert,
+.chat-danger {
 	color: #f22;
 }
 .chat-broadcast {
@@ -1576,16 +1577,23 @@ background-clip: content-box;
 #bar-wrap {
 	display: none;
 	font-family: Quatro, Roboto Condensed, Roboto, sans-serif;
-	position: absolute;
+	position: fixed;
 	top: .2rem;
 	left: .2rem;
 	z-index: 2;
-	padding: .3rem;
-	border: 2px groove #013;
-	/*background-image: -webkit-linear-gradient(left, rgba(0, 32, 60, .7), rgba(0, 0, 0, 0));
+	padding: 0 .3rem;
+	/*border: 2px groove #013;
+	background-image: -webkit-linear-gradient(left, rgba(0, 32, 60, .7), rgba(0, 0, 0, 0));
 	background-image: -moz-linear-gradient(left, rgba(0, 32, 60, .7), rgba(0, 0, 0, 0));
 	background-image: -o-linear-gradient(left, rgba(0, 32, 60, .7), rgba(0, 0, 0, 0));
 	background-image: linear-gradient(left, rgba(0, 32, 60, .7), rgba(0, 0, 0, 0));*/
+}
+#bar-lag {
+	display: flex;
+	justify-content: space-between;
+	font-size: .675rem;
+	color: #0a0;
+	opacity: 0;
 }
 #bar-header {
 	display: flex;
@@ -1602,13 +1610,13 @@ background-clip: content-box;
 	background: radial-gradient(bottom left, cover,rgba(0,48,96,1) 0,rgba(0,0,0,1) 100%);
 }
 #bar-all-player-wrap {
-	border: .1rem outset #048;
-	outline: 1px solid #579;
+	/*border: .1rem outset #048;
+	outline: 1px solid #579;*/
 	padding: .2rem;
-	background: -webkit-radial-gradient(top left,cover,rgba(0,48,96,1) 0,rgba(0,0,0,1) 100%);
+	/*background: -webkit-radial-gradient(top left,cover,rgba(0,48,96,1) 0,rgba(0,0,0,1) 100%);
 	background: -moz-radial-gradient(top left, cover,rgba(0,48,96,1) 0,rgba(0,0,0,1) 100%);
 	background: -o-radial-gradient(top left, cover,rgba(0,48,96,1) 0,rgba(0,0,0,1) 100%);
-	background: radial-gradient(top left, cover,rgba(0,48,96,1) 0,rgba(0,0,0,1) 100%);
+	background: radial-gradient(top left, cover,rgba(0,48,96,1) 0,rgba(0,0,0,1) 100%);*/
 }
 .bar-icons {
 	color: gold;
@@ -1999,7 +2007,7 @@ background-clip: content-box;
 	background: rgba(0,64,128,.3);
 }
 #mission-abandon {
-	box-shadow: 0 500px 0 rgba(255,0,0,.4) inset;
+	box-shadow: 0 500px 0 rgba(255, 0, 0, .4) inset;
 }
 /* dungeon */
 #scene-dungeon {
@@ -2007,7 +2015,7 @@ background-clip: content-box;
 }
 #button-wrap {
 	display: none;
-	position: absolute;
+	position: fixed;
 	justify-content: flex-start;
 	align-items: stretch;
 	bottom: 0;
@@ -2015,14 +2023,18 @@ background-clip: content-box;
 	left: 0;
 	right: 0;
 	height: 3.6rem;
-	width: 26rem;
+	width: 29.6rem;
 	z-index: 1;
 }
 .class-btn {
 	border: .1rem outset #013;
 	background-size: 61.2rem 13.6rem; /* convert via 3.4 * number of buttons?? */
 	flex: 1;
-	cursor: url('cursor/pointer.cur'), pointer
+	cursor: url('cursor/pointer.cur'), pointer;
+	-webkit-transition : border .1s linear;
+	-moz-transition : border .1s linear;
+	-o-transition : border .1s linear;
+	transition : border .1s linear;
 }
 .class-btn:hover {
 	border: .1rem groove #048;
@@ -2038,6 +2050,7 @@ background-clip: content-box;
 #class-btn-5 { background-position: -20.6rem 0; }
 #class-btn-6 { background-position: -24rem 0; }
 #class-btn-7 { background-position: -27.4rem 0; }
+#class-btn-8 { background-position: -30.8rem 0; }
 /* battle */
 #scene-battle {
 	opacity: 0;

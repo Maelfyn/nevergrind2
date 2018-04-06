@@ -117,13 +117,6 @@ var socket = {
 		// chat updates
 		if (socket.initialConnection) {
 			socket.initialConnection = 0;
-			// subscribe to town-1 default channel - general chat
-			var town = chat.getChannel();
-			console.info("subscribing to channel: ", town);
-			chat.log("You have joined channel: " + my.channel, 'chat-warning');
-			socket.zmq.subscribe(town, function(topic, data) {
-				socket.routeMainChat(topic, data);
-			});
 
 			// subscribe to admin broadcasts
 			var admin = 'admin:broadcast';

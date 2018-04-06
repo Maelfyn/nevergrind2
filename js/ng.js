@@ -448,6 +448,10 @@ var ng = {
 					town.go();
 				}
 			}
+
+			if (r.resetSession === null) {
+				sessionStorage.clear();
+			}
 		});
 	},
 	playerCardClicks: 0,

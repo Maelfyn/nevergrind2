@@ -213,7 +213,7 @@ var mission = {
 		data.quests !== undefined &&
 		data.quests.forEach(function(v){
 			str +=
-				'<div class="mission-quest-item '+ mission.getDiffClass(v.level) +'" '+
+				'<div class="mission-quest-item ellipsis '+ mission.getDiffClass(v.level) +'" '+
 					'data-id="'+ v.row +'" ' +
 					'data-zone="'+ v.zone +'" ' +
 					'data-level="'+ v.level +'">' +
@@ -372,7 +372,6 @@ var mission = {
 				url: app.url + 'php2/mission/abandon-quest.php'
 			}).done(function (data) {
 				console.info('abandon ', data);
-				mission.abort();
 			}).fail(function (data) {
 				chat.log(data.responseText, 'chat-alert');
 			}).always(function () {
@@ -411,6 +410,8 @@ var mission = {
 	abortCallback: function() {
 		// init client and transition back to town
 		mission.initQuest();
+		// rejoin main chat
+		chat.join.channel('town', 1);
 		TweenMax.to('#scene-dungeon', 2, {
 			delay: 1,
 			opacity: 0
@@ -420,6 +421,9 @@ var mission = {
 			town.go();
 			chat.broadcast.add();
 			chat.setHeader();
+			chat.mode.change({
+				mode: '/say'
+			});
 		}, game.questDelay);
 	},
 	openFirstTwoZones: function() {

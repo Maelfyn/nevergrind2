@@ -200,8 +200,8 @@ var create = {
 	msg: function(key, val){
 		var z = {
 			gender: {
-				Male: "Males have strong cold and arcane resistance.                                                                                                                                                      ",
-				Female: "Females receive a boost to bleed and poison resistance.                                                                                                                                                      "
+				Male: "Males have strong cold and arcane resistance.",
+				Female: "Females receive a boost to bleed and poison resistance."
 			},
 			race: {
 				Barbarian: 'Barbarians are a hardy race that benefit from high strength and stamina. Living through harsh winters in Fenwoven has given them strong cold resistance and above-average scouting skills.',
