@@ -8,9 +8,10 @@ var dungeon = {
 		// set new channel data
 		my.channel = '';
 		// force change to party chat if in town chat
-		chat.mode.change({
-			mode: '/party'
-		});
+		chat.mode.command === '/say' &&
+			chat.mode.change({
+				mode: '/party'
+			});
 		chat.size.small();
 		ng.setScene('dungeon');
 		dungeon.init();

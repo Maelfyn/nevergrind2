@@ -1153,6 +1153,7 @@ tbody {
 #mob-wrap-8 { bottom: 280px; left: 80%; }
 .mob-details {
 	position: absolute;
+	display: none;
 	left: -100px;
 	width: 200px;
 	cursor: url('cursor/pointer.cur'), pointer;
@@ -1179,6 +1180,7 @@ tbody {
 }
 .mob-shadow {
 	position: absolute;
+	display: none;
 	left: -200px;
 	bottom: 30px;
 	border-radius: 50%;
@@ -1593,7 +1595,6 @@ background-clip: content-box;
 	justify-content: space-between;
 	font-size: .675rem;
 	color: #0a0;
-	opacity: 0;
 	line-height: 1.2;
 }
 #bar-header {
@@ -2024,7 +2025,7 @@ background-clip: content-box;
 	left: 0;
 	right: 0;
 	height: 3.6rem;
-	width: 29.6rem;
+	width: 33rem;
 	z-index: 1;
 }
 .class-btn {
@@ -2052,6 +2053,7 @@ background-clip: content-box;
 #class-btn-6 { background-position: -24rem 0; }
 #class-btn-7 { background-position: -27.4rem 0; }
 #class-btn-8 { background-position: -30.8rem 0; }
+#class-btn-9 { background-position: -34.2rem 0; }
 /* battle */
 #scene-battle {
 	opacity: 0;

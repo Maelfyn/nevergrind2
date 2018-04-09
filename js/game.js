@@ -46,6 +46,7 @@ var game = {
 		}
 	},
 	heartbeat: {
+		enabled: 1,
 		timer: 0,
 		success: 0,
 		fails: 0,
@@ -66,33 +67,43 @@ var game = {
 			console.info("%c Last heartbeat interval: ", "background: #ff0", Date.now() - game.ping.start +'ms');
 			game.ping.start = Date.now();
 			clearTimeout(game.heartbeat.timer);
-			$.ajax({
-				type: 'GET',
-				url: app.url + 'php2/heartbeat.php'
-			}).done(function (data) {
-				game.heartbeat.success++;
-				if (game.heartbeat.successiveFails) {
-					// this does nothing right now, but maybe later?!
-					game.resync();
-				}
-				game.heartbeat.successiveFails = 0;
-				console.info("heartbeat data: ", data);
-				data.name = my.name;
-				bar.updateBars(data);
-			}).fail(function(data){
-				console.info('%c heartbeatCallback', 'background: #f00', data.responseText);
-				game.heartbeat.fails++;
-				game.heartbeat.successiveFails++;
-				game.heartbeat.successiveFails > 1 && ng.disconnect(data.responseText);
-			}).always(function() {
-				game.heartbeat.timer = setTimeout(game.heartbeat.send, 5000);
-				game.heartbeat.attempts++;
-				var ping = game.ping.oneWay();
-				console.info("%c Ping: ", 'background: #0f0', ping +'ms', "Ratio: " + ((game.heartbeat.success / game.heartbeat.attempts)*100) + "%");
+			if (game.heartbeat.enabled) {
+				$.ajax({
+					type: 'GET',
+					url: app.url + 'php2/heartbeat.php'
+				}).done(function (data) {
+					game.heartbeat.success++;
+					if (game.heartbeat.successiveFails) {
+						// this does nothing right now, but maybe later?!
+						game.resync();
+					}
+					game.heartbeat.successiveFails = 0;
+					console.info("heartbeat data: ", data);
+					data.name = my.name;
+					bar.updateBars(data);
+				}).fail(function(data){
+					game.heartbeat.callbackFail(data);
+				}).always(function() {
+					game.heartbeat.timer = setTimeout(game.heartbeat.send, 5000);
+					game.heartbeat.attempts++;
+					var ping = game.ping.oneWay();
+					console.info("%c Ping: ", 'background: #0f0', ping +'ms', "Ratio: " + ((game.heartbeat.success / game.heartbeat.attempts)*100) + "%");
 
-				bar.dom.ping.innerHTML =
-					'<span class="'+ game.pingColor(ping) +'">' + (ping) + 'ms</span>';
-			});
+					bar.dom.ping.innerHTML =
+						'<span class="'+ game.pingColor(ping) +'">' + (ping) + 'ms</span>';
+				});
+			}
+			else {
+				game.heartbeat.callbackFail({
+					responseText: "You failed to find your way back to town."
+				});
+			}
+		},
+		callbackFail: function(data) {
+			console.info('%c heartbeatCallback', 'background: #f00', data.responseText);
+			game.heartbeat.fails++;
+			game.heartbeat.successiveFails++;
+			game.heartbeat.successiveFails > 1 && ng.disconnect(data.responseText);
 		}
 	},
 	socket: {
@@ -101,17 +112,17 @@ var game = {
 		sendTime: 0,
 		receiveTime: 0,
 		interval: 5000,
-		expired: 12000,
+		expired: 16000,
 		start: function() {
 			setTimeout(function() {
 				TweenMax.to('#bar-lag', .5, {
 					opacity: 1
 				});
-			}, game.socket.interval * 2);
+			}, game.socket.interval);
 			game.socket.sendTime = Date.now();
 			game.socket.receiveTime = Date.now();
 			clearInterval(game.socket.checkTimer);
-			game.socket.checkTimer = setInterval(game.socket.checkDifference, game.socket.interval);
+			game.socket.checkTimer = setInterval(game.socket.checkTimeout, game.socket.interval);
 			clearInterval(game.socket.timer);
 			game.socket.timer = setInterval(game.socket.send, game.socket.interval);
 		},
@@ -120,18 +131,20 @@ var game = {
 			game.socket.sendTime = Date.now();
 			socket.zmq.publish('hb:' + my.name, {});
 		},
-		checkDifference: function() {
+		checkTimeout: function() {
 			// longer than interval plus checkTolerance? disconnect (failed 2x)
-			var diff = Date.now() - game.socket.receiveTime,
-				ping = game.socket.receiveTime - game.socket.sendTime;
-
-			bar.dom.socket.innerHTML =
-				'<span class="'+ game.pingColor(ping) +'">' + (ping) + 'ms</span>';
+			var diff = Date.now() - game.socket.receiveTime;
 
 			console.info("%c Socket ping: ", "background: #08f", diff + 'ms');
 			if (diff > game.socket.expired) {
 				ng.disconnect();
 			}
+		},
+		heartbeatCallback: function() {
+			game.socket.receiveTime = Date.now();
+			var ping = game.socket.receiveTime - game.socket.sendTime;
+			bar.dom.socket.innerHTML =
+				'<span class="'+ game.pingColor(ping) +'">' + (ping) + 'ms</span>';
 		}
 	},
 	played: {

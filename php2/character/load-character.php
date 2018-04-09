@@ -22,44 +22,6 @@
 			exit("One of your characters is already logged in or has not timed out yet.");
 		}
 	}
-	if (!isset($_SESSION['party'])) {
-		require '../session/init-party.php';
-	}
-	if (!isset($_SESSION['quest'])) {
-		require '../session/init-quest.php';
-	}
-
-	// check party data
-	if (!$_SESSION['party']['id']) {
-		require '../session/init-party.php';
-		if (isset($_SESSION['ng2']['row'])) {
-			// delete from parties if player data is known
-			mysqli_query(
-			$link, 'delete from ng2_parties where c_id='. $_SESSION['ng2']['row']
-			);
-		}
-		// am I in a party? This will trigger party-get-all client-side
-		/*$stmt = $link->prepare('SELECT count(row) count FROM ng2_parties where c_id=?');
-		$stmt->bind_param('i', $r['characterData']['row']);
-		$stmt->execute();
-		$stmt->bind_result($inParty);
-		$inParty = 0;
-		while ($stmt->fetch()) {
-			$r['inParty'] = $inParty;
-		}*/
-	}
-	else {
-		$r['party']['id'] = $_SESSION['party']['id'];
-		// delete from parties on server no matter what
-		if ($_SERVER["SERVER_NAME"] !== "localhost"){
-			// delete from parties if player data is known
-			require '../session/init-party.php';
-			mysqli_query(
-			$link, 'delete from ng2_parties where c_id='. $_SESSION['ng2']['row']);
-		}
-	}
-	// init session values
-	require '../session/init-guild.php';
 
 	// get my character data
 	$query = 'select row, name, level, race, job, hp, maxHp, mp, maxMp,
@@ -148,9 +110,30 @@
 			$_SESSION['ng2']['mp'] = $cacheMp;
 			$r['characterData']['mp'] = $cacheMp;
 		}
+
+		// init or wipe all party data
+		if (!isset($_SESSION['party'])) {
+			require '../session/init-party.php';
+		}
+		else {
+			require '../session/init-party.php';
+			// delete from parties if player data is known
+			mysqli_query($link, 'delete from ng2_parties where c_id='. $_SESSION['ng2']['row']);
+		}
+
+		if (!isset($_SESSION['quest'])) {
+			require '../session/init-quest.php';
+		}
+		else {
+			require '../session/init-quest.php';
+
+		}
+		// init session values
+		require '../session/init-guild.php';
+
 		// set hp/mp regen, etc
 		require 'setEquipmentValues.php';
-
+		/*
 		// update player heartbeat table
 		$stmt = $link->prepare('insert into ng2_players 
 			(`id`, `account`, `name`, `level`, `race`, `job`, `zone`) 
@@ -165,6 +148,8 @@
 			$_SESSION['ng2']['race'],
 			$_SESSION['ng2']['job'],
 			$_SESSION['ng2']['zone']);
+		*/
+
 		// count active players
 		$result = mysqli_query(
 			$link,

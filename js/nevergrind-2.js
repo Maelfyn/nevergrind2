@@ -639,7 +639,7 @@ var ng = {
 				}
 				if (ng.view === 'battle') {
 					for (var i=0; i<mob.max; i++) {
-						mob.sizeMob(mobs[i]);
+						mob.sizeMob(i);
 					}
 				}
 			}, 50);
@@ -727,6 +727,9 @@ var ng = {
 	},
 	toJobLong: function(key){
 		return ng.jobLong[key];
+	},
+	getJobShortKeys: function() {
+		return Object.keys(ng.jobLong);
 	},
 	copy: function(o){
 		return JSON.parse(JSON.stringify(o));
@@ -1016,9 +1019,9 @@ var ng = {
 	initGame: function(){
 		$.ajax({
 			type: 'GET',
-			url: app.url + 'php2/initGame.php'
+			url: app.url + 'php2/init-game.php'
 		}).done(function(r){
-			console.info("initGame: ", r);
+			console.info("init-game: ", r);
 			app.initialized = 1;
 			if (r.account) {
 				app.account = my.account = r.account; // for global reference
@@ -1651,6 +1654,7 @@ var game = {
 		}
 	},
 	heartbeat: {
+		enabled: 1,
 		timer: 0,
 		success: 0,
 		fails: 0,
@@ -1671,33 +1675,43 @@ var game = {
 			console.info("%c Last heartbeat interval: ", "background: #ff0", Date.now() - game.ping.start +'ms');
 			game.ping.start = Date.now();
 			clearTimeout(game.heartbeat.timer);
-			$.ajax({
-				type: 'GET',
-				url: app.url + 'php2/heartbeat.php'
-			}).done(function (data) {
-				game.heartbeat.success++;
-				if (game.heartbeat.successiveFails) {
-					// this does nothing right now, but maybe later?!
-					game.resync();
-				}
-				game.heartbeat.successiveFails = 0;
-				console.info("heartbeat data: ", data);
-				data.name = my.name;
-				bar.updateBars(data);
-			}).fail(function(data){
-				console.info('%c heartbeatCallback', 'background: #f00', data.responseText);
-				game.heartbeat.fails++;
-				game.heartbeat.successiveFails++;
-				game.heartbeat.successiveFails > 1 && ng.disconnect(data.responseText);
-			}).always(function() {
-				game.heartbeat.timer = setTimeout(game.heartbeat.send, 5000);
-				game.heartbeat.attempts++;
-				var ping = game.ping.oneWay();
-				console.info("%c Ping: ", 'background: #0f0', ping +'ms', "Ratio: " + ((game.heartbeat.success / game.heartbeat.attempts)*100) + "%");
+			if (game.heartbeat.enabled) {
+				$.ajax({
+					type: 'GET',
+					url: app.url + 'php2/heartbeat.php'
+				}).done(function (data) {
+					game.heartbeat.success++;
+					if (game.heartbeat.successiveFails) {
+						// this does nothing right now, but maybe later?!
+						game.resync();
+					}
+					game.heartbeat.successiveFails = 0;
+					console.info("heartbeat data: ", data);
+					data.name = my.name;
+					bar.updateBars(data);
+				}).fail(function(data){
+					game.heartbeat.callbackFail(data);
+				}).always(function() {
+					game.heartbeat.timer = setTimeout(game.heartbeat.send, 5000);
+					game.heartbeat.attempts++;
+					var ping = game.ping.oneWay();
+					console.info("%c Ping: ", 'background: #0f0', ping +'ms', "Ratio: " + ((game.heartbeat.success / game.heartbeat.attempts)*100) + "%");
 
-				bar.dom.ping.innerHTML =
-					'<span class="'+ game.pingColor(ping) +'">' + (ping) + 'ms</span>';
-			});
+					bar.dom.ping.innerHTML =
+						'<span class="'+ game.pingColor(ping) +'">' + (ping) + 'ms</span>';
+				});
+			}
+			else {
+				game.heartbeat.callbackFail({
+					responseText: "You failed to find your way back to town."
+				});
+			}
+		},
+		callbackFail: function(data) {
+			console.info('%c heartbeatCallback', 'background: #f00', data.responseText);
+			game.heartbeat.fails++;
+			game.heartbeat.successiveFails++;
+			game.heartbeat.successiveFails > 1 && ng.disconnect(data.responseText);
 		}
 	},
 	socket: {
@@ -1706,17 +1720,17 @@ var game = {
 		sendTime: 0,
 		receiveTime: 0,
 		interval: 5000,
-		expired: 12000,
+		expired: 16000,
 		start: function() {
 			setTimeout(function() {
 				TweenMax.to('#bar-lag', .5, {
 					opacity: 1
 				});
-			}, game.socket.interval * 2);
+			}, game.socket.interval);
 			game.socket.sendTime = Date.now();
 			game.socket.receiveTime = Date.now();
 			clearInterval(game.socket.checkTimer);
-			game.socket.checkTimer = setInterval(game.socket.checkDifference, game.socket.interval);
+			game.socket.checkTimer = setInterval(game.socket.checkTimeout, game.socket.interval);
 			clearInterval(game.socket.timer);
 			game.socket.timer = setInterval(game.socket.send, game.socket.interval);
 		},
@@ -1725,18 +1739,20 @@ var game = {
 			game.socket.sendTime = Date.now();
 			socket.zmq.publish('hb:' + my.name, {});
 		},
-		checkDifference: function() {
+		checkTimeout: function() {
 			// longer than interval plus checkTolerance? disconnect (failed 2x)
-			var diff = Date.now() - game.socket.receiveTime,
-				ping = game.socket.receiveTime - game.socket.sendTime;
-
-			bar.dom.socket.innerHTML =
-				'<span class="'+ game.pingColor(ping) +'">' + (ping) + 'ms</span>';
+			var diff = Date.now() - game.socket.receiveTime;
 
 			console.info("%c Socket ping: ", "background: #08f", diff + 'ms');
 			if (diff > game.socket.expired) {
 				ng.disconnect();
 			}
+		},
+		heartbeatCallback: function() {
+			game.socket.receiveTime = Date.now();
+			var ping = game.socket.receiveTime - game.socket.sendTime;
+			bar.dom.socket.innerHTML =
+				'<span class="'+ game.pingColor(ping) +'">' + (ping) + 'ms</span>';
 		}
 	},
 	played: {
@@ -2323,7 +2339,7 @@ var socket = {
 			console.info("subscribing to heartbeat channel: ", channel);
 			socket.zmq.subscribe(channel, function(){
 				// nothin
-				game.socket.receiveTime = Date.now();
+				game.socket.heartbeatCallback();
 			});
 			// whisper
 			channel = 'name:' + my.name;
@@ -3693,6 +3709,14 @@ var bar = {
 
 				console.info(id, slot, my.party[slot].name);
 				context.getPartyMenu(my.party[slot].name);
+			}).on(env.click, '#bar-camp', function () {
+				chat.camp();
+			}).on(env.click, '#bar-stats', function () {
+				console.info($(this).attr('id'));
+			}).on(env.click, '#bar-inventory', function () {
+				console.info($(this).attr('id'));
+			}).on(env.click, '#bar-options', function () {
+				console.info($(this).attr('id'));
 			}).on(env.click, '#bar-mission-abandon', function () {
 				mission.abandon();
 			});
@@ -3730,10 +3754,11 @@ var bar = {
 		var s = '';
 		s +=
 		'<div id="bar-lag">' +
-			'<span id="bar-ping">0ms</span>' +
-			'<span id="bar-socket">0ms</span>' +
+			'<span id="bar-ping"><i class="fa fa-exchange"></i></span>' +
+			'<span id="bar-socket"><i class="fa fa-exchange"></i></span>' +
 		'</div>' +
 		'<div id="bar-header">' +
+			'<i id="bar-camp" class="fa fa-power-off bar-icons" title="Camp"></i>' +
 			'<i id="bar-stats" class="fa fa-user-circle-o bar-icons" title="Stat Sheet"></i>' +
 			'<i id="bar-inventory" class="fa fa-suitcase bar-icons" title="Inventory"></i>' +
 			'<i id="bar-options" class="fa fa-gear bar-icons" title="Options"></i>' +
@@ -3970,6 +3995,13 @@ var battle = {
 			delay: .5,
 			opacity: 1
 		});
+		if (!mob.initialized) {
+			// initialization things only
+			mob.initialized = 1;
+			mob.imageKeys = Object.keys(mobs.images);
+			mob.index = mob.imageKeys.length - 1;
+		}
+		button.init();
 	},
 	html: function(){
 		var s = '<img id="battle-bg" class="img-bg" src="img2/bg/fw2.jpg">';
@@ -4017,23 +4049,12 @@ var battle = {
 		console.info("Setting target ", i, Date.now());
 	},
 	// MUST INIT THEN SHOW
-	init: function(){
-		if (!mob.initialized) {
-			// initialization things only
-			mob.initialized = 1;
-			mob.imageKeys = Object.keys(mobs.images);
-			mob.index = mob.imageKeys.length - 1;
-		}
-
+	testInit: function() {
 		for (var i=0; i<mob.max; i++){
-		//for (var i=2; i<3; i++){
-			var m = mobs[i],
-				mobKey = mob.getRandomMobKey();
+			var mobKey = mob.getRandomMobKey();
 				// mobKey = 'toadlok';
 			cache.preload.mob(mobKey);
-			m.type = mobKey;
-			mob.setMob(m);
-			mob.idle(m);
+			mob.setMob(i, mobKey);
 		}
 	},
 	// 1080p defaults
@@ -5196,7 +5217,7 @@ mobs.images = {
 };
 // test methods
 var mob = {
-	test: 1, // used to enable test mode to show all animations looping
+	test: 0, // used to enable test mode to show all animations looping
 	imageKeysLen: 0,
 	index: 0,
 	cache: {},
@@ -5240,20 +5261,24 @@ var mob = {
 				mobs[i].dom[e] = document.getElementById('mob-'+ e +'-' + i);
 			});
 		}
-		battle.init();
 	},
 	element: {},
 	animationActive: 0,
 	frame: 1,
-	setMob: function(m){
-		// set memory
-		m.size = m.size;
-		m = Object.assign(m, mobs.images[m.type]);
-		delete m.cache;
-		mob.sizeMob(m);
+	// configs, resets (active animations) and idles mobs in one call for start of combat
+	setMob: function(i, mobKey) {
+		// m.size = m.size;
+		mobs[i].type = mobKey;
+		// combine/assign image object props to mobs[index]
+		mobs[i] = Object.assign(mobs[i], mobs.images[mobKey]);
+		delete mobs[i].cache;
+		mob.sizeMob(i);
+		mob.resetIdle(i);
+		mob.idle(i);
 	},
-	sizeMob: function(m){
-		// TODO: perhaps modify this later responsively using window.innerWidth ?
+	// size only
+	sizeMob: function(index){
+		var m = mobs[index];
 		// set dom
 		var w = ~~(m.size * (mobs.images[m.type].w));
 
@@ -5261,6 +5286,7 @@ var mob = {
 		// wrapper
 		// name
 		m.dom.name.innerHTML = m.type.replace(/-/g, ' ');
+		m.dom.details.style.display = 'block';
 		// img
 		m.dom.img.style.left = (w * -.5) + 'px';
 		m.dom.img.style.width = w + 'px';
@@ -5271,6 +5297,7 @@ var mob = {
 			bottom: m.detailAliveBottom * m.size
 		});
 		// shadow
+		m.dom.shadow.style.display = 'block';
 		m.dom.shadow.style.width = (m.shadowWidth * m.size) + 'px';
 		m.dom.shadow.style.height = (m.shadowHeight * m.size) + 'px';
 		m.dom.shadow.style.left = ((m.shadowWidth * m.size ) * -.5) + 'px';
@@ -5295,19 +5322,20 @@ var mob = {
 		m.dom.dead.style.height = (m.clickDeadH * m.size) + 'px';
 		m.dom.dead.style.display = m.hp ? 'none' : 'block';
 	},
-	setSrc: function(m){
-		m.frame = ~~m.frame;
-		if (m.frame !== m.lastFrame) {
-			m.dom.img.src = 'mobs/' + m.type + '/' + m.frame + '.png';
-			m.lastFrame = m.frame;
+	setSrc: function(i){
+		mobs[i].frame = ~~mobs[i].frame;
+		if (mobs[i].frame !== mobs[i].lastFrame) {
+			mobs[i].dom.img.src = 'mobs/' + mobs[i].type + '/' + mobs[i].frame + '.png';
+			mobs[i].lastFrame = mobs[i].frame;
 		}
 	},
-	resetIdle: function(m){
-		m.animationActive = 0;
-		mob.idle(m, 1);
+	resetIdle: function(i){
+		mobs[i].animationActive = 0;
+		mob.idle(mobs[i].index, 1);
 	},
-	idle: function(m, skip){
-		var startFrame = 1,
+	idle: function(i, skip){
+		var m = mobs[i],
+			startFrame = 1,
 			endFrame = 5.9,
 			diff = endFrame - startFrame;
 
@@ -5321,16 +5349,17 @@ var mob = {
 			repeatDelay: m.speed,
 			ease: Sine.easeOut,
 			onUpdate: function(){
-				mob.setSrc(m);
+				mob.setSrc(m.index);
 			}
 		});
 		if (skip) return;
 		TweenMax.delayedCall(.25, function(){
-			mob.test && mob.hit(m);
+			mob.test && mob.hit(m.index);
 			//mob.death();
 		})
 	},
-	hit: function(m){
+	hit: function(i){
+		var m = mobs[i];
 		if (m.animationActive) return;
 		m.animationActive = 1;
 		var startFrame = 6,
@@ -5347,19 +5376,20 @@ var mob = {
 			yoyo: true,
 			repeat: 1,
 			onUpdate: function(){
-				mob.setSrc(m);
+				mob.setSrc(m.index);
 			},
 			onComplete: function(){
-				mob.resetIdle(m);
+				mob.resetIdle(m.index);
 				if (mob.test){
 					TweenMax.delayedCall(.5, function() {
-						mob.attack(m, 1);
+						mob.attack(m.index, 1);
 					});
 				}
 			}
 		});
 	},
-	attack: function(m, force){
+	attack: function(i, force){
+		var m = mobs[i];
 		if (m.animationActive) return;
 		m.animationActive = 1;
 		var tl = ng.TM(),
@@ -5381,34 +5411,35 @@ var mob = {
 			frame: endFrame,
 			ease: Linear.easeNone,
 			onUpdate: function() {
-				mob.setSrc(m);
+				mob.setSrc(m.index);
 			},
 			onComplete: function() {
-				mob.resetIdle(m);
+				mob.resetIdle(m.index);
 				if (mob.test){
 					if (force === 1){
 						TweenMax.delayedCall(.5, function() {
-							mob.attack(m, 2);
+							mob.attack(m.index, 2);
 						});
 					}
 					else if (force === 3){
 						TweenMax.delayedCall(.5, function() {
-							mob.death(m);
+							mob.death(m.index);
 						});
 					}
 					else {
 						TweenMax.delayedCall(.5, function() {
-							mob.special(m);
+							mob.special(m.index);
 						});
 					}
 				}
 			}
 		});
 	},
-	special: function(m){
+	special: function(i){
+		var m = mobs[i];
 		if (m.animationActive) return;
 		if (!m.enableSpecial) {
-			mob.attack(m, 3);
+			mob.attack(m.index, 3);
 		}
 		else {
 			m.animationActive = 1;
@@ -5427,20 +5458,21 @@ var mob = {
 				yoyo: m.yoyo,
 				repeat: m.yoyo ? 1 : 0,
 				onUpdate: function () {
-					mob.setSrc(m);
+					mob.setSrc(m.index);
 				},
 				onComplete: function () {
-					mob.resetIdle(m);
+					mob.resetIdle(m.index);
 					if (mob.test) {
 						TweenMax.delayedCall(.5, function () {
-							mob.death(m);
+							mob.death(m.index);
 						});
 					}
 				}
 			});
 		}
 	},
-	death: function(m){
+	death: function(i){
+		var m = mobs[i];
 		if (m.deathState) return;
 		m.deathState = 1;
 		m.hp = 0;
@@ -5463,7 +5495,7 @@ var mob = {
 			frame: endFrame,
 			ease: Linear.easeNone,
 			onUpdate: function () {
-				mob.setSrc(m);
+				mob.setSrc(m.index);
 			},
 			onComplete: function() {
 				var filters = {
@@ -5484,8 +5516,8 @@ var mob = {
 					onComplete: function () {
 						if (mob.test) {
 							m.hp = 1;
-							mob.sizeMob(m);
-							mob.idle(m);
+							mob.sizeMob(m.index);
+							mob.idle(m.index);
 						}
 						TweenMax.delayedCall(.1, function () {
 							m.deathState = 0;
@@ -5619,12 +5651,12 @@ var town = {
 			ng.lock(1);
 			chat.size.large();
 			$.ajax({
-				url: app.url + 'php2/character/loadCharacter.php',
+				url: app.url + 'php2/character/load-character.php',
 				data: {
 					row: create.selected
 				}
 			}).done(function(data) {
-				console.info('loadCharacter: ', data);
+				console.info('load-character: ', data);
 				var z = data.characterData;
 				my.name = z.name;
 				my.job = z.job;
@@ -6887,6 +6919,7 @@ var mission = {
 	},
 	abortCallback: function() {
 		// init client and transition back to town
+		game.heartbeat.enabled = 0;
 		$.ajax({
 			type: 'GET',
 			url: app.url + 'php2/chat/delete-from-players.php'
@@ -6906,6 +6939,8 @@ var mission = {
 			chat.mode.change({
 				mode: '/say'
 			});
+			// this must be in place to prevent heartbeat updates while going back to town
+			game.heartbeat.enabled = 1;
 		}, game.questDelay);
 	},
 	openFirstTwoZones: function() {
@@ -6927,9 +6962,10 @@ var dungeon = {
 		// set new channel data
 		my.channel = '';
 		// force change to party chat if in town chat
-		chat.mode.change({
-			mode: '/party'
-		});
+		chat.mode.command === '/say' &&
+			chat.mode.change({
+				mode: '/party'
+			});
 		chat.size.small();
 		ng.setScene('dungeon');
 		dungeon.init();
@@ -6969,135 +7005,399 @@ var dungeon = {
 	}
 }
 var skills = {
+	ALL: {
+		route: function(id) {
+			var key = skills[my.job].skillKeys[id];
+			skills.RNG[key]();
+		},
+		pull: function() {
+			console.info("skills.pull");
+		},
+		toggleAutoAttack: function() {
+			console.info("toggleAutoAttack");
+		}
+	},
 	WAR: {
-		bash: function() {},
-		taunt: function() {},
-		kick: function() {},
-		demoralize: function() {}
+		bash: function() {
+			console.info("bash");
+		},
+		taunt: function() {
+			console.info("taunt");
+		},
+		kick: function() {
+			console.info("kick");
+		},
+		demoralize: function() {
+			console.info("demoralize");
+		},
+		tearAsunder: function() {
+			console.info("tearAsunder");
+		},
+		shout: function() {
+			console.info("shout");
+		},
+		warCry: function() {
+			console.info("warCry");
+		},
+		warStomp: function() {
+			console.info("warStomp");
+		},
 	},
 	PAL: {
-		layHands: function() {},
-		bash: function() {},
-		taunt: function() {},
-		heal: function() {},
-		blessedHammer: function() {},
-		smite: function() {},
-		resolution: function() {},
-		holyMight: function() {}
+		layHands: function() {
+			console.info("layHands");
+		},
+		bash: function() {
+			console.info("bash");
+		},
+		taunt: function() {
+			console.info("taunt");
+		},
+		heal: function() {
+			console.info("heal");
+		},
+		blessedHammer: function() {
+			console.info("blessedHammer");
+		},
+		smite: function() {
+			console.info("smite");
+		},
+		resolution: function() {
+			console.info("resolution");
+		},
+		holyMight: function() {
+			console.info("holyMight");
+		}
 	},
 	SHD: {
-		harmTouch: function() {},
-		bash: function() {},
-		taunt: function() {},
-		lifeTap: function() {},
-		engulfingDarkness: function() {},
-		bloodBoil: function() {},
-		invokeFear: function() {},
-		waveOfHorror: function() {}
+		harmTouch: function() {
+			console.info("harmTouch");
+		},
+		bash: function() {
+			console.info("bash");
+		},
+		taunt: function() {
+			console.info("taunt");
+		},
+		lifeTap: function() {
+			console.info("lifeTap");
+		},
+		engulfingDarkness: function() {
+			console.info("engulfingDarkness");
+		},
+		bloodBoil: function() {
+			console.info("bloodBoil");
+		},
+		invokeFear: function() {
+			console.info("invokeFear");
+		},
+		waveOfHorror: function() {
+			console.info("waveOfHorror");
+		}
 	},
 	RNG: {
-		trueshotStrike: function() {},
-		kick: function() {},
-		ensnare: function() {},
-		ignite: function() {},
-		faerieFlame: function() {},
-		carelessLightning: function() {},
-		healing: function() {},
-		feetLikeCat: function() {},
+		trueshotStrike: function() {
+			console.info("trueshotStrike");
+		},
+		kick: function() {
+			console.info("kick");
+		},
+		ensnare: function() {
+			console.info("ensnare");
+		},
+		ignite: function() {
+			console.info("ignite");
+		},
+		faerieFlame: function() {
+			console.info("faerieFlame");
+		},
+		carelessLightning: function() {
+			console.info("carelessLightning");
+		},
+		healing: function() {
+			console.info("healing");
+		},
+		feetLikeCat: function() {
+			console.info("feetLikeCat");
+		},
 	},
 	MNK: {
-		roundhouseKick: function() {},
-		mend: function() {},
-		feignDeath: function() {},
-		intimidation: function() {}
+		roundhouseKick: function() {
+			console.info("roundhouseKick");
+		},
+		mend: function() {
+			console.info("mend");
+		},
+		feignDeath: function() {
+			console.info("feignDeath");
+		},
+		intimidation: function() {
+			console.info("intimidation");
+		},
+		chiBlast: function() {
+			console.info("chiBlast");
+		},
+		shoryuken: function() {
+			console.info("shoryuken");
+		},
+		hadoken: function() {
+			console.info("hadoken");
+		},
+		nirvana: function() {
+			console.info("nirvana");
+		},
 	},
 	ROG: {
-		backstab: function() {},
-		evade: function() {},
-		widowStrike: function() {},
-		flashPowder: function() {}
+		backstab: function() {
+			console.info("backstab");
+		},
+		evade: function() {
+			console.info("evade");
+		},
+		widowStrike: function() {
+			console.info("widowStrike");
+		},
+		flashPowder: function() {
+			console.info("flashPowder");
+		},
+		shadowStrike: function() {
+			console.info("shadowStrike");
+		},
+		mirrorStrike: function() {
+			console.info("mirrorStrike");
+		},
+		crossSlash: function() {
+			console.info("crossSlash");
+		},
+		awestruck: function() {
+			console.info("awestruck");
+		},
 	},
 	DRU: {
-		healing: function() {},
-		starfire: function() {},
-		skinLikeWood: function() {},
-		driftingDeath: function() {},
-		tornado: function() {},
-		endureLightning: function() {},
-		lightningBlast: function() {},
-		chloroplast: function() {},
+		healing: function() {
+			console.info("healing");
+		},
+		starfire: function() {
+			console.info("starfire");
+		},
+		skinLikeWood: function() {
+			console.info("skinLikeWood");
+		},
+		driftingDeath: function() {
+			console.info("driftingDeath");
+		},
+		tornado: function() {
+			console.info("tornado");
+		},
+		endureLightning: function() {
+			console.info("endureLightning");
+		},
+		lightningBlast: function() {
+			console.info("lightningBlast");
+		},
+		chloroplast: function() {
+			console.info("chloroplast");
+		},
 	},
 	CLR: {
-		holyMight: function() {},
-		smite: function() {},
-		blessedHammer: function() {},
-		healing: function() {},
-		resolution: function() {},
-		symbolOfYentus: function() {},
-		endureBleed: function() {},
-		armorOfFaith: function() {},
+		holyMight: function() {
+			console.info("holyMight");
+		},
+		smite: function() {
+			console.info("smite");
+		},
+		blessedHammer: function() {
+			console.info("blessedHammer");
+		},
+		healing: function() {
+			console.info("healing");
+		},
+		resolution: function() {
+			console.info("resolution");
+		},
+		symbolOfYentus: function() {
+			console.info("symbolOfYentus");
+		},
+		endureBleed: function() {
+			console.info("endureBleed");
+		},
+		armorOfFaith: function() {
+			console.info("armorOfFaith");
+		},
 	},
 	SHM: {
-		healing: function() {},
-		frostRift: function() {},
-		devouringPlague: function() {},
-		drowsy: function() {},
-		spiritOfTheBear: function() {},
-		bloodRitual: function() {},
-		endureCold: function() {},
-		talismanOfTrogmaar: function() {},
+		healing: function() {
+			console.info("healing");
+		},
+		frostRift: function() {
+			console.info("frostRift");
+		},
+		devouringPlague: function() {
+			console.info("devouringPlague");
+		},
+		drowsy: function() {
+			console.info("drowsy");
+		},
+		spiritOfTheBear: function() {
+			console.info("spiritOfTheBear");
+		},
+		bloodRitual: function() {
+			console.info("bloodRitual");
+		},
+		endureCold: function() {
+			console.info("endureCold");
+		},
+		talismanOfTrogmaar: function() {
+			console.info("talismanOfTrogmaar");
+		},
 	},
 	BRD: {
-		chantOfBattle: function() {},
-		hymnOfRestoration: function() {},
-		boastfulBellow: function() {},
-		consonantChain: function() {},
-		lucidLullaby: function() {},
-		elementalRhythms: function() {},
-		chorusOfClarity: function() {},
-		sirensSong: function() {},
+		chantOfBattle: function() {
+			console.info("chantOfBattle");
+		},
+		hymnOfRestoration: function() {
+			console.info("hymnOfRestoration");
+		},
+		boastfulBellow: function() {
+			console.info("boastfulBellow");
+		},
+		consonantChain: function() {
+			console.info("consonantChain");
+		},
+		lucidLullaby: function() {
+			console.info("lucidLullaby");
+		},
+		elementalRhythms: function() {
+			console.info("elementalRhythms");
+		},
+		chorusOfClarity: function() {
+			console.info("chorusOfClarity");
+		},
+		sirensSong: function() {
+			console.info("sirensSong");
+		},
 	},
 	NEC: {
-		engulfingDarkness: function() {},
-		invokeDeath: function() {},
-		venomBolt: function() {},
-		bloodBoil: function() {},
-		invokeFear: function() {},
-		lifeTap: function() {},
-		endurePoison: function() {},
-		dyingBreath: function() {},
+		engulfingDarkness: function() {
+			console.info("engulfingDarkness");
+		},
+		invokeDeath: function() {
+			console.info("invokeDeath");
+		},
+		venomBolt: function() {
+			console.info("venomBolt");
+		},
+		bloodBoil: function() {
+			console.info("bloodBoil");
+		},
+		invokeFear: function() {
+			console.info("invokeFear");
+		},
+		lifeTap: function() {
+			console.info("lifeTap");
+		},
+		endurePoison: function() {
+			console.info("endurePoison");
+		},
+		dyingBreath: function() {
+			console.info("dyingBreath");
+		},
 	},
 	ENC: {
-		discordantMind: function() {},
-		colorShift: function() {},
-		alacrity: function() {},
-		dazzle: function() {},
-		gaspingEmbrace: function() {},
-		clarity: function() {},
-		cajolingWhispers: function() {},
-		mysticRune: function() {},
+		discordantMind: function() {
+			console.info("discordantMind");
+		},
+		colorShift: function() {
+			console.info("colorShift");
+		},
+		alacrity: function() {
+			console.info("alacrity");
+		},
+		dazzle: function() {
+			console.info("dazzle");
+		},
+		gaspingEmbrace: function() {
+			console.info("gaspingEmbrace");
+		},
+		clarity: function() {
+			console.info("clarity");
+		},
+		cajolingWhispers: function() {
+			console.info("cajolingWhispers");
+		},
+		mysticRune: function() {
+			console.info("mysticRune");
+		},
 	},
 	MAG: {
-		lavaBolt: function() {},
-		summonElemental: function() {},
-		frozenOrb: function() {},
-		elementalFury: function() {},
-		psionicStorm: function() {},
-		malaise: function() {},
-		endureFire: function() {},
-		stasisField: function() {},
+		lavaBolt: function() {
+			console.info("lavaBolt");
+		},
+		summonElemental: function() {
+			console.info("summonElemental");
+		},
+		frozenOrb: function() {
+			console.info("frozenOrb");
+		},
+		elementalFury: function() {
+			console.info("elementalFury");
+		},
+		psionicStorm: function() {
+			console.info("psionicStorm");
+		},
+		malaise: function() {
+			console.info("malaise");
+		},
+		endureFire: function() {
+			console.info("endureFire");
+		},
+		stasisField: function() {
+			console.info("stasisField");
+		},
 	},
 	WIZ: {
-		iceBolt: function() {},
-		arcaneMissiles: function() {},
-		manaShield: function() {},
-		fireball: function() {},
-		viziersShielding: function() {},
-		lightningStrike: function() {},
-		glacialSpike: function() {},
-		mirrorImages: function() {},
+		iceBolt: function() {
+			console.info("iceBolt");
+		},
+		arcaneMissiles: function() {
+			console.info("arcaneMissiles");
+		},
+		manaShield: function() {
+			console.info("manaShield");
+		},
+		fireball: function() {
+			console.info("fireball");
+		},
+		viziersShielding: function() {
+			console.info("viziersShielding");
+		},
+		lightningStrike: function() {
+			console.info("lightningStrike");
+		},
+		glacialSpike: function() {
+			console.info("glacialSpike");
+		},
+		mirrorImages: function() {
+			console.info("mirrorImages");
+		},
 	},
-}
+};
+
+(function() {
+	var shortClassKeys = ng.getJobShortKeys();
+	for (var key in skills) {
+		if (shortClassKeys.indexOf(key) > -1) {
+			// this is a player class
+			skills[key].skillKeys = Object.keys(skills[key]);
+			skills[key].skillKeys.unshift('toggleAutoAttack');
+			skills[key].skillKeys.unshift('pull');
+			for (var k2 in skills.ALL) {
+				// assign ALL functions to each class
+				skills[key][k2] = skills.ALL[k2];
+			}
+		}
+	}
+})();
 var zone = {
 }
 var party = {
@@ -7169,22 +7469,25 @@ var button = {
 	init: function() {
 		var s = '';
 		// skill buttons
-		for (var i=0; i<9; i++) {
-			s += '<div id="class-btn-'+ i +'" class="class-btn" style="background-image: url(img2/skills/'+ my.job +'.png)"></div>';
+		for (var i=0; i<10; i++) {
+			s +=
+			'<div id="class-btn-'+ i +'" '+
+				'class="class-btn" '+
+				'style="background-image: url(img2/skills/'+ my.job +'.png)"></div>';
 		}
 		button.wrap.innerHTML = s;
 		if (!button.initialized) {
 			$("#button-wrap").on(env.click, '.class-btn', function() {
 				var id = this.id.substr(10) * 1;
 				console.info('CLICKED SKILL: ', id, typeof id);
+				skills[my.job].route(id);
 			});
 			setTimeout(function() {
 				TweenMax.to(button.wrap, 1, {
 					startAt: {
-						display: 'flex',
-						y: 90
+						display: 'flex'
 					},
-					y: 0
+					bottom: 0
 				});
 
 			}, 1000);
@@ -7279,6 +7582,10 @@ var test = {
 			}, 'saturate');
 			 */
 		}
+	},
+	battle: function() {
+		mob.test = 1;
+		battle.testInit();
 	}
 }
 })($,

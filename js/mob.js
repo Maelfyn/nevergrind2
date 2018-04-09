@@ -1,6 +1,6 @@
 // test methods
 var mob = {
-	test: 1, // used to enable test mode to show all animations looping
+	test: 0, // used to enable test mode to show all animations looping
 	imageKeysLen: 0,
 	index: 0,
 	cache: {},
@@ -44,20 +44,24 @@ var mob = {
 				mobs[i].dom[e] = document.getElementById('mob-'+ e +'-' + i);
 			});
 		}
-		battle.init();
 	},
 	element: {},
 	animationActive: 0,
 	frame: 1,
-	setMob: function(m){
-		// set memory
-		m.size = m.size;
-		m = Object.assign(m, mobs.images[m.type]);
-		delete m.cache;
-		mob.sizeMob(m);
+	// configs, resets (active animations) and idles mobs in one call for start of combat
+	setMob: function(i, mobKey) {
+		// m.size = m.size;
+		mobs[i].type = mobKey;
+		// combine/assign image object props to mobs[index]
+		mobs[i] = Object.assign(mobs[i], mobs.images[mobKey]);
+		delete mobs[i].cache;
+		mob.sizeMob(i);
+		mob.resetIdle(i);
+		mob.idle(i);
 	},
-	sizeMob: function(m){
-		// TODO: perhaps modify this later responsively using window.innerWidth ?
+	// size only
+	sizeMob: function(index){
+		var m = mobs[index];
 		// set dom
 		var w = ~~(m.size * (mobs.images[m.type].w));
 
@@ -65,6 +69,7 @@ var mob = {
 		// wrapper
 		// name
 		m.dom.name.innerHTML = m.type.replace(/-/g, ' ');
+		m.dom.details.style.display = 'block';
 		// img
 		m.dom.img.style.left = (w * -.5) + 'px';
 		m.dom.img.style.width = w + 'px';
@@ -75,6 +80,7 @@ var mob = {
 			bottom: m.detailAliveBottom * m.size
 		});
 		// shadow
+		m.dom.shadow.style.display = 'block';
 		m.dom.shadow.style.width = (m.shadowWidth * m.size) + 'px';
 		m.dom.shadow.style.height = (m.shadowHeight * m.size) + 'px';
 		m.dom.shadow.style.left = ((m.shadowWidth * m.size ) * -.5) + 'px';
@@ -99,19 +105,20 @@ var mob = {
 		m.dom.dead.style.height = (m.clickDeadH * m.size) + 'px';
 		m.dom.dead.style.display = m.hp ? 'none' : 'block';
 	},
-	setSrc: function(m){
-		m.frame = ~~m.frame;
-		if (m.frame !== m.lastFrame) {
-			m.dom.img.src = 'mobs/' + m.type + '/' + m.frame + '.png';
-			m.lastFrame = m.frame;
+	setSrc: function(i){
+		mobs[i].frame = ~~mobs[i].frame;
+		if (mobs[i].frame !== mobs[i].lastFrame) {
+			mobs[i].dom.img.src = 'mobs/' + mobs[i].type + '/' + mobs[i].frame + '.png';
+			mobs[i].lastFrame = mobs[i].frame;
 		}
 	},
-	resetIdle: function(m){
-		m.animationActive = 0;
-		mob.idle(m, 1);
+	resetIdle: function(i){
+		mobs[i].animationActive = 0;
+		mob.idle(mobs[i].index, 1);
 	},
-	idle: function(m, skip){
-		var startFrame = 1,
+	idle: function(i, skip){
+		var m = mobs[i],
+			startFrame = 1,
 			endFrame = 5.9,
 			diff = endFrame - startFrame;
 
@@ -125,16 +132,17 @@ var mob = {
 			repeatDelay: m.speed,
 			ease: Sine.easeOut,
 			onUpdate: function(){
-				mob.setSrc(m);
+				mob.setSrc(m.index);
 			}
 		});
 		if (skip) return;
 		TweenMax.delayedCall(.25, function(){
-			mob.test && mob.hit(m);
+			mob.test && mob.hit(m.index);
 			//mob.death();
 		})
 	},
-	hit: function(m){
+	hit: function(i){
+		var m = mobs[i];
 		if (m.animationActive) return;
 		m.animationActive = 1;
 		var startFrame = 6,
@@ -151,19 +159,20 @@ var mob = {
 			yoyo: true,
 			repeat: 1,
 			onUpdate: function(){
-				mob.setSrc(m);
+				mob.setSrc(m.index);
 			},
 			onComplete: function(){
-				mob.resetIdle(m);
+				mob.resetIdle(m.index);
 				if (mob.test){
 					TweenMax.delayedCall(.5, function() {
-						mob.attack(m, 1);
+						mob.attack(m.index, 1);
 					});
 				}
 			}
 		});
 	},
-	attack: function(m, force){
+	attack: function(i, force){
+		var m = mobs[i];
 		if (m.animationActive) return;
 		m.animationActive = 1;
 		var tl = ng.TM(),
@@ -185,34 +194,35 @@ var mob = {
 			frame: endFrame,
 			ease: Linear.easeNone,
 			onUpdate: function() {
-				mob.setSrc(m);
+				mob.setSrc(m.index);
 			},
 			onComplete: function() {
-				mob.resetIdle(m);
+				mob.resetIdle(m.index);
 				if (mob.test){
 					if (force === 1){
 						TweenMax.delayedCall(.5, function() {
-							mob.attack(m, 2);
+							mob.attack(m.index, 2);
 						});
 					}
 					else if (force === 3){
 						TweenMax.delayedCall(.5, function() {
-							mob.death(m);
+							mob.death(m.index);
 						});
 					}
 					else {
 						TweenMax.delayedCall(.5, function() {
-							mob.special(m);
+							mob.special(m.index);
 						});
 					}
 				}
 			}
 		});
 	},
-	special: function(m){
+	special: function(i){
+		var m = mobs[i];
 		if (m.animationActive) return;
 		if (!m.enableSpecial) {
-			mob.attack(m, 3);
+			mob.attack(m.index, 3);
 		}
 		else {
 			m.animationActive = 1;
@@ -231,20 +241,21 @@ var mob = {
 				yoyo: m.yoyo,
 				repeat: m.yoyo ? 1 : 0,
 				onUpdate: function () {
-					mob.setSrc(m);
+					mob.setSrc(m.index);
 				},
 				onComplete: function () {
-					mob.resetIdle(m);
+					mob.resetIdle(m.index);
 					if (mob.test) {
 						TweenMax.delayedCall(.5, function () {
-							mob.death(m);
+							mob.death(m.index);
 						});
 					}
 				}
 			});
 		}
 	},
-	death: function(m){
+	death: function(i){
+		var m = mobs[i];
 		if (m.deathState) return;
 		m.deathState = 1;
 		m.hp = 0;
@@ -267,7 +278,7 @@ var mob = {
 			frame: endFrame,
 			ease: Linear.easeNone,
 			onUpdate: function () {
-				mob.setSrc(m);
+				mob.setSrc(m.index);
 			},
 			onComplete: function() {
 				var filters = {
@@ -288,8 +299,8 @@ var mob = {
 					onComplete: function () {
 						if (mob.test) {
 							m.hp = 1;
-							mob.sizeMob(m);
-							mob.idle(m);
+							mob.sizeMob(m.index);
+							mob.idle(m.index);
 						}
 						TweenMax.delayedCall(.1, function () {
 							m.deathState = 0;

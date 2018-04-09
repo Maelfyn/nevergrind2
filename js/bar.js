@@ -23,6 +23,14 @@ var bar = {
 
 				console.info(id, slot, my.party[slot].name);
 				context.getPartyMenu(my.party[slot].name);
+			}).on(env.click, '#bar-camp', function () {
+				chat.camp();
+			}).on(env.click, '#bar-stats', function () {
+				console.info($(this).attr('id'));
+			}).on(env.click, '#bar-inventory', function () {
+				console.info($(this).attr('id'));
+			}).on(env.click, '#bar-options', function () {
+				console.info($(this).attr('id'));
 			}).on(env.click, '#bar-mission-abandon', function () {
 				mission.abandon();
 			});
@@ -60,10 +68,11 @@ var bar = {
 		var s = '';
 		s +=
 		'<div id="bar-lag">' +
-			'<span id="bar-ping">0ms</span>' +
-			'<span id="bar-socket">0ms</span>' +
+			'<span id="bar-ping"><i class="fa fa-exchange"></i></span>' +
+			'<span id="bar-socket"><i class="fa fa-exchange"></i></span>' +
 		'</div>' +
 		'<div id="bar-header">' +
+			'<i id="bar-camp" class="fa fa-power-off bar-icons" title="Camp"></i>' +
 			'<i id="bar-stats" class="fa fa-user-circle-o bar-icons" title="Stat Sheet"></i>' +
 			'<i id="bar-inventory" class="fa fa-suitcase bar-icons" title="Inventory"></i>' +
 			'<i id="bar-options" class="fa fa-gear bar-icons" title="Options"></i>' +

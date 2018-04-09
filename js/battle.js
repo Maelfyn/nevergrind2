@@ -10,6 +10,13 @@ var battle = {
 			delay: .5,
 			opacity: 1
 		});
+		if (!mob.initialized) {
+			// initialization things only
+			mob.initialized = 1;
+			mob.imageKeys = Object.keys(mobs.images);
+			mob.index = mob.imageKeys.length - 1;
+		}
+		button.init();
 	},
 	html: function(){
 		var s = '<img id="battle-bg" class="img-bg" src="img2/bg/fw2.jpg">';
@@ -57,23 +64,12 @@ var battle = {
 		console.info("Setting target ", i, Date.now());
 	},
 	// MUST INIT THEN SHOW
-	init: function(){
-		if (!mob.initialized) {
-			// initialization things only
-			mob.initialized = 1;
-			mob.imageKeys = Object.keys(mobs.images);
-			mob.index = mob.imageKeys.length - 1;
-		}
-
+	testInit: function() {
 		for (var i=0; i<mob.max; i++){
-		//for (var i=2; i<3; i++){
-			var m = mobs[i],
-				mobKey = mob.getRandomMobKey();
+			var mobKey = mob.getRandomMobKey();
 				// mobKey = 'toadlok';
 			cache.preload.mob(mobKey);
-			m.type = mobKey;
-			mob.setMob(m);
-			mob.idle(m);
+			mob.setMob(i, mobKey);
 		}
 	},
 	// 1080p defaults

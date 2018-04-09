@@ -409,6 +409,7 @@ var mission = {
 	},
 	abortCallback: function() {
 		// init client and transition back to town
+		game.heartbeat.enabled = 0;
 		$.ajax({
 			type: 'GET',
 			url: app.url + 'php2/chat/delete-from-players.php'
@@ -428,6 +429,8 @@ var mission = {
 			chat.mode.change({
 				mode: '/say'
 			});
+			// this must be in place to prevent heartbeat updates while going back to town
+			game.heartbeat.enabled = 1;
 		}, game.questDelay);
 	},
 	openFirstTwoZones: function() {

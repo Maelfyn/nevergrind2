@@ -6,12 +6,12 @@ var town = {
 			ng.lock(1);
 			chat.size.large();
 			$.ajax({
-				url: app.url + 'php2/character/loadCharacter.php',
+				url: app.url + 'php2/character/load-character.php',
 				data: {
 					row: create.selected
 				}
 			}).done(function(data) {
-				console.info('loadCharacter: ', data);
+				console.info('load-character: ', data);
 				var z = data.characterData;
 				my.name = z.name;
 				my.job = z.job;

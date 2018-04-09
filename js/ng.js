@@ -46,7 +46,7 @@ var ng = {
 				}
 				if (ng.view === 'battle') {
 					for (var i=0; i<mob.max; i++) {
-						mob.sizeMob(mobs[i]);
+						mob.sizeMob(i);
 					}
 				}
 			}, 50);
@@ -134,6 +134,9 @@ var ng = {
 	},
 	toJobLong: function(key){
 		return ng.jobLong[key];
+	},
+	getJobShortKeys: function() {
+		return Object.keys(ng.jobLong);
 	},
 	copy: function(o){
 		return JSON.parse(JSON.stringify(o));
@@ -423,9 +426,9 @@ var ng = {
 	initGame: function(){
 		$.ajax({
 			type: 'GET',
-			url: app.url + 'php2/initGame.php'
+			url: app.url + 'php2/init-game.php'
 		}).done(function(r){
-			console.info("initGame: ", r);
+			console.info("init-game: ", r);
 			app.initialized = 1;
 			if (r.account) {
 				app.account = my.account = r.account; // for global reference
