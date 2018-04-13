@@ -1,13 +1,15 @@
 <?php
-header("Access-Control-Allow-Origin: *");
-header('Content-Type: application/json');
-if (session_status() === PHP_SESSION_NONE) {
-	session_start();
-	session_set_cookie_params(86400);
-	ini_set('session.gc_maxlifetime', 86400);
-}
+require 'header.php';
 require 'db.php';
 require('../php/values.php');
+
+if($_SERVER["SERVER_NAME"] === "localhost"){
+	error_reporting(E_ALL);
+	ini_set('display_errors', true);
+} else {
+	error_reporting(0);
+}
+
 $r = [];
 
 // using this for twitterCallback.php because REQUEST_URI wasn't working right?!

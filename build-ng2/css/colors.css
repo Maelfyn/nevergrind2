@@ -1,0 +1,36 @@
+/* nevergrind 2 color theme */
+.colors {
+	/* basics */
+	color: #fff;
+	color: #000;
+	
+	/* blues */
+	color: #aef;
+	color: #8bf;
+	color: #579;
+	color: #468;
+	color: #05b;
+	color: #103860; /* ng-blue */
+	color: #048;
+	color: #025;
+	color: #013;
+	
+	/* red */
+	color: #e11;
+	
+	/* greens */
+	color: #0B4C0B; /* ng-green */
+	color: #060;
+	
+	/* yellows */
+	color: #fd0;
+	color: #ff0;
+	color: #a96;
+	color: #ffb700;
+
+	/* grays */
+	color: #bba;
+	color: #777;
+	color: #444;
+	color: #222;
+}

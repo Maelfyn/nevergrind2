@@ -29,20 +29,8 @@ else {
 	}
 	$r['mp'] = $_SESSION['ng2']['mp'];
 
-	$stmt = $link->prepare('insert into ng2_players 
-		(`id`, `account`, `name`, `level`, `race`, `job`, `zone`) 
-		values (?, ?, ?, ?, ?, ?, ?) 
-		on duplicate key update timestamp=now()');
-
-	$stmt->bind_param('ississs',
-		$_SESSION['ng2']['row'],
-		$_SESSION['account'],
-		$_SESSION['ng2']['name'],
-		$_SESSION['ng2']['level'],
-		$_SESSION['ng2']['race'],
-		$_SESSION['ng2']['job'],
-		$_SESSION['ng2']['zone']);
-
+	$stmt = $link->prepare('update ng2_players set timestamp=now() where id=?');
+	$stmt->bind_param('i', $_SESSION['ng2']['row']);
 	$stmt->execute();
 
 	// update ng2_parties hp/mp

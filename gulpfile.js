@@ -204,56 +204,102 @@ gulp.task('minify-css', function(){
 		.pipe(gulp.dest('./games/firmament-wars/css'));
 });
 
-gulp.task('clean', [], function(){
-	console.info("Cleaning out build directory...");
-	return gulp.src("./build/*", {
+gulp.task('clean-ng2', [], function(){
+	console.info("Cleaning out ng2 build directory...");
+	return gulp.src("./build-ng2/*", {
 		read: false
 	}).pipe(clean());
-})
+});
+
+gulp.task('clean-fw', [], function(){
+	console.info("Cleaning out fw build directory...");
+	return gulp.src("./build-fw/*", {
+		read: false
+	}).pipe(clean());
+});
 
 gulp.task('build-ng2', [
 	'minify-css',
 	'minify-js',
-	'clean'
+	'clean-ng2'
 ], function(){
 	// move app files
 	gulp.src([
 		'./index.html',
 		'./package.json',
 		'./nwjs/**/*'
-	]).pipe(gulp.dest('./build'));
+	]).pipe(gulp.dest('./build-ng2'));
 
 	gulp.src([
 		'./css/**/*'
-	]).pipe(gulp.dest('./build/css'));
+	]).pipe(gulp.dest('./build-ng2/css'));
 
 	gulp.src([
 		'./fonts/*'
-	]).pipe(gulp.dest('./build/fonts'));
+	]).pipe(gulp.dest('./build-ng2/fonts'));
 
 	gulp.src([
 		'./js/**/*'
-	]).pipe(gulp.dest('./build/js'));
+	]).pipe(gulp.dest('./build-ng2/js'));
 
 	gulp.src([
 		'./sound/*'
-	]).pipe(gulp.dest('./build/sound'));
+	]).pipe(gulp.dest('./build-ng2/sound'));
 
 	gulp.src([
 		'./music/*'
-	]).pipe(gulp.dest('./build/music'));
+	]).pipe(gulp.dest('./build-ng2/music'));
 
 	gulp.src([
 		'./img2/**/*'
-	]).pipe(gulp.dest('./build/img2'));
+	]).pipe(gulp.dest('./build-ng2/img2'));
 
 	gulp.src([
 		'./mobs/**/*'
-	]).pipe(gulp.dest('./build/mobs'));
-
+	]).pipe(gulp.dest('./build-ng2/mobs'));
+	/*
 	gulp.src([
 		'./mobs/*'
-	]).pipe(gulp.dest('./build/mobs'));
+	]).pipe(gulp.dest('./build-ng2/mobs'));
+	*/
+});
+
+gulp.task('build-fw', [
+	'minify-css',
+	'minify-js',
+	'clean-fw'
+], function(){
+	// move app files
+	gulp.src([
+		'./games/firmament-wars/index.html',
+		'./games/firmament-wars/package.json',
+		'./nwjs/**/*'
+	]).pipe(gulp.dest('./build-fw'));
+
+	gulp.src([
+		'./games/firmament-wars/css/**/*'
+	]).pipe(gulp.dest('./build-fw/css'));
+
+	gulp.src([
+		'./games/firmament-wars/fonts/*'
+	]).pipe(gulp.dest('./build-fw/fonts'));
+
+	gulp.src([
+		'./games/firmament-wars/images/**/*'
+	]).pipe(gulp.dest('./build-fw/images'));
+
+	gulp.src([
+		'./games/firmament-wars/js/**/*'
+	]).pipe(gulp.dest('./build-fw/js'));
+
+	gulp.src([
+		'./games/firmament-wars/music/*'
+	]).pipe(gulp.dest('./build-fw/music'));
+
+	gulp.src([
+		'./games/firmament-wars/sound/*'
+	]).pipe(gulp.dest('./build-fw/sound'));
+
 });
 
 gulp.task("build-icon", function(){

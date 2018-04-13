@@ -31,14 +31,13 @@
 	<!--link rel="stylesheet" href="css/bootstrap-slider.min.css"-->
 	<script>
 		var app = {
-			version: '0.0.112',
-			initialized: 0,
+			version: '0.0.113',
+			initialized: 0, // init-game returned
 			isApp: location.protocol === 'chrome-extension:' ? 1 : 0,
 			account: ''
 		};
 		app.url = app.isApp ?
 			'https://nevergrind.com/ng2-test-server/' : '';
-		app.loginUrl = 'https://nevergrind.com';
 		app.socketUrl = app.isApp ?
 			'nevergrind.com' : location.hostname;
 		app.isServer = 0;
@@ -46,9 +45,8 @@
 			app.isServer = 1;
 		}
 		app.isLocal = location.hostname.indexOf('localhost') > -1;
-		if (app.isLocal) {
-			app.loginUrl = '';
-		}
+		app.loginUrl = app.isLocal ? '' : 'https://nevergrind.com';
+		if (location.hash==='#test') app.isApp = 1;
 	</script>
 	<style>
 		body {
@@ -169,7 +167,7 @@
 								Cooperative Multiplayer<br>
 								Browser RPG
 							</div>
-							<div class="small">a free online web game by</div>
+							<div class="small">developed by</div>
 							<img class="neverworks" src="img2/neverworks-txt.png" alt="Neverworks Games">
 							<hr class="fancy-hr-dark">
 						</h1>
@@ -584,22 +582,6 @@
 <div id="msg" class="text-shadow no-pointer"></div>
 
 <script src="js/libs/libs.min.js"></script>
-<script>
-	// kongregate
-	/*
-	if (app.isServer) {
-		(function(d, s, id) {
-			var js, fjs = d.getElementsByTagName(s)[0];
-			js = d.createElement(s);
-			js.id = id;
-			js.src = "https://cdn1.kongregate.com/javascripts/kongregate_api.js";
-			fjs.parentNode.insertBefore(js, fjs);
-		}(document, 'script', 'Kongregate-OAuth'));
-	}
-	*/
-</script>
-
-<!--script src="https://js.stripe.com/v2/"></script-->
 
 <script>
 	var login = {
@@ -956,11 +938,9 @@
 			return false;
 		}
 		var loginEmail = $("#loginEmail").val().toLowerCase();
-		var setToken = false;
 		if ($("#rememberMe").prop('checked')){
 			localStorage.setItem('email', loginEmail);
 			localStorage.setItem('token', token);
-			setToken = true;
 		} else {
 			localStorage.removeItem('email');
 		}
@@ -1078,55 +1058,6 @@
 			visibility: 'visible'
 		});
 		$("#logout").remove();
-
-
-		/*if (app.isServer) {
-			kongregateAPI.loadAPI(function () {
-				function loginKong() {
-					loginAuthenticationLock = true;
-					var kongGames = {
-						'/': 'ng', // TODO: this changes later
-						'/ng2-test-server/': 'ng2',
-						'/classic': 'ng',
-						'/games/firmament-wars/': 'fw'
-					};
-					var o = {
-						kongUserName: kongregate.services.getUsername(),
-						kongToken: kongregate.services.getGameAuthToken(),
-						kongGame: kongGames[location.pathname],
-						run: 'authenticate'
-					}
-
-					$.ajax({
-						type: 'POST',
-						url: app.loginUrl + '/php/master1.php',
-						data: o
-					}).done(function (data) {
-						if (data === 'Create an account name!') {
-							// redirect to
-							var to = 'https://nevergrind.com/setAccount.php' + (sessionStorage.getItem('refer') || '');
-							window.location = to;
-						} else {
-							// it's coming out here for some reason
-							loginGotoRefer(data, undefined, 'loginKong');
-						}
-					}).fail(function (data) {
-						loginMsg(data.statusText);
-					}).always(function () {
-						loginAuthenticationLock = false;
-					});
-				}
-
-				kongregate = kongregateAPI.getAPI();
-				if (!kongregate.services.isGuest()) {
-					loginKong();
-				} else {
-					kongregate.services.addEventListener('login', function () {
-						loginKong();
-					});
-				}
-			});
-		}*/
 	}
 
 	(function(d, s, x){

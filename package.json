@@ -4,9 +4,7 @@
   "version": "0.0.49",
   "description": "multiplayer-cooperative-rpg",
   "product_string": "Nevergrind 2",
-  // set nodejs to false will disable Node support in NW.js.
   "nodejs": true,
-  // The web engine will share the same cookies between your application and the website under the same domain.
   "domain": "nevergrind.com",
   "repository": {
     "type": "git",
