@@ -33,7 +33,8 @@ bg-497/
 node_modules/
 *.min.js
 .idea/
-build/
+build-ng2/
+build-fw/
 *.min.css
 nevergrind-online.js
 nwjs/
