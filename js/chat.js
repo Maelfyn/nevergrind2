@@ -14,7 +14,8 @@ var chat = {
 			'</div>' +
 			'<div id="chat-log-wrap">' +
 				'<div id="chat-log">' +
-					'<div>Welcome to Vandamor.</div>' +
+					'<div>Welcome to Broken.net!</div>' +
+					'<div>You have entered Vandamor.</div>' +
 					'<div class="chat-warning">Nevergrind 2 is still in development, but feel free to test it out!</div>' +
 					'<div class="chat-emote">Type /help or /h for a list of chat commands.</div>' +
 				'</div>' +

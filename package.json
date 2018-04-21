@@ -25,6 +25,8 @@
     "toolbar": true,
     "frame": true,
     "position": "center",
+    "width": 1920,
+    "height": 1080,
     "min_width": 1280,
     "min_height": 720,
     "max_width": 1920,

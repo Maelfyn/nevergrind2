@@ -349,7 +349,7 @@
 								   type="text"
 								   maxlength="16"
 								   spellcheck="false"
-								   autocomplete="off"
+								   auto-complete="disabled"
 								   placeholder="Character Name">
 						</div>
 					</div>
@@ -618,7 +618,7 @@
 						'id="password"' +
 						'class="loginInputs text-shadow"' +
 						'maxlength="20"' +
-						'autocomplete="current-password"' +
+						'auto-complete="current-password"' +
 						'placeholder="Password"' +
 						'required="required" />' +
 				'</label>' +
@@ -641,6 +641,7 @@
 					'id="loginEmail" ' +
 					'class="loginInputs" ' +
 					'maxlength="255" ' +
+					'auto-complete="disabled" '+
 					'placeholder="Account or Email Address" ' +
 					'required="required" ' +
 					'spellcheck="false"/></label>' +
@@ -649,6 +650,7 @@
 					'<input name="password" ' +
 					'type="password" ' +
 					'id="password" ' +
+					'auto-complete="disabled" '+
 					'class="loginInputs" ' +
 					'maxlength="20" ' +
 					'placeholder="Password" required="required" /></label>' +
@@ -657,6 +659,7 @@
 					'<input name="account" ' +
 					'type="text" ' +
 					'name="account" ' +
+					'auto-complete="disabled" '+
 					'id="loginAccount" ' +
 					'class="loginInputs create-account" ' +
 					'maxlength="16" ' +
@@ -725,7 +728,6 @@
 				loginMsg("There was a problem communicating with the server.");
 			}).always(function() {
 				login.lock = 0;
-				alert('ok');
 			});
 			return false; // prevent form submission
 		}
@@ -999,17 +1001,18 @@
 		} else if (data === "Login successful!"){
 			if (origin === 'loginRenderButton'){
 				$("#login-modal").remove();
-				(function repeat(){
-					if (app.initialized){
-						if (!app.account) {
-							// not logged in - Google SSO requires this
-							redirect();
-						}
+				(function repeat(count){
+					console.info("repeat");
+					if (!app.account) {
+						// not logged in - Google SSO requires this
+						redirect();
 					}
 					else {
-						setTimeout(repeat, 100);
+						if (count < 50) {
+							setTimeout(repeat, 100, ++count);
+						}
 					}
-				})();
+				})(0);
 			}
 			else {
 				redirect();

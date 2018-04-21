@@ -429,7 +429,7 @@ var ng = {
 			url: app.url + 'php2/init-game.php'
 		}).done(function(r){
 			console.info('init-game', r.account, r);
-			console.info(r);
+
 			app.initialized = 1;
 			if (r.account) {
 				app.account = my.account = r.account; // for global reference

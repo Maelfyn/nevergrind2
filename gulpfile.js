@@ -62,7 +62,7 @@ gulp.task('minify-fw-js', function(){
 		.pipe(gulp.dest('./games/firmament-wars/js'));
 });
 
-gulp.task('minify-js', function() {
+gulp.task('minify-ng2-js', function() {
 return gulp.src([
 	'./js/beginWrap.js',
 	'./js/init.js',
@@ -99,7 +99,7 @@ return gulp.src([
 ])
 .pipe(concat('nevergrind-2.js'))
 .pipe(gulp.dest('./js'))
-//.pipe(stripDebug()) // watch out for this for nwjs
+.pipe(stripDebug()) // watch out for this for nwjs
 .pipe(uglify())
 .pipe(rename('nevergrind-2.min.js'))
 .pipe(gulp.dest('./js'));
@@ -220,7 +220,7 @@ gulp.task('clean-fw', [], function(){
 
 gulp.task('build-ng2', [
 	'minify-css',
-	'minify-js',
+	'minify-ng2-js',
 	'clean-ng2'
 ], function(){
 	// move app files
@@ -266,7 +266,7 @@ gulp.task('build-ng2', [
 
 gulp.task('build-fw', [
 	'minify-css',
-	'minify-js',
+	'minify-fw-js',
 	'clean-fw'
 ], function(){
 	// move app files
@@ -317,5 +317,5 @@ gulp.task("build-icon", function(){
 })
 
 gulp.task('default', function(){
-	gulp.run('minify-css', 'minify-js');
+	gulp.run('minify-css', 'minify-ng2-js');
 });

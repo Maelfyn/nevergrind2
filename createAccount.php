@@ -116,7 +116,7 @@
 				
 				<hr class="fancy-hr">
 			
-				<label class="textLeft" for="loginEmail">Email Address
+				<label class="textLeft" for="loginEmail" style="text-align: center">Email Address
 					<input name="username" 
 						type="text" 
 						id="loginEmail" 
@@ -127,16 +127,12 @@
 						spellcheck="false"/>
 				</label>
 				
-				<label class="textLeft" for="password">Password
+				<label class="textLeft" for="password" style="text-align: center">Password
 					<input name="password" type="password" id="password" class="loginInputs" maxlength="20" placeholder="Password" required="required" />
 				</label>
 				
-				<label class="textLeft create-account signupHeader" for="loginAccount">Account Name
+				<label class="textLeft create-account signupHeader" for="loginAccount" style="text-align: center">Account Name
 					<input name="account" type="text" name="account" id="loginAccount" class="loginInputs create-account" maxlength="16" placeholder="Account Name" required="required" />
-				</label>
-				
-				<label class="signupHeader create-account" for="promoCode">Promo Code
-					<input name="promo" type="text" id="promoCode" class="loginInputs create-account" maxlength="20" placeholder="Promo Code" />
 				</label>
 				
 				<div id="tosWrap" class="create-account">

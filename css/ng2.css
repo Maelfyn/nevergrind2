@@ -27,8 +27,11 @@ fieldset {
 	font-size: 14px;
 	margin:0 auto;
 	width:280px;
-	padding-bottom:40px;
-	text-align:center;
+	padding-bottom:20px;
+}
+#login-form-contents > label {
+	display: block;
+	text-align: center;
 }
 .textLeft{
 	text-align:left;
@@ -43,6 +46,9 @@ fieldset {
 	left: 0;
 	right: 0;
 	outline: none;
+}
+#login-form-contents > * {
+	display: block;
 }
 #create-account:hover, #login-btn:hover, #resetPW:hover{
 	box-shadow:0 0 2px rgba(80, 110, 240, 1),
@@ -617,9 +623,6 @@ tbody {
 }
 .pointer {
 	cursor: url('cursor/pointer.cur'), pointer
-}
-.no-pointer {
-	pointer-events: none
 }
 .text {
 	cursor: text!important
