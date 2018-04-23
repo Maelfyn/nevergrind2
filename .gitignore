@@ -43,3 +43,7 @@ mobs-huge/
 mobs/
 archive/
 mobs-archive/
+steamworks/
+greenworks.js
+steam_appid.txt
+lib/
