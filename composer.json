@@ -3,6 +3,7 @@
         "google/apiclient": "^2.2",
         "firebase/php-jwt": "4.0",
         "facebook/graph-sdk": "^5.6",
-        "abraham/twitteroauth": "^0.7.4"
+        "abraham/twitteroauth": "^0.7.4",
+        "da-mitchell/steam-api": "^2.1"
     }
 }

@@ -56,7 +56,7 @@ gulp.task('minify-fw-js', function(){
 	])
 		.pipe(concat('firmament-wars.js'))
 		.pipe(gulp.dest('./games/firmament-wars/js'))
-		.pipe(stripDebug())
+		//.pipe(stripDebug())
 		.pipe(uglify())
 		.pipe(rename('firmament-wars.min.js'))
 		.pipe(gulp.dest('./games/firmament-wars/js'));
@@ -227,8 +227,14 @@ gulp.task('build-ng2', [
 	gulp.src([
 		'./index.html',
 		'./package.json',
+		'./greenworks.js',
+		'./steam_appid.txt',
 		'./nwjs/**/*'
 	]).pipe(gulp.dest('./build-ng2'));
+
+	gulp.src([
+		'./lib/*'
+	]).pipe(gulp.dest('./build-ng2/lib'));
 
 	gulp.src([
 		'./css/**/*'
@@ -273,8 +279,14 @@ gulp.task('build-fw', [
 	gulp.src([
 		'./games/firmament-wars/index.html',
 		'./games/firmament-wars/package.json',
+		'./games/firmament-wars/greenworks.js',
+		'./games/firmament-wars/steam_appid.txt',
 		'./nwjs/**/*'
 	]).pipe(gulp.dest('./build-fw'));
+
+	gulp.src([
+		'./games/firmament-wars/lib/*'
+	]).pipe(gulp.dest('./build-fw/lib'));
 
 	gulp.src([
 		'./games/firmament-wars/css/**/*'

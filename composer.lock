@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "bbf71c9b1997681e30a620eb5c5891bb",
+    "content-hash": "6ca22c2da0abe24de5155c54c907351e",
     "packages": [
         {
             "name": "abraham/twitteroauth",
@@ -59,6 +59,61 @@
                 "twitter"
             ],
             "time": "2017-06-30T22:02:01+00:00"
+        },
+        {
+            "name": "da-mitchell/steam-api",
+            "version": "2.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/DaMitchell/steam-api-php.git",
+                "reference": "c004d4eecfeaf85d48a262b820934deebce82678"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/DaMitchell/steam-api-php/zipball/c004d4eecfeaf85d48a262b820934deebce82678",
+                "reference": "c004d4eecfeaf85d48a262b820934deebce82678",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "~6.1",
+                "php": ">=5.5.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "~0.9",
+                "phpunit/phpunit": "~4.6"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Steam\\": "src/Steam"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-2-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Dan Mitchell",
+                    "email": "danmitchellster@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "PHP wrapper for the steam web API",
+            "homepage": "https://github.com/DaMitchell/steam-api-php",
+            "keywords": [
+                "api",
+                "counter strike",
+                "csgo",
+                "dota",
+                "steam"
+            ],
+            "time": "2015-12-28T17:42:46+00:00"
         },
         {
             "name": "facebook/graph-sdk",
