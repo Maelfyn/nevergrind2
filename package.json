@@ -57,7 +57,7 @@
     "linux",
     "mac"
   ],
-  "chromium-args": "--allow-file-access-from-files",
+  "chromium-args": "--allow-file-access-from-files --enable-experimental-web-platform-features --disable-devtools",
   "requires": true,
   "lockfileVersion": 1,
   "dependencies": {

@@ -178,7 +178,7 @@ audio.init = (function(){
 			}
 		}).slider('setValue', ng.config.audio.musicVolume);
 	}
-	var e = $("#musicSlider");
+	var e = $("#soundSlider");
 	if (e.length){
 		$("#soundSlider").slider({
 			min  : 0, 
