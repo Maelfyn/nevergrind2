@@ -38,6 +38,7 @@ build-fw/
 *.min.css
 nevergrind-online.js
 nwjs/
+nwjs-sdk/
 images/
 mobs-huge/
 mobs/
