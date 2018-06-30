@@ -217,7 +217,7 @@
 				email: $("#loginEmail").val().toLowerCase(),
 				account: acc.toLowerCase(),
 				password: pw,
-				promo: $("#promoCode").val().toLowerCase()
+				promo: ''
 			}
 		}).done(function(data) {
 			if (data.indexOf("Account Created") === -1){

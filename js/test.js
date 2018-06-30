@@ -83,7 +83,6 @@ var test = {
 		}
 	},
 	battle: function() {
-		mob.test = 1;
 		battle.testInit();
 	}
 }

@@ -5280,7 +5280,7 @@ var mob = {
 		mobs[i].type = mobKey;
 		// combine/assign image object props to mobs[index]
 		mobs[i] = Object.assign(mobs[i], mobs.images[mobKey]);
-		delete mobs[i].cache;
+		// delete mobs[i].cache;
 		mob.sizeMob(i);
 		mob.resetIdle(i);
 		mob.idle(i);

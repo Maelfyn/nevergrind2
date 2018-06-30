@@ -30,17 +30,15 @@ var mob = {
 				box: {},
 				dom: {}
 			};
-			[
-				'wrap',
-				'center',
-				'alive',
-				'dead',
-				'img',
-				'details',
-				'name',
-				'shadow',
-				'bar'
-			].forEach(function(e){
+			['wrap',
+			'center',
+			'alive',
+			'dead',
+			'img',
+			'details',
+			'name',
+			'shadow',
+			'bar'].forEach(function(e){
 				mobs[i].dom[e] = document.getElementById('mob-'+ e +'-' + i);
 			});
 		}
@@ -54,7 +52,7 @@ var mob = {
 		mobs[i].type = mobKey;
 		// combine/assign image object props to mobs[index]
 		mobs[i] = Object.assign(mobs[i], mobs.images[mobKey]);
-		delete mobs[i].cache;
+		// delete mobs[i].cache;
 		mob.sizeMob(i);
 		mob.resetIdle(i);
 		mob.idle(i);
@@ -137,6 +135,7 @@ var mob = {
 		});
 		if (skip) return;
 		TweenMax.delayedCall(.25, function(){
+			console.info('mob.test ', mob.test);
 			mob.test && mob.hit(m.index);
 			//mob.death();
 		})
