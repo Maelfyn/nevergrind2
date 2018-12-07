@@ -17,21 +17,6 @@ var ng = {
 		$("body").on('dragstart', 'img', function(e) {
 			e.preventDefault();
 		});
-		// disable stuff in app to appear more "native"
-		if (!app.isLocal) {
-			document.addEventListener('contextmenu', function (e) {
-				// disable default right-click menu
-				context.hideCheck();
-				e.preventDefault();
-				return false;
-			}, false);
-			window.addEventListener("wheel", function(e){
-				if (e.ctrlKey) {
-					// disable wheel zoom
-					e.preventDefault();
-				}
-			}, false);
-		}
 		$("#enter-world").on(env.click, function(){
 			town.go();
 		});

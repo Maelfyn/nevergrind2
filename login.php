@@ -56,7 +56,6 @@
 		} else {
 			require $_SERVER['DOCUMENT_ROOT'] . "/includes/loginModal.php";
 		}
-		require $_SERVER['DOCUMENT_ROOT'] . "/includes/loginRefer.php";
 	?>
 	</div>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"></script>

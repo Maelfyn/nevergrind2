@@ -111,7 +111,7 @@
 			onSubmit="return createAccount(this);">
 			<fieldset>
 				<div id="createAccountWrap">
-					<a id="createAccount" href="/login.php" class="strongShadow">Return to Login Page</a>
+					<a id="createAccount" href="/" class="strongShadow">Return to Login Page</a>
 				</div>
 				
 				<hr class="fancy-hr">

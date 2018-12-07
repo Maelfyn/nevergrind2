@@ -100,7 +100,7 @@
 		$stmt->execute();
 		$stmt->store_result();
 		if($stmt->num_rows==0){
-			echo "<p>Your token has expired. Tokens are valid for one hour. Reset your password again at <a href='//nevergrind.com/login.php'>Nevergrind</a>.</p>";
+			echo "<p>Your token has expired. Tokens are valid for one hour. Reset your password again at <a href='//nevergrind.com/'>Nevergrind</a>.</p>";
 			$showReset = false;
 			$checkHash = false;
 		} else {
@@ -202,7 +202,7 @@
 					document.getElementById('loginWrap').style.display = 'none';
 					$("#message").html("<p>Your password has been reset!</p>" +
 						"<div><a href='/'>Play Nevergrind</a></div>" +
-						"<div><a href='/games/firmament-wars'>Play Firmament Wars</a></div>");
+						"<div><a href='https://store.steampowered.com/app/849790/Firmament_Wars'>Play Firmament Wars</a></div>");
 				} else {
 					$("#message").html("<p>There was a server error when resetting your password.</p>");
 				}

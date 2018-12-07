@@ -9,11 +9,19 @@ var uglify = require('gulp-uglify'); // Minify JavaScript
 var rename = require('gulp-rename');
 var imagemin = require('imagemin');
 var imageminPngquant = require('imagemin-pngquant');
-var fs = require('fs');
 var imageResize = require('gulp-image-resize');
 
-gulp.task('minify-ng-classic-js', function(){
 // classic NG
+gulp.task('build-ng1', function(){
+	// css minify/rename
+	gulp.src([
+		'./classic/css/nevergrind.css'
+	])
+		.pipe(cleanCSS({compatibility: 'ie8'}))
+		.pipe(rename('nevergrind.min.css'))
+		.pipe(gulp.dest('./classic/css'));
+
+	// javascript minify/concat
 	gulp.src([
 		'./classic/scripts/beginWrap.js',
 		'./classic/scripts/functions4.js',
@@ -35,30 +43,50 @@ gulp.task('minify-ng-classic-js', function(){
 		.pipe(gulp.dest('./classic/scripts'));
 });
 
+var fwJsFiles = [
+	'./games/firmament-wars/js/beginWrap.js',
+	'./games/firmament-wars/js/maps.js',
+	'./games/firmament-wars/js/bible.js',
+	'./games/firmament-wars/js/ui.js',
+	'./games/firmament-wars/js/lang.js',
+	'./games/firmament-wars/js/stats.js',
+	'./games/firmament-wars/js/animate.js',
+	'./games/firmament-wars/js/my.js',
+	'./games/firmament-wars/js/core.js',
+	'./games/firmament-wars/js/game.js',
+	'./games/firmament-wars/js/title.js',
+	'./games/firmament-wars/js/lobby.js',
+	'./games/firmament-wars/js/ws.js',
+	'./games/firmament-wars/js/audio.js',
+	'./games/firmament-wars/js/map.js',
+	'./games/firmament-wars/js/actions.js',
+	'./games/firmament-wars/js/events.js',
+	'./games/firmament-wars/js/ai.js',
+	'./games/firmament-wars/js/endWrap.js'
+];
+
 gulp.task('minify-fw-js', function(){
 // FW
-	gulp.src([
-		'./games/firmament-wars/js/beginWrap.js',
-		'./games/firmament-wars/js/ui.js',
-		'./games/firmament-wars/js/lang.js',
-		'./games/firmament-wars/js/stats.js',
-		'./games/firmament-wars/js/animate.js',
-		'./games/firmament-wars/js/my.js',
-		'./games/firmament-wars/js/core.js',
-		'./games/firmament-wars/js/title.js',
-		'./games/firmament-wars/js/lobby.js',
-		'./games/firmament-wars/js/ws.js',
-		'./games/firmament-wars/js/audio.js',
-		'./games/firmament-wars/js/map.js',
-		'./games/firmament-wars/js/actions.js',
-		'./games/firmament-wars/js/events.js',
-		'./games/firmament-wars/js/ai.js',
-		'./games/firmament-wars/js/endWrap.js'
-	])
+	gulp.src(fwJsFiles)
 		.pipe(concat('firmament-wars.js'))
 		.pipe(gulp.dest('./games/firmament-wars/js'))
 		.pipe(stripDebug())
 		.pipe(uglify())
+		.pipe(rename('firmament-wars.min.js'))
+		.pipe(gulp.dest('./games/firmament-wars/js'));
+});
+
+gulp.task('minify-fw-js-sdk', function(){
+// FW
+	// remove wrapper files for easy debug
+	var files = fwJsFiles;
+	files.shift();
+	files.pop();
+	gulp.src(files)
+		.pipe(concat('firmament-wars.js'))
+		.pipe(gulp.dest('./games/firmament-wars/js'))
+		//.pipe(stripDebug())
+		//.pipe(uglify())
 		.pipe(rename('firmament-wars.min.js'))
 		.pipe(gulp.dest('./games/firmament-wars/js'));
 });
@@ -123,7 +151,7 @@ gulp.task('minify-png', function(){
 
 gulp.task('resize-png', function(){
 	// add minify-png pipe
-	var img = 'dragon-desert';
+	var img = 'toadlok';
 	var promise = new Promise(function(resolve) {
 		gulp.src('./mobs-huge/' + img + '/*')
 			.pipe(imageResize({
@@ -188,13 +216,6 @@ gulp.task('minify-css', function(){
 		.pipe(cleanCSS({compatibility: 'ie8'}))
 		.pipe(rename('ng2.min.css'))
 		.pipe(gulp.dest('./css'));
-
-	gulp.src([
-		'./classic/css/nevergrind.css'
-	])
-		.pipe(cleanCSS({compatibility: 'ie8'}))
-		.pipe(rename('nevergrind.min.css'))
-		.pipe(gulp.dest('./classic/css'));
 
 	gulp.src([
 		'./games/firmament-wars/css/firmament-wars.css'
@@ -272,7 +293,7 @@ gulp.task('build-ng2', [
 
 gulp.task('build-fw-sdk', [
 	'minify-css',
-	'minify-fw-js',
+	'minify-fw-js-sdk',
 	'clean-fw'
 ], function(){
 	// move app files
@@ -292,7 +313,7 @@ gulp.task('build-fw-sdk', [
 			});
 
 	gulp.src([
-		'./games/firmament-wars/lib/*'
+		'./lib/*'
 	]).pipe(gulp.dest('./build-fw/lib'));
 
 	gulp.src([
@@ -310,6 +331,11 @@ gulp.task('build-fw-sdk', [
 	gulp.src([
 		'./games/firmament-wars/js/libs/*',
 	]).pipe(gulp.dest('./build-fw/js/libs'));
+
+	gulp.src([
+		'./games/firmament-wars/js/maps/*',
+	]).pipe(gulp.dest('./build-fw/js/maps'));
+
 	gulp.src([
 		'./games/firmament-wars/js/firmament-wars.min.js'
 	]).pipe(gulp.dest('./build-fw/js'));
@@ -346,7 +372,7 @@ gulp.task('build-fw', [
 			});
 
 	gulp.src([
-		'./games/firmament-wars/lib/*'
+		'./lib/*'
 	]).pipe(gulp.dest('./build-fw/lib'));
 
 	gulp.src([
@@ -366,6 +392,10 @@ gulp.task('build-fw', [
 	]).pipe(gulp.dest('./build-fw/js/libs'));
 
 	gulp.src([
+		'./games/firmament-wars/js/maps/*',
+	]).pipe(gulp.dest('./build-fw/js/maps'));
+
+	gulp.src([
 		'./games/firmament-wars/js/firmament-wars.min.js'
 	]).pipe(gulp.dest('./build-fw/js'));
 
@@ -380,7 +410,6 @@ gulp.task('build-fw', [
 });
 
 gulp.task('rename', function() {
-
 	gulp.src("./build-fw/nw.exe")
 		.pipe(clean())
 		.pipe(rename("firmament-wars.exe"))

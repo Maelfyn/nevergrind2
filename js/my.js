@@ -1,6 +1,7 @@
 
 // player data values
 var my = {
+	lastDifficulty: 'Very Easy',
 	mouse: {
 		x: 0,
 		y: 0

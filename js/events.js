@@ -31,7 +31,7 @@ $(document).on(env.click, function(e){
 	}
 	else {
 		// not local
-		if (code >= 112 && code <= 121 || code === 123) {
+		if (code >= 112 && code <= 121) {
 			// disable all F keys except F11
 			// TODO: Put party targeting in here later
 			return false;

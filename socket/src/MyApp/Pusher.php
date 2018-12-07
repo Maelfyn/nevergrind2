@@ -42,11 +42,7 @@ class Pusher implements WampServerInterface {
         $conn->callError($id, $topic, 'You are not allowed to make calls')->close();
     }
     public function onPublish(ConnectionInterface $conn, $topic, $event, array $exclude, array $eligible){
-		/*if (isset($event['message'])){
-			$event = strip_tags($event['message']);
-		}*/
 		$topic->broadcast($event);
-        // $conn->close();
     }
     public function onError(ConnectionInterface $conn, \Exception $e) {}
 }

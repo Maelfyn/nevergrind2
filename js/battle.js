@@ -19,15 +19,15 @@ var battle = {
 		button.init();
 		// add this to test out mob placement etc;
 		// also required to configure the mobs images array properly
-		//test.battle();
+		test.battle();
 	},
 	html: function(){
 		var s = '<img id="battle-bg" class="img-bg" src="img2/bg/fw2.jpg">',
 			test = '';
 
 		for (var i=0; i<mob.max; i++){
-			test = i === 2 ? "" : " test";
-			// test = '';
+			//test = i === 2 ? "" : " test";
+			test = '';
 			s +=
 			'<div id="mob-center-' +i+ '" class="mob-center"></div>' +
 			'<div id="mob-wrap-' +i+ '" class="mob-wrap' + test +'">' +
@@ -72,8 +72,8 @@ var battle = {
 		var mobKey = '';
 		mob.test = 1;
 		for (var i=0; i<mob.max; i++){
-			mobKey = mob.getRandomMobKey();
-			mobKey = 'dragon-desert';
+			// mobKey = mob.getRandomMobKey();
+			mobKey = 'toadlok';
 			cache.preload.mob(mobKey);
 			mob.setMob(i, mobKey);
 		}
